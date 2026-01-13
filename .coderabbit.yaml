@@ -1,5 +1,14 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: ko-KR
+tone_instructions: |
+  리뷰는 한국어로 작성하며, 중요도를 반드시 명시합니다.
+  중요도 기준: 
+    - [BLOCKER]: 크래시, ANR, 보안, 데이터 무결성 문제 
+    - [MAJOR]: 아키텍처 침범, 테스트 불가 구조, 코루틴/스코프 오용
+    - [MINOR]: 네이밍, 가독성, 컨벤션 
+    - [NIT]: 개인 취향 또는 사소한 제안
+
+  BLOCKER와 MAJOR는 반드시 수정 근거를 포함합니다.
 reviews:
   collapse_walkthrough: false
   changed_files_summary: false
