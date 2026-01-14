@@ -12,3 +12,4 @@ echo "detekt 실행 중..."
 "$ROOT_DIR/Prezel/gradlew" -p "$ROOT_DIR/Prezel" detekt
 
 echo "[pre-push] 완료"
+
