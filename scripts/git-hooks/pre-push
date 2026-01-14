@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+echo ""
+echo "────────── [pre-push] 시작 ───────────"
+echo "ktlintCheck 실행 중..."
+"$ROOT_DIR/Prezel/gradlew" -p "$ROOT_DIR/Prezel" ktlintCheck
+
+echo "detekt 실행 중..."
+"$ROOT_DIR/Prezel/gradlew" -p "$ROOT_DIR/Prezel" detekt
+
+echo "[pre-push] 완료"
