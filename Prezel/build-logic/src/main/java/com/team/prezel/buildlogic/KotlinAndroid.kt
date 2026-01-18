@@ -1,4 +1,4 @@
-package com.team.prezel.buildlogic.convention
+package com.team.prezel.buildlogic
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
@@ -31,9 +31,9 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
 
     extensions.configure<KotlinAndroidProjectExtension> {
         compilerOptions.apply {
-            languageVersion.set(KotlinVersion.KOTLIN_2_3)
+            languageVersion.set(KotlinVersion.KOTLIN_2_1)
             coreLibrariesVersion = "2.3.0"
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.JVM_20)
             allWarningsAsErrors.set(false)
             freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
             freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
@@ -41,7 +41,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
     }
 
     dependencies {
-        "coreLibraryDesugaring"(libs.findLibrary("desugar-jdk-libs").get())
+        "coreLibraryDesugaring"("com.android.tools:desugar_jdk_libs:2.0.3")
     }
 }
 
@@ -56,9 +56,9 @@ internal fun Project.configureKotlinJvm() {
 
     extensions.configure<KotlinJvmProjectExtension> {
         compilerOptions.apply {
-            languageVersion.set(KotlinVersion.KOTLIN_2_3)
+            languageVersion.set(KotlinVersion.KOTLIN_2_1)
             coreLibrariesVersion = "2.3.0"
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.JVM_20)
             allWarningsAsErrors.set(false)
             freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
             freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
