@@ -1,4 +1,4 @@
-package com.team.prezel.ui.theme
+package com.team.prezel.core.designsystem.foundation.typography
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
