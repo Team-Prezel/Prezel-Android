@@ -28,6 +28,7 @@ import com.team.prezel.core.designsystem.foundation.color.ColorTokens
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import java.util.Locale
 
 internal object PrezelColorScheme {
     val Light = PrezelColors(
@@ -105,6 +106,7 @@ internal object PrezelColorScheme {
 
 @ThemePreview
 @Composable
+@Suppress("LongMethod")
 private fun PrezelColorsPreview() {
     val colors: PrezelColors = PrezelTheme.colors
 
@@ -275,7 +277,7 @@ private fun ColorRow(
         )
 
         Text(
-            text = String.format("#%08X", color.toArgb()),
+            text = String.format(Locale.ROOT, "#%08X", color.toArgb()),
             color = textColor.copy(alpha = 0.7f),
         )
     }
