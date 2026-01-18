@@ -106,10 +106,15 @@ internal object PrezelColorScheme {
 
 @ThemePreview
 @Composable
-@Suppress("LongMethod")
-private fun PrezelColorsPreview() {
-    val colors: PrezelColors = PrezelTheme.colors
+private fun PrezelColorSchemePreview() {
+    PrezelTheme {
+        PrezelColorsPreview()
+    }
+}
 
+@Composable
+@Suppress("LongMethod")
+private fun PrezelColorsPreview(colors: PrezelColors = PrezelTheme.colors) {
     Column(
         modifier = Modifier
             .fillMaxSize()
