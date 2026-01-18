@@ -10,8 +10,8 @@ import org.gradle.kotlin.dsl.getByType
 class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            apply(plugin = "com.android.application")
             apply(plugin = "org.jetbrains.kotlin.plugin.compose")
+            apply(plugin = "prezel.android.application")
 
             val extension = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extension)
