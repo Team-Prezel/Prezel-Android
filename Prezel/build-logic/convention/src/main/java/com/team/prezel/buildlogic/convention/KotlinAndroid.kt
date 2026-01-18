@@ -32,7 +32,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
     extensions.configure<KotlinAndroidProjectExtension> {
         compilerOptions.apply {
             languageVersion.set(KotlinVersion.KOTLIN_2_3)
-            coreLibrariesVersion = "2.3.0"
+            coreLibrariesVersion = libs.findVersion("kotlin").get().toString()
             jvmTarget.set(JvmTarget.JVM_21)
             allWarningsAsErrors.set(false)
             freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
@@ -57,7 +57,7 @@ internal fun Project.configureKotlinJvm() {
     extensions.configure<KotlinJvmProjectExtension> {
         compilerOptions.apply {
             languageVersion.set(KotlinVersion.KOTLIN_2_3)
-            coreLibrariesVersion = "2.3.0"
+            coreLibrariesVersion = libs.findVersion("kotlin").get().toString()
             jvmTarget.set(JvmTarget.JVM_21)
             allWarningsAsErrors.set(false)
             freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
