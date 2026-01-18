@@ -13,6 +13,7 @@ android {
 
 dependencies {
     implementation(projects.core.data)
+    implementation(projects.core.designsystem)
 
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
