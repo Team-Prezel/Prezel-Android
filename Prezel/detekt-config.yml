@@ -19,6 +19,11 @@ style:
   ReturnCount:
     active: true
     max: 3
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated:
+      - Preview
+      - ThemePreview
   WildcardImport:
     active: true
 
