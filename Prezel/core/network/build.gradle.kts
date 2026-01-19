@@ -34,18 +34,20 @@ dependencies {
 
 androidComponents {
     onVariants { variant ->
+        val buildConfigFields = variant.buildConfigFields ?: return@onVariants
         val isRelease = variant.buildType == "release"
         // DEBUG_RELEASE_BASE_URL 또는 RELEASE_BASE_URL
         val key = "${variant.buildType!!.uppercase()}_BASE_URL"
 
-        val urlProvider = providers
-            .localProperty(
-                projectDirectory = isolated.rootProject.projectDirectory,
-                key = key,
-                default = if (isRelease) null else "http://10.0.2.2",
-            ).map { it }
+        val urlProvider = if (isRelease) {
+            localProperty(key).map {
+                it.ifEmpty { throw GradleException("$key is required for release builds") }
+            }
+        } else {
+            localProperty(key).orElse("http://10.0.2.2")
+        }
 
-        variant.buildConfigFields!!.put(
+        buildConfigFields.put(
             "BASE_URL",
             urlProvider.map { value ->
                 BuildConfigField("String", """"$value"""", null)
