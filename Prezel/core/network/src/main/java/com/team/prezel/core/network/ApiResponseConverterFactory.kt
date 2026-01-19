@@ -33,8 +33,8 @@ class ApiResponseConverterFactory : Converter.Factory {
     private suspend fun parseSuccess(
         response: HttpResponse,
         bodyTypeInfo: TypeInfo,
-    ): ApiResponse<Any> {
-        return try {
+    ): ApiResponse<Any> =
+        try {
             val body = response.body<Any>(bodyTypeInfo)
             ApiResponse.Success(body)
         } catch (t: Throwable) {
@@ -42,7 +42,6 @@ class ApiResponseConverterFactory : Converter.Factory {
             Timber.e(t, "Response parsing failed")
             ApiResponse.Failure.NetworkError(t)
         }
-    }
 
     private fun mapFailure(t: Throwable): ApiResponse<Any> {
         t.rethrowIfCancellation()
