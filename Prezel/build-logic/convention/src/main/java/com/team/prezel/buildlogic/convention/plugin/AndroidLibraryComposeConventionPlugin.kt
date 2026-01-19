@@ -1,7 +1,7 @@
 package com.team.prezel.buildlogic.convention.plugin
 
 import com.android.build.api.dsl.LibraryExtension
-import com.team.prezel.buildlogic.convention.configureAndroidCompose
+import com.team.prezel.buildlogic.convention.internal.configureAndroidCompose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply

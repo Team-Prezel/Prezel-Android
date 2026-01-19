@@ -1,7 +1,7 @@
 package com.team.prezel.buildlogic.convention.plugin
 
-import com.team.prezel.buildlogic.convention.configureKotlinJvm
-import com.team.prezel.buildlogic.convention.libs
+import com.team.prezel.buildlogic.convention.internal.configureKotlinJvm
+import com.team.prezel.buildlogic.convention.internal.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply

@@ -1,4 +1,4 @@
-package com.team.prezel.buildlogic.convention
+package com.team.prezel.buildlogic.convention.external
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider

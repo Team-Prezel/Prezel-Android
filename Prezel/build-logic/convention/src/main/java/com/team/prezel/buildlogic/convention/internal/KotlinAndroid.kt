@@ -1,4 +1,4 @@
-package com.team.prezel.buildlogic.convention
+package com.team.prezel.buildlogic.convention.internal
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
