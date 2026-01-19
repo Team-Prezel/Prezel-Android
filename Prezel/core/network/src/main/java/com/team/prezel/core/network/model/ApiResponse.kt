@@ -10,6 +10,8 @@ sealed interface ApiResponse<out T> {
             val throwable: Throwable,
         ) : Failure
 
-        data object NetworkError : Failure
+        data class NetworkError(
+            val throwable: Throwable,
+        ) : Failure
     }
 }

@@ -18,6 +18,7 @@ class ApiResponseConverterFactory : Converter.Factory {
         ktorfit: Ktorfit,
     ): Converter.SuspendResponseConverter<HttpResponse, *>? {
         if (typeData.typeInfo.type != ApiResponse::class) return null
+        val bodyTypeInfo = typeData.typeArgs.firstOrNull()?.typeInfo ?: return null
 
         return object : Converter.SuspendResponseConverter<HttpResponse, ApiResponse<Any>> {
             override suspend fun convert(result: KtorfitResult): ApiResponse<Any> =
@@ -25,13 +26,13 @@ class ApiResponseConverterFactory : Converter.Factory {
                     is KtorfitResult.Success -> {
                         try {
                             val body =
-                                result.response.body<Any>(typeData.typeArgs.first().typeInfo)
+                                result.response.body<Any>(bodyTypeInfo)
                             ApiResponse.Success(body)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
                             Timber.e(e, "Response parsing failed: ${e.message}")
-                            ApiResponse.Failure.NetworkError
+                            ApiResponse.Failure.NetworkError(e)
                         }
                     }
 
@@ -43,7 +44,7 @@ class ApiResponseConverterFactory : Converter.Factory {
 
                             is IOException -> {
                                 Timber.e(t, "Network error: ${t.message}")
-                                ApiResponse.Failure.NetworkError
+                                ApiResponse.Failure.NetworkError(t)
                             }
 
                             is ResponseException -> {
@@ -53,7 +54,7 @@ class ApiResponseConverterFactory : Converter.Factory {
 
                             else -> {
                                 Timber.e(t, "Unknown error: ${t.message}")
-                                ApiResponse.Failure.NetworkError
+                                ApiResponse.Failure.NetworkError(t)
                             }
                         }
                     }
