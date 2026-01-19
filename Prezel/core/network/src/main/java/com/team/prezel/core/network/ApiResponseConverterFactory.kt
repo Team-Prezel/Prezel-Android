@@ -8,6 +8,7 @@ import de.jensklingenberg.ktorfit.converter.TypeData
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.HttpResponse
+import timber.log.Timber
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -29,16 +30,31 @@ class ApiResponseConverterFactory : Converter.Factory {
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
+                            Timber.e(e, "Response parsing failed: ${e.message}")
                             ApiResponse.Failure.NetworkError
                         }
                     }
 
                     is KtorfitResult.Failure -> {
                         when (val t = result.throwable) {
-                            is CancellationException -> throw t
-                            is IOException -> ApiResponse.Failure.NetworkError
-                            is ResponseException -> ApiResponse.Failure.HttpError(t)
-                            else -> ApiResponse.Failure.NetworkError
+                            is CancellationException -> {
+                                throw t
+                            }
+
+                            is IOException -> {
+                                Timber.e(t, "Network error: ${t.message}")
+                                ApiResponse.Failure.NetworkError
+                            }
+
+                            is ResponseException -> {
+                                Timber.e(t, "HTTP error ${t.response.status.value}: ${t.message}")
+                                ApiResponse.Failure.HttpError(t)
+                            }
+
+                            else -> {
+                                Timber.e(t, "Unknown error: ${t.message}")
+                                ApiResponse.Failure.NetworkError
+                            }
                         }
                     }
                 }
