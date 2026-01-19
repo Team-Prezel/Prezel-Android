@@ -1,6 +1,5 @@
 import com.android.build.api.variant.BuildConfigField
-import java.io.StringReader
-import java.util.Properties
+import com.team.prezel.buildlogic.convention.localProperty
 
 plugins {
     alias(libs.plugins.prezel.android.library)
@@ -33,22 +32,23 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
-val backendUrl = providers
-    .fileContents(
-        isolated.rootProject.projectDirectory.file("local.properties"),
-    ).asText
-    .map { text: String ->
-        val properties = Properties()
-        properties.load(StringReader(text))
-        properties.getProperty("BASE_URL")
-    }.orElse("http://example.com")
-
 androidComponents {
-    onVariants {
-        it.buildConfigFields!!.put(
+    onVariants { variant ->
+        val isRelease = variant.buildType == "release"
+        // DEBUG_RELEASE_BASE_URL 또는 RELEASE_BASE_URL
+        val key = "${variant.buildType!!.uppercase()}_BASE_URL"
+
+        val urlProvider = providers
+            .localProperty(
+                projectDirectory = isolated.rootProject.projectDirectory,
+                key = key,
+                default = if (isRelease) null else "http://10.0.2.2",
+            ).map { it }
+
+        variant.buildConfigFields!!.put(
             "BASE_URL",
-            backendUrl.map { value ->
-                BuildConfigField(type = "String", value = """"$value"""", comment = null)
+            urlProvider.map { value ->
+                BuildConfigField("String", """"$value"""", null)
             },
         )
     }
