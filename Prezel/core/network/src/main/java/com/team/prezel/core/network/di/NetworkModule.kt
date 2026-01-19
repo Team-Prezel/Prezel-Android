@@ -31,7 +31,7 @@ object NetworkModule {
             ignoreUnknownKeys = true
             coerceInputValues = true
             encodeDefaults = true
-            prettyPrint = BuildConfig.DEBUG
+            prettyPrint = false
         }
 
     @Provides
