@@ -9,5 +9,7 @@ android {
 }
 
 dependencies {
-    // api(projects.core.network)
+    implementation(projects.core.network)
+
+    implementation(libs.kotlinx.coroutines.core)
 }

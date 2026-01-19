@@ -5,6 +5,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.prezel.android.library)
     alias(libs.plugins.prezel.hilt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -22,6 +23,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.timber)
 
     // Ktorfit
     implementation(libs.ktorfit.lib)
@@ -37,13 +40,13 @@ val backendUrl = providers
     .map { text: String ->
         val properties = Properties()
         properties.load(StringReader(text))
-        properties.getProperty("BACKEND_URL")
+        properties.getProperty("BASE_URL")
     }.orElse("http://example.com")
 
 androidComponents {
     onVariants {
         it.buildConfigFields!!.put(
-            "BACKEND_URL",
+            "BASE_URL",
             backendUrl.map { value ->
                 BuildConfigField(type = "String", value = """"$value"""", comment = null)
             },

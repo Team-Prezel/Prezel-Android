@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.di
 
+import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -11,11 +12,13 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
@@ -40,11 +43,15 @@ object NetworkModule {
             }
 
             install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Timber.tag("KtorClient").d(message)
+                    }
+                }
                 level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
             }
 
             defaultRequest {
-                url(BuildConfig.BACKEND_URL)
                 contentType(ContentType.Application.Json)
             }
         }
@@ -54,6 +61,8 @@ object NetworkModule {
     fun provideKtorfit(httpClient: HttpClient): Ktorfit =
         Ktorfit
             .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
             .httpClient(httpClient)
+            .converterFactories(ApiResponseConverterFactory())
             .build()
 }
