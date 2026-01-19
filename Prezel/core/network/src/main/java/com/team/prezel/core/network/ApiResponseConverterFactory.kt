@@ -6,9 +6,10 @@ import de.jensklingenberg.ktorfit.converter.Converter
 import de.jensklingenberg.ktorfit.converter.KtorfitResult
 import de.jensklingenberg.ktorfit.converter.TypeData
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.isSuccess
 import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class ApiResponseConverterFactory : Converter.Factory {
     override fun suspendResponseConverter(
@@ -21,33 +22,23 @@ class ApiResponseConverterFactory : Converter.Factory {
             override suspend fun convert(result: KtorfitResult): ApiResponse<Any> =
                 when (result) {
                     is KtorfitResult.Success -> {
-                        val response = result.response
                         try {
-                            if (response.status.isSuccess()) {
-                                val body = response.body<Any>(typeData.typeArgs.first().typeInfo)
-                                ApiResponse.Success(body)
-                            } else {
-                                ApiResponse.Error(
-                                    code = response.status.value,
-                                    message = response.status.description,
-                                )
-                            }
+                            val body =
+                                result.response.body<Any>(typeData.typeArgs.first().typeInfo)
+                            ApiResponse.Success(body)
+                        } catch (e: CancellationException) {
+                            throw e
                         } catch (e: Exception) {
-                            ApiResponse.Error(
-                                code = response.status.value,
-                                message = e.message ?: "Unknown error",
-                            )
+                            ApiResponse.Failure.NetworkError
                         }
                     }
 
                     is KtorfitResult.Failure -> {
-                        when (result.throwable) {
-                            is IOException -> ApiResponse.NetworkError
-
-                            else -> ApiResponse.Error(
-                                code = -1,
-                                message = result.throwable.message ?: "Unknown error",
-                            )
+                        when (val t = result.throwable) {
+                            is CancellationException -> throw t
+                            is IOException -> ApiResponse.Failure.NetworkError
+                            is ResponseException -> ApiResponse.Failure.HttpError(t)
+                            else -> ApiResponse.Failure.NetworkError
                         }
                     }
                 }

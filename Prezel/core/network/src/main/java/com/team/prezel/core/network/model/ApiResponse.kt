@@ -5,10 +5,11 @@ sealed interface ApiResponse<out T> {
         val data: T,
     ) : ApiResponse<T>
 
-    data class Error(
-        val code: Int,
-        val message: String,
-    ) : ApiResponse<Nothing>
+    sealed interface Failure : ApiResponse<Nothing> {
+        data class HttpError(
+            val throwable: Throwable,
+        ) : Failure
 
-    data object NetworkError : ApiResponse<Nothing>
+        data object NetworkError : Failure
+    }
 }
