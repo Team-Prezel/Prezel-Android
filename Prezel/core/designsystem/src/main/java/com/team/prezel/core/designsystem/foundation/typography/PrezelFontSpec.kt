@@ -36,14 +36,23 @@ enum class PrezelFontSize(
 }
 
 enum class PrezelFontLineHeight(
-    val value: TextUnit,
+    val value: Dp,
 ) {
-    V_100(16.sp),
-    V_150(18.sp),
-    V_200(20.sp),
-    V_300(24.sp),
-    V_400(28.sp),
-    V_500(32.sp),
+    V_100(16.dp),
+    V_150(18.dp),
+    V_200(20.dp),
+    V_300(24.dp),
+    V_400(28.dp),
+    V_500(32.dp),
+    ;
+
+    @Composable
+    fun sp(): TextUnit {
+        val density = LocalDensity.current
+        return with(density) {
+            (value.toPx() / fontScale).sp
+        }
+    }
 }
 
 enum class PrezelFontLetterSpacing(

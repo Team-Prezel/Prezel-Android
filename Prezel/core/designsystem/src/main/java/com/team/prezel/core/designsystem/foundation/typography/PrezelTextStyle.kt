@@ -16,7 +16,7 @@ data class PrezelTextStyle(
         return TextStyle(
             fontWeight = fontWeight.value,
             fontSize = size,
-            lineHeight = lineHeight.value,
+            lineHeight = lineHeight.sp(),
             letterSpacing = letterSpacing.multiply(size),
         )
     }
