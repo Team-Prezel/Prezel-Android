@@ -1,7 +1,5 @@
 package com.team.prezel.core.designsystem.foundation.typography
 
-import PrezelTextStyle
-
 internal object PrezelTextStyles {
     val Title1Medium: PrezelTextStyle = PrezelTextStyle(
         fontWeight = PrezelFontWeight.MEDIUM,
