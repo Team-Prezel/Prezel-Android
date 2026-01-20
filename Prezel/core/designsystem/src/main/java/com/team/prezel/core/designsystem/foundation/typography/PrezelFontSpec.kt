@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.em
 
 enum class PrezelFontWeight(
     val value: FontWeight,
@@ -26,13 +26,9 @@ enum class PrezelFontSize(
     V_500(24.dp),
     ;
 
-    @Composable
-    fun sp(): TextUnit {
-        val density = LocalDensity.current
-        return with(density) {
-            (value.toPx() / fontScale).sp
-        }
-    }
+    val sp: TextUnit
+        @Composable
+        get() = with(LocalDensity.current) { value.toSp() }
 }
 
 enum class PrezelFontLineHeight(
@@ -46,24 +42,17 @@ enum class PrezelFontLineHeight(
     V_500(32.dp),
     ;
 
-    @Composable
-    fun sp(): TextUnit {
-        val density = LocalDensity.current
-        return with(density) {
-            (value.toPx() / fontScale).sp
-        }
-    }
+    val sp: TextUnit
+        @Composable
+        get() = with(LocalDensity.current) { value.toSp() }
 }
 
 enum class PrezelFontLetterSpacing(
-    val value: Float,
+    val value: TextUnit,
 ) {
-    V_100(1.2f),
-    V_200(0.8f),
-    V_300(0.6f),
-    V_400(-1.2f),
-    V_500(-1.8f),
-    ;
-
-    fun multiply(fontSize: TextUnit): TextUnit = fontSize * value
+    V_100(0.012.em),
+    V_200(0.008.em),
+    V_300(0.006.em),
+    V_400((-0.012).em),
+    V_500((-0.018).em),
 }

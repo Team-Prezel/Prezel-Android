@@ -10,14 +10,11 @@ data class PrezelTextStyle(
     val letterSpacing: PrezelFontLetterSpacing,
 ) {
     @Composable
-    fun toTextStyle(): TextStyle {
-        val size = fontSize.sp()
-
-        return TextStyle(
+    fun toTextStyle(): TextStyle =
+        TextStyle(
             fontWeight = fontWeight.value,
-            fontSize = size,
-            lineHeight = lineHeight.sp(),
-            letterSpacing = letterSpacing.multiply(size),
+            fontSize = fontSize.sp,
+            lineHeight = lineHeight.sp,
+            letterSpacing = letterSpacing.value,
         )
-    }
 }
