@@ -33,12 +33,15 @@ dependencies {
 
 androidComponents {
     onVariants { variant ->
+        val buildType = variant.buildType ?: return@onVariants
         val buildConfigFields = variant.buildConfigFields ?: return@onVariants
+        val baseUrlKey = "${buildType.uppercase()}_BASE_URL"
 
-        val baseUrlKey = "${variant.buildType?.uppercase()}_BASE_URL"
         buildConfigFields.put(
             "BASE_URL",
-            BuildConfigField("String", "\"${localProperty(baseUrlKey)}\"", null),
+            localProperty(baseUrlKey).map { value ->
+                BuildConfigField("String", "\"$value\"", null)
+            },
         )
     }
 }
