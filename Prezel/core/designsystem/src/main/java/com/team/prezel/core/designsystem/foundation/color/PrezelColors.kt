@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.theme
+package com.team.prezel.core.designsystem.foundation.color
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
