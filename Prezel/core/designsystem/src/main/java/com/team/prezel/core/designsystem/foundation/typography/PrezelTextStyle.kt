@@ -12,6 +12,7 @@ data class PrezelTextStyle(
     @Composable
     fun toTextStyle(): TextStyle =
         TextStyle(
+            fontFamily = SuitFamily,
             fontWeight = fontWeight.value,
             fontSize = fontSize.sp,
             lineHeight = lineHeight.sp,
