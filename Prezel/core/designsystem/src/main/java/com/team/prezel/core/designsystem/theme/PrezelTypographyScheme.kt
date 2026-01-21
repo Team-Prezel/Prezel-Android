@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
+import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -47,60 +46,86 @@ internal object PrezelTypographyScheme {
 
 @Preview(
     showBackground = true,
-    device = "spec:width=800dp,height=1900dp",
+    device = "spec:width=800dp,height=600dp",
     fontScale = 10f,
 )
 @Composable
-private fun PrezelTypographySchemePreview() {
+private fun PrezelTypographyTitlePreview() {
     PrezelTheme {
-        PrezelTypographyPreviewContent()
+        PrezelTypographyPreviewContent(
+            title = "Title",
+            items = persistentListOf(
+                "Title1 Medium" to PrezelTheme.typography.title1Medium,
+                "Title1 Bold" to PrezelTheme.typography.title1Bold,
+                "Title2 Medium" to PrezelTheme.typography.title2Medium,
+                "Title2 Bold" to PrezelTheme.typography.title2Bold,
+            ),
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=800dp,height=1000dp",
+    fontScale = 10f,
+)
+@Composable
+private fun PrezelTypographyBodyPreview() {
+    PrezelTheme {
+        PrezelTypographyPreviewContent(
+            title = "Body",
+            items = persistentListOf(
+                "Body1 Regular" to PrezelTheme.typography.body1Regular,
+                "Body1 Medium" to PrezelTheme.typography.body1Medium,
+                "Body1 Bold" to PrezelTheme.typography.body1Bold,
+                "Body2 Regular" to PrezelTheme.typography.body2Regular,
+                "Body2 Medium" to PrezelTheme.typography.body2Medium,
+                "Body2 Bold" to PrezelTheme.typography.body2Bold,
+                "Body3 Regular" to PrezelTheme.typography.body3Regular,
+                "Body3 Medium" to PrezelTheme.typography.body3Medium,
+                "Body3 Bold" to PrezelTheme.typography.body3Bold,
+            ),
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=800dp,height=600dp",
+    fontScale = 10f,
+)
+@Composable
+private fun PrezelTypographyCaptionPreview() {
+    PrezelTheme {
+        PrezelTypographyPreviewContent(
+            title = "Caption",
+            items = persistentListOf(
+                "Caption1 Regular" to PrezelTheme.typography.caption1Regular,
+                "Caption1 Medium" to PrezelTheme.typography.caption1Medium,
+                "Caption2 Regular" to PrezelTheme.typography.caption2Regular,
+                "Caption2 Medium" to PrezelTheme.typography.caption2Medium,
+            ),
+        )
     }
 }
 
 @Composable
 private fun PrezelTypographyPreviewContent(
-    typography: PrezelTypography = PrezelTheme.typography,
-    items: ImmutableList<Triple<String, String, TextStyle>> = persistentListOf(
-        Triple("Title", "Title1 Medium", typography.title1Medium),
-        Triple("Title", "Title1 Bold", typography.title1Bold),
-        Triple("Title", "Title2 Medium", typography.title2Medium),
-        Triple("Title", "Title2 Bold", typography.title2Bold),
-        Triple("Body", "Body1 Regular", typography.body1Regular),
-        Triple("Body", "Body1 Medium", typography.body1Medium),
-        Triple("Body", "Body1 Bold", typography.body1Bold),
-        Triple("Body", "Body2 Regular", typography.body2Regular),
-        Triple("Body", "Body2 Medium", typography.body2Medium),
-        Triple("Body", "Body2 Bold", typography.body2Bold),
-        Triple("Body", "Body3 Regular", typography.body3Regular),
-        Triple("Body", "Body3 Medium", typography.body3Medium),
-        Triple("Body", "Body3 Bold", typography.body3Bold),
-        Triple("Caption", "Caption1 Regular", typography.caption1Regular),
-        Triple("Caption", "Caption1 Medium", typography.caption1Medium),
-        Triple("Caption", "Caption2 Regular", typography.caption2Regular),
-        Triple("Caption", "Caption2 Medium", typography.caption2Medium),
-    ),
+    title: String,
+    items: ImmutableList<Pair<String, TextStyle>>,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PrezelTheme.colors.bgRegular)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        items
-            .groupBy { it.first }
-            .forEach { (group, groupedItems) ->
-                HorizontalDivider()
-                Text(text = group, style = typography.title1Bold)
-                HorizontalDivider()
+    PreviewScaffold {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            HorizontalDivider()
+            Text(text = title, style = PrezelTheme.typography.title1Bold)
+            HorizontalDivider()
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    groupedItems.forEach { item ->
-                        TypographyRow(name = item.second, style = item.third)
-                    }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items.forEach { (name, style) ->
+                    TypographyRow(name = name, style = style)
                 }
             }
+        }
     }
 }
 

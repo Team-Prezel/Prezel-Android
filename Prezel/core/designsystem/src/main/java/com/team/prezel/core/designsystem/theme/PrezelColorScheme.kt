@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.team.prezel.core.designsystem.foundation.color.ColorTokens
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
+import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -109,152 +106,164 @@ internal object PrezelColorScheme {
 
 @ThemePreview
 @Composable
-private fun PrezelColorSchemePreview() {
+private fun PrezelColorSchemeInteractivePreview() {
     PrezelTheme {
-        PrezelColorsPreview()
-    }
-}
-
-@Composable
-@Suppress("LongMethod")
-private fun PrezelColorsPreview(colors: PrezelColors = PrezelTheme.colors) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colors.bgRegular)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        ColorSection(
+        PrezelColorsPreviewSection(
             title = "Interactive",
             description = "브랜드 색으로 활성화 상태 및 강조가 필요한 요소에 사용하는 색상입니다.",
             items = persistentListOf(
-                "XSmall" to colors.interactiveXSmall,
-                "Small" to colors.interactiveSmall,
-                "Regular" to colors.interactiveRegular,
+                "XSmall" to PrezelTheme.colors.interactiveXSmall,
+                "Small" to PrezelTheme.colors.interactiveSmall,
+                "Regular" to PrezelTheme.colors.interactiveRegular,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeBackgroundPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Background",
             description = "콘텐츠의 구조와 계층을 구분하는 색상입니다.",
             items = persistentListOf(
-                "Regular" to colors.bgRegular,
-                "Medium" to colors.bgMedium,
-                "Large" to colors.bgLarge,
-                "Scrim" to colors.bgScrim,
-                "Disabled" to colors.bgDisabled,
+                "Regular" to PrezelTheme.colors.bgRegular,
+                "Medium" to PrezelTheme.colors.bgMedium,
+                "Large" to PrezelTheme.colors.bgLarge,
+                "Scrim" to PrezelTheme.colors.bgScrim,
+                "Disabled" to PrezelTheme.colors.bgDisabled,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeTextPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Text",
             description = "정보와 콘텐츠를 명확하게 전달하기 위해 사용하는 색상입니다.",
             items = persistentListOf(
-                "Small" to colors.textSmall,
-                "Regular" to colors.textRegular,
-                "Medium" to colors.textMedium,
-                "Large" to colors.textLarge,
-                "Disabled" to colors.textDisabled,
+                "Small" to PrezelTheme.colors.textSmall,
+                "Regular" to PrezelTheme.colors.textRegular,
+                "Medium" to PrezelTheme.colors.textMedium,
+                "Large" to PrezelTheme.colors.textLarge,
+                "Disabled" to PrezelTheme.colors.textDisabled,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeIconPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Icon",
             description = "기능적 액션과 시각적 커뮤니케이션을 돕기 위해 사용하는 색상입니다.",
             items = persistentListOf(
-                "Regular" to colors.iconRegular,
-                "Medium" to colors.iconMedium,
-                "Disabled" to colors.iconDisabled,
+                "Regular" to PrezelTheme.colors.iconRegular,
+                "Medium" to PrezelTheme.colors.iconMedium,
+                "Disabled" to PrezelTheme.colors.iconDisabled,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeBorderPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Border",
             description = "콘텐츠의 영역과 구조를 구분하는 색상입니다.",
             items = persistentListOf(
-                "Small" to colors.borderSmall,
-                "Regular" to colors.borderRegular,
-                "Medium" to colors.borderMedium,
-                "Large" to colors.borderLarge,
-                "Disabled" to colors.borderDisabled,
+                "Small" to PrezelTheme.colors.borderSmall,
+                "Regular" to PrezelTheme.colors.borderRegular,
+                "Medium" to PrezelTheme.colors.borderMedium,
+                "Large" to PrezelTheme.colors.borderLarge,
+                "Disabled" to PrezelTheme.colors.borderDisabled,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeFeedbackPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Feedback",
             description = "성공, 오류, 경고 상황을 명확하게 전달하기 위해 의미별로 정의된 색상입니다.",
             items = persistentListOf(
-                "GoodSmall" to colors.feedbackGoodSmall,
-                "GoodRegular" to colors.feedbackGoodRegular,
-                "BadSmall" to colors.feedbackBadSmall,
-                "BadRegular" to colors.feedbackBadRegular,
-                "WarningSmall" to colors.feedbackWarningSmall,
-                "WarningRegular" to colors.feedbackWarningRegular,
+                "GoodSmall" to PrezelTheme.colors.feedbackGoodSmall,
+                "GoodRegular" to PrezelTheme.colors.feedbackGoodRegular,
+                "BadSmall" to PrezelTheme.colors.feedbackBadSmall,
+                "BadRegular" to PrezelTheme.colors.feedbackBadRegular,
+                "WarningSmall" to PrezelTheme.colors.feedbackWarningSmall,
+                "WarningRegular" to PrezelTheme.colors.feedbackWarningRegular,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeAccentPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Accent",
             description = "콘텐츠의 주목성과 인지도를 높이기 위해 버튼, 액션, 강조 요소 등에 사용되는 포인트 색상입니다.",
             items = persistentListOf(
-                "PurpleSmall" to colors.accentPurpleSmall,
-                "PurpleRegular" to colors.accentPurpleRegular,
-                "MagentaSmall" to colors.accentMagentaSmall,
-                "MagentaRegular" to colors.accentMagentaRegular,
+                "PurpleSmall" to PrezelTheme.colors.accentPurpleSmall,
+                "PurpleRegular" to PrezelTheme.colors.accentPurpleRegular,
+                "MagentaSmall" to PrezelTheme.colors.accentMagentaSmall,
+                "MagentaRegular" to PrezelTheme.colors.accentMagentaRegular,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
+    }
+}
 
-        ColorSection(
+@ThemePreview
+@Composable
+private fun PrezelColorSchemeSolidPreview() {
+    PrezelTheme {
+        PrezelColorsPreviewSection(
             title = "Solid",
             description = "흰색과 검정색을 제공하여 시각적 대비, 보조, 구분 등에 활용되는 절대값 색상입니다.",
             items = persistentListOf(
-                "White" to colors.solidWhite,
-                "Black" to colors.solidBlack,
+                "White" to PrezelTheme.colors.solidWhite,
+                "Black" to PrezelTheme.colors.solidBlack,
             ),
-            dividerColor = colors.borderRegular,
-            textColor = colors.textLarge,
         )
     }
 }
 
 @Composable
-private fun ColorSection(
+private fun PrezelColorsPreviewSection(
     title: String,
     description: String,
     items: ImmutableList<Pair<String, Color>>,
-    dividerColor: Color,
-    textColor: Color,
+    colors: PrezelColors = PrezelTheme.colors,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        HorizontalDivider(color = dividerColor)
+    PreviewScaffold {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            HorizontalDivider(color = colors.borderRegular)
 
-        Text(text = title, color = textColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = title, color = colors.textLarge, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-        Text(text = description, color = textColor.copy(alpha = 0.7f))
+            Text(text = description, color = colors.textLarge.copy(alpha = 0.7f))
 
-        HorizontalDivider(color = dividerColor)
+            HorizontalDivider(color = colors.borderRegular)
 
-        items.forEach { (name, color) ->
-            ColorRow(color = color, name = name, textColor = textColor)
+            items.forEach { (name, color) ->
+                ColorRow(color = color, name = name, textColor = colors.textLarge)
+            }
         }
     }
 }
