@@ -1,0 +1,96 @@
+package com.team.prezel.core.designsystem.preview
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlinx.collections.immutable.ImmutableList
+
+@Composable
+internal fun PreviewScaffold(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PrezelTheme.colors.bgRegular)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        content()
+    }
+}
+
+@Composable
+internal fun SectionTitle(title: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = title, style = PrezelTheme.typography.title2Bold, color = PrezelTheme.colors.textLarge)
+        HorizontalDivider(color = PrezelTheme.colors.borderRegular)
+    }
+}
+
+@Composable
+internal fun TokenList(
+    items: ImmutableList<Pair<String, Dp>>,
+    preview: @Composable (Dp) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        items.forEach { (name, value) ->
+            TokenRow(
+                name = name,
+                valueLabel = "${value.value}dp",
+                preview = { preview(value) },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun TokenRow(
+    name: String,
+    valueLabel: String,
+    preview: @Composable () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = name,
+            style = PrezelTheme.typography.body3Medium,
+            color = PrezelTheme.colors.textMedium,
+            modifier = Modifier.width(48.dp),
+        )
+        Text(
+            text = valueLabel,
+            style = PrezelTheme.typography.body3Regular,
+            color = PrezelTheme.colors.textSmall,
+            modifier = Modifier.width(64.dp),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier = Modifier
+                .background(Color.Transparent)
+                .padding(4.dp),
+        ) {
+            preview()
+        }
+    }
+}
