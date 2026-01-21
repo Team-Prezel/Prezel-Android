@@ -19,11 +19,11 @@ enum class PrezelFontWeight(
 enum class PrezelFontSize(
     private val value: Dp,
 ) {
-    V_100(12.dp),
-    V_200(14.dp),
-    V_300(16.dp),
-    V_400(20.dp),
-    V_500(24.dp),
+    V100(12.dp),
+    V200(14.dp),
+    V300(16.dp),
+    V400(20.dp),
+    V500(24.dp),
     ;
 
     val sp: TextUnit
@@ -34,12 +34,12 @@ enum class PrezelFontSize(
 enum class PrezelFontLineHeight(
     val value: Dp,
 ) {
-    V_100(16.dp),
-    V_150(18.dp),
-    V_200(20.dp),
-    V_300(24.dp),
-    V_400(28.dp),
-    V_500(32.dp),
+    V100(16.dp),
+    V150(18.dp),
+    V200(20.dp),
+    V300(24.dp),
+    V400(28.dp),
+    V500(32.dp),
     ;
 
     val sp: TextUnit
@@ -50,9 +50,9 @@ enum class PrezelFontLineHeight(
 enum class PrezelFontLetterSpacing(
     val value: TextUnit,
 ) {
-    V_100(0.012.em),
-    V_200(0.008.em),
-    V_300(0.006.em),
-    V_400((-0.012).em),
-    V_500((-0.018).em),
+    V100(0.012.em),
+    V200(0.008.em),
+    V300(0.006.em),
+    V400((-0.012).em),
+    V500((-0.018).em),
 }
