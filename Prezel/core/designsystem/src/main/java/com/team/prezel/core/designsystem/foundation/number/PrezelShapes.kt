@@ -16,6 +16,8 @@ import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.preview.TokenRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 object PrezelShapes {
     val V2 = RoundedCornerShape(PrezelRadius.V2)
@@ -41,7 +43,7 @@ private fun ShapesTokensPreview() {
 private fun ShapesSection() {
     SectionTitle(title = "Shapes")
     ShapeList(
-        items = listOf(
+        items = persistentListOf(
             "V2" to PrezelShapes.V2,
             "V4" to PrezelShapes.V4,
             "V6" to PrezelShapes.V6,
@@ -54,7 +56,7 @@ private fun ShapesSection() {
 }
 
 @Composable
-private fun ShapeList(items: List<Pair<String, androidx.compose.foundation.shape.RoundedCornerShape>>) {
+private fun ShapeList(items: ImmutableList<Pair<String, RoundedCornerShape>>) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.forEach { (name, shape) ->
             TokenRow(
