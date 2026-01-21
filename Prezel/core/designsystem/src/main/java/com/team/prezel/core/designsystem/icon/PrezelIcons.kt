@@ -2,7 +2,6 @@ package com.team.prezel.core.designsystem.icon
 
 import com.team.prezel.core.designsystem.R
 
-// Prezel icons. Material icons are [ImageVector]s, custom icons are drawable resource IDs.
 object PrezelIcons {
     val ArrowLeft = R.drawable.ic_arrow_left
     val Balloon = R.drawable.ic_balloon
