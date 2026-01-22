@@ -1,17 +1,24 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -24,37 +31,34 @@ fun PrezelTopAppBar(
     title: @Composable () -> Unit = {},
     leadingIcon: @Composable () -> Unit = {},
     trailingIcons: @Composable RowScope.() -> Unit = {},
-    isScrolled: Boolean = false,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     TopAppBar(
-        title = title,
+        title = {
+            ProvideTextStyle(PrezelTextStyles.Body2Bold.toTextStyle()) {
+                title()
+            }
+        },
         navigationIcon = leadingIcon,
         actions = trailingIcons,
-        colors = if (isScrolled) {
-            PrezelTopAppBarDefaults.scrolledColors()
-        } else {
-            PrezelTopAppBarDefaults.colors()
-        },
+        colors = prezelTopAppBarColors(),
+        scrollBehavior = scrollBehavior,
         modifier = modifier.testTag("PrezelTopAppBar"),
     )
 }
 
-object PrezelTopAppBarDefaults {
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun colors() =
-        TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-        )
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun prezelTopAppBarColors() =
+    TopAppBarDefaults.topAppBarColors(
+        containerColor = Color.Transparent,
+        scrolledContainerColor = PrezelTheme.colors.bgRegular,
+        navigationIconContentColor = PrezelTheme.colors.iconRegular,
+        titleContentColor = PrezelTheme.colors.textLarge,
+        actionIconContentColor = PrezelTheme.colors.iconRegular,
+    )
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun scrolledColors() =
-        TopAppBarDefaults.topAppBarColors(
-            containerColor = PrezelTheme.colors.bgRegular,
-        )
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @ThemePreview
 @Composable
 private fun PrezelTopAppBarTitleOnlyPreview() {
@@ -70,6 +74,7 @@ private fun PrezelTopAppBarTitleOnlyPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ThemePreview
 @Composable
 private fun PrezelTopAppBarWithLeadingPreview() {
@@ -94,6 +99,7 @@ private fun PrezelTopAppBarWithLeadingPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ThemePreview
 @Composable
 private fun PrezelTopAppBarWithAllIconsPreview() {
@@ -134,27 +140,40 @@ private fun PrezelTopAppBarWithAllIconsPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ThemePreview
 @Composable
-private fun PrezelTopAppBarScrolledPreview() {
+private fun PrezelTopAppBarScrollTestPreview() {
     PrezelTheme {
-        PrezelTopAppBar(
-            title = {
-                Text(
-                    text = "제목",
-                    style = PrezelTextStyles.Body2Bold.toTextStyle(),
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                PrezelTopAppBar(
+                    title = { Text("제목") },
+                    leadingIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                painter = painterResource(PrezelIcons.Blank),
+                                contentDescription = "뒤로가기",
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
                 )
             },
-            leadingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Blank),
-                        contentDescription = "뒤로가기",
-                        tint = PrezelTheme.colors.iconRegular,
+        ) { innerPadding ->
+            LazyColumn(
+                modifier = Modifier.padding(innerPadding),
+            ) {
+                items(30) { index ->
+                    Text(
+                        text = "Item $index",
+                        modifier = Modifier.padding(16.dp),
                     )
                 }
-            },
-            isScrolled = true,
-        )
+            }
+        }
     }
 }
