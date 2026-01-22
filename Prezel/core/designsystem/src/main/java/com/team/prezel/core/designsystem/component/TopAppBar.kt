@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -19,7 +21,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -63,14 +64,9 @@ private fun prezelTopAppBarColors() =
 @Composable
 private fun PrezelTopAppBarTitleOnlyPreview() {
     PrezelTheme {
-        PrezelTopAppBar(
-            title = {
-                Text(
-                    text = "제목",
-                    style = PrezelTextStyles.Body2Bold.toTextStyle(),
-                )
-            },
-        )
+        Surface(color = PrezelTheme.colors.bgRegular) {
+            PrezelTopAppBar(title = { Text(text = "제목") })
+        }
     }
 }
 
@@ -79,23 +75,19 @@ private fun PrezelTopAppBarTitleOnlyPreview() {
 @Composable
 private fun PrezelTopAppBarWithLeadingPreview() {
     PrezelTheme {
-        PrezelTopAppBar(
-            title = {
-                Text(
-                    text = "제목",
-                    style = PrezelTextStyles.Body2Bold.toTextStyle(),
-                )
-            },
-            leadingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Blank),
-                        contentDescription = "뒤로가기",
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
-            },
-        )
+        Surface(color = PrezelTheme.colors.bgRegular) {
+            PrezelTopAppBar(
+                title = { Text(text = "제목") },
+                leadingIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(PrezelIcons.Blank),
+                            contentDescription = "뒤로가기",
+                        )
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -104,39 +96,33 @@ private fun PrezelTopAppBarWithLeadingPreview() {
 @Composable
 private fun PrezelTopAppBarWithAllIconsPreview() {
     PrezelTheme {
-        PrezelTopAppBar(
-            title = {
-                Text(
-                    text = "제목",
-                    style = PrezelTextStyles.Body2Bold.toTextStyle(),
-                )
-            },
-            leadingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Blank),
-                        contentDescription = "뒤로가기",
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
-            },
-            trailingIcons = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Blank),
-                        contentDescription = "검색",
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Blank),
-                        contentDescription = "더보기",
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
-            },
-        )
+        Surface(color = PrezelTheme.colors.bgRegular) {
+            PrezelTopAppBar(
+                title = { Text(text = "제목") },
+                leadingIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(PrezelIcons.Blank),
+                            contentDescription = "뒤로가기",
+                        )
+                    }
+                },
+                trailingIcons = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(PrezelIcons.Blank),
+                            contentDescription = "검색",
+                        )
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painter = painterResource(PrezelIcons.Blank),
+                            contentDescription = "더보기",
+                        )
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -149,6 +135,7 @@ private fun PrezelTopAppBarScrollTestPreview() {
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            containerColor = PrezelTheme.colors.bgRegular,
             topBar = {
                 PrezelTopAppBar(
                     title = { Text("제목") },
@@ -165,14 +152,12 @@ private fun PrezelTopAppBarScrollTestPreview() {
             },
         ) { innerPadding ->
             LazyColumn(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                items(30) { index ->
-                    Text(
-                        text = "Item $index",
-                        modifier = Modifier.padding(16.dp),
-                    )
-                }
+                items(30) { index -> Text(text = "Item $index") }
             }
         }
     }
