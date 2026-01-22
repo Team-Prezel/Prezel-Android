@@ -3,7 +3,9 @@ package com.team.prezel.core.designsystem.component.button
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
@@ -48,12 +50,15 @@ fun PrezelButton(
             LocalContentColor provides prezelButtonContentColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
         ) {
             Row(
-                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize)),
+                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, onlyIcon = text == null && icon != null)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 PrezelButtonIcon(icon = icon, size = buttonSize)
-                text?.let { Text(text = it) }
+                text?.let {
+                    Spacer(modifier = Modifier.width(if (buttonSize == PrezelButtonSize.REGULAR) PrezelTheme.spacing.V8 else PrezelTheme.spacing.V4))
+                    Text(text = it)
+                }
             }
         }
     }
