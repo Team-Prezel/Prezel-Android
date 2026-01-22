@@ -94,22 +94,20 @@ private fun PrezelButtonPreviewHierarchyBlock(
     content: PrezelButtonPreviewContent,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    Row(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PreviewSizes.forEach { size ->
-                content(
-                    PrezelButtonStyle(
-                        buttonType = type,
-                        buttonHierarchy = hierarchy,
-                        buttonSize = size,
-                        isRounded = isRounded,
-                    ),
-                    enabled,
-                )
-            }
+        PreviewSizes.forEach { size ->
+            content(
+                PrezelButtonStyle(
+                    buttonType = type,
+                    buttonHierarchy = hierarchy,
+                    buttonSize = size,
+                    isRounded = isRounded,
+                ),
+                enabled,
+            )
         }
     }
 }
