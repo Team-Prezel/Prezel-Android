@@ -3,9 +3,7 @@ package com.team.prezel.core.designsystem.component.button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -65,9 +63,6 @@ internal fun PrezelButtonIcon(
                 PrezelButtonSize.REGULAR -> 20.dp
             },
         ),
-    )
-    Spacer(
-        modifier = Modifier.width(if (size == PrezelButtonSize.REGULAR) PrezelTheme.spacing.V8 else PrezelTheme.spacing.V4),
     )
 }
 
@@ -144,8 +139,11 @@ internal fun prezelButtonContentColor(
 @Composable
 internal fun prezelButtonContentPadding(
     size: PrezelButtonSize,
+    onlyIcon: Boolean = false,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues {
+    if (onlyIcon) return prezelIconButtonContentPadding(size)
+
     val horizontal = when (size) {
         PrezelButtonSize.XSMALL -> spacing.V10
         PrezelButtonSize.SMALL -> spacing.V12
@@ -160,3 +158,14 @@ internal fun prezelButtonContentPadding(
 
     return PaddingValues(horizontal = horizontal, vertical = vertical)
 }
+
+@Composable
+private fun prezelIconButtonContentPadding(
+    size: PrezelButtonSize,
+    spacing: PrezelSpacing = PrezelTheme.spacing,
+): PaddingValues =
+    when (size) {
+        PrezelButtonSize.XSMALL -> spacing.V8
+        PrezelButtonSize.SMALL -> spacing.V10
+        PrezelButtonSize.REGULAR -> spacing.V14
+    }.let { spacing -> PaddingValues(all = spacing) }
