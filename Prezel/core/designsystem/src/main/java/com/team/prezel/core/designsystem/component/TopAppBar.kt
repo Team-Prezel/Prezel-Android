@@ -35,7 +35,7 @@ fun PrezelTopAppBar(
 ) {
     TopAppBar(
         title = {
-            ProvideTextStyle(PrezelTextStyles.Body2Bold.toTextStyle()) {
+            ProvideTextStyle(PrezelTheme.typography.body2Bold) {
                 title()
             }
         },
