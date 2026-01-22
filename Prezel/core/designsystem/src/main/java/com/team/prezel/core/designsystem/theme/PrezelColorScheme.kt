@@ -43,7 +43,7 @@ internal object PrezelColorScheme {
         iconMedium = ColorTokens.CoolGray800,
         iconLarge = ColorTokens.CoolGray900,
         iconDisabled = ColorTokens.CoolGray300,
-        borderSmall = ColorTokens.CoolGray500,
+        borderSmall = ColorTokens.CoolGray50,
         borderRegular = ColorTokens.CoolGray100,
         borderMedium = ColorTokens.CoolGray200,
         borderLarge = ColorTokens.CoolGray500,
