@@ -8,12 +8,15 @@ import androidx.compose.ui.res.painterResource
 
 @Immutable
 interface IconSource {
+    val contentDescription: String?
+
     @Composable
     fun painter(): Painter
 }
 
 @Immutable
 data class DrawableIcon(
+    override val contentDescription: String? = null,
     @param:DrawableRes val resId: Int,
 ) : IconSource {
     @Composable

@@ -50,12 +50,11 @@ internal fun PrezelButtonIcon(
     icon: IconSource?,
     size: PrezelButtonSize,
     modifier: Modifier = Modifier,
-    contentDescription: String? = null,
 ) {
     if (icon == null) return
     Icon(
         painter = icon.painter(),
-        contentDescription = contentDescription,
+        contentDescription = icon.contentDescription,
         modifier = modifier.size(
             when (size) {
                 PrezelButtonSize.XSMALL -> 14.dp

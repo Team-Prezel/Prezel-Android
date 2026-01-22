@@ -101,7 +101,7 @@ private fun PrezelButtonPreviewItem(
 ) {
     PrezelButton(
         text = "Label",
-        icon = DrawableIcon(PrezelIcons.Blank),
+        icon = DrawableIcon(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,
