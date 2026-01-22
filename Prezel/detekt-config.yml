@@ -26,6 +26,8 @@ style:
       - ThemePreview
   WildcardImport:
     active: true
+  DestructuringDeclarationWithTooManyEntries:
+      active: false
 
 complexity:
   active: true
