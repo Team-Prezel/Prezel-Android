@@ -1,6 +1,8 @@
 package com.team.prezel.core.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -66,6 +68,8 @@ fun PrezelTheme(
         LocalPrezelShapes provides PrezelShapes,
         LocalPrezelSpacing provides PrezelSpacing,
         LocalPrezelStroke provides PrezelStroke,
+        LocalTextStyle provides typographyScheme.body3Regular,
+        LocalContentColor provides colorScheme.textLarge,
         content = content,
     )
 }
