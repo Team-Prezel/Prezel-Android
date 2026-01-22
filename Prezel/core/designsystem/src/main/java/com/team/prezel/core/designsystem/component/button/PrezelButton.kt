@@ -33,7 +33,9 @@ fun PrezelButton(
     enabled: Boolean = true,
     style: PrezelButtonStyle = PrezelButtonStyle(),
 ) {
-    if (text == null && icon == null) error("Button must have text or icon")
+    val hasText = text != null
+    val hasIcon = icon != null
+    require(hasText || hasIcon) { "Button은 text 또는 icon 중 하나는 반드시 필요합니다." }
     val (buttonType, buttonHierarchy, buttonSize, isRounded) = style
 
     Surface(
@@ -50,15 +52,19 @@ fun PrezelButton(
             LocalContentColor provides prezelButtonContentColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
         ) {
             Row(
-                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, onlyIcon = text == null && icon != null)),
+                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, onlyIcon = hasIcon && !hasText)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 PrezelButtonIcon(icon = icon, size = buttonSize)
-                text?.let {
-                    Spacer(modifier = Modifier.width(if (buttonSize == PrezelButtonSize.REGULAR) PrezelTheme.spacing.V8 else PrezelTheme.spacing.V4))
-                    Text(text = it)
+
+                if (!hasText) return@Row
+                if (hasIcon) {
+                    val spacing = if (buttonSize == PrezelButtonSize.REGULAR) PrezelTheme.spacing.V8 else PrezelTheme.spacing.V4
+                    Spacer(modifier = Modifier.width(width = spacing))
                 }
+
+                Text(text = text)
             }
         }
     }
