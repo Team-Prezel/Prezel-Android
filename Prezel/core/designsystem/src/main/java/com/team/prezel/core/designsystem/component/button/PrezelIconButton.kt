@@ -3,13 +3,14 @@ package com.team.prezel.core.designsystem.component.button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.icon.DrawableIcon
+import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 fun PrezelIconButton(
-    icon: DrawableIcon,
+    icon: IconSource,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
