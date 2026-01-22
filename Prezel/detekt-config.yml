@@ -1,62 +1,62 @@
 build:
-  maxIssues: 0
+    maxIssues: 0
 
 config:
-  validation: true
-  warningsAsErrors: false
-  checkExhaustiveness: false
+    validation: true
+    warningsAsErrors: false
+    checkExhaustiveness: false
 
 processors:
-  active: true
+    active: true
 
 style:
-  active: true
-  MaxLineLength:
     active: true
-    maxLineLength: 150
-  MagicNumber:
-    active: false
-  ReturnCount:
-    active: true
-    max: 3
-  UnusedPrivateMember:
-    active: true
-    ignoreAnnotated:
-      - Preview
-      - ThemePreview
-  WildcardImport:
-    active: true
-  DestructuringDeclarationWithTooManyEntries:
-      active: false
+    MaxLineLength:
+        active: true
+        maxLineLength: 150
+    MagicNumber:
+        active: false
+    ReturnCount:
+        active: true
+        max: 3
+    UnusedPrivateMember:
+        active: true
+        ignoreAnnotated:
+            - Preview
+            - ThemePreview
+    WildcardImport:
+        active: true
+    DestructuringDeclarationWithTooManyEntries:
+        active: false
 
 complexity:
-  active: true
-  LongMethod:
     active: true
-    threshold: 40
-  LongParameterList:
-    active: true
-    functionThreshold: 7
-    constructorThreshold: 8
-  CyclomaticComplexMethod:
-    active: true
-    threshold: 15
-  NestedBlockDepth:
-    active: true
-    threshold: 4
+    LongMethod:
+        active: true
+        threshold: 40
+    LongParameterList:
+        active: true
+        functionThreshold: 7
+        constructorThreshold: 8
+    CyclomaticComplexMethod:
+        active: true
+        threshold: 15
+    NestedBlockDepth:
+        active: true
+        threshold: 4
 
 naming:
-  active: true
-  FunctionNaming:
     active: true
-    ignoreAnnotated:
-      - Composable
-      - Preview
+    FunctionNaming:
+        active: true
+        ignoreAnnotated:
+            - Composable
+            - Preview
 
 potential-bugs:
-  active: true
+    active: true
 
 exceptions:
-  active: true
-  TooGenericExceptionCaught:
-    active: false
+    active: true
+    TooGenericExceptionCaught:
+        active: false
