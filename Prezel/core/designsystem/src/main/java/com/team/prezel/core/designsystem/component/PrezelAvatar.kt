@@ -27,11 +27,6 @@ import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-enum class PrezelAvatarSize {
-    REGULAR,
-    SMALL,
-}
-
 @Composable
 fun PrezelAvatar(
     imageUrl: String?,
@@ -72,6 +67,11 @@ fun PrezelAvatar(
             )
         }
     }
+}
+
+enum class PrezelAvatarSize {
+    REGULAR,
+    SMALL,
 }
 
 private fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
