@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -24,6 +22,7 @@ import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -35,10 +34,7 @@ fun PrezelFloatingMenuButton(
     style: PrezelFloatingButtonStyle = PrezelFloatingButtonStyle(),
     content: @Composable (ColumnScope.() -> Unit),
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides PrezelTheme.colors.textMedium,
-        LocalTextStyle provides PrezelTheme.typography.body2Regular,
-    ) {
+    CompositionLocalProvider(LocalContentColor provides PrezelColorScheme.Light.textMedium) {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.End,
@@ -110,7 +106,7 @@ private fun PrimaryPrezelFloatingMenuButtonPreview() {
             modifier = Modifier
                 .wrapContentHeight()
                 .requiredHeightIn(200.dp)
-                .background(PrezelTheme.colors.bgRegular)
+                .background(PrezelTheme.colors.bgScrim)
                 .padding(12.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -143,7 +139,7 @@ private fun SecondaryPrezelFloatingMenuButtonPreview() {
             modifier = Modifier
                 .wrapContentHeight()
                 .requiredHeightIn(200.dp)
-                .background(PrezelTheme.colors.bgRegular)
+                .background(PrezelTheme.colors.bgScrim)
                 .padding(12.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -179,8 +175,37 @@ private fun PreviewFloatingMenuButton(
         onClick = {},
         style = style,
     ) {
-        Text(text = "Label")
-        Text(text = "Label")
-        Text(text = "Label")
+        PrezelFloatingButtonMenuItem(label = "LongLabel", onClick = {})
+        PrezelFloatingButtonMenuItem(label = "Label", onClick = {})
+        PrezelFloatingButtonMenuItem(label = "Label", onClick = {})
+    }
+}
+
+@ThemePreview
+@Composable
+private fun PrezelFloatingMenuButtonPreview() {
+    PrezelTheme {
+        Row {
+            PreviewFloatingMenuButton(true)
+            PreviewFloatingMenuButton(false)
+        }
+    }
+}
+
+@Composable
+private fun PreviewFloatingMenuButton(isShowIcon: Boolean) {
+    val iconSource = if (isShowIcon) DrawableIcon(resId = PrezelIcons.Blank) else null
+
+    PrezelFloatingMenuButton(
+        modifier = Modifier
+            .background(PrezelTheme.colors.bgScrim)
+            .padding(16.dp),
+        iconSource = DrawableIcon(resId = PrezelIcons.Blank),
+        isExpanded = true,
+        onClick = {},
+    ) {
+        PrezelFloatingButtonMenuItem(label = "LongLabel", onClick = {}, iconSource = iconSource)
+        PrezelFloatingButtonMenuItem(label = "Label", onClick = {}, iconSource = iconSource)
+        PrezelFloatingButtonMenuItem(label = "Label", onClick = {}, iconSource = iconSource)
     }
 }
