@@ -35,15 +35,17 @@ fun PrezelAvatar(
     size: PrezelAvatarSize = PrezelAvatarSize.SMALL,
 ) {
     var isError by remember(imageUrl) { mutableStateOf(false) }
+    val shape = PrezelTheme.shapes.V1000
 
     Box(
         modifier = modifier
             .size(size = prezelAvatarContainerSize(size))
+            .clip(shape = shape)
             .background(color = PrezelTheme.colors.bgRegular)
             .border(
                 width = prezelAvatarBorderWidth(size),
                 color = PrezelTheme.colors.borderRegular,
-                shape = PrezelTheme.shapes.V1000,
+                shape = shape,
             ),
         contentAlignment = Alignment.Center,
     ) {
