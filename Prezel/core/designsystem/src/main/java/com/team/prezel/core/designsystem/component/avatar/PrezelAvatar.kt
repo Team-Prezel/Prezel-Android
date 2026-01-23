@@ -19,24 +19,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelAsyncImage
+import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 fun PrezelAvatar(
-    type: PrezelAvatarType,
+    imageUrl: String?,
     contentDescription: String,
     modifier: Modifier = Modifier,
     size: PrezelAvatarSize = PrezelAvatarSize.SMALL,
 ) {
+    var isError by remember(imageUrl) { mutableStateOf(false) }
+
     Box(
         modifier = modifier
-            .size(prezelAvatarContainerSize(size))
-            .clip(PrezelTheme.shapes.V1000)
-            .background(PrezelTheme.colors.bgRegular)
+            .size(size = prezelAvatarContainerSize(size))
+            .background(color = PrezelTheme.colors.bgRegular)
             .border(
                 width = prezelAvatarBorderWidth(size),
                 color = PrezelTheme.colors.borderRegular,
@@ -44,34 +47,51 @@ fun PrezelAvatar(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        when (type) {
-            is PrezelAvatarType.Default -> {
-                DefaultAvatarIcon(
-                    size = size,
-                    contentDescription = contentDescription,
-                )
-            }
+        val shouldShowDefault =
+            imageUrl.isNullOrBlank() || isError
 
-            is PrezelAvatarType.Image -> {
-                var isError by remember(type.url) { mutableStateOf(false) }
-
-                if (isError) {
-                    DefaultAvatarIcon(
-                        size = size,
-                        contentDescription = contentDescription,
-                    )
-                } else {
-                    PrezelAsyncImage(
-                        url = type.url,
-                        contentDescription = contentDescription,
-                        modifier = Modifier.fillMaxSize(),
-                        onFailure = { isError = true },
-                    )
-                }
-            }
+        if (shouldShowDefault) {
+            DefaultAvatarIcon(
+                size = size,
+                contentDescription = contentDescription,
+            )
+        } else {
+            PrezelAsyncImage(
+                url = imageUrl,
+                contentDescription = contentDescription,
+                modifier = Modifier.fillMaxSize(),
+                onFailure = { isError = true },
+            )
         }
     }
 }
+
+enum class PrezelAvatarSize {
+    REGULAR,
+    SMALL,
+}
+
+internal fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
+    when (size) {
+        PrezelAvatarSize.REGULAR -> 120.dp
+        PrezelAvatarSize.SMALL -> 64.dp
+    }
+
+internal fun prezelAvatarIconSize(size: PrezelAvatarSize): Dp =
+    when (size) {
+        PrezelAvatarSize.REGULAR -> 48.dp
+        PrezelAvatarSize.SMALL -> 24.dp
+    }
+
+@Composable
+internal fun prezelAvatarBorderWidth(
+    size: PrezelAvatarSize,
+    stroke: PrezelStroke = PrezelTheme.stroke,
+): Dp =
+    when (size) {
+        PrezelAvatarSize.REGULAR -> stroke.V4
+        PrezelAvatarSize.SMALL -> stroke.V2
+    }
 
 @Composable
 private fun DefaultAvatarIcon(
@@ -96,12 +116,12 @@ private fun PrezelAvatarSizePreview() {
                 modifier = Modifier.padding(16.dp),
             ) {
                 PrezelAvatar(
-                    type = PrezelAvatarType.Default,
+                    imageUrl = null,
                     contentDescription = "기본 아바타",
                     size = PrezelAvatarSize.SMALL,
                 )
                 PrezelAvatar(
-                    type = PrezelAvatarType.Default,
+                    imageUrl = null,
                     contentDescription = "기본 아바타",
                     size = PrezelAvatarSize.REGULAR,
                 )
@@ -120,12 +140,12 @@ private fun PrezelAvatarTypePreview() {
                 modifier = Modifier.padding(16.dp),
             ) {
                 PrezelAvatar(
-                    type = PrezelAvatarType.Default,
+                    imageUrl = null,
                     contentDescription = "Default Type",
                     size = PrezelAvatarSize.SMALL,
                 )
                 PrezelAvatar(
-                    type = PrezelAvatarType.Image(url = "https://picsum.photos/200"),
+                    imageUrl = "https://picsum.photos/200",
                     contentDescription = "Image Type",
                     size = PrezelAvatarSize.SMALL,
                 )
