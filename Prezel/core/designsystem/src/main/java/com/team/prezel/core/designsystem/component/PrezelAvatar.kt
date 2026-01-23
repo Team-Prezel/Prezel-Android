@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.avatar
+package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,14 +18,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.component.PrezelAsyncImage
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+
+enum class PrezelAvatarSize {
+    REGULAR,
+    SMALL,
+}
 
 @Composable
 fun PrezelAvatar(
@@ -63,30 +68,26 @@ fun PrezelAvatar(
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize(),
                 onFailure = { isError = true },
+                contentScale = ContentScale.Crop,
             )
         }
     }
 }
 
-enum class PrezelAvatarSize {
-    REGULAR,
-    SMALL,
-}
-
-internal fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
+private fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
     when (size) {
         PrezelAvatarSize.REGULAR -> 120.dp
         PrezelAvatarSize.SMALL -> 64.dp
     }
 
-internal fun prezelAvatarIconSize(size: PrezelAvatarSize): Dp =
+private fun prezelAvatarIconSize(size: PrezelAvatarSize): Dp =
     when (size) {
         PrezelAvatarSize.REGULAR -> 48.dp
         PrezelAvatarSize.SMALL -> 24.dp
     }
 
 @Composable
-internal fun prezelAvatarBorderWidth(
+private fun prezelAvatarBorderWidth(
     size: PrezelAvatarSize,
     stroke: PrezelStroke = PrezelTheme.stroke,
 ): Dp =
