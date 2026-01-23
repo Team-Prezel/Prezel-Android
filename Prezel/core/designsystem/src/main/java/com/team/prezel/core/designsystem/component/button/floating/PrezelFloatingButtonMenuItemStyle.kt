@@ -2,6 +2,7 @@ package com.team.prezel.core.designsystem.component.button.floating
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,9 +24,11 @@ enum class PrezelFloatingButtonMenuItemSize {
     }
 }
 
+internal val LocalPrezelFloatingButtonMenuItemSize = compositionLocalOf { PrezelFloatingButtonMenuItemSize.REGULAR }
+
 @Composable
 internal fun prezelFloatingButtonMenuItemTextStyle(
-    size: PrezelFloatingButtonMenuItemSize,
+    size: PrezelFloatingButtonMenuItemSize = LocalPrezelFloatingButtonMenuItemSize.current,
     typography: PrezelTypography = PrezelTheme.typography,
 ): TextStyle =
     when (size) {
@@ -35,7 +38,7 @@ internal fun prezelFloatingButtonMenuItemTextStyle(
 
 @Composable
 internal fun prezelFloatingButtonMenuItemPaddingValues(
-    size: PrezelFloatingButtonMenuItemSize,
+    size: PrezelFloatingButtonMenuItemSize = LocalPrezelFloatingButtonMenuItemSize.current,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues =
     when (size) {
@@ -43,8 +46,19 @@ internal fun prezelFloatingButtonMenuItemPaddingValues(
         PrezelFloatingButtonMenuItemSize.REGULAR -> spacing.V12 to spacing.V8
     }.let { (horizontal, vertical) -> PaddingValues(horizontal = horizontal, vertical = vertical) }
 
-internal fun prezelFloatingButtonMenuItemIconSize(size: PrezelFloatingButtonMenuItemSize): Dp =
+@Composable
+internal fun prezelFloatingButtonMenuItemIconSize(size: PrezelFloatingButtonMenuItemSize = LocalPrezelFloatingButtonMenuItemSize.current): Dp =
     when (size) {
         PrezelFloatingButtonMenuItemSize.SMALL -> 16.dp
         PrezelFloatingButtonMenuItemSize.REGULAR -> 20.dp
+    }
+
+@Composable
+internal fun prezelFloatingButtonMenuItemSpaceDp(
+    size: PrezelFloatingButtonMenuItemSize = LocalPrezelFloatingButtonMenuItemSize.current,
+    spacing: PrezelSpacing = PrezelTheme.spacing,
+): Dp =
+    when (size) {
+        PrezelFloatingButtonMenuItemSize.SMALL -> spacing.V4
+        PrezelFloatingButtonMenuItemSize.REGULAR -> spacing.V8
     }

@@ -13,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +23,6 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-internal val LocalPrezelFloatingButtonMenuItemSize = compositionLocalOf { PrezelFloatingButtonMenuItemSize.REGULAR }
-
 @Composable
 fun PrezelFloatingButtonMenuItem(
     label: String,
@@ -33,8 +30,6 @@ fun PrezelFloatingButtonMenuItem(
     modifier: Modifier = Modifier,
     iconSource: IconSource? = null,
 ) {
-    val size = LocalPrezelFloatingButtonMenuItemSize.current
-
     Row(
         modifier = modifier
             .clip(PrezelTheme.shapes.V4)
@@ -42,29 +37,23 @@ fun PrezelFloatingButtonMenuItem(
                 indication = ripple(),
                 interactionSource = null,
                 onClick = onClick,
-            ).padding(prezelFloatingButtonMenuItemPaddingValues(size)),
+            ).padding(prezelFloatingButtonMenuItemPaddingValues()),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        iconSource?.let { source -> PrezelFloatingButtonMenuItemIcon(iconSource = source, size = size) }
-        Text(text = label, style = prezelFloatingButtonMenuItemTextStyle(size))
+        iconSource?.let { source -> PrezelFloatingButtonMenuItemIcon(iconSource = source) }
+        Text(text = label, style = prezelFloatingButtonMenuItemTextStyle())
     }
 }
 
 @Composable
-private fun PrezelFloatingButtonMenuItemIcon(
-    iconSource: IconSource,
-    size: PrezelFloatingButtonMenuItemSize,
-) {
+private fun PrezelFloatingButtonMenuItemIcon(iconSource: IconSource) {
     Icon(
         painter = iconSource.painter(),
         contentDescription = iconSource.contentDescription,
-        modifier = Modifier.size(prezelFloatingButtonMenuItemIconSize(size)),
+        modifier = Modifier.size(prezelFloatingButtonMenuItemIconSize()),
     )
 
-    when (size) {
-        PrezelFloatingButtonMenuItemSize.SMALL -> PrezelTheme.spacing.V4
-        PrezelFloatingButtonMenuItemSize.REGULAR -> PrezelTheme.spacing.V8
-    }.let { spacing -> Spacer(modifier = Modifier.width(spacing)) }
+    Spacer(modifier = Modifier.width(prezelFloatingButtonMenuItemSpaceDp()))
 }
 
 @ThemePreview
