@@ -7,11 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -89,7 +90,7 @@ private fun PrezelFloatingButtonMenu(
     ) {
         Column(
             modifier = modifier
-                .wrapContentSize()
+                .width(IntrinsicSize.Max)
                 .background(
                     shape = PrezelTheme.shapes.V12,
                     color = prezelFloatingMenuButtonContainerColor(style.hierarchy),
