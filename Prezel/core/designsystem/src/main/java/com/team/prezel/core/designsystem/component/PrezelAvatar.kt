@@ -82,8 +82,8 @@ private fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
 
 private fun prezelAvatarIconSize(size: PrezelAvatarSize): Dp =
     when (size) {
-        PrezelAvatarSize.REGULAR -> 48.dp
-        PrezelAvatarSize.SMALL -> 24.dp
+        PrezelAvatarSize.REGULAR -> 64.dp
+        PrezelAvatarSize.SMALL -> 32.dp
     }
 
 @Composable
@@ -105,7 +105,7 @@ private fun DefaultAvatarIcon(
         painter = painterResource(R.drawable.ic_person),
         contentDescription = contentDescription,
         modifier = Modifier.size(prezelAvatarIconSize(size)),
-        tint = PrezelTheme.colors.borderMedium,
+        tint = PrezelTheme.colors.iconDisabled,
     )
 }
 
