@@ -54,7 +54,7 @@ internal fun prezelFloatingButtonContentColor(
 ): Color =
     when (hierarchy) {
         PrezelFloatingButtonHierarchy.PRIMARY -> colors.solidWhite
-        PrezelFloatingButtonHierarchy.SECONDARY -> colors.iconLarge
+        PrezelFloatingButtonHierarchy.SECONDARY -> colors.iconRegular
     }
 
 @Composable
