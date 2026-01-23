@@ -4,8 +4,10 @@ plugins {
 
 android {
     namespace = "com.team.prezel.core.designsystem"
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil.kt.compose)
 }
