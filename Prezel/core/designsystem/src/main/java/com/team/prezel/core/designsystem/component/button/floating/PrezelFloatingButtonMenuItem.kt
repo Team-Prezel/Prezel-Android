@@ -34,6 +34,7 @@ fun PrezelFloatingButtonMenuItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(PrezelTheme.shapes.V6)
             .clickable(
                 indication = ripple(),
                 interactionSource = null,
