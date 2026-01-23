@@ -62,7 +62,7 @@ fun PrezelAvatar(
                 url = imageUrl,
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize(),
-                onFailure = { isError = true },
+                onError = { isError = true },
                 contentScale = ContentScale.Crop,
             )
         }

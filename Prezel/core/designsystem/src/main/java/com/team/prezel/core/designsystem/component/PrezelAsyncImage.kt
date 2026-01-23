@@ -13,18 +13,16 @@ fun PrezelAsyncImage(
     contentDescription: String,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
-    onLoading: () -> Unit = {},
     onSuccess: () -> Unit = {},
-    onFailure: (Throwable?) -> Unit = {},
+    onError: (Throwable?) -> Unit = {},
 ) {
     AsyncImage(
         model = url,
         contentDescription = contentDescription,
         modifier = modifier,
         placeholder = ColorPainter(Color.Transparent),
-        onLoading = { onLoading() },
         onSuccess = { onSuccess() },
-        onError = { onFailure(it.result.throwable) },
+        onError = { onError(it.result.throwable) },
         contentScale = contentScale,
     )
 }
