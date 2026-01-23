@@ -20,14 +20,12 @@ sealed interface PrezelAvatarType {
     ) : PrezelAvatarType
 }
 
-@Composable
 internal fun prezelAvatarContainerSize(size: PrezelAvatarSize): Dp =
     when (size) {
         PrezelAvatarSize.REGULAR -> 120.dp
         PrezelAvatarSize.SMALL -> 64.dp
     }
 
-@Composable
 internal fun prezelAvatarIconSize(size: PrezelAvatarSize): Dp =
     when (size) {
         PrezelAvatarSize.REGULAR -> 48.dp

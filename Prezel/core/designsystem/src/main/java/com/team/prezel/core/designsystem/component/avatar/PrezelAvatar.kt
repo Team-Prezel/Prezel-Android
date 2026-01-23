@@ -32,8 +32,6 @@ fun PrezelAvatar(
     modifier: Modifier = Modifier,
     size: PrezelAvatarSize = PrezelAvatarSize.SMALL,
 ) {
-    var isError by remember { mutableStateOf(false) }
-
     Box(
         modifier = modifier
             .size(prezelAvatarContainerSize(size))
@@ -55,6 +53,8 @@ fun PrezelAvatar(
             }
 
             is PrezelAvatarType.Image -> {
+                var isError by remember(type.url) { mutableStateOf(false) }
+
                 if (isError) {
                     DefaultAvatarIcon(
                         size = size,
@@ -125,7 +125,7 @@ private fun PrezelAvatarTypePreview() {
                     size = PrezelAvatarSize.SMALL,
                 )
                 PrezelAvatar(
-                    type = PrezelAvatarType.Image(url = "http://picsum.photos/200"),
+                    type = PrezelAvatarType.Image(url = "https://picsum.photos/200"),
                     contentDescription = "Image Type",
                     size = PrezelAvatarSize.SMALL,
                 )
