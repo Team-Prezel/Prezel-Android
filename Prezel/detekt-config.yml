@@ -47,6 +47,8 @@ complexity:
 
 naming:
     active: true
+    MatchingDeclarationName:
+        active: false
     FunctionNaming:
         active: true
         ignoreAnnotated:
