@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,14 +24,17 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+internal val LocalPrezelFloatingButtonMenuItemSize = compositionLocalOf { PrezelFloatingButtonMenuItemSize.REGULAR }
+
 @Composable
 fun PrezelFloatingButtonMenuItem(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconSource: IconSource? = null,
-    size: PrezelFloatingButtonMenuItemSize = PrezelFloatingButtonMenuItemSize.REGULAR,
 ) {
+    val size = LocalPrezelFloatingButtonMenuItemSize.current
+
     Row(
         modifier = modifier
             .clip(PrezelTheme.shapes.V4)
@@ -78,25 +82,11 @@ private fun PrezelFloatingButtonMenuItemPreview() {
                 label = "Label",
                 onClick = {},
                 iconSource = DrawableIcon(resId = PrezelIcons.Blank),
-                size = PrezelFloatingButtonMenuItemSize.REGULAR,
             )
 
             PrezelFloatingButtonMenuItem(
                 label = "Label",
                 onClick = {},
-                iconSource = DrawableIcon(resId = PrezelIcons.Blank),
-                size = PrezelFloatingButtonMenuItemSize.SMALL,
-            )
-            PrezelFloatingButtonMenuItem(
-                label = "Label",
-                onClick = {},
-                size = PrezelFloatingButtonMenuItemSize.REGULAR,
-            )
-
-            PrezelFloatingButtonMenuItem(
-                label = "Label",
-                onClick = {},
-                size = PrezelFloatingButtonMenuItemSize.SMALL,
             )
         }
     }

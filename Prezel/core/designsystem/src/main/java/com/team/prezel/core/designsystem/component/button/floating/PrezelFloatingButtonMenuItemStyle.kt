@@ -12,6 +12,15 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 enum class PrezelFloatingButtonMenuItemSize {
     SMALL,
     REGULAR,
+    ;
+
+    companion object {
+        fun buttonMenuItemSize(size: PrezelFloatingButtonSize): PrezelFloatingButtonMenuItemSize =
+            when (size) {
+                PrezelFloatingButtonSize.SMALL -> SMALL
+                PrezelFloatingButtonSize.REGULAR -> REGULAR
+            }
+    }
 }
 
 @Composable

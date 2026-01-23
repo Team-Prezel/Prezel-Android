@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.button.floating
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
@@ -7,6 +8,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
+import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
+import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.dropShadowCache
 
@@ -66,3 +69,33 @@ internal fun prezelFloatingButtonContainerColor(
         PrezelFloatingButtonHierarchy.PRIMARY -> colors.interactiveRegular
         PrezelFloatingButtonHierarchy.SECONDARY -> colors.bgLarge
     }
+
+@Composable
+internal fun prezelFloatingMenuButtonContentColor(
+    hierarchy: PrezelFloatingButtonHierarchy,
+    colors: PrezelColors = PrezelTheme.colors,
+): Color =
+    when (hierarchy) {
+        PrezelFloatingButtonHierarchy.PRIMARY -> PrezelColorScheme.Light.textMedium
+        PrezelFloatingButtonHierarchy.SECONDARY -> colors.textMedium
+    }
+
+@Composable
+internal fun prezelFloatingMenuButtonContainerColor(
+    hierarchy: PrezelFloatingButtonHierarchy,
+    colors: PrezelColors = PrezelTheme.colors,
+): Color =
+    when (hierarchy) {
+        PrezelFloatingButtonHierarchy.PRIMARY -> colors.solidWhite
+        PrezelFloatingButtonHierarchy.SECONDARY -> colors.bgRegular
+    }
+
+@Composable
+internal fun prezelFloatingMenuButtonPaddingValues(
+    size: PrezelFloatingButtonSize,
+    spacing: PrezelSpacing = PrezelTheme.spacing,
+): PaddingValues =
+    when (size) {
+        PrezelFloatingButtonSize.SMALL -> spacing.V4
+        PrezelFloatingButtonSize.REGULAR -> spacing.V6
+    }.let { padding -> PaddingValues(padding) }

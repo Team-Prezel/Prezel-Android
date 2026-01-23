@@ -22,7 +22,6 @@ import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -34,7 +33,9 @@ fun PrezelFloatingMenuButton(
     style: PrezelFloatingButtonStyle = PrezelFloatingButtonStyle(),
     content: @Composable (ColumnScope.() -> Unit),
 ) {
-    CompositionLocalProvider(LocalContentColor provides PrezelColorScheme.Light.textMedium) {
+    CompositionLocalProvider(
+        LocalContentColor provides prezelFloatingMenuButtonContentColor(style.hierarchy),
+    ) {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.End,
@@ -42,6 +43,7 @@ fun PrezelFloatingMenuButton(
         ) {
             PrezelFloatingButtonMenu(
                 isExpanded = isExpanded,
+                style = style,
                 content = content,
             )
 
@@ -77,6 +79,7 @@ private fun PrezelMainFloatingButton(
 private fun PrezelFloatingButtonMenu(
     isExpanded: Boolean,
     modifier: Modifier = Modifier,
+    style: PrezelFloatingButtonStyle,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     AnimatedVisibility(
@@ -89,12 +92,17 @@ private fun PrezelFloatingButtonMenu(
                 .wrapContentSize()
                 .background(
                     shape = PrezelTheme.shapes.V12,
-                    color = PrezelTheme.colors.solidWhite,
-                ).padding(PrezelTheme.spacing.V4),
+                    color = prezelFloatingMenuButtonContainerColor(style.hierarchy),
+                ).padding(prezelFloatingMenuButtonPaddingValues(style.size)),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V4),
-            content = content,
-        )
+        ) {
+            CompositionLocalProvider(
+                LocalPrezelFloatingButtonMenuItemSize provides PrezelFloatingButtonMenuItemSize.buttonMenuItemSize(style.size),
+            ) {
+                content()
+            }
+        }
     }
 }
 
