@@ -14,7 +14,7 @@ interface IconSource {
     fun painter(): Painter
 
     @Composable
-    fun contentDescription(): String?
+    fun contentDescription(vararg args: String): String?
 }
 
 @Immutable
@@ -26,5 +26,5 @@ data class DrawableIcon(
     override fun painter(): Painter = painterResource(resId)
 
     @Composable
-    override fun contentDescription(): String? = contentDescTextId?.let { stringResource(contentDescTextId) }
+    override fun contentDescription(vararg args: String): String? = contentDescTextId?.let { resId -> stringResource(resId, args) }
 }
