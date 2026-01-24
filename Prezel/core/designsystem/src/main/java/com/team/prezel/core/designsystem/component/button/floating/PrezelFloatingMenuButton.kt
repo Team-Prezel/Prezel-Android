@@ -72,7 +72,14 @@ private fun PrezelMainFloatingButton(
     modifier: Modifier = Modifier,
 ) {
     val currentIconSource =
-        if (isExpanded) DrawableIcon(resId = PrezelIcons.Cancel, contentDescTextId = R.string.close_floating_btn_content_desc) else iconSource
+        if (isExpanded) {
+            DrawableIcon(
+                resId = PrezelIcons.Cancel,
+                contentDescTextId = R.string.core_designsystem_close_floating_btn_content_desc,
+            )
+        } else {
+            iconSource
+        }
 
     PrezelFloatingButton(
         iconSource = currentIconSource,
