@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -104,9 +105,9 @@ private fun prezelBadgeColors(
     active: Boolean,
 ): Pair<Color, Color> =
     when {
-        disabled -> PrezelTheme.colors.bgDisabled to PrezelTheme.colors.textDisabled
-        active -> PrezelTheme.colors.interactiveRegular to PrezelTheme.colors.textLarge
-        else -> PrezelTheme.colors.solidBlack to PrezelTheme.colors.textLarge
+        disabled -> PrezelTheme.colors.bgLarge to PrezelTheme.colors.textDisabled
+        active -> PrezelTheme.colors.interactiveRegular to PrezelColorScheme.Light.bgRegular
+        else -> PrezelTheme.colors.solidBlack to PrezelColorScheme.Light.bgRegular
     }
 
 @Composable
