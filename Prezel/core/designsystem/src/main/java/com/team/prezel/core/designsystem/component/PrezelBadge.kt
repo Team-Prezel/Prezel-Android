@@ -109,7 +109,7 @@ private fun badgeColors(
 
 @ThemePreview
 @Composable
-fun PrezelBadgePreview() {
+private fun PrezelBadgePreview() {
     PrezelTheme {
         Column(
             modifier = Modifier
