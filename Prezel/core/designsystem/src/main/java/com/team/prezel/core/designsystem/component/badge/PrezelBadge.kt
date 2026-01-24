@@ -54,8 +54,7 @@ fun PrezelBadge(
                     .background(
                         color = backgroundColor,
                         shape = PrezelTheme.shapes.V1000,
-                    )
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                    ).padding(horizontal = 4.dp, vertical = 2.dp),
             ) {
                 if (!text.isNullOrEmpty()) {
                     Text(
