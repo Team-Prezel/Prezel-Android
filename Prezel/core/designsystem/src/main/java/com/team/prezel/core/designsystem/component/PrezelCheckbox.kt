@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,35 +22,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
+import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+enum class CheckboxSize {
+    REGULAR,
+    LARGE,
+}
+
 @Composable
 fun PrezelCheckbox(
+    modifier: Modifier = Modifier,
     size: CheckboxSize = CheckboxSize.REGULAR,
     checked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit,
 ) {
-    var currentState by remember { mutableStateOf(checked) }
-
     val checkboxSize = when (size) {
         CheckboxSize.REGULAR -> 24.dp
         CheckboxSize.LARGE -> 32.dp
     }
 
-    val iconRes = if (currentState) R.drawable.ic_check_circle_filled else R.drawable.ic_check_circle_outlined
-    val iconColor = if (currentState) PrezelTheme.colors.interactiveRegular else PrezelTheme.colors.iconDisabled
+    val iconRes =
+        if (checked) {
+            R.drawable.ic_check_circle_filled
+        } else {
+            R.drawable.ic_check_circle_outlined
+        }
+
+    val iconColor =
+        if (checked) {
+            PrezelTheme.colors.interactiveRegular
+        } else {
+            PrezelTheme.colors.iconDisabled
+        }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(checkboxSize)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-            ) {
-                currentState = !currentState
-                onCheckedChange(currentState)
-            },
+                onClick = { onCheckedChange(!checked) },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -60,33 +76,28 @@ fun PrezelCheckbox(
     }
 }
 
-enum class CheckboxSize {
-    REGULAR,
-    LARGE,
-}
-
 @ThemePreview
 @Composable
 private fun PrezelRegularCheckboxPreview() {
     PrezelTheme {
-        Column(modifier = Modifier.background(PrezelTheme.colors.bgRegular)) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp),
-            ) {
-                var regularChecked by remember { mutableStateOf(true) }
-                var regularUnchecked by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(16.dp),
+        ) {
+            CheckboxRowPreview(title = "Regular Checkbox") {
+                var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
                     size = CheckboxSize.REGULAR,
-                    checked = regularChecked,
-                    onCheckedChange = { regularChecked = it },
+                    checked = checkState,
+                    onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
                     size = CheckboxSize.REGULAR,
-                    checked = regularUnchecked,
-                    onCheckedChange = { regularUnchecked = it },
+                    checked = !checkState,
+                    onCheckedChange = { checkState = it },
                 )
             }
         }
@@ -97,26 +108,45 @@ private fun PrezelRegularCheckboxPreview() {
 @Composable
 private fun PrezelLargeCheckboxPreview() {
     PrezelTheme {
-        Column(modifier = Modifier.background(PrezelTheme.colors.bgRegular)) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp),
-            ) {
-                var largeChecked by remember { mutableStateOf(true) }
-                var largeUnchecked by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(16.dp),
+        ) {
+            CheckboxRowPreview(title = "Large Checkbox") {
+                var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
                     size = CheckboxSize.LARGE,
-                    checked = largeChecked,
-                    onCheckedChange = { largeChecked = it },
+                    checked = checkState,
+                    onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
                     size = CheckboxSize.LARGE,
-                    checked = largeUnchecked,
-                    onCheckedChange = { largeUnchecked = it },
+                    checked = !checkState,
+                    onCheckedChange = { checkState = it },
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun CheckboxRowPreview(
+    title: String,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Column(modifier = Modifier.padding(bottom = 16.dp)) {
+        Text(
+            text = title,
+            style = PrezelTextStyles.Caption2Regular.toTextStyle(),
+            color = PrezelTheme.colors.textLarge,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            content = content,
+        )
     }
 }
