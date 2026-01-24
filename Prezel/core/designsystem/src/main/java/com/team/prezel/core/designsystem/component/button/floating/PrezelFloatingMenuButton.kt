@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -70,7 +71,8 @@ private fun PrezelMainFloatingButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val currentIconSource = if (isExpanded) DrawableIcon(resId = PrezelIcons.Cancel, contentDescription = "플로팅 버튼 닫기") else iconSource
+    val currentIconSource =
+        if (isExpanded) DrawableIcon(resId = PrezelIcons.Cancel, contentDescTextId = R.string.close_floating_btn_content_desc) else iconSource
 
     PrezelFloatingButton(
         iconSource = currentIconSource,
