@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -29,41 +30,63 @@ fun PrezelBadge(
         active = active,
     )
 
-    val dimension = when (size) {
+    val badgeSize = when (size) {
         PrezelBadgeSize.SMALL -> 8.dp
         PrezelBadgeSize.REGULAR -> 20.dp
     }
 
     when (size) {
-        PrezelBadgeSize.SMALL -> {
-            Box(
-                modifier = modifier
-                    .size(dimension)
-                    .background(
-                        color = backgroundColor,
-                        shape = PrezelTheme.shapes.V1000,
-                    ),
-            )
-        }
+        PrezelBadgeSize.SMALL -> PrezelDotBadge(modifier = modifier, badgeSize = badgeSize, backgroundColor = backgroundColor)
 
-        PrezelBadgeSize.REGULAR -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = modifier
-                    .size(dimension)
-                    .background(
-                        color = backgroundColor,
-                        shape = PrezelTheme.shapes.V1000,
-                    ).padding(horizontal = 4.dp, vertical = 2.dp),
-            ) {
-                if (!text.isNullOrEmpty()) {
-                    Text(
-                        text = text,
-                        color = textColor,
-                        style = PrezelTextStyles.Caption2Regular.toTextStyle(),
-                    )
-                }
-            }
+        PrezelBadgeSize.REGULAR -> PrezelNumberBadge(
+            modifier = modifier,
+            badgeSize = badgeSize,
+            text = text,
+            backgroundColor = backgroundColor,
+            textColor = textColor,
+        )
+    }
+}
+
+@Composable
+private fun PrezelDotBadge(
+    modifier: Modifier = Modifier,
+    badgeSize: Dp,
+    backgroundColor: Color,
+) {
+    Box(
+        modifier = modifier
+            .size(badgeSize)
+            .background(
+                color = backgroundColor,
+                shape = PrezelTheme.shapes.V1000,
+            ),
+    )
+}
+
+@Composable
+private fun PrezelNumberBadge(
+    modifier: Modifier = Modifier,
+    badgeSize: Dp,
+    text: String?,
+    backgroundColor: Color,
+    textColor: Color,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(badgeSize)
+            .background(
+                color = backgroundColor,
+                shape = PrezelTheme.shapes.V1000,
+            ).padding(horizontal = 4.dp, vertical = 2.dp),
+    ) {
+        if (!text.isNullOrEmpty()) {
+            Text(
+                text = text,
+                color = textColor,
+                style = PrezelTextStyles.Caption2Regular.toTextStyle(),
+            )
         }
     }
 }
