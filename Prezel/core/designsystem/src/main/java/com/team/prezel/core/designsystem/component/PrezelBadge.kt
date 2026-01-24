@@ -17,11 +17,6 @@ import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-enum class PrezelBadgeSize {
-    SMALL,
-    REGULAR,
-}
-
 @Composable
 fun PrezelBadge(
     modifier: Modifier = Modifier,
@@ -51,6 +46,11 @@ fun PrezelBadge(
             textColor = textColor,
         )
     }
+}
+
+enum class PrezelBadgeSize {
+    SMALL,
+    REGULAR,
 }
 
 @Composable
