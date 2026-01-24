@@ -3,7 +3,6 @@ package com.team.prezel.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
@@ -14,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
@@ -52,8 +50,8 @@ fun PrezelBadge(
 
 @Composable
 private fun PrezelDotBadge(
-    modifier: Modifier = Modifier,
     backgroundColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -68,9 +66,9 @@ private fun PrezelDotBadge(
 @Composable
 private fun PrezelNumberBadge(
     count: Int,
-    modifier: Modifier = Modifier,
     backgroundColor: Color,
     textColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -79,7 +77,7 @@ private fun PrezelNumberBadge(
             .background(
                 color = backgroundColor,
                 shape = PrezelTheme.shapes.V1000,
-            ).padding(prezelBadgeContentPadding()),
+            ).padding(horizontal = PrezelTheme.spacing.V4, vertical = PrezelTheme.spacing.V2),
     ) {
         Text(
             text = count.toString(),
@@ -99,13 +97,6 @@ private fun prezelBadgeColors(
         active -> PrezelTheme.colors.interactiveRegular to PrezelColorScheme.Dark.textLarge
         else -> PrezelTheme.colors.solidBlack to PrezelColorScheme.Dark.textLarge
     }
-
-@Composable
-private fun prezelBadgeContentPadding(spacing: PrezelSpacing = PrezelTheme.spacing): PaddingValues =
-    PaddingValues(
-        horizontal = spacing.V4,
-        vertical = spacing.V2,
-    )
 
 @ThemePreview
 @Composable
