@@ -127,19 +127,19 @@ private fun PrimaryPrezelFloatingMenuButtonPreview() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             PreviewFloatingMenuButton(
-                isExpanded = false,
+                initialExpanded = false,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.PRIMARY, size = PrezelFloatingButtonSize.REGULAR),
             )
             PreviewFloatingMenuButton(
-                isExpanded = true,
+                initialExpanded = true,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.PRIMARY, size = PrezelFloatingButtonSize.REGULAR),
             )
             PreviewFloatingMenuButton(
-                isExpanded = false,
+                initialExpanded = false,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.PRIMARY, size = PrezelFloatingButtonSize.SMALL),
             )
             PreviewFloatingMenuButton(
-                isExpanded = true,
+                initialExpanded = true,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.PRIMARY, size = PrezelFloatingButtonSize.SMALL),
             )
         }
@@ -160,19 +160,19 @@ private fun SecondaryPrezelFloatingMenuButtonPreview() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             PreviewFloatingMenuButton(
-                isExpanded = false,
+                initialExpanded = false,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.SECONDARY, size = PrezelFloatingButtonSize.REGULAR),
             )
             PreviewFloatingMenuButton(
-                isExpanded = true,
+                initialExpanded = true,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.SECONDARY, size = PrezelFloatingButtonSize.REGULAR),
             )
             PreviewFloatingMenuButton(
-                isExpanded = false,
+                initialExpanded = false,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.SECONDARY, size = PrezelFloatingButtonSize.SMALL),
             )
             PreviewFloatingMenuButton(
-                isExpanded = true,
+                initialExpanded = true,
                 style = PrezelFloatingButtonStyle(hierarchy = PrezelFloatingButtonHierarchy.SECONDARY, size = PrezelFloatingButtonSize.SMALL),
             )
         }
@@ -181,10 +181,10 @@ private fun SecondaryPrezelFloatingMenuButtonPreview() {
 
 @Composable
 private fun PreviewFloatingMenuButton(
-    isExpanded: Boolean,
+    initialExpanded: Boolean,
     style: PrezelFloatingButtonStyle,
 ) {
-    var isExpanded by remember { mutableStateOf(isExpanded) }
+    var isExpanded by remember { mutableStateOf(initialExpanded) }
 
     PrezelFloatingMenuButton(
         iconSource = DrawableIcon(resId = PrezelIcons.Blank),
