@@ -3,6 +3,7 @@ package com.team.prezel.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -25,7 +27,7 @@ fun PrezelBadge(
     active: Boolean = false,
     disabled: Boolean = false,
 ) {
-    val (backgroundColor, textColor) = badgeColors(
+    val (backgroundColor, textColor) = prezelBadgeColors(
         disabled = disabled,
         active = active,
     )
@@ -84,7 +86,7 @@ private fun PrezelNumberBadge(
             .background(
                 color = backgroundColor,
                 shape = PrezelTheme.shapes.V1000,
-            ).padding(horizontal = 4.dp, vertical = 2.dp),
+            ).padding(prezelBadgeContentPadding()),
     ) {
         if (!text.isNullOrEmpty()) {
             Text(
@@ -97,7 +99,7 @@ private fun PrezelNumberBadge(
 }
 
 @Composable
-private fun badgeColors(
+private fun prezelBadgeColors(
     disabled: Boolean,
     active: Boolean,
 ): Pair<Color, Color> =
@@ -106,6 +108,13 @@ private fun badgeColors(
         active -> PrezelTheme.colors.interactiveRegular to PrezelTheme.colors.textLarge
         else -> PrezelTheme.colors.solidBlack to PrezelTheme.colors.textLarge
     }
+
+@Composable
+private fun prezelBadgeContentPadding(spacing: PrezelSpacing = PrezelTheme.spacing): PaddingValues =
+    PaddingValues(
+        horizontal = spacing.V4,
+        vertical = spacing.V2,
+    )
 
 @ThemePreview
 @Composable
