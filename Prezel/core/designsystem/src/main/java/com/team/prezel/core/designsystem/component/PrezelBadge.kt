@@ -75,7 +75,7 @@ private fun PrezelNumberBadge(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .defaultMinSize(20.dp)
+            .defaultMinSize(minWidth = 20.dp, minHeight = 20.dp)
             .background(
                 color = backgroundColor,
                 shape = PrezelTheme.shapes.V1000,
