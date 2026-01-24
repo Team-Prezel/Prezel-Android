@@ -26,5 +26,5 @@ data class DrawableIcon(
     override fun painter(): Painter = painterResource(resId)
 
     @Composable
-    override fun contentDescription(vararg args: String): String? = contentDescTextId?.let { resId -> stringResource(resId, args) }
+    override fun contentDescription(vararg args: String): String? = contentDescTextId?.let { resId -> stringResource(resId, *args) }
 }
