@@ -79,8 +79,7 @@ private fun PrezelNumberBadge(
             .background(
                 color = backgroundColor,
                 shape = PrezelTheme.shapes.V1000,
-            )
-            .padding(horizontal = PrezelTheme.spacing.V4, vertical = PrezelTheme.spacing.V2),
+            ).padding(horizontal = PrezelTheme.spacing.V4, vertical = PrezelTheme.spacing.V2),
     ) {
         Text(
             text = count.toString(),
