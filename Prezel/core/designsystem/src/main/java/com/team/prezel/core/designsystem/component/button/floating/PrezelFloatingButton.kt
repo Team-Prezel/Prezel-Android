@@ -36,7 +36,7 @@ fun PrezelFloatingButton(
     ) {
         Icon(
             painter = iconSource.painter(),
-            contentDescription = iconSource.contentDescription,
+            contentDescription = iconSource.contentDescription(),
             modifier = Modifier.size(prezelFloatingButtonIconSize(style.size)),
         )
     }
