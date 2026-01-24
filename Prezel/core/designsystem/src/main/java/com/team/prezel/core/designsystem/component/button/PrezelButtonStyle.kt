@@ -54,7 +54,7 @@ internal fun PrezelButtonIcon(
     if (icon == null) return
     Icon(
         painter = icon.painter(),
-        contentDescription = icon.contentDescription,
+        contentDescription = icon.contentDescription(),
         modifier = modifier.size(
             when (size) {
                 PrezelButtonSize.XSMALL -> 14.dp
