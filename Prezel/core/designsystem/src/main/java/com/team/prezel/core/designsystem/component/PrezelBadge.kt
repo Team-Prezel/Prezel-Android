@@ -1,12 +1,16 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -107,21 +111,15 @@ private fun PrezelSmallBadgePreview() {
                 .background(PrezelTheme.colors.bgRegular)
                 .padding(16.dp),
         ) {
-            BadgeRowPreview(
-                title = "Small Badge Active",
-                badges = listOf(
-                    { PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = false) },
-                    { PrezelBadge(active = true, count = 0, size = PrezelBadgeSize.SMALL, disabled = false) },
-                ),
-            )
+            BadgeRowPreview(title = "Small Badge Active") {
+                PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = false)
+                PrezelBadge(active = true, count = 0, size = PrezelBadgeSize.SMALL, disabled = false)
+            }
 
-            BadgeRowPreview(
-                title = "Small Badge Disabled",
-                badges = listOf(
-                    { PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = false) },
-                    { PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = true) },
-                ),
-            )
+            BadgeRowPreview(title = "Small Badge Disabled") {
+                PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = false)
+                PrezelBadge(active = false, count = 0, size = PrezelBadgeSize.SMALL, disabled = true)
+            }
         }
     }
 }
@@ -135,21 +133,15 @@ private fun PrezelRegularBadgePreview() {
                 .background(PrezelTheme.colors.bgRegular)
                 .padding(16.dp),
         ) {
-            BadgeRowPreview(
-                title = "Regular Badge Active",
-                badges = listOf(
-                    { PrezelBadge(count = 0, active = false, disabled = false) },
-                    { PrezelBadge(count = 1, active = true, disabled = false) },
-                ),
-            )
+            BadgeRowPreview(title = "Regular Badge Active") {
+                PrezelBadge(count = 0, active = false, disabled = false)
+                PrezelBadge(count = 1, active = true, disabled = false)
+            }
 
-            BadgeRowPreview(
-                title = "Regular Badge Disabled",
-                badges = listOf(
-                    { PrezelBadge(count = 10, active = false, disabled = false) },
-                    { PrezelBadge(count = 999, active = false, disabled = true) },
-                ),
-            )
+            BadgeRowPreview(title = "Regular Badge Disabled") {
+                PrezelBadge(count = 10, active = false, disabled = false)
+                PrezelBadge(count = 999, active = false, disabled = true)
+            }
         }
     }
 }
@@ -157,7 +149,7 @@ private fun PrezelRegularBadgePreview() {
 @Composable
 private fun BadgeRowPreview(
     title: String,
-    badges: List<@Composable () -> Unit>,
+    content: @Composable RowScope.() -> Unit,
 ) {
     Column(modifier = Modifier.padding(bottom = 16.dp)) {
         Text(
@@ -166,12 +158,9 @@ private fun BadgeRowPreview(
             color = PrezelTheme.colors.textLarge,
             modifier = Modifier.padding(bottom = 4.dp),
         )
-        Row {
-            badges.forEach { badge ->
-                Row(modifier = Modifier.padding(end = 8.dp)) {
-                    badge()
-                }
-            }
-        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            content = content,
+        )
     }
 }
