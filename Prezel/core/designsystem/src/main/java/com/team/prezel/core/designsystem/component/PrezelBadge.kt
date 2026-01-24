@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.badge
+package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,13 +17,18 @@ import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+enum class PrezelBadgeSize {
+    SMALL,
+    REGULAR,
+}
+
 @Composable
 fun PrezelBadge(
     modifier: Modifier = Modifier,
     text: String? = null,
     size: PrezelBadgeSize = PrezelBadgeSize.REGULAR,
-    active: PrezelBadgeActive = PrezelBadgeActive.OFF,
-    disabled: PrezelBadgeDisabled = PrezelBadgeDisabled.OFF,
+    active: Boolean = false,
+    disabled: Boolean = false,
 ) {
     val (backgroundColor, textColor) = badgeColors(
         disabled = disabled,
@@ -93,12 +98,12 @@ private fun PrezelNumberBadge(
 
 @Composable
 private fun badgeColors(
-    disabled: PrezelBadgeDisabled,
-    active: PrezelBadgeActive,
+    disabled: Boolean,
+    active: Boolean,
 ): Pair<Color, Color> =
     when {
-        disabled == PrezelBadgeDisabled.ON -> PrezelTheme.colors.bgDisabled to PrezelTheme.colors.textDisabled
-        active == PrezelBadgeActive.ON -> PrezelTheme.colors.interactiveRegular to PrezelTheme.colors.textLarge
+        disabled -> PrezelTheme.colors.bgDisabled to PrezelTheme.colors.textDisabled
+        active -> PrezelTheme.colors.interactiveRegular to PrezelTheme.colors.textLarge
         else -> PrezelTheme.colors.solidBlack to PrezelTheme.colors.textLarge
     }
 
@@ -114,24 +119,24 @@ fun PrezelBadgePreview() {
             Row(modifier = Modifier.padding(bottom = 8.dp)) {
                 PrezelBadge(
                     size = PrezelBadgeSize.SMALL,
-                    active = PrezelBadgeActive.OFF,
-                    disabled = PrezelBadgeDisabled.OFF,
+                    active = false,
+                    disabled = false,
                 )
             }
 
             Row(modifier = Modifier.padding(bottom = 8.dp)) {
                 PrezelBadge(
                     size = PrezelBadgeSize.SMALL,
-                    active = PrezelBadgeActive.ON,
-                    disabled = PrezelBadgeDisabled.OFF,
+                    active = true,
+                    disabled = false,
                 )
             }
 
             Row(modifier = Modifier.padding(bottom = 8.dp)) {
                 PrezelBadge(
                     size = PrezelBadgeSize.SMALL,
-                    active = PrezelBadgeActive.OFF,
-                    disabled = PrezelBadgeDisabled.ON,
+                    active = false,
+                    disabled = true,
                 )
             }
 
@@ -139,8 +144,8 @@ fun PrezelBadgePreview() {
                 PrezelBadge(
                     size = PrezelBadgeSize.REGULAR,
                     text = "0",
-                    active = PrezelBadgeActive.OFF,
-                    disabled = PrezelBadgeDisabled.OFF,
+                    active = false,
+                    disabled = false,
                 )
             }
 
@@ -148,8 +153,8 @@ fun PrezelBadgePreview() {
                 PrezelBadge(
                     size = PrezelBadgeSize.REGULAR,
                     text = "1",
-                    active = PrezelBadgeActive.ON,
-                    disabled = PrezelBadgeDisabled.OFF,
+                    active = true,
+                    disabled = false,
                 )
             }
 
@@ -157,8 +162,8 @@ fun PrezelBadgePreview() {
                 PrezelBadge(
                     size = PrezelBadgeSize.REGULAR,
                     text = "9",
-                    active = PrezelBadgeActive.OFF,
-                    disabled = PrezelBadgeDisabled.ON,
+                    active = false,
+                    disabled = true,
                 )
             }
         }
