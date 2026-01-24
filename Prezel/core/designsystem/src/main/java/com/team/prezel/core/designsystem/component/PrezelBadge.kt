@@ -109,62 +109,77 @@ private fun badgeColors(
 
 @ThemePreview
 @Composable
-private fun PrezelBadgePreview() {
+private fun PrezelSmallBadgePreview() {
     PrezelTheme {
         Column(
             modifier = Modifier
                 .background(PrezelTheme.colors.bgRegular)
                 .padding(16.dp),
         ) {
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.SMALL,
-                    active = false,
-                    disabled = false,
-                )
-            }
+            BadgeRowPreview(
+                title = "Small Badge Active",
+                badges = listOf(
+                    { PrezelBadge(active = false, size = PrezelBadgeSize.SMALL, disabled = false) },
+                    { PrezelBadge(active = true, size = PrezelBadgeSize.SMALL, disabled = false) },
+                ),
+            )
 
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.SMALL,
-                    active = true,
-                    disabled = false,
-                )
-            }
+            BadgeRowPreview(
+                title = "Small Badge Disabled",
+                badges = listOf(
+                    { PrezelBadge(active = false, size = PrezelBadgeSize.SMALL, disabled = false) },
+                    { PrezelBadge(active = false, size = PrezelBadgeSize.SMALL, disabled = true) },
+                ),
+            )
+        }
+    }
+}
 
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.SMALL,
-                    active = false,
-                    disabled = true,
-                )
-            }
+@ThemePreview
+@Composable
+private fun PrezelRegularBadgePreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(16.dp),
+        ) {
+            BadgeRowPreview(
+                title = "Regular Badge Active",
+                badges = listOf(
+                    { PrezelBadge(text = "0", active = false, disabled = false) },
+                    { PrezelBadge(text = "1", active = true, disabled = false) },
+                ),
+            )
 
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.REGULAR,
-                    text = "0",
-                    active = false,
-                    disabled = false,
-                )
-            }
+            BadgeRowPreview(
+                title = "Regular Badge Disabled",
+                badges = listOf(
+                    { PrezelBadge(text = "0", active = false, disabled = false) },
+                    { PrezelBadge(text = "9", active = false, disabled = true) },
+                ),
+            )
+        }
+    }
+}
 
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.REGULAR,
-                    text = "1",
-                    active = true,
-                    disabled = false,
-                )
-            }
-
-            Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                PrezelBadge(
-                    size = PrezelBadgeSize.REGULAR,
-                    text = "9",
-                    active = false,
-                    disabled = true,
-                )
+@Composable
+private fun BadgeRowPreview(
+    title: String,
+    badges: List<@Composable () -> Unit>,
+) {
+    Column(modifier = Modifier.padding(bottom = 16.dp)) {
+        Text(
+            text = title,
+            style = PrezelTextStyles.Caption2Regular.toTextStyle(),
+            color = PrezelTheme.colors.textLarge,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row {
+            badges.forEach { badge ->
+                Row(modifier = Modifier.padding(end = 8.dp)) {
+                    badge()
+                }
             }
         }
     }
