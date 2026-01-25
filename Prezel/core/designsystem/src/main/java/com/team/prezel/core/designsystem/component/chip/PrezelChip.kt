@@ -16,7 +16,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -79,31 +78,26 @@ fun PrezelChip(
     val hasIcon = icon != null
     val iconOnly = hasIcon && !hasText
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
-    val (chipType, chipSize, interaction, feedback) = style
-
-    val resolvedContainerColor =
-        containerColor ?: prezelChipContainerColor(
-            type = chipType,
-            interaction = interaction,
-            feedback = feedback,
-            iconOnly = iconOnly,
-        )
-
-    val resolvedContentColor = contentColor ?: prezelChipContentColor(
-        interaction = interaction,
-        feedback = feedback,
-    )
+    val (_, chipSize, _, _) = style
 
     val resolvedBorder =
-        if (containerColor != null) {
-            BorderStroke(0.dp, Color.Transparent)
-        } else {
-            prezelChipBorderStroke(
-                type = chipType,
-                interaction = interaction,
-                feedback = feedback,
-            )
-        }
+        resolveChipBorder(
+            style = style,
+            hasCustomContainerColor = containerColor != null,
+        )
+
+    val resolvedContainerColor =
+        resolveChipContainerColor(
+            style = style,
+            iconOnly = iconOnly,
+            overrideColor = containerColor,
+        )
+
+    val resolvedContentColor =
+        resolveChipContentColor(
+            style = style,
+            overrideColor = contentColor,
+        )
 
     Surface(
         modifier = modifier,
@@ -133,6 +127,44 @@ fun PrezelChip(
         }
     }
 }
+
+@Composable
+private fun resolveChipBorder(
+    style: PrezelChipStyle,
+    hasCustomContainerColor: Boolean,
+): BorderStroke? =
+    if (hasCustomContainerColor) {
+        null
+    } else {
+        prezelChipBorderStroke(
+            type = style.type,
+            interaction = style.interaction,
+            feedback = style.feedback,
+        )
+    }
+
+@Composable
+private fun resolveChipContainerColor(
+    style: PrezelChipStyle,
+    iconOnly: Boolean,
+    overrideColor: Color?,
+): Color =
+    overrideColor ?: prezelChipContainerColor(
+        type = style.type,
+        interaction = style.interaction,
+        feedback = style.feedback,
+        iconOnly = iconOnly,
+    )
+
+@Composable
+private fun resolveChipContentColor(
+    style: PrezelChipStyle,
+    overrideColor: Color?,
+): Color =
+    overrideColor ?: prezelChipContentColor(
+        interaction = style.interaction,
+        feedback = style.feedback,
+    )
 
 @ThemePreview
 @Composable
