@@ -20,8 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -37,7 +39,6 @@ private val MinTouchTargetSize = 48.dp
 @Composable
 fun PrezelCheckbox(
     checked: Boolean,
-    contentDescription: String,
     modifier: Modifier = Modifier,
     size: CheckboxSize = CheckboxSize.REGULAR,
     onCheckedChange: (Boolean) -> Unit,
@@ -75,7 +76,7 @@ fun PrezelCheckbox(
     ) {
         Icon(
             painter = painterResource(id = iconRes),
-            contentDescription = contentDescription,
+            contentDescription = stringResource(R.string.core_designsystem_checkbox_desc),
             modifier = Modifier.size(checkboxSize),
             tint = iconColor,
         )
@@ -95,14 +96,12 @@ private fun PrezelRegularCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    contentDescription = "",
                     size = CheckboxSize.REGULAR,
                     checked = checkState,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    contentDescription = "",
                     size = CheckboxSize.REGULAR,
                     checked = !checkState,
                     onCheckedChange = { checkState = it },
@@ -125,14 +124,12 @@ private fun PrezelLargeCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    contentDescription = "",
                     size = CheckboxSize.LARGE,
                     checked = checkState,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    contentDescription = "",
                     size = CheckboxSize.LARGE,
                     checked = !checkState,
                     onCheckedChange = { checkState = it },
