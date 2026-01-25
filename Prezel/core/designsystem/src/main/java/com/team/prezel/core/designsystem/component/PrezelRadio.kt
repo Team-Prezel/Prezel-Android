@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -114,7 +115,7 @@ fun PrezelRadio(
             modifier = Modifier.clearAndSetSemantics { },
         )
 
-        Spacer(modifier = Modifier.padding(PrezelTheme.spacing.V4))
+        Spacer(modifier = Modifier.width(PrezelTheme.spacing.V4))
 
         Text(
             text = text,
