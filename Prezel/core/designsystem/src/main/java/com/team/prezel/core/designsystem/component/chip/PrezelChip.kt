@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.chip
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.foundation.color.PrezelColors
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -66,12 +68,12 @@ fun PrezelChip(
 
 @Composable
 fun PrezelChip(
-    containerColor: PrezelColors,
-    contentColor: PrezelColors,
     modifier: Modifier = Modifier,
     text: String? = null,
     icon: IconSource? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
+    containerColor: Color? = null,
+    contentColor: Color? = null,
 ) {
     val hasText = text != null
     val hasIcon = icon != null
@@ -79,21 +81,39 @@ fun PrezelChip(
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
     val (chipType, chipSize, interaction, feedback) = style
 
-    Surface(
-        modifier = modifier,
-        shape = prezelChipShape(chipSize),
-        color = prezelChipContainerColor(
+    val resolvedContainerColor =
+        containerColor ?: prezelChipContainerColor(
             type = chipType,
             interaction = interaction,
             feedback = feedback,
             iconOnly = iconOnly,
-            colors = containerColor,
-        ),
-        border = prezelChipBorderStroke(type = chipType, interaction = interaction, feedback = feedback),
+        )
+
+    val resolvedContentColor = contentColor ?: prezelChipContentColor(
+        interaction = interaction,
+        feedback = feedback,
+    )
+
+    val resolvedBorder =
+        if (containerColor != null) {
+            BorderStroke(0.dp, Color.Transparent)
+        } else {
+            prezelChipBorderStroke(
+                type = chipType,
+                interaction = interaction,
+                feedback = feedback,
+            )
+        }
+
+    Surface(
+        modifier = modifier,
+        shape = prezelChipShape(chipSize),
+        color = resolvedContainerColor,
+        border = resolvedBorder,
     ) {
         CompositionLocalProvider(
             LocalTextStyle provides prezelChipTextStyle(chipSize),
-            LocalContentColor provides prezelChipContentColor(interaction = interaction, feedback = feedback, colors = contentColor),
+            LocalContentColor provides resolvedContentColor,
         ) {
             Row(
                 modifier = Modifier.padding(prezelChipContentPadding(size = chipSize, onlyIcon = hasIcon && !hasText)),
