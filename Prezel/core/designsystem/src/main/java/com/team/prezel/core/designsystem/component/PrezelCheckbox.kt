@@ -1,7 +1,6 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,7 +64,7 @@ fun PrezelCheckbox(
             .size(48.dp)
             .toggleable(
                 value = checked,
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = null,
                 indication = null,
                 role = Role.Checkbox,
                 onValueChange = onCheckedChange,
