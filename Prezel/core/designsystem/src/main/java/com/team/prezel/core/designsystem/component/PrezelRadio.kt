@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -58,22 +57,17 @@ fun PrezelRadio(
     modifier: Modifier = Modifier,
     size: PrezelRadioSize = PrezelRadioSize.REGULAR,
 ) {
-    val tintColor = if (checked) PrezelTheme.colors.interactiveRegular else PrezelTheme.colors.iconDisabled
-    val icon = if (checked) PrezelIcons.RadioCircleFilled else PrezelIcons.RadioCircleOutlined
-
-    Icon(
-        painter = painterResource(icon),
-        contentDescription = null,
-        tint = tintColor,
+    PrezelRadioIcon(
+        checked = checked,
+        size = size,
         modifier = modifier
-            .size(size.value)
             .toggleable(
                 value = checked,
                 onValueChange = onCheckedChange,
                 role = Role.RadioButton,
                 indication = null,
                 interactionSource = null,
-            ).padding(PrezelTheme.spacing.V8),
+            ),
     )
 }
 
@@ -108,21 +102,30 @@ fun PrezelRadio(
                 interactionSource = null,
             ),
     ) {
-        PrezelRadio(
-            checked = checked,
-            onCheckedChange = {},
-            size = size,
-            modifier = Modifier.clearAndSetSemantics { },
-        )
-
+        PrezelRadioIcon(checked = checked, size = size)
         Spacer(modifier = Modifier.width(PrezelTheme.spacing.V4))
-
-        Text(
-            text = text,
-            style = textStyle,
-            color = textColor,
-        )
+        Text(text = text, style = textStyle, color = textColor)
     }
+}
+
+@Composable
+private fun PrezelRadioIcon(
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+    size: PrezelRadioSize = PrezelRadioSize.REGULAR,
+) {
+    val tintColor = if (checked) PrezelTheme.colors.interactiveRegular else PrezelTheme.colors.iconDisabled
+    val icon = if (checked) PrezelIcons.RadioCircleFilled else PrezelIcons.RadioCircleOutlined
+
+    Icon(
+        painter = painterResource(icon),
+        contentDescription = null,
+        tint = tintColor,
+        modifier = Modifier
+            .size(size.value)
+            .then(modifier)
+            .padding(PrezelTheme.spacing.V8),
+    )
 }
 
 @ThemePreview
