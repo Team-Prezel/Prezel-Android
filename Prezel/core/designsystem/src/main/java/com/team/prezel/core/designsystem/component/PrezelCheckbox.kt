@@ -34,8 +34,6 @@ enum class CheckboxSize {
     LARGE,
 }
 
-private val MinTouchTargetSize = 48.dp
-
 @Composable
 fun PrezelCheckbox(
     checked: Boolean,
@@ -64,7 +62,7 @@ fun PrezelCheckbox(
 
     Box(
         modifier = modifier
-            .size(MinTouchTargetSize)
+            .size(48.dp)
             .toggleable(
                 value = checked,
                 interactionSource = remember { MutableInteractionSource() },
