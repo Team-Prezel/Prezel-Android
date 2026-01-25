@@ -145,7 +145,7 @@ private fun PrezelRadioPreview() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            SectionTitle(" PrezelRadioSize.LARGE")
+            SectionTitle("PrezelRadioSize.LARGE")
             Text("Checked: true")
             PrezelRadio(checked = true, onCheckedChange = {}, size = PrezelRadioSize.LARGE)
             Text("Checked: false")
