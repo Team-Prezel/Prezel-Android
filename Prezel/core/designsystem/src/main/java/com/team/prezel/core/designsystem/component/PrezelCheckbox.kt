@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -31,6 +32,8 @@ enum class CheckboxSize {
     REGULAR,
     LARGE,
 }
+
+private val MinTouchTargetSize = 48.dp
 
 @Composable
 fun PrezelCheckbox(
@@ -47,9 +50,9 @@ fun PrezelCheckbox(
 
     val iconRes =
         if (checked) {
-            R.drawable.ic_check_circle_filled
+            PrezelIcons.CheckCircleFilled
         } else {
-            R.drawable.ic_check_circle_outlined
+            PrezelIcons.CheckCircleOutlined
         }
 
     val iconColor =
@@ -61,12 +64,12 @@ fun PrezelCheckbox(
 
     Box(
         modifier = modifier
-            .size(checkboxSize)
+            .size(MinTouchTargetSize)
             .toggleable(
                 value = checked,
-                role = Role.Checkbox,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                role = Role.Checkbox,
                 onValueChange = onCheckedChange,
             ),
         contentAlignment = Alignment.Center,
