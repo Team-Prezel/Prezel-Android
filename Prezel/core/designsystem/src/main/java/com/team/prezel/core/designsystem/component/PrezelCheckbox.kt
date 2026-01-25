@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -37,10 +36,10 @@ private val MinTouchTargetSize = 48.dp
 
 @Composable
 fun PrezelCheckbox(
+    checked: Boolean,
     contentDescription: String,
     modifier: Modifier = Modifier,
     size: CheckboxSize = CheckboxSize.REGULAR,
-    checked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     val checkboxSize = when (size) {
