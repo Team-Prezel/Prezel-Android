@@ -9,6 +9,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.network)
+    implementation(projects.coreNetwork)
     implementation(libs.kotlinx.coroutines.core)
 }
