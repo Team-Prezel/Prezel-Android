@@ -17,6 +17,8 @@ import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+internal val LocalPrezelChipColors = staticCompositionLocalOf { PrezelChipColors() }
+
 enum class PrezelChipType {
     FILLED,
     OUTLINED,
@@ -37,6 +39,12 @@ enum class PrezelChipSize {
     SMALL,
     REGULAR,
 }
+
+@Immutable
+data class PrezelChipColors(
+    val containerColor: Color = Color.Unspecified,
+    val contentColor: Color = Color.Unspecified,
+)
 
 @Immutable
 data class PrezelChipStyle(
@@ -158,11 +166,3 @@ data class PrezelChipStyle(
             PrezelChipSize.REGULAR -> 16.dp
         }
 }
-
-@Immutable
-data class PrezelChipColors(
-    val containerColor: Color = Color.Unspecified,
-    val contentColor: Color = Color.Unspecified,
-)
-
-internal val LocalPrezelChipColors = staticCompositionLocalOf { PrezelChipColors() }
