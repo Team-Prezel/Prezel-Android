@@ -71,8 +71,8 @@ fun PrezelChip(
     text: String? = null,
     icon: IconSource? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
-    containerColor: Color? = null,
-    contentColor: Color? = null,
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified,
 ) {
     val hasText = text != null
     val hasIcon = icon != null
