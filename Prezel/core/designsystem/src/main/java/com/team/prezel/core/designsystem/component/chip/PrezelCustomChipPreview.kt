@@ -23,13 +23,7 @@ private fun PrezelChip_CustomColors_Preview() {
     PrezelTheme {
         PreviewScaffold {
             CustomChipHeader()
-
-            Spacer(modifier = Modifier.height(12.dp))
-
             CustomChipLabelSection()
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             CustomChipIconOnlySection()
         }
     }

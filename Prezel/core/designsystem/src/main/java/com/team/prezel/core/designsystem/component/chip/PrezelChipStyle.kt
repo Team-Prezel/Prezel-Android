@@ -56,26 +56,17 @@ data class PrezelChipStyle(
     internal fun borderStroke(
         colors: PrezelColors = PrezelTheme.colors,
         stroke: PrezelStroke = PrezelTheme.stroke,
+        chipColors: PrezelChipColors = LocalPrezelChipColors.current,
     ): BorderStroke? {
         if (type == PrezelChipType.FILLED) return null
 
         val borderColor =
             when {
-                feedback == PrezelChipFeedback.BAD -> {
-                    colors.feedbackBadRegular
-                }
-
-                interaction == PrezelChipInteraction.ACTIVE -> {
-                    colors.interactiveRegular
-                }
-
-                interaction == PrezelChipInteraction.DISABLED -> {
-                    colors.borderRegular
-                }
-
-                else -> {
-                    colors.borderMedium
-                }
+                chipColors.contentColor != Color.Unspecified -> chipColors.contentColor
+                feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
+                interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
+                interaction == PrezelChipInteraction.DISABLED -> colors.borderRegular
+                else -> colors.borderMedium
             }
 
         return BorderStroke(
@@ -95,24 +86,17 @@ data class PrezelChipStyle(
     internal fun containerColor(
         iconOnly: Boolean,
         colors: PrezelColors = PrezelTheme.colors,
+        chipColors: PrezelChipColors = LocalPrezelChipColors.current,
     ): Color {
         if (type == PrezelChipType.OUTLINED && iconOnly) {
             return Color.Transparent
         }
 
         return when {
-            feedback == PrezelChipFeedback.BAD -> {
-                colors.feedbackBadSmall
-            }
-
-            interaction == PrezelChipInteraction.ACTIVE -> {
-                colors.interactiveXSmall
-            }
-
-            interaction == PrezelChipInteraction.DISABLED -> {
-                colors.bgLarge
-            }
-
+            chipColors.containerColor != Color.Unspecified -> chipColors.containerColor
+            feedback == PrezelChipFeedback.BAD -> colors.feedbackBadSmall
+            interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveXSmall
+            interaction == PrezelChipInteraction.DISABLED -> colors.bgLarge
             else -> {
                 when (type) {
                     PrezelChipType.FILLED -> colors.bgMedium
@@ -123,23 +107,16 @@ data class PrezelChipStyle(
     }
 
     @Composable
-    internal fun contentColor(colors: PrezelColors = PrezelTheme.colors): Color =
+    internal fun contentColor(
+        colors: PrezelColors = PrezelTheme.colors,
+        chipColors: PrezelChipColors = LocalPrezelChipColors.current,
+    ): Color =
         when {
-            feedback == PrezelChipFeedback.BAD -> {
-                colors.feedbackBadRegular
-            }
-
-            interaction == PrezelChipInteraction.ACTIVE -> {
-                colors.interactiveRegular
-            }
-
-            interaction == PrezelChipInteraction.DISABLED -> {
-                colors.iconDisabled
-            }
-
-            else -> {
-                colors.iconRegular
-            }
+            chipColors.contentColor != Color.Unspecified -> chipColors.contentColor
+            feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> colors.iconDisabled
+            else -> colors.iconRegular
         }
 
     @Composable
@@ -167,6 +144,13 @@ data class PrezelChipStyle(
 
         return PaddingValues(horizontal = horizontal, vertical = vertical)
     }
+
+    @Composable
+    internal fun iconTextSpacing(spacing: PrezelSpacing = PrezelTheme.spacing): Dp =
+        when (size) {
+            PrezelChipSize.REGULAR -> spacing.V4
+            PrezelChipSize.SMALL -> spacing.V2
+        }
 
     internal fun iconSize(): Dp =
         when (size) {

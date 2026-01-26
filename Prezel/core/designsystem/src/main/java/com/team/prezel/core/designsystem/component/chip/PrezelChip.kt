@@ -31,11 +31,49 @@ fun PrezelChip(
     icon: IconSource? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
 ) {
+    PrezelChipImpl(
+        modifier = modifier,
+        text = text,
+        icon = icon,
+        style = style,
+    )
+}
+
+@Composable
+fun PrezelChip(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    icon: IconSource? = null,
+    style: PrezelChipStyle = PrezelChipStyle(),
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified,
+) {
+    CompositionLocalProvider(
+        LocalPrezelChipColors provides PrezelChipColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
+    ) {
+        PrezelChipImpl(
+            modifier = modifier,
+            text = text,
+            icon = icon,
+            style = style,
+        )
+    }
+}
+
+@Composable
+private fun PrezelChipImpl(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    icon: IconSource? = null,
+    style: PrezelChipStyle = PrezelChipStyle(),
+) {
     val hasText = text != null
     val hasIcon = icon != null
     val iconOnly = hasIcon && !hasText
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
-    val (_, chipSize, _, _) = style
 
     Surface(
         modifier = modifier,
@@ -54,69 +92,11 @@ fun PrezelChip(
             ) {
                 PrezelChipIcon(icon = icon, style = style)
 
-                if (!hasText) return@Row
-                if (hasIcon) {
-                    val spacing = if (chipSize == PrezelChipSize.REGULAR) PrezelTheme.spacing.V4 else PrezelTheme.spacing.V2
-                    Spacer(modifier = Modifier.width(width = spacing))
-                }
-
-                Text(text = text)
-            }
-        }
-    }
-}
-
-@Composable
-fun PrezelChip(
-    modifier: Modifier = Modifier,
-    text: String? = null,
-    icon: IconSource? = null,
-    style: PrezelChipStyle = PrezelChipStyle(),
-    containerColor: Color = Color.Unspecified,
-    contentColor: Color = Color.Unspecified,
-) {
-    val hasText = text != null
-    val hasIcon = icon != null
-    val iconOnly = hasIcon && !hasText
-    require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
-
-    val colors = PrezelChipColors(
-        containerColor = containerColor,
-        contentColor = contentColor,
-    )
-
-    CompositionLocalProvider(LocalPrezelChipColors provides colors) {
-        val resolvedContainer = style.containerColor(iconOnly = iconOnly)
-        val resolvedContent = style.contentColor()
-        val resolvedBorder = style.borderStroke()
-
-        Surface(
-            modifier = modifier,
-            shape = style.shape(),
-            color = resolvedContainer,
-            border = resolvedBorder,
-        ) {
-            CompositionLocalProvider(
-                LocalTextStyle provides style.textStyle(),
-                LocalContentColor provides resolvedContent,
-            ) {
-                Row(
-                    modifier = Modifier.padding(style.contentPadding(iconOnly = iconOnly)),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    PrezelChipIcon(icon = icon, style = style)
-
-                    if (hasText) {
-                        if (hasIcon) {
-                            val spacing = when (style.size) {
-                                PrezelChipSize.REGULAR -> PrezelTheme.spacing.V4
-                                PrezelChipSize.SMALL -> PrezelTheme.spacing.V2
-                            }
-                            Spacer(modifier = Modifier.width(spacing))
-                        }
-                        Text(text = text)
+                if (hasText) {
+                    if (hasIcon) {
+                        Spacer(modifier = Modifier.width(style.iconTextSpacing()))
                     }
+                    Text(text = text)
                 }
             }
         }
@@ -142,18 +122,16 @@ private fun PrezelChipIcon(
 @Composable
 private fun PrezelChipPreview() {
     PrezelTheme {
-        PrezelTheme {
-            PreviewScaffold {
-                PrezelChipPreviewByType(
-                    type = PrezelChipType.FILLED,
-                ) { style -> PrezelChipPreviewItem(style) }
+        PreviewScaffold {
+            PrezelChipPreviewByType(
+                type = PrezelChipType.FILLED,
+            ) { style -> PrezelChipPreviewItem(style) }
 
-                HorizontalDivider()
+            HorizontalDivider()
 
-                PrezelChipPreviewByType(
-                    type = PrezelChipType.OUTLINED,
-                ) { style -> PrezelChipPreviewItem(style) }
-            }
+            PrezelChipPreviewByType(
+                type = PrezelChipType.OUTLINED,
+            ) { style -> PrezelChipPreviewItem(style) }
         }
     }
 }
