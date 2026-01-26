@@ -60,8 +60,8 @@ internal fun PrezelChipIcon(
         contentDescription = icon.contentDescription(),
         modifier = modifier.size(
             when (size) {
-                PrezelChipSize.SMALL -> 12.dp
-                PrezelChipSize.REGULAR -> 14.dp
+                PrezelChipSize.SMALL -> 14.dp
+                PrezelChipSize.REGULAR -> 16.dp
             },
         ),
     )
