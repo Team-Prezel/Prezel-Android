@@ -30,41 +30,6 @@ fun PrezelChip(
     icon: IconSource? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
 ) {
-    PrezelChipImpl(
-        modifier = modifier,
-        text = text,
-        icon = icon,
-        style = style,
-    )
-}
-
-@Composable
-fun PrezelChip(
-    modifier: Modifier = Modifier,
-    text: String? = null,
-    icon: IconSource? = null,
-    style: PrezelChipStyle = PrezelChipStyle(),
-    customColors: PrezelChipColors = LocalPrezelChipColors.current,
-) {
-    CompositionLocalProvider(
-        LocalPrezelChipColors provides customColors,
-    ) {
-        PrezelChipImpl(
-            modifier = modifier,
-            text = text,
-            icon = icon,
-            style = style,
-        )
-    }
-}
-
-@Composable
-private fun PrezelChipImpl(
-    modifier: Modifier = Modifier,
-    text: String? = null,
-    icon: IconSource? = null,
-    style: PrezelChipStyle = PrezelChipStyle(),
-) {
     val hasText = text != null
     val hasIcon = icon != null
     val iconOnly = hasIcon && !hasText
@@ -95,6 +60,26 @@ private fun PrezelChipImpl(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PrezelChip(
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    icon: IconSource? = null,
+    style: PrezelChipStyle = PrezelChipStyle(),
+    customColors: PrezelChipColors = LocalPrezelChipColors.current,
+) {
+    CompositionLocalProvider(
+        LocalPrezelChipColors provides customColors,
+    ) {
+        PrezelChip(
+            modifier = modifier,
+            text = text,
+            icon = icon,
+            style = style,
+        )
     }
 }
 
