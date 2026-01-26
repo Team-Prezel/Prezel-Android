@@ -1,12 +1,13 @@
 package com.team.prezel.core.designsystem.component.chip
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
@@ -34,24 +35,24 @@ fun PrezelChip(
     val hasIcon = icon != null
     val iconOnly = hasIcon && !hasText
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
-    val (chipType, chipSize, interaction, feedback) = style
+    val (_, chipSize, _, _) = style
 
     Surface(
         modifier = modifier,
-        shape = prezelChipShape(chipSize),
-        color = prezelChipContainerColor(type = chipType, interaction = interaction, feedback = feedback, iconOnly = iconOnly),
-        border = prezelChipBorderStroke(type = chipType, interaction = interaction, feedback = feedback),
+        shape = style.shape(),
+        color = style.containerColor(iconOnly = iconOnly),
+        border = style.borderStroke(),
     ) {
         CompositionLocalProvider(
-            LocalTextStyle provides prezelChipTextStyle(chipSize),
-            LocalContentColor provides prezelChipContentColor(interaction = interaction, feedback = feedback),
+            LocalTextStyle provides style.textStyle(),
+            LocalContentColor provides style.contentColor(),
         ) {
             Row(
-                modifier = Modifier.padding(prezelChipContentPadding(size = chipSize, onlyIcon = hasIcon && !hasText)),
+                modifier = Modifier.padding(style.contentPadding(iconOnly = iconOnly)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PrezelChipIcon(icon = icon, size = chipSize)
+                PrezelChipIcon(icon = icon, style = style)
 
                 if (!hasText) return@Row
                 if (hasIcon) {
@@ -78,93 +79,64 @@ fun PrezelChip(
     val hasIcon = icon != null
     val iconOnly = hasIcon && !hasText
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
-    val (_, chipSize, _, _) = style
 
-    val resolvedBorder =
-        resolveChipBorder(
-            style = style,
-            hasCustomContainerColor = containerColor != null,
-        )
+    val colors = PrezelChipColors(
+        containerColor = containerColor,
+        contentColor = contentColor,
+    )
 
-    val resolvedContainerColor =
-        resolveChipContainerColor(
-            style = style,
-            iconOnly = iconOnly,
-            overrideColor = containerColor,
-        )
+    CompositionLocalProvider(LocalPrezelChipColors provides colors) {
+        val resolvedContainer = style.containerColor(iconOnly = iconOnly)
+        val resolvedContent = style.contentColor()
+        val resolvedBorder = style.borderStroke()
 
-    val resolvedContentColor =
-        resolveChipContentColor(
-            style = style,
-            overrideColor = contentColor,
-        )
-
-    Surface(
-        modifier = modifier,
-        shape = prezelChipShape(chipSize),
-        color = resolvedContainerColor,
-        border = resolvedBorder,
-    ) {
-        CompositionLocalProvider(
-            LocalTextStyle provides prezelChipTextStyle(chipSize),
-            LocalContentColor provides resolvedContentColor,
+        Surface(
+            modifier = modifier,
+            shape = style.shape(),
+            color = resolvedContainer,
+            border = resolvedBorder,
         ) {
-            Row(
-                modifier = Modifier.padding(prezelChipContentPadding(size = chipSize, onlyIcon = hasIcon && !hasText)),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+            CompositionLocalProvider(
+                LocalTextStyle provides style.textStyle(),
+                LocalContentColor provides resolvedContent,
             ) {
-                PrezelChipIcon(icon = icon, size = chipSize)
+                Row(
+                    modifier = Modifier.padding(style.contentPadding(iconOnly = iconOnly)),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    PrezelChipIcon(icon = icon, style = style)
 
-                if (!hasText) return@Row
-                if (hasIcon) {
-                    val spacing = if (chipSize == PrezelChipSize.REGULAR) PrezelTheme.spacing.V4 else PrezelTheme.spacing.V2
-                    Spacer(modifier = Modifier.width(width = spacing))
+                    if (hasText) {
+                        if (hasIcon) {
+                            val spacing = when (style.size) {
+                                PrezelChipSize.REGULAR -> PrezelTheme.spacing.V4
+                                PrezelChipSize.SMALL -> PrezelTheme.spacing.V2
+                            }
+                            Spacer(modifier = Modifier.width(spacing))
+                        }
+                        Text(text = text)
+                    }
                 }
-
-                Text(text = text)
             }
         }
     }
 }
 
 @Composable
-private fun resolveChipBorder(
+private fun PrezelChipIcon(
+    icon: IconSource?,
     style: PrezelChipStyle,
-    hasCustomContainerColor: Boolean,
-): BorderStroke? =
-    if (hasCustomContainerColor) {
-        null
-    } else {
-        prezelChipBorderStroke(
-            type = style.type,
-            interaction = style.interaction,
-            feedback = style.feedback,
-        )
-    }
+    modifier: Modifier = Modifier,
+) {
+    if (icon == null) return
 
-@Composable
-private fun resolveChipContainerColor(
-    style: PrezelChipStyle,
-    iconOnly: Boolean,
-    overrideColor: Color?,
-): Color =
-    overrideColor ?: prezelChipContainerColor(
-        type = style.type,
-        interaction = style.interaction,
-        feedback = style.feedback,
-        iconOnly = iconOnly,
+    Icon(
+        painter = icon.painter(),
+        contentDescription = icon.contentDescription(),
+        modifier = modifier.size(style.iconSize()),
     )
-
-@Composable
-private fun resolveChipContentColor(
-    style: PrezelChipStyle,
-    overrideColor: Color?,
-): Color =
-    overrideColor ?: prezelChipContentColor(
-        interaction = style.interaction,
-        feedback = style.feedback,
-    )
+}
 
 @ThemePreview
 @Composable
