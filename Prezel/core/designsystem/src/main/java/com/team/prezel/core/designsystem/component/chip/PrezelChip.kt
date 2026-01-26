@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -45,14 +44,10 @@ fun PrezelChip(
     text: String? = null,
     icon: IconSource? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
-    containerColor: Color = Color.Unspecified,
-    contentColor: Color = Color.Unspecified,
+    customColors: PrezelChipColors = LocalPrezelChipColors.current,
 ) {
     CompositionLocalProvider(
-        LocalPrezelChipColors provides PrezelChipColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-        ),
+        LocalPrezelChipColors provides customColors,
     ) {
         PrezelChipImpl(
             modifier = modifier,

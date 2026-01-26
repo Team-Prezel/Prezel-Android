@@ -78,8 +78,10 @@ private fun CustomYellowLabelChip() {
             interaction = PrezelChipInteraction.DISABLED,
             feedback = PrezelChipFeedback.BAD,
         ),
-        containerColor = PrezelTheme.colors.feedbackWarningSmall,
-        contentColor = PrezelTheme.colors.feedbackWarningRegular,
+        customColors = PrezelChipColors(
+            containerColor = PrezelTheme.colors.feedbackWarningSmall,
+            contentColor = PrezelTheme.colors.feedbackWarningRegular,
+        ),
     )
 }
 
@@ -94,8 +96,10 @@ private fun CustomRedLabelChip() {
             interaction = PrezelChipInteraction.DEFAULT,
             feedback = PrezelChipFeedback.DEFAULT,
         ),
-        containerColor = PrezelTheme.colors.feedbackBadSmall,
-        contentColor = PrezelTheme.colors.feedbackBadRegular,
+        customColors = PrezelChipColors(
+            containerColor = PrezelTheme.colors.feedbackBadSmall,
+            contentColor = PrezelTheme.colors.feedbackBadRegular,
+        ),
     )
 }
 
@@ -110,8 +114,10 @@ private fun CustomGreenLabelChip() {
             interaction = PrezelChipInteraction.ACTIVE,
             feedback = PrezelChipFeedback.DEFAULT,
         ),
-        containerColor = Color(0xFFDBFFF6),
-        contentColor = Color(0xFF00A37A),
+        customColors = PrezelChipColors(
+            containerColor = Color(0xFFDBFFF6),
+            contentColor = Color(0xFF00A37A),
+        ),
     )
 }
 
@@ -126,8 +132,10 @@ private fun CustomYellowIconChip() {
             interaction = PrezelChipInteraction.DISABLED,
             feedback = PrezelChipFeedback.BAD,
         ),
-        containerColor = PrezelTheme.colors.feedbackWarningSmall,
-        contentColor = PrezelTheme.colors.feedbackWarningRegular,
+        customColors = PrezelChipColors(
+            containerColor = PrezelTheme.colors.feedbackWarningSmall,
+            contentColor = PrezelTheme.colors.feedbackWarningRegular,
+        ),
     )
 }
 
@@ -142,8 +150,10 @@ private fun CustomRedIconChip() {
             interaction = PrezelChipInteraction.DEFAULT,
             feedback = PrezelChipFeedback.DEFAULT,
         ),
-        containerColor = PrezelTheme.colors.feedbackBadSmall,
-        contentColor = PrezelTheme.colors.feedbackBadRegular,
+        customColors = PrezelChipColors(
+            containerColor = PrezelTheme.colors.feedbackBadSmall,
+            contentColor = PrezelTheme.colors.feedbackBadRegular,
+        ),
     )
 }
 
@@ -158,7 +168,9 @@ private fun CustomGreenIconChip() {
             interaction = PrezelChipInteraction.ACTIVE,
             feedback = PrezelChipFeedback.DEFAULT,
         ),
-        containerColor = Color(0xFFDBFFF6),
-        contentColor = Color(0xFF00A37A),
+        customColors = PrezelChipColors(
+            containerColor = Color(0xFFDBFFF6),
+            contentColor = Color(0xFF00A37A),
+        ),
     )
 }
