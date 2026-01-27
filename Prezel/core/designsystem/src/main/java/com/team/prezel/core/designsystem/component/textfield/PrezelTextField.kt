@@ -325,6 +325,12 @@ private fun PreviewTextFieldItem(
         state = state,
         modifier = modifier,
         onFocusChange = {},
+        trailingIcon = {
+            Icon(
+                painter = painterResource(PrezelIcons.Blank),
+                contentDescription = null,
+            )
+        },
     )
 
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
