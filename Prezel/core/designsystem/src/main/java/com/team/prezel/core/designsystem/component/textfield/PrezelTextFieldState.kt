@@ -51,10 +51,10 @@ enum class PrezelTextFieldInteraction {
             idleTyped: Boolean,
         ): PrezelTextFieldInteraction =
             when {
-                !enabled -> PrezelTextFieldInteraction.DISABLED
-                focused && !idleTyped -> PrezelTextFieldInteraction.TYPING
-                focused && idleTyped -> PrezelTextFieldInteraction.TYPED
-                else -> PrezelTextFieldInteraction.DEFAULT
+                !enabled -> DISABLED
+                focused && !idleTyped -> TYPING
+                focused && idleTyped -> TYPED
+                else -> DEFAULT
             }
     }
 }
