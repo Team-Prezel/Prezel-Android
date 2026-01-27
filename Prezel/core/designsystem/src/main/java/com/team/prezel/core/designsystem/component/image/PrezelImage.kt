@@ -41,7 +41,6 @@ fun PrezelImage(
 
     Box(
         modifier = modifier
-            .size(100.dp)
             .clip(shape)
             .then(
                 if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier,
@@ -64,7 +63,7 @@ fun PrezelImage(
                 Image(
                     painter = painterResource(id = source.resId),
                     contentDescription = contentDescription,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier,
                     contentScale = ContentScale.Fit,
                 )
 
@@ -90,22 +89,34 @@ private fun PrezelImagePreview() {
             PrezelImage(
                 source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
                 contentDescription = "Drawable / No Round / No Border",
+                modifier = Modifier.size(100.dp),
                 rounded = false,
                 border = false,
             )
 
-            Text(text = "Drawable / No Round / No Border")
+            Text(text = "Drawable / Round / No Border")
             PrezelImage(
                 source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
                 contentDescription = "Drawable / Round / No Border",
+                modifier = Modifier.size(100.dp),
                 rounded = true,
                 border = false,
+            )
+
+            Text(text = "Drawable / No Round / Border")
+            PrezelImage(
+                source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
+                contentDescription = "Drawable / Round / Border",
+                modifier = Modifier.size(100.dp),
+                rounded = false,
+                border = true,
             )
 
             Text(text = "Drawable / Round / Border")
             PrezelImage(
                 source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
                 contentDescription = "Drawable / Round / Border",
+                modifier = Modifier.size(100.dp),
                 rounded = true,
                 border = true,
             )
