@@ -42,6 +42,21 @@ enum class PrezelTextFieldInteraction {
 
     /** 비활성화된 상태 */
     DISABLED,
+    ;
+
+    companion object {
+        fun calculate(
+            enabled: Boolean,
+            focused: Boolean,
+            idleTyped: Boolean,
+        ): PrezelTextFieldInteraction =
+            when {
+                !enabled -> PrezelTextFieldInteraction.DISABLED
+                focused && !idleTyped -> PrezelTextFieldInteraction.TYPING
+                focused && idleTyped -> PrezelTextFieldInteraction.TYPED
+                else -> PrezelTextFieldInteraction.DEFAULT
+            }
+    }
 }
 
 /**
@@ -224,13 +239,8 @@ internal fun rememberPrezelTextFieldState(
             .collectLatest { idleTyped = true }
     }
 
-    val interaction = remember(value, enabled, focused, idleTyped) {
-        when {
-            !enabled -> PrezelTextFieldInteraction.DISABLED
-            focused && !idleTyped -> PrezelTextFieldInteraction.TYPING
-            focused && idleTyped -> PrezelTextFieldInteraction.TYPED
-            else -> PrezelTextFieldInteraction.DEFAULT
-        }
+    val interaction = remember(enabled, focused, idleTyped) {
+        PrezelTextFieldInteraction.calculate(enabled = enabled, focused = focused, idleTyped = idleTyped)
     }
 
     return remember(interaction, feedback) { PrezelTextFieldState(interaction = interaction, feedback = feedback) }
