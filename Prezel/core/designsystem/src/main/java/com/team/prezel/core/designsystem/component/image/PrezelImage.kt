@@ -85,41 +85,45 @@ private fun PrezelImagePreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(text = "Drawable / No Round / No Border")
-            PrezelImage(
-                source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
-                contentDescription = "Drawable / No Round / No Border",
-                modifier = Modifier.size(100.dp),
+            PrezelImagePreviewItem(
+                label = "Drawable / No Round / No Border",
                 rounded = false,
                 border = false,
             )
 
-            Text(text = "Drawable / Round / No Border")
-            PrezelImage(
-                source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
-                contentDescription = "Drawable / Round / No Border",
-                modifier = Modifier.size(100.dp),
+            PrezelImagePreviewItem(
+                label = "Drawable / Round / No Border",
                 rounded = true,
                 border = false,
             )
 
-            Text(text = "Drawable / No Round / Border")
-            PrezelImage(
-                source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
-                contentDescription = "Drawable / Round / Border",
-                modifier = Modifier.size(100.dp),
+            PrezelImagePreviewItem(
+                label = "Drawable / No Round / Border",
                 rounded = false,
                 border = true,
             )
 
-            Text(text = "Drawable / Round / Border")
-            PrezelImage(
-                source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
-                contentDescription = "Drawable / Round / Border",
-                modifier = Modifier.size(100.dp),
+            PrezelImagePreviewItem(
+                label = "Drawable / Round / Border",
                 rounded = true,
                 border = true,
             )
         }
     }
+}
+
+@Composable
+private fun PrezelImagePreviewItem(
+    label: String,
+    rounded: Boolean,
+    border: Boolean,
+) {
+    Text(text = label)
+    PrezelImage(
+        source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
+        contentDescription = label,
+        modifier = Modifier.size(100.dp),
+        rounded = rounded,
+        border = border,
+    )
 }
