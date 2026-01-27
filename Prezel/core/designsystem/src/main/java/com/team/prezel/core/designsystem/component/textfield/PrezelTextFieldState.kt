@@ -3,11 +3,26 @@ package com.team.prezel.core.designsystem.component.textfield
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Prezel TextField의 상호작용 상태를 나타냅니다.
@@ -34,15 +49,28 @@ enum class PrezelTextFieldInteraction {
  *
  * 입력이 완료된 이후(`TYPED`) 상태에서 시각적인 피드백을 제공하기 위해 사용됩니다.
  */
-enum class PrezelTextFieldFeedback {
+@Stable
+sealed interface PrezelTextFieldFeedback {
+    val message: String
+
     /** 기본 상태 (피드백 없음) */
-    DEFAULT,
+    data class DEFAULT(
+        override val message: String,
+    ) : PrezelTextFieldFeedback
 
     /** 긍정적인 입력 결과 */
-    GOOD,
+    data class GOOD(
+        override val message: String,
+    ) : PrezelTextFieldFeedback
 
     /** 부정적인 입력 결과 */
-    BAD,
+    data class BAD(
+        override val message: String,
+    ) : PrezelTextFieldFeedback
+
+    companion object {
+        val NO_MESSAGE = DEFAULT(message = "")
+    }
 }
 
 /**
@@ -57,10 +85,13 @@ enum class PrezelTextFieldFeedback {
  * @property interaction TextField의 현재 상호작용 상태
  * @property feedback 입력 결과에 대한 피드백 상태
  */
-data class PrezelTextFieldStyle(
+@Immutable
+data class PrezelTextFieldState(
     val interaction: PrezelTextFieldInteraction = PrezelTextFieldInteraction.DEFAULT,
-    val feedback: PrezelTextFieldFeedback = PrezelTextFieldFeedback.DEFAULT,
+    val feedback: PrezelTextFieldFeedback = PrezelTextFieldFeedback.NO_MESSAGE,
 ) {
+    val supportingText: String = feedback.message
+
     /**
      * TextField 컨테이너의 배경 색상을 반환합니다.
      *
@@ -71,9 +102,9 @@ data class PrezelTextFieldStyle(
     internal fun containerColor(colors: PrezelColors = PrezelTheme.colors): Color =
         when (interaction) {
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                PrezelTextFieldFeedback.DEFAULT -> Color.Transparent
-                PrezelTextFieldFeedback.GOOD -> colors.feedbackGoodSmall
-                PrezelTextFieldFeedback.BAD -> colors.feedbackBadSmall
+                is PrezelTextFieldFeedback.DEFAULT -> Color.Transparent
+                is PrezelTextFieldFeedback.GOOD -> colors.feedbackGoodSmall
+                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadSmall
             }
 
             else -> Color.Transparent
@@ -95,9 +126,24 @@ data class PrezelTextFieldStyle(
             PrezelTextFieldInteraction.DISABLED -> colors.textDisabled
             PrezelTextFieldInteraction.TYPING -> colors.textLarge
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                PrezelTextFieldFeedback.DEFAULT -> colors.textRegular
+                is PrezelTextFieldFeedback.DEFAULT -> colors.textRegular
                 else -> if (isDarkTheme) PrezelColorScheme.Light.textLarge else colors.textLarge
             }
+        }
+
+    /**
+     * TextField Supporting 텍스트 색상을 반환합니다.
+     */
+    @Composable
+    internal fun supportingTextColor(colors: PrezelColors = PrezelTheme.colors): Color =
+        when (interaction) {
+            PrezelTextFieldInteraction.TYPED -> when (feedback) {
+                is PrezelTextFieldFeedback.DEFAULT -> colors.textRegular
+                is PrezelTextFieldFeedback.GOOD -> colors.feedbackGoodRegular
+                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+            }
+
+            else -> PrezelTheme.colors.textRegular
         }
 
     /**
@@ -115,9 +161,9 @@ data class PrezelTextFieldStyle(
 
             PrezelTextFieldInteraction.TYPING -> colors.iconRegular
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                PrezelTextFieldFeedback.DEFAULT -> colors.iconRegular
-                PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
-                PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+                is PrezelTextFieldFeedback.DEFAULT -> colors.iconRegular
+                is PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
+                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
             }
         }
 
@@ -144,12 +190,48 @@ data class PrezelTextFieldStyle(
             PrezelTextFieldInteraction.DEFAULT -> colors.borderSmall
             PrezelTextFieldInteraction.TYPING -> colors.borderMedium
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                PrezelTextFieldFeedback.DEFAULT -> colors.borderRegular
-                PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
-                PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+                is PrezelTextFieldFeedback.DEFAULT -> colors.borderRegular
+                is PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
+                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
             }
         }
 
         return BorderStroke(width = borderWidth, color = borderColor)
     }
+}
+
+@OptIn(FlowPreview::class)
+@Composable
+internal fun rememberPrezelTextFieldState(
+    value: String,
+    enabled: Boolean,
+    focused: Boolean,
+    feedback: PrezelTextFieldFeedback,
+    idleMillis: Long = 1000L,
+): PrezelTextFieldState {
+    var idleTyped by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(focused) {
+        if (!focused) idleTyped = false
+    }
+
+    LaunchedEffect(value, focused, enabled) {
+        snapshotFlow { value }
+            .distinctUntilChanged()
+            .onEach { idleTyped = false }
+            .debounce(idleMillis)
+            .filter { focused && enabled }
+            .collectLatest { idleTyped = true }
+    }
+
+    val interaction = remember(value, enabled, focused, idleTyped) {
+        when {
+            !enabled -> PrezelTextFieldInteraction.DISABLED
+            focused && !idleTyped -> PrezelTextFieldInteraction.TYPING
+            focused && idleTyped -> PrezelTextFieldInteraction.TYPED
+            else -> PrezelTextFieldInteraction.DEFAULT
+        }
+    }
+
+    return remember(interaction, feedback) { PrezelTextFieldState(interaction = interaction, feedback = feedback) }
 }
