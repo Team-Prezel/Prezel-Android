@@ -43,7 +43,9 @@ fun PrezelImage(
         modifier = modifier
             .size(100.dp)
             .clip(shape)
-            .then(if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier),
+            .then(
+                if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         when (source) {
@@ -66,7 +68,7 @@ fun PrezelImage(
                     contentScale = ContentScale.Fit,
                 )
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(source) {
                     onSuccess()
                 }
             }
