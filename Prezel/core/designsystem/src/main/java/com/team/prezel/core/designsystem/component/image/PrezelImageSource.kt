@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 sealed interface PrezelImageSource {
-
     @Immutable
     data class Url(
         val value: String,

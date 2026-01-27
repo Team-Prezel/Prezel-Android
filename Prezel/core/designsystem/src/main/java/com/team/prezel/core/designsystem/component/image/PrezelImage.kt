@@ -46,7 +46,6 @@ fun PrezelImage(
             .then(if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
-
         when (source) {
             is PrezelImageSource.Url -> {
                 PrezelAsyncImage(
