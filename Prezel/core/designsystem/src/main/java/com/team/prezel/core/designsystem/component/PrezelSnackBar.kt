@@ -136,12 +136,26 @@ private fun PrezelSnackBarLeadingIcon(
 
 @ThemePreview
 @Composable
-private fun PrezelSnackBarPreview() {
+private fun PrezelSnackBarAllPreview() {
     PrezelTheme {
         Column(
             modifier = Modifier
                 .background(PrezelTheme.colors.bgRegular)
                 .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            PrezelSnackbarPreview()
+            PrezelToastPreview()
+        }
+    }
+}
+
+@ThemePreview
+@Composable
+private fun PrezelSnackbarPreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val previewAction = PrezelSnackBarAction(
@@ -170,7 +184,18 @@ private fun PrezelSnackBarPreview() {
                 icon = null,
                 action = previewAction,
             )
+        }
+    }
+}
 
+@ThemePreview
+@Composable
+private fun PrezelToastPreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             Text("Toast")
             SnackBarPreviewItem(message = "Message", icon = null)
             SnackBarPreviewItem(message = "Message Message Message Message Message Message", icon = null)
