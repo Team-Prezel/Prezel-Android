@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.image
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +28,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 fun PrezelImage(
-    source: PrezelImageSource,
+    url: String,
     contentDescription: String,
     modifier: Modifier = Modifier,
     rounded: Boolean = false,
@@ -36,43 +36,53 @@ fun PrezelImage(
     onSuccess: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
 ) {
+    Box(
+        modifier = modifier.prezelImageContainer(rounded, border),
+        contentAlignment = Alignment.Center,
+    ) {
+        PrezelAsyncImage(
+            url = url,
+            contentDescription = contentDescription,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+}
+
+@Composable
+fun PrezelImage(
+    @DrawableRes resId: Int,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+    rounded: Boolean = false,
+    border: Boolean = false,
+) {
+    Box(
+        modifier = modifier.prezelImageContainer(rounded, border),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(id = resId),
+            contentDescription = contentDescription,
+            modifier = Modifier,
+            contentScale = ContentScale.Fit,
+        )
+    }
+}
+
+@Composable
+private fun Modifier.prezelImageContainer(
+    rounded: Boolean,
+    border: Boolean,
+): Modifier {
     val shape = if (rounded) RoundedCornerShape(12.dp) else RectangleShape
     val borderStroke = if (border) BorderStroke(width = 1.dp, color = PrezelTheme.colors.borderRegular) else null
 
-    Box(
-        modifier = modifier
-            .clip(shape)
-            .then(
-                if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        when (source) {
-            is PrezelImageSource.Url -> {
-                PrezelAsyncImage(
-                    url = source.value,
-                    contentDescription = contentDescription,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    onSuccess = onSuccess,
-                    onError = onError,
-                )
-            }
-
-            is PrezelImageSource.Drawable -> {
-                Image(
-                    painter = painterResource(id = source.resId),
-                    contentDescription = contentDescription,
-                    modifier = Modifier,
-                    contentScale = ContentScale.Fit,
-                )
-
-                LaunchedEffect(source) {
-                    onSuccess()
-                }
-            }
-        }
-    }
+    return this
+        .clip(shape)
+        .then(if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier)
 }
 
 @ThemePreview
@@ -120,7 +130,7 @@ private fun PrezelImagePreviewItem(
 ) {
     Text(text = label)
     PrezelImage(
-        source = PrezelImageSource.Drawable(resId = PrezelIcons.Calendar),
+        resId = PrezelIcons.Calendar,
         contentDescription = label,
         modifier = Modifier.size(100.dp),
         rounded = rounded,
