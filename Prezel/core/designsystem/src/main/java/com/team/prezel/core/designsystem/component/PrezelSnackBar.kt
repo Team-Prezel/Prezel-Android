@@ -151,19 +151,23 @@ private fun PrezelSnackBarPreview() {
 
             Text("SnackBar")
             SnackBarPreviewItem(
-                message = "Message", icon = DrawableIcon(PrezelIcons.Blank),
+                message = "Message",
+                icon = DrawableIcon(PrezelIcons.Blank),
                 action = previewAction,
             )
             SnackBarPreviewItem(
-                message = "Message Message Message Message Message", icon = DrawableIcon(PrezelIcons.Blank),
+                message = "Message Message Message Message Message",
+                icon = DrawableIcon(PrezelIcons.Blank),
                 action = previewAction,
             )
             SnackBarPreviewItem(
-                message = "Message", icon = null,
+                message = "Message",
+                icon = null,
                 action = previewAction,
             )
             SnackBarPreviewItem(
-                message = "Message Message Message Message Message", icon = null,
+                message = "Message Message Message Message Message",
+                icon = null,
                 action = previewAction,
             )
 
@@ -175,7 +179,6 @@ private fun PrezelSnackBarPreview() {
         }
     }
 }
-
 
 @Composable
 private fun SnackBarPreviewItem(
