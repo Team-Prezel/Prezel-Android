@@ -190,8 +190,7 @@ private fun PrezelTextFieldSupportingText(
     modifier: Modifier = Modifier,
 ) {
     Text(
-//        text = state.supportingText,
-        text = state.interaction.toString(),
+        text = state.supportingText,
         style = PrezelTheme.typography.body3Regular,
         color = state.supportingTextColor(),
         modifier = modifier,
