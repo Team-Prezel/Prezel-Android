@@ -150,7 +150,7 @@ private fun PrezelTextFieldDecorationBox(
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 innerTextField()
-                value.ifEmpty {
+                if (value.isEmpty()) {
                     Text(
                         text = placeholder,
                         maxLines = 1,
