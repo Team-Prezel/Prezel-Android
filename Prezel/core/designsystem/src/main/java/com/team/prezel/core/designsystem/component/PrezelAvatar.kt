@@ -102,7 +102,7 @@ private fun DefaultAvatarIcon(
     contentDescription: String,
 ) {
     Icon(
-        painter = painterResource(R.drawable.ic_person),
+        painter = painterResource(R.drawable.core_designsystem_ic_person),
         contentDescription = contentDescription,
         modifier = Modifier.size(prezelAvatarIconSize(size)),
         tint = PrezelTheme.colors.iconDisabled,
