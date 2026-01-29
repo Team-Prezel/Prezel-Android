@@ -189,10 +189,11 @@ private data class PreviewSnackbarVisuals(
     override val duration: SnackbarDuration = SnackbarDuration.Short,
 ) : SnackbarVisuals
 
+@Suppress("EmptyFunctionBlock")
 private class PreviewSnackbarData(
     override val visuals: SnackbarVisuals,
 ) : SnackbarData {
-    override fun performAction() {}
-
     override fun dismiss() {}
+
+    override fun performAction() {}
 }
