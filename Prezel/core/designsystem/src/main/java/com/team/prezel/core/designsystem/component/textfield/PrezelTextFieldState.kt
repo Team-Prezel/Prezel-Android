@@ -9,7 +9,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
@@ -21,7 +21,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 
 /**
@@ -48,13 +47,13 @@ enum class PrezelTextFieldInteraction {
         fun calculate(
             enabled: Boolean,
             focused: Boolean,
-            idleTyped: Boolean,
+            isIdle: Boolean,
         ): PrezelTextFieldInteraction =
             when {
                 !enabled -> DISABLED
-                focused && !idleTyped -> TYPING
-                focused && idleTyped -> TYPED
-                else -> DEFAULT
+                !focused -> DEFAULT
+                !isIdle -> TYPING
+                else -> TYPED
             }
     }
 }
@@ -172,7 +171,7 @@ data class PrezelTextFieldState(
         when (interaction) {
             PrezelTextFieldInteraction.DISABLED,
             PrezelTextFieldInteraction.DEFAULT,
-            -> colors.iconDisabled
+                -> colors.iconDisabled
 
             PrezelTextFieldInteraction.TYPING -> colors.iconRegular
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
@@ -193,11 +192,11 @@ data class PrezelTextFieldState(
         val borderWidth = when (interaction) {
             PrezelTextFieldInteraction.DEFAULT,
             PrezelTextFieldInteraction.DISABLED,
-            -> 1.dp
+                -> 1.dp
 
             PrezelTextFieldInteraction.TYPING,
             PrezelTextFieldInteraction.TYPED,
-            -> 2.dp
+                -> 2.dp
         }
 
         val borderColor = when (interaction) {
@@ -217,31 +216,32 @@ data class PrezelTextFieldState(
 
 @OptIn(FlowPreview::class)
 @Composable
-internal fun rememberPrezelTextFieldState(
+internal fun rememberPrezelTextFieldInteraction(
     value: String,
     enabled: Boolean,
     focused: Boolean,
-    feedback: PrezelTextFieldFeedback,
-    idleMillis: Long = 1000L,
-): PrezelTextFieldState {
-    var idleTyped by rememberSaveable { mutableStateOf(false) }
+    idleMillis: Long = 800L,
+): PrezelTextFieldInteraction {
+    var isIdle by remember { mutableStateOf(false) }
+    val latestValue by rememberUpdatedState(value)
+    val latestEnabled by rememberUpdatedState(enabled)
+    val latestFocused by rememberUpdatedState(focused)
 
     LaunchedEffect(focused) {
-        if (!focused) idleTyped = false
+        if (!focused) isIdle = false
     }
 
-    LaunchedEffect(value, focused, enabled) {
-        snapshotFlow { value }
+    LaunchedEffect(idleMillis) {
+        snapshotFlow { latestValue }
             .distinctUntilChanged()
-            .onEach { idleTyped = false }
+            .onEach { isIdle = false }
             .debounce(idleMillis)
-            .filter { focused && enabled }
-            .collectLatest { idleTyped = true }
+            .collectLatest { if (latestEnabled && latestFocused) isIdle = true }
     }
 
-    val interaction = remember(enabled, focused, idleTyped) {
-        PrezelTextFieldInteraction.calculate(enabled = enabled, focused = focused, idleTyped = idleTyped)
-    }
-
-    return remember(interaction, feedback) { PrezelTextFieldState(interaction = interaction, feedback = feedback) }
+    return PrezelTextFieldInteraction.calculate(
+        enabled = enabled,
+        focused = focused,
+        isIdle = isIdle,
+    )
 }

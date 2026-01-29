@@ -53,12 +53,11 @@ fun PrezelTextField(
 ) {
     var focused by remember { mutableStateOf(false) }
 
-    val state = rememberPrezelTextFieldState(
+    val state = rememberPrezelTextFieldInteraction(
         value = value,
         enabled = enabled,
         focused = focused,
-        feedback = feedback,
-    )
+    ).let { interaction -> PrezelTextFieldState(interaction = interaction, feedback = feedback) }
 
     PrezelTextField(
         value = value,
@@ -191,7 +190,8 @@ private fun PrezelTextFieldSupportingText(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = state.supportingText,
+//        text = state.supportingText,
+        text = state.interaction.toString(),
         style = PrezelTheme.typography.body3Regular,
         color = state.supportingTextColor(),
         modifier = modifier,
