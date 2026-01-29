@@ -56,7 +56,6 @@ internal object PrezelSnackbarDefaults {
     )
 }
 
-
 @Composable
 fun PrezelSnackbar(
     data: SnackbarData,
@@ -175,12 +174,13 @@ private fun PrezelSnackBarPreview_Cases() {
 private fun previewData(
     message: String,
     actionLabel: String?,
-): SnackbarData = PreviewSnackbarData(
-    visuals = PreviewSnackbarVisuals(
-        message = message,
-        actionLabel = actionLabel,
-    ),
-)
+): SnackbarData =
+    PreviewSnackbarData(
+        visuals = PreviewSnackbarVisuals(
+            message = message,
+            actionLabel = actionLabel,
+        ),
+    )
 
 private data class PreviewSnackbarVisuals(
     override val message: String,
@@ -193,5 +193,6 @@ private class PreviewSnackbarData(
     override val visuals: SnackbarVisuals,
 ) : SnackbarData {
     override fun performAction() {}
+
     override fun dismiss() {}
 }
