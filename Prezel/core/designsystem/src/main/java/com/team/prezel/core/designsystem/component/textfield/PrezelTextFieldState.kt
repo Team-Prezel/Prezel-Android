@@ -158,7 +158,7 @@ data class PrezelTextFieldState(
                 is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
             }
 
-            else -> PrezelTheme.colors.textRegular
+            else -> colors.textRegular
         }
 
     /**
