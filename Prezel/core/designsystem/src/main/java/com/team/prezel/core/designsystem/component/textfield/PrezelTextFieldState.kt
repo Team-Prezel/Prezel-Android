@@ -68,22 +68,22 @@ sealed interface PrezelTextFieldFeedback {
     val message: String
 
     /** 기본 상태 (피드백 없음) */
-    data class DEFAULT(
+    data class Default(
         override val message: String,
     ) : PrezelTextFieldFeedback
 
     /** 긍정적인 입력 결과 */
-    data class GOOD(
+    data class Good(
         override val message: String,
     ) : PrezelTextFieldFeedback
 
     /** 부정적인 입력 결과 */
-    data class BAD(
+    data class Bad(
         override val message: String,
     ) : PrezelTextFieldFeedback
 
     companion object {
-        val NO_MESSAGE = DEFAULT(message = "")
+        val NO_MESSAGE = Default(message = "")
     }
 }
 
@@ -116,9 +116,9 @@ data class PrezelTextFieldState(
     internal fun containerColor(colors: PrezelColors = PrezelTheme.colors): Color =
         when (interaction) {
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.DEFAULT -> Color.Transparent
-                is PrezelTextFieldFeedback.GOOD -> colors.feedbackGoodSmall
-                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadSmall
+                is PrezelTextFieldFeedback.Default -> Color.Transparent
+                is PrezelTextFieldFeedback.Good -> colors.feedbackGoodSmall
+                is PrezelTextFieldFeedback.Bad -> colors.feedbackBadSmall
             }
 
             else -> Color.Transparent
@@ -140,7 +140,7 @@ data class PrezelTextFieldState(
             PrezelTextFieldInteraction.DISABLED -> colors.textDisabled
             PrezelTextFieldInteraction.TYPING -> colors.textLarge
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.DEFAULT -> colors.textRegular
+                is PrezelTextFieldFeedback.Default -> colors.textRegular
                 else -> if (isDarkTheme) PrezelColorScheme.Light.textLarge else colors.textLarge
             }
         }
@@ -152,9 +152,9 @@ data class PrezelTextFieldState(
     internal fun supportingTextColor(colors: PrezelColors = PrezelTheme.colors): Color =
         when (interaction) {
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.DEFAULT -> colors.textRegular
-                is PrezelTextFieldFeedback.GOOD -> colors.feedbackGoodRegular
-                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+                is PrezelTextFieldFeedback.Default -> colors.textRegular
+                is PrezelTextFieldFeedback.Good -> colors.feedbackGoodRegular
+                is PrezelTextFieldFeedback.Bad -> colors.feedbackBadRegular
             }
 
             else -> colors.textRegular
@@ -171,13 +171,13 @@ data class PrezelTextFieldState(
         when (interaction) {
             PrezelTextFieldInteraction.DISABLED,
             PrezelTextFieldInteraction.DEFAULT,
-                -> colors.iconDisabled
+            -> colors.iconDisabled
 
             PrezelTextFieldInteraction.TYPING -> colors.iconRegular
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.DEFAULT -> colors.iconRegular
-                is PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
-                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+                is PrezelTextFieldFeedback.Default -> colors.iconRegular
+                is PrezelTextFieldFeedback.Good -> colors.interactiveRegular
+                is PrezelTextFieldFeedback.Bad -> colors.feedbackBadRegular
             }
         }
 
@@ -192,11 +192,11 @@ data class PrezelTextFieldState(
         val borderWidth = when (interaction) {
             PrezelTextFieldInteraction.DEFAULT,
             PrezelTextFieldInteraction.DISABLED,
-                -> 1.dp
+            -> 1.dp
 
             PrezelTextFieldInteraction.TYPING,
             PrezelTextFieldInteraction.TYPED,
-                -> 2.dp
+            -> 2.dp
         }
 
         val borderColor = when (interaction) {
@@ -204,9 +204,9 @@ data class PrezelTextFieldState(
             PrezelTextFieldInteraction.DEFAULT -> colors.borderSmall
             PrezelTextFieldInteraction.TYPING -> colors.borderMedium
             PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.DEFAULT -> colors.borderRegular
-                is PrezelTextFieldFeedback.GOOD -> colors.interactiveRegular
-                is PrezelTextFieldFeedback.BAD -> colors.feedbackBadRegular
+                is PrezelTextFieldFeedback.Default -> colors.borderRegular
+                is PrezelTextFieldFeedback.Good -> colors.interactiveRegular
+                is PrezelTextFieldFeedback.Bad -> colors.feedbackBadRegular
             }
         }
 

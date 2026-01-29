@@ -209,7 +209,7 @@ private fun DefaultPrezelTextFieldPreview() {
                 value = "",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.DEFAULT,
-                    feedback = PrezelTextFieldFeedback.DEFAULT("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
 
@@ -217,7 +217,7 @@ private fun DefaultPrezelTextFieldPreview() {
                 value = "",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.DISABLED,
-                    feedback = PrezelTextFieldFeedback.DEFAULT("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
         }
@@ -234,7 +234,7 @@ private fun TypingPrezelTextFieldPreview() {
                 value = "입력 중...",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPING,
-                    feedback = PrezelTextFieldFeedback.DEFAULT("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
         }
@@ -251,14 +251,14 @@ private fun TypedPrezelTextFieldPreview() {
                 value = "입력함",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
-                    feedback = PrezelTextFieldFeedback.DEFAULT("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
             PreviewTextFieldItem(
                 value = "입력함",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
-                    feedback = PrezelTextFieldFeedback.GOOD("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Good("헬퍼 메시지"),
                 ),
             )
 
@@ -266,7 +266,7 @@ private fun TypedPrezelTextFieldPreview() {
                 value = "입력함",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
-                    feedback = PrezelTextFieldFeedback.BAD("헬퍼 메시지"),
+                    feedback = PrezelTextFieldFeedback.Bad("헬퍼 메시지"),
                 ),
             )
         }
@@ -299,7 +299,7 @@ private fun MainPrezelTextFieldPreview() {
                             ),
                     )
                 },
-                feedback = PrezelTextFieldFeedback.DEFAULT("헬퍼 메시지"),
+                feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
             )
 
             Spacer(modifier = Modifier.height(20.dp))
