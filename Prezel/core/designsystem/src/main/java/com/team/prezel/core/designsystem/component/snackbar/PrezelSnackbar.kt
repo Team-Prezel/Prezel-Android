@@ -63,7 +63,7 @@ fun PrezelSnackbar(
 
             Text(
                 text = visuals.message,
-                modifier = modifier.weight(1f),
+                modifier = Modifier.weight(1f),
                 style = PrezelTextStyles.Body3Regular.toTextStyle(),
             )
         }
