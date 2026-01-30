@@ -12,7 +12,7 @@ import com.team.prezel.core.designsystem.icon.IconSource
 internal data class PrezelSnackbarVisuals(
     override val message: String,
     override val actionLabel: String?,
-    override val withDismissAction: Boolean,
+    override val withDismissAction: Boolean = false,
     override val duration: SnackbarDuration,
     val leadingIcon: IconSource?,
 ) : SnackbarVisuals
@@ -21,7 +21,6 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     message: String,
     leadingIcon: IconSource? = null,
     actionLabel: String? = null,
-    withDismissAction: Boolean = false,
     duration: SnackbarDuration = SnackbarDuration.Short,
     onAction: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
@@ -34,7 +33,6 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
         visuals = PrezelSnackbarVisuals(
             message = message,
             actionLabel = actionLabel,
-            withDismissAction = withDismissAction,
             duration = duration,
             leadingIcon = leadingIcon,
         ),
