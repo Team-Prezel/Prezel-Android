@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.button.PrezelButton
+import com.team.prezel.core.designsystem.component.button.PrezelButtonSize
 import com.team.prezel.core.designsystem.component.button.PrezelButtonStyle
 import com.team.prezel.core.designsystem.component.button.PrezelButtonType
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
@@ -46,7 +47,7 @@ fun PrezelSnackbar(
                 PrezelButton(
                     text = label,
                     onClick = { data.performAction() },
-                    style = PrezelButtonStyle(PrezelButtonType.GHOST),
+                    style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
                 )
             }
         },
@@ -81,6 +82,8 @@ private fun PrezelSnackbarLeadingIcon(
         tint = PrezelColorScheme.Dark.iconLarge,
     )
 }
+
+private fun SnackbarVisuals.leadingIconOrNull(): IconSource? = (this as? PrezelSnackbarVisuals)?.leadingIcon
 
 @ThemePreview
 @Composable

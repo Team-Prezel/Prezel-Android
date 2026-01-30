@@ -58,5 +58,3 @@ fun PrezelSnackbarHost(
         PrezelSnackbar(data = data)
     }
 }
-
-internal fun SnackbarVisuals.leadingIconOrNull(): IconSource? = (this as? PrezelSnackbarVisuals)?.leadingIcon
