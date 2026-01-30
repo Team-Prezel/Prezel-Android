@@ -3,6 +3,7 @@ package com.team.prezel.core.designsystem.component.snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,12 +19,14 @@ data class PrezelSnackbarVisuals(
 
 suspend fun SnackbarHostState.showPrezelSnackbar(
     message: String,
-    leadingIcon: IconSource?,
+    leadingIcon: IconSource? = null,
     actionLabel: String? = null,
     withDismissAction: Boolean = false,
     duration: SnackbarDuration = SnackbarDuration.Short,
+    onAction: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
 ) {
-    showSnackbar(
+    val result = showSnackbar(
         visuals = PrezelSnackbarVisuals(
             message = message,
             actionLabel = actionLabel,
@@ -32,6 +35,11 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
             leadingIcon = leadingIcon,
         ),
     )
+
+    when (result) {
+        SnackbarResult.ActionPerformed -> onAction?.invoke()
+        SnackbarResult.Dismissed -> onDismiss?.invoke()
+    }
 }
 
 @Composable
@@ -43,12 +51,11 @@ fun PrezelSnackbarHost(
         hostState = hostState,
         modifier = modifier,
     ) { data ->
-        val visuals = data.visuals
-        val leadingIcon = (visuals as? PrezelSnackbarVisuals)?.leadingIcon
-
         PrezelSnackbar(
             data = data,
-            leadingIcon = leadingIcon,
+            leadingIcon = data.visuals.leadingIconOrNull(),
         )
     }
 }
+
+internal fun SnackbarVisuals.leadingIconOrNull(): IconSource? = (this as? PrezelSnackbarVisuals)?.leadingIcon
