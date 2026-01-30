@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.icon.IconSource
 
-data class PrezelSnackbarVisuals(
+internal data class PrezelSnackbarVisuals(
     override val message: String,
     override val actionLabel: String?,
     override val withDismissAction: Boolean,
@@ -26,6 +26,10 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     onAction: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
+    require((actionLabel == null) == (onAction == null)) {
+        "actionLabel과 onAction은 둘 다 있거나 둘 다 없어야 합니다."
+    }
+
     val result = showSnackbar(
         visuals = PrezelSnackbarVisuals(
             message = message,
@@ -51,10 +55,7 @@ fun PrezelSnackbarHost(
         hostState = hostState,
         modifier = modifier,
     ) { data ->
-        PrezelSnackbar(
-            data = data,
-            leadingIcon = data.visuals.leadingIconOrNull(),
-        )
+        PrezelSnackbar(data = data)
     }
 }
 
