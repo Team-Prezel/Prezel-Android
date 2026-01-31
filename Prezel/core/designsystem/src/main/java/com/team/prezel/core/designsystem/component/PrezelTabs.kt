@@ -46,7 +46,7 @@ fun PrezelTabs(
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     size: PrezelTabSize = PrezelTabSize.Regular,
-    userScrolledEnabled: Boolean = true,
+    userScrollEnabled: Boolean = true,
     content: @Composable (pageIndex: Int) -> Unit,
 ) {
     require(tabs.isNotEmpty()) { "tabs는 비어있을 수 없습니다." }
@@ -69,7 +69,7 @@ fun PrezelTabs(
 
         PrezelTabsPager(
             pagerState = pagerState,
-            userScrolledEnabled = userScrolledEnabled,
+            userScrollEnabled = userScrollEnabled,
             content = content,
         )
     }
@@ -98,7 +98,7 @@ private fun PrezelTabsBar(
         },
     ) {
         tabs.forEachIndexed { index, item ->
-            PrezelTabItem(
+            PrezelTabContent(
                 item = item,
                 selected = pagerState.currentPage == index,
                 size = size,
@@ -109,7 +109,7 @@ private fun PrezelTabsBar(
 }
 
 @Composable
-private fun PrezelTabItem(
+private fun PrezelTabContent(
     item: PrezelTabItem,
     selected: Boolean,
     size: PrezelTabSize,
@@ -163,12 +163,12 @@ private fun PrezelTabLabel(
 @Composable
 private fun PrezelTabsPager(
     pagerState: PagerState,
-    userScrolledEnabled: Boolean,
+    userScrollEnabled: Boolean,
     content: @Composable (pageIndex: Int) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
-        userScrollEnabled = userScrolledEnabled,
+        userScrollEnabled = userScrollEnabled,
         overscrollEffect = null,
     ) { page ->
         content(page)
