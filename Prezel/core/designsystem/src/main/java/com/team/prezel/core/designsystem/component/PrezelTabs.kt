@@ -57,52 +57,80 @@ fun PrezelTabs(
     val scope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxSize()) {
-        SecondaryTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            modifier = Modifier.fillMaxWidth(),
-            containerColor = Color.Transparent,
-            indicator = {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .tabIndicatorOffset(
-                            selectedTabIndex = pagerState.currentPage,
-                        ).background(PrezelTheme.colors.solidBlack),
-                )
+        PrezelTabsBar(
+            tabs = tabs,
+            pagerState = pagerState,
+            size = size,
+            onTabClick = { index, enabled ->
+                if (!enabled) return@PrezelTabsBar
+                handleTabClick(scope, pagerState, index)
             },
-        ) {
-            tabs.forEachIndexed { index, item ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        if (!item.enabled) return@Tab
-                        handleTabClick(scope, pagerState, index)
-                    },
-                    modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
-                    enabled = item.enabled,
-                    text = {
-                        PrezelTabLabel(
-                            label = item.label,
-                            size = size,
-                            badgeCount = item.badgeCount,
-                            selected = pagerState.currentPage == index,
-                        )
-                    },
-                    selectedContentColor = PrezelTheme.colors.solidBlack,
-                    unselectedContentColor = PrezelTheme.colors.textDisabled,
-                )
-            }
-        }
+        )
 
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = userScrolledEnabled,
-            overscrollEffect = null,
-        ) { page ->
-            content(page)
+        PrezelTabsPager(
+            pagerState = pagerState,
+            userScrolledEnabled = userScrolledEnabled,
+            content = content,
+        )
+    }
+}
+
+@Composable
+private fun PrezelTabsBar(
+    tabs: ImmutableList<PrezelTabItem>,
+    pagerState: PagerState,
+    size: PrezelTabSize,
+    onTabClick: (index: Int, enabled: Boolean) -> Unit,
+) {
+    SecondaryTabRow(
+        selectedTabIndex = pagerState.currentPage,
+        modifier = Modifier.fillMaxWidth(),
+        containerColor = Color.Transparent,
+        indicator = {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .tabIndicatorOffset(
+                        selectedTabIndex = pagerState.currentPage,
+                    ).background(PrezelTheme.colors.solidBlack),
+            )
+        },
+    ) {
+        tabs.forEachIndexed { index, item ->
+            PrezelTabItem(
+                item = item,
+                selected = pagerState.currentPage == index,
+                size = size,
+                onClick = { onTabClick(index, item.enabled) },
+            )
         }
     }
+}
+
+@Composable
+private fun PrezelTabItem(
+    item: PrezelTabItem,
+    selected: Boolean,
+    size: PrezelTabSize,
+    onClick: () -> Unit,
+) {
+    Tab(
+        selected = selected,
+        onClick = onClick,
+        modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
+        enabled = item.enabled,
+        text = {
+            PrezelTabLabel(
+                label = item.label,
+                size = size,
+                badgeCount = item.badgeCount,
+                selected = selected,
+            )
+        },
+        selectedContentColor = PrezelTheme.colors.solidBlack,
+        unselectedContentColor = PrezelTheme.colors.textDisabled,
+    )
 }
 
 @Composable
@@ -129,6 +157,21 @@ private fun PrezelTabLabel(
                 disabled = !selected,
             )
         }
+    }
+}
+
+@Composable
+private fun PrezelTabsPager(
+    pagerState: PagerState,
+    userScrolledEnabled: Boolean,
+    content: @Composable (pageIndex: Int) -> Unit,
+) {
+    HorizontalPager(
+        state = pagerState,
+        userScrollEnabled = userScrolledEnabled,
+        overscrollEffect = null,
+    ) { page ->
+        content(page)
     }
 }
 
