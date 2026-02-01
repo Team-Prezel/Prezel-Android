@@ -1,36 +1,45 @@
 package com.team.prezel.ui
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.navigation.toEntries
-import com.team.prezel.feature.home.api.HomeNavKey
-import com.team.prezel.feature.home.impl.HomeScreen
+import com.team.prezel.feature.home.impl.navigation.homeEntry
+import com.team.prezel.navigation.TOP_LEVEL_KEYS
+import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
+import com.team.prezel.navigation.currentTopLevelKeyOrStart
 
 @Composable
 fun PrezelApp(appState: PrezelAppState) {
     val navigationState = appState.navigationState
     val navigator = appState.navigator
+    val currentTopLevelKey = navigationState.currentTopLevelKeyOrStart()
+    val entryProvider = entryProvider {
+        homeEntry(navigator)
+        // historyEntry(navigator)
+        // profileEntry(navigator)
+    }
 
-    Scaffold { paddingValues ->
-        val entryMapper: (NavKey) -> NavEntry<NavKey> = { key ->
-            NavEntry(key) {
-                when (key) {
-                    HomeNavKey -> HomeScreen(modifier = Modifier.padding(paddingValues))
-                    // HistoryNavKey -> HistoryRoute()
-                    // ProfileNavKey -> ProfileRoute()
-                    else -> Unit
-                }
+    PrezelNavigationScaffold(
+        showNavigationBar = navigationState.currentKey in TOP_LEVEL_KEYS,
+        navigationItems = {
+            TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
+                item(
+                    selected = key == currentTopLevelKey,
+                    onClick = { navigator.navigate(key) },
+                    labelTextId = item.titleTextId,
+                    iconRes = item.iconRes,
+                )
             }
-        }
-
+        },
+    ) { padding ->
         NavDisplay(
-            entries = navigationState.toEntries(entryMapper),
+            entries = navigationState.toEntries(entryProvider = entryProvider),
             onBack = { navigator.goBack() },
+            modifier = Modifier.padding(padding),
         )
     }
 }

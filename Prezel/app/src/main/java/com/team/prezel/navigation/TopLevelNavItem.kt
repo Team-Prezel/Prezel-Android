@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.home.api.R as homeR
 
@@ -35,3 +36,9 @@ val TOP_LEVEL_NAV_ITEMS = linkedMapOf(
 
 val TOP_LEVEL_KEYS: Set<NavKey> = TOP_LEVEL_NAV_ITEMS.keys
 val START_KEY: NavKey = HomeNavKey
+
+
+fun NavigationState.currentTopLevelKeyOrStart(): NavKey {
+    val current = currentKey
+    return if (current in TOP_LEVEL_KEYS) current else START_KEY
+}
