@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -22,5 +23,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.timber)
+
     implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 }
