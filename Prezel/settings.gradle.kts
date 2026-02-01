@@ -38,6 +38,7 @@ includeAuto(
     ":core:network",
     ":core:navigation",
     ":feature:home:api",
+    ":feature:home:impl",
 )
 
 /**
