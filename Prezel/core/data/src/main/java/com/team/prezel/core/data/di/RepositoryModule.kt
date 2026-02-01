@@ -1,4 +1,4 @@
-package com.team.prezel.core.data
+package com.team.prezel.core.data.di
 
 import dagger.Module
 import dagger.hilt.InstallIn
