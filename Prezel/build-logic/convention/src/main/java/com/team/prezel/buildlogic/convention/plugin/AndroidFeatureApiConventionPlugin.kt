@@ -9,7 +9,7 @@ class AndroidFeatureApiConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "prezel.android.library")
-            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+//            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             dependencies {
 //                "api"(project(":core:navigation"))
