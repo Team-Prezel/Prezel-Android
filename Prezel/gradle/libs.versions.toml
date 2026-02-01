@@ -10,6 +10,7 @@ junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 activityCompose = "1.12.2"
 androidxLifecycle = "2.10.0"
+androidxSavedStateCompose = "1.4.0"
 composeBom = "2026.01.00"
 ktlint = "14.0.1"
 detekt = "1.23.8"
@@ -41,6 +42,8 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+androidx-lifecycle-viewModel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "androidxLifecycle" }
+androidx-savedstate-compose = { group = "androidx.savedstate", name = "savedstate-compose", version.ref = "androidxSavedStateCompose" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
@@ -90,6 +93,7 @@ prezel-android-feature-impl = { id = "prezel.android.feature.impl" }
 prezel-android-feature-api = { id = "prezel.android.feature.api" }
 prezel-hilt = { id = "prezel.hilt" }
 prezel-jvm-library = { id = "prezel.jvm.library" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 
 [bundles]
 android-compose = [
