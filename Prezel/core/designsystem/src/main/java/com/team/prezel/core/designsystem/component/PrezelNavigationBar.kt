@@ -1,18 +1,25 @@
 package com.team.prezel.core.designsystem.component
 
+import android.R
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,26 +80,124 @@ fun RowScope.PrezelNavigationBarItem(
     )
 }
 
+@Composable
+fun PrezelNavigationScaffold(
+    navigationItems: @Composable PrezelNavigationScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    showNavigationBar: Boolean = true,
+    content: @Composable (PaddingValues) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier,
+        bottomBar = {
+            if (!showNavigationBar) return@Scaffold
+
+            PrezelNavigationBar {
+                PrezelNavigationScope(this).navigationItems()
+            }
+        },
+        content = content,
+    )
+}
+
+/**
+ * A scope wrapper to declare navigation items.
+ * This keeps the calling code in app module clean and consistent.
+ */
+class PrezelNavigationScope internal constructor(
+    private val rowScope: RowScope,
+) {
+    @Composable
+    fun item(
+        selected: Boolean,
+        @StringRes labelTextId: Int,
+        @DrawableRes iconRes: Int,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        alwaysShowLabel: Boolean = true,
+    ) {
+        rowScope.PrezelNavigationBarItem(
+            selected = selected,
+            onClick = onClick,
+            labelTextId = labelTextId,
+            iconRes = iconRes,
+            modifier = modifier,
+            enabled = enabled,
+            alwaysShowLabel = alwaysShowLabel,
+        )
+    }
+}
+
+@ThemePreview
+@Composable
+private fun PrezelNavigationScaffoldPreview() {
+    PrezelTheme {
+        PrezelNavigationScaffold(
+            navigationItems = {
+                item(
+                    selected = true,
+                    onClick = {},
+                    labelTextId = R.string.untitled,
+                    iconRes = PrezelIcons.Home,
+                )
+                item(
+                    selected = false,
+                    onClick = {},
+                    labelTextId = R.string.copy,
+                    iconRes = PrezelIcons.Blank,
+                )
+                item(
+                    selected = false,
+                    onClick = {},
+                    labelTextId = R.string.paste,
+                    iconRes = PrezelIcons.Profile,
+                )
+            },
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Content")
+            }
+        }
+    }
+}
+
 @ThemePreview
 @Composable
 fun NiaNavigationBarPreview() {
-    val items = listOf(
-        Pair(PrezelIcons.Home, android.R.string.ok),
-        Pair(PrezelIcons.Blank, android.R.string.copy),
-        Pair(PrezelIcons.Profile, android.R.string.paste),
-    )
-
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
 
+    val items = listOf(
+        Triple(PrezelIcons.Home, R.string.untitled, 0),
+        Triple(PrezelIcons.Blank, R.string.copy, 1),
+        Triple(PrezelIcons.Profile, R.string.paste, 2),
+    )
+
     PrezelTheme {
-        PrezelNavigationBar {
-            items.forEachIndexed { index, (iconRes, labelRes) ->
-                PrezelNavigationBarItem(
-                    selected = index == selectedIndex,
-                    onClick = { selectedIndex = index },
-                    iconRes = iconRes,
-                    labelTextId = labelRes,
-                )
+        PrezelNavigationScaffold(
+            navigationItems = {
+                items.forEach { (iconRes, labelRes, index) ->
+                    item(
+                        selected = selectedIndex == index,
+                        onClick = { selectedIndex = index },
+                        labelTextId = labelRes,
+                        iconRes = iconRes,
+                    )
+                }
+            },
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Selected: $selectedIndex")
             }
         }
     }
