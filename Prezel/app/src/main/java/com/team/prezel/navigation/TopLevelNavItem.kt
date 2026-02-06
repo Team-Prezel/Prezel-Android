@@ -9,7 +9,9 @@ import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.profile.api.ProfileNavKey
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentMapOf
+import com.team.prezel.feature.history.api.R as historyR
 import com.team.prezel.feature.home.api.R as homeR
+import com.team.prezel.feature.profile.api.R as profileR
 
 data class TopLevelNavItem(
     @param:DrawableRes val iconRes: Int,
@@ -22,13 +24,13 @@ val HOME = TopLevelNavItem(
 )
 
 val HISTORY = TopLevelNavItem(
-    iconRes = PrezelIcons.Home,
-    titleTextId = homeR.string.feature_home_api_title,
+    iconRes = PrezelIcons.Storage,
+    titleTextId = historyR.string.feature_history_api_title,
 )
 
 val PROFILE = TopLevelNavItem(
     iconRes = PrezelIcons.Profile,
-    titleTextId = homeR.string.feature_home_api_title,
+    titleTextId = profileR.string.feature_profile_api_title,
 )
 
 val TOP_LEVEL_NAV_ITEMS = persistentMapOf(
