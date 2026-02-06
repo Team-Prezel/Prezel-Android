@@ -41,6 +41,8 @@ includeAuto(
     ":feature:home:impl",
     ":feature:history:api",
     ":feature:history:impl",
+    ":feature:profile:api",
+    ":feature:profile:impl",
 )
 
 /**
