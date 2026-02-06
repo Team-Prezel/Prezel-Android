@@ -4,8 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.feature.home.api.HomeNavKey
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentMapOf
 import com.team.prezel.feature.home.api.R as homeR
 
 data class TopLevelNavItem(
@@ -28,17 +29,10 @@ val PROFILE = TopLevelNavItem(
     titleTextId = homeR.string.feature_home_api_title,
 )
 
-val TOP_LEVEL_NAV_ITEMS = linkedMapOf(
+val TOP_LEVEL_NAV_ITEMS = persistentMapOf(
     HomeNavKey to HOME,
 //    HistoryNavKey to HISTORY,
 //    ProfileNavKey to PROFILE,
 )
 
-val TOP_LEVEL_KEYS: Set<NavKey> = TOP_LEVEL_NAV_ITEMS.keys
-val START_KEY: NavKey = HomeNavKey
-
-
-fun NavigationState.currentTopLevelKeyOrStart(): NavKey {
-    val current = currentKey
-    return if (current in TOP_LEVEL_KEYS) current else START_KEY
-}
+val TOP_LEVEL_KEYS: ImmutableSet<NavKey> = TOP_LEVEL_NAV_ITEMS.keys
