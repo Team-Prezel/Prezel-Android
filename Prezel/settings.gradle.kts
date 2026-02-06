@@ -39,6 +39,8 @@ includeAuto(
     ":core:navigation",
     ":feature:home:api",
     ":feature:home:impl",
+    ":feature:history:api",
+    ":feature:history:impl",
 )
 
 /**
