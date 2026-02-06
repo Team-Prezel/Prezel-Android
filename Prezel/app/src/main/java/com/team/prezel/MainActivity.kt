@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.ui.PrezelApp
@@ -15,6 +17,9 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
                 PrezelApp(
                     appState = appState,
+                    entryBuilders = entryBuilders,
                 )
             }
         }

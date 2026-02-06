@@ -48,9 +48,6 @@ class PrezelAppState(
     val shouldShowNavigationBar
         get() = navigationState.currentKey in TOP_LEVEL_KEYS
 
-    val currentTopLevelKey
-        get() = navigationState.currentKey
-
     /**
      * true면 오프라인 상태
      */

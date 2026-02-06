@@ -4,21 +4,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.toEntries
-import com.team.prezel.feature.home.impl.navigation.homeEntry
 import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
 
 @Composable
-fun PrezelApp(appState: PrezelAppState) {
+fun PrezelApp(
+    appState: PrezelAppState,
+    entryBuilders: Set<EntryProviderScope<NavKey>.() -> Unit>,
+) {
     val navigator = remember { Navigator(appState.navigationState) }
     val entryProvider = entryProvider {
-        homeEntry(navigator)
-        // historyEntry(navigator)
-        // profileEntry(navigator)
+        entryBuilders.forEach { builder -> this.builder() }
     }
 
     PrezelNavigationScaffold(

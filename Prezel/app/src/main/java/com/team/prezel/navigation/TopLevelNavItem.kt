@@ -4,7 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.home.api.HomeNavKey
+import com.team.prezel.feature.profile.api.ProfileNavKey
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentMapOf
 import com.team.prezel.feature.home.api.R as homeR
@@ -31,8 +33,8 @@ val PROFILE = TopLevelNavItem(
 
 val TOP_LEVEL_NAV_ITEMS = persistentMapOf(
     HomeNavKey to HOME,
-//    HistoryNavKey to HISTORY,
-//    ProfileNavKey to PROFILE,
+    HistoryNavKey to HISTORY,
+    ProfileNavKey to PROFILE,
 )
 
 val TOP_LEVEL_KEYS: ImmutableSet<NavKey> = TOP_LEVEL_NAV_ITEMS.keys

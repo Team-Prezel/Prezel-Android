@@ -18,6 +18,10 @@ dependencies {
     implementation(projects.coreNavigation)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
+    implementation(projects.featureHistoryApi)
+    implementation(projects.featureHistoryImpl)
+    implementation(projects.featureProfileApi)
+    implementation(projects.featureProfileImpl)
 
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
