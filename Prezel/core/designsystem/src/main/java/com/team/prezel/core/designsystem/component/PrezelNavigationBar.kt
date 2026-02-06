@@ -70,7 +70,6 @@ fun RowScope.PrezelNavigationBarItem(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
-                tint = if (selected) PrezelTheme.colors.iconMedium else PrezelTheme.colors.iconRegular,
             )
         },
         modifier = modifier,
@@ -182,7 +181,7 @@ private fun PrezelNavigationScaffoldPreview() {
 
 @ThemePreview
 @Composable
-fun NiaNavigationBarPreview() {
+private fun PrezelNavigationBarPreview() {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val items = listOf(

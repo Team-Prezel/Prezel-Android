@@ -10,7 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
-fun EntryProviderScope<NavKey>.featureProfileEntryBuilder() {
+internal fun EntryProviderScope<NavKey>.featureProfileEntryBuilder() {
     entry<ProfileNavKey> {
         ProfileScreen()
     }

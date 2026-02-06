@@ -13,7 +13,7 @@ class AndroidFeatureApiConventionPlugin : Plugin<Project> {
             apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             dependencies {
-                "implementation"(libs.findLibrary("androidx.navigation3.runtime").get())
+                "api"(libs.findLibrary("androidx.navigation3.runtime").get())
             }
         }
     }
