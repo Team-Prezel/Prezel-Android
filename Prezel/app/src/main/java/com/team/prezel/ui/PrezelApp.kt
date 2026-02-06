@@ -1,7 +1,8 @@
 package com.team.prezel.ui
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -43,8 +44,14 @@ fun PrezelApp(
             entries = appState.navigationState.toEntries(entryProvider),
             onBack = navigator::goBack,
             modifier = Modifier.padding(padding),
-            transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
-            popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+            transitionSpec = {
+                fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                    fadeOut(animationSpec = tween(durationMillis = 100))
+            },
+            popTransitionSpec = {
+                fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                    fadeOut(animationSpec = tween(durationMillis = 100))
+            },
         )
     }
 }
