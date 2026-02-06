@@ -3,10 +3,14 @@ package com.team.prezel.core.designsystem.component
 import android.R
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -33,12 +37,20 @@ fun PrezelNavigationBar(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
-    NavigationBar(
-        modifier = modifier,
-        containerColor = PrezelTheme.colors.bgRegular,
-        tonalElevation = 0.dp,
-        content = content,
-    )
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(PrezelTheme.colors.borderRegular),
+        )
+
+        NavigationBar(
+            containerColor = PrezelTheme.colors.bgRegular,
+            tonalElevation = 0.dp,
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -58,7 +70,7 @@ fun RowScope.PrezelNavigationBarItem(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
-                tint = if (selected) PrezelTheme.colors.iconMedium else PrezelTheme.colors.iconDisabled,
+                tint = if (selected) PrezelTheme.colors.iconMedium else PrezelTheme.colors.iconRegular,
             )
         },
         modifier = modifier,
