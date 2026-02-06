@@ -16,7 +16,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import kotlinx.collections.immutable.ImmutableSet
 
 /**
- * Create a navigation state that survives configuration change and process death.
+ * 구성 변경과 프로세스 종료 후 복원에도 살아남는 네비게이션 상태를 생성합니다.
  */
 @Composable
 fun rememberNavigationState(
@@ -36,18 +36,17 @@ fun rememberNavigationState(
 }
 
 /**
- * State holder for navigation.
+ * 내비게이션을 위한 State Holder
  *
- * @param startKey - the starting navigation key. The user will exit the app through this key.
- * @param topLevelStack - the top level back stack. It holds only top level keys.
- * @param subStacks - the back stacks for each top level key
+ * @param startKey - 시작 내비게이션 키입니다. 사용자는 이 키를 통해 앱을 종료하게 됩니다.
+ * @param topLevelStack - 최상위 백 스택입니다. 최상위 키만을 보관합니다.
+ * @param subStacks - 각 최상위 키에 대응하는 하위 백 스택들입니다.
  */
 class NavigationState(
     val startKey: NavKey,
     val topLevelStack: NavBackStack<NavKey>,
     val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
-    /** Currently selected top-level destination */
     val currentTopLevelKey: NavKey by derivedStateOf {
         topLevelStack.last()
     }
@@ -63,7 +62,7 @@ class NavigationState(
 }
 
 /**
- * Convert NavigationState into NavEntries for NavHost.
+ * NavHost에서 사용할 수 있도록 NavigationState를 NavEntries로 변환합니다.
  */
 @Composable
 fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): SnapshotStateList<NavEntry<NavKey>> {

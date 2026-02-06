@@ -96,13 +96,14 @@ fun PrezelNavigationScaffold(
                 PrezelNavigationScope(this).navigationItems()
             }
         },
+        containerColor = PrezelTheme.colors.bgRegular,
         content = content,
     )
 }
 
 /**
- * A scope wrapper to declare navigation items.
- * This keeps the calling code in app module clean and consistent.
+ * 내비게이션 아이템을 선언하기 위한 스코프 wrapper입니다.
+ * 앱 모듈의 호출 코드를 깔끔하고 일관되게 유지하기 위한 목적입니다.
  */
 class PrezelNavigationScope internal constructor(
     private val rowScope: RowScope,
@@ -145,7 +146,7 @@ private fun PrezelNavigationScaffoldPreview() {
                     selected = false,
                     onClick = {},
                     labelTextId = R.string.copy,
-                    iconRes = PrezelIcons.Blank,
+                    iconRes = PrezelIcons.Storage,
                 )
                 item(
                     selected = false,
@@ -174,7 +175,7 @@ fun NiaNavigationBarPreview() {
 
     val items = listOf(
         Triple(PrezelIcons.Home, R.string.untitled, 0),
-        Triple(PrezelIcons.Blank, R.string.copy, 1),
+        Triple(PrezelIcons.Storage, R.string.copy, 1),
         Triple(PrezelIcons.Profile, R.string.paste, 2),
     )
 
