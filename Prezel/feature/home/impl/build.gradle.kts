@@ -10,6 +10,4 @@ android {
 
 dependencies {
     implementation(projects.featureHomeApi)
-    implementation(projects.coreDesignsystem)
-    implementation(libs.androidx.navigation3.runtime)
 }

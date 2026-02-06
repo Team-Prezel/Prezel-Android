@@ -1,8 +1,6 @@
 plugins {
-    alias(libs.plugins.prezel.android.library)
+    alias(libs.plugins.prezel.android.library.compose)
     alias(libs.plugins.prezel.hilt)
-    alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -10,6 +8,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.savedstate.compose)
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
+    implementation(libs.kotlinx.collections.immutable)
 }

@@ -1,5 +1,6 @@
 package com.team.prezel.buildlogic.convention.plugin
 
+import com.team.prezel.buildlogic.convention.internal.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -9,10 +10,10 @@ class AndroidFeatureApiConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "prezel.android.library")
-//            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             dependencies {
-//                "api"(project(":core:navigation"))
+                "implementation"(libs.findLibrary("androidx.navigation3.runtime").get())
             }
         }
     }

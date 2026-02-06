@@ -11,7 +11,7 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidFeatureImplConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            apply(plugin = "prezel.android.library")
+            apply(plugin = "prezel.android.library.compose")
             apply(plugin = "prezel.hilt")
 
             extensions.configure<LibraryExtension> {
@@ -20,14 +20,9 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
 
             dependencies {
 //                "implementation"(project(":core:ui"))
-//                "implementation"(project(":core:designsystem"))
-
-                "implementation"(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
-                "implementation"(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
-
-                "androidTestImplementation"(
-                    libs.findLibrary("androidx.lifecycle.runtimeTesting").get(),
-                )
+                "implementation"(project(":core-designsystem"))
+                "implementation"(project(":core-navigation"))
+                "implementation"(libs.findLibrary("androidx.navigation3.ui").get())
             }
         }
     }
