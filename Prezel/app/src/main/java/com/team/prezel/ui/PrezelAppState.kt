@@ -48,9 +48,6 @@ class PrezelAppState(
     val shouldShowNavigationBar
         get() = navigationState.currentKey in TOP_LEVEL_KEYS
 
-    /**
-     * true면 오프라인 상태
-     */
     val isOffline: StateFlow<Boolean> =
         networkMonitor.isOnline
             .map(Boolean::not)
