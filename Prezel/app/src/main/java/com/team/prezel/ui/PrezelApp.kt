@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -33,13 +34,28 @@ fun PrezelApp(
     appState: PrezelAppState,
     entryBuilders: Set<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
-    val navigator = remember { Navigator(appState.navigationState) }
+    val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val entryProvider = entryProvider {
+    val provider = entryProvider {
         entryBuilders.forEach { builder -> this.builder() }
     }
 
+
+    PrezelAppRoot(
+        appState = appState,
+        navigator = navigator,
+        snackbarHostState = snackbarHostState,
+        entryProvider = provider,
+    )
+}
+
+@Composable
+private fun PrezelAppRoot(
+    appState: PrezelAppState,
+    navigator: Navigator,
+    snackbarHostState: SnackbarHostState,
+    entryProvider: (NavKey) -> NavEntry<NavKey>,
+) {
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
@@ -74,3 +90,4 @@ fun PrezelApp(
         }
     }
 }
+
