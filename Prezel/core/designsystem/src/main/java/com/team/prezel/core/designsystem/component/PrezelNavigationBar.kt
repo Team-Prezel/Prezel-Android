@@ -72,7 +72,7 @@ fun RowScope.PrezelNavigationBarItem(
         icon = {
             Icon(
                 painter = painterResource(iconRes),
-                contentDescription = null,
+                contentDescription = stringResource(id = labelTextId),
             )
         },
         modifier = modifier,
