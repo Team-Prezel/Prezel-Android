@@ -30,9 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -115,8 +117,8 @@ private fun PrezelAccordionHeader(
 @Composable
 private fun PrezelAccordionChevron(rotation: Float) {
     Icon(
-        painter = painterResource(R.drawable.core_designsystem_ic_chevron_down),
-        contentDescription = null,
+        painter = painterResource(PrezelIcons.ChevronDown),
+        contentDescription = stringResource(R.string.core_designsystem_accordion_desc),
         modifier = Modifier
             .size(24.dp)
             .rotate(rotation),
@@ -246,12 +248,7 @@ private fun PrezelAccordionPreview_Interactive() {
 
                         Spacer(Modifier.width(4.dp))
 
-                        Text(
-                            text = "(필수) 이용약관",
-                            modifier = Modifier.weight(1f),
-                            style = PrezelTextStyles.Body3Medium.toTextStyle(),
-                            color = PrezelTheme.colors.textLarge,
-                        )
+                        Text(text = "(필수) 이용약관")
                     }
                 },
                 label = {

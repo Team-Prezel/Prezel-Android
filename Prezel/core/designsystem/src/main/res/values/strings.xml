@@ -2,4 +2,5 @@
 <resources>
     <string name="core_designsystem_close_floating_btn_content_desc">플로팅 버튼 닫기</string>
     <string name="core_designsystem_checkbox_desc">체크박스</string>
+    <string name="core_designsystem_accordion_desc">아코디언 토글</string>
 </resources>
