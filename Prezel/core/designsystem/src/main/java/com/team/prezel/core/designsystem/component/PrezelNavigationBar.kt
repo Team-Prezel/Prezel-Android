@@ -155,35 +155,7 @@ private fun PrezelNavigationScaffoldPreview() {
     PrezelTheme {
         PrezelNavigationScaffold(
             snackbarHostState = snackbarHostState,
-            navigationItems = {
-                item(
-                    selected = true,
-                    onClick = {},
-                    label = stringResource(R.string.untitled),
-                    icon = DrawableIcon(
-                        resId = PrezelIcons.Home,
-                        contentDescTextId = R.string.untitled,
-                    ),
-                )
-                item(
-                    selected = false,
-                    onClick = {},
-                    label = stringResource(R.string.copy),
-                    icon = DrawableIcon(
-                        resId = PrezelIcons.Storage,
-                        contentDescTextId = R.string.copy,
-                    ),
-                )
-                item(
-                    selected = false,
-                    onClick = {},
-                    label = stringResource(R.string.paste),
-                    icon = DrawableIcon(
-                        resId = PrezelIcons.Profile,
-                        contentDescTextId = R.string.paste,
-                    ),
-                )
-            },
+            navigationItems = { PreviewNavigationItems() },
         ) { padding ->
             Box(
                 modifier = Modifier
@@ -233,4 +205,26 @@ private fun PrezelNavigationBarPreview() {
             }
         }
     }
+}
+
+@Composable
+private fun PrezelNavigationScope.PreviewNavigationItems() {
+    item(
+        selected = true,
+        onClick = {},
+        label = stringResource(R.string.untitled),
+        icon = DrawableIcon(PrezelIcons.Home, R.string.untitled),
+    )
+    item(
+        selected = false,
+        onClick = {},
+        label = stringResource(R.string.copy),
+        icon = DrawableIcon(PrezelIcons.Storage, R.string.copy),
+    )
+    item(
+        selected = false,
+        onClick = {},
+        label = stringResource(R.string.paste),
+        icon = DrawableIcon(PrezelIcons.Profile, R.string.paste),
+    )
 }
