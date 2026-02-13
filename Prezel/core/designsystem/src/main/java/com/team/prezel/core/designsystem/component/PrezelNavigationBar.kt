@@ -1,8 +1,6 @@
 package com.team.prezel.core.designsystem.component
 
 import android.R
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,9 +26,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.icon.DrawableIcon
+import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -60,8 +59,8 @@ fun PrezelNavigationBar(
 fun RowScope.PrezelNavigationBarItem(
     selected: Boolean,
     onClick: () -> Unit,
-    @StringRes labelTextId: Int,
-    @DrawableRes iconRes: Int,
+    label: String,
+    icon: IconSource,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     alwaysShowLabel: Boolean = true,
@@ -71,15 +70,15 @@ fun RowScope.PrezelNavigationBarItem(
         onClick = onClick,
         icon = {
             Icon(
-                painter = painterResource(iconRes),
-                contentDescription = stringResource(id = labelTextId),
+                icon.painter(),
+                contentDescription = icon.contentDescription(),
             )
         },
         modifier = modifier,
         enabled = enabled,
         label = {
             Text(
-                text = stringResource(id = labelTextId),
+                text = label,
                 style = PrezelTheme.typography.caption2Medium,
             )
         },
@@ -129,8 +128,8 @@ class PrezelNavigationScope internal constructor(
     @Composable
     fun item(
         selected: Boolean,
-        @StringRes labelTextId: Int,
-        @DrawableRes iconRes: Int,
+        label: String,
+        icon: IconSource,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
@@ -139,8 +138,8 @@ class PrezelNavigationScope internal constructor(
         rowScope.PrezelNavigationBarItem(
             selected = selected,
             onClick = onClick,
-            labelTextId = labelTextId,
-            iconRes = iconRes,
+            label = label,
+            icon = icon,
             modifier = modifier,
             enabled = enabled,
             alwaysShowLabel = alwaysShowLabel,
@@ -160,20 +159,29 @@ private fun PrezelNavigationScaffoldPreview() {
                 item(
                     selected = true,
                     onClick = {},
-                    labelTextId = R.string.untitled,
-                    iconRes = PrezelIcons.Home,
+                    label = stringResource(R.string.untitled),
+                    icon = DrawableIcon(
+                        resId = PrezelIcons.Home,
+                        contentDescTextId = R.string.untitled,
+                    ),
                 )
                 item(
                     selected = false,
                     onClick = {},
-                    labelTextId = R.string.copy,
-                    iconRes = PrezelIcons.Storage,
+                    label = stringResource(R.string.copy),
+                    icon = DrawableIcon(
+                        resId = PrezelIcons.Storage,
+                        contentDescTextId = R.string.copy,
+                    ),
                 )
                 item(
                     selected = false,
                     onClick = {},
-                    labelTextId = R.string.paste,
-                    iconRes = PrezelIcons.Profile,
+                    label = stringResource(R.string.paste),
+                    icon = DrawableIcon(
+                        resId = PrezelIcons.Profile,
+                        contentDescTextId = R.string.paste,
+                    ),
                 )
             },
         ) { padding ->
@@ -196,21 +204,21 @@ private fun PrezelNavigationBarPreview() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val items = listOf(
-        Triple(PrezelIcons.Home, R.string.untitled, 0),
-        Triple(PrezelIcons.Storage, R.string.copy, 1),
-        Triple(PrezelIcons.Profile, R.string.paste, 2),
+        Triple(DrawableIcon(PrezelIcons.Home), stringResource(R.string.untitled), 0),
+        Triple(DrawableIcon(PrezelIcons.Storage), stringResource(R.string.copy), 1),
+        Triple(DrawableIcon(PrezelIcons.Profile), stringResource(R.string.paste), 2),
     )
 
     PrezelTheme {
         PrezelNavigationScaffold(
             snackbarHostState = snackbarHostState,
             navigationItems = {
-                items.forEach { (iconRes, labelRes, index) ->
+                items.forEach { (icon, label, index) ->
                     item(
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index },
-                        labelTextId = labelRes,
-                        iconRes = iconRes,
+                        label = label,
+                        icon = icon,
                     )
                 }
             },

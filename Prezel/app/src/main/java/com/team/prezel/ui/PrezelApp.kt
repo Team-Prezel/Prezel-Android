@@ -10,17 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
+import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.LocalSnackbarHostState
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
-
 
 @Composable
 fun PrezelApp(
@@ -63,8 +64,8 @@ private fun PrezelAppContent(
                 item(
                     selected = key == appState.navigationState.currentTopLevelKey,
                     onClick = { navigator.navigate(key) },
-                    labelTextId = item.titleTextId,
-                    iconRes = item.iconRes,
+                    label = stringResource(item.titleTextId),
+                    icon = DrawableIcon(item.iconRes),
                 )
             }
         },
