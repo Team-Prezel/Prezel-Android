@@ -37,6 +37,7 @@ includeAuto(
     ":core:designsystem",
     ":core:network",
     ":core:navigation",
+    ":core:ui",
     ":feature:home:api",
     ":feature:home:impl",
     ":feature:history:api",

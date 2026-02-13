@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.coreData)
     implementation(projects.coreDesignsystem)
     implementation(projects.coreNavigation)
+    implementation(projects.coreUi)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
     implementation(projects.featureHistoryApi)

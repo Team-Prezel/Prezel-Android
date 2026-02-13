@@ -18,9 +18,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.navigation.LocalNavigator
-import com.team.prezel.core.navigation.LocalSnackbarHostState
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.toEntries
+import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
 
 @Composable
