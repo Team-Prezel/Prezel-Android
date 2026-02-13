@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -120,7 +119,7 @@ private fun PrezelChipPreview() {
 private fun PrezelChipPreviewItem(style: PrezelChipStyle) {
     PrezelChip(
         text = "Label",
-        icon = DrawableIcon(resId = PrezelIcons.Blank),
+        icon = IconSource(resId = PrezelIcons.Blank),
         style = style,
     )
 }

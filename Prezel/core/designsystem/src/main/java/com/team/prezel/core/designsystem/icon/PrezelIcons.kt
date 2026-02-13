@@ -38,6 +38,7 @@ object PrezelIcons {
     val Reset = R.drawable.core_designsystem_ic_reset
     val Rotate = R.drawable.core_designsystem_ic_rotate
     val Stop = R.drawable.core_designsystem_ic_stop
+    val Storage = R.drawable.core_designsystem_ic_storage
     val Trophy = R.drawable.core_designsystem_ic_trophy
     val Video = R.drawable.core_designsystem_ic_video
     val Voice = R.drawable.core_designsystem_ic_voice

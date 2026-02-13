@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -98,7 +97,7 @@ private fun PrezelButtonPreviewItem(
 ) {
     PrezelButton(
         text = "Label",
-        icon = DrawableIcon(resId = PrezelIcons.Blank),
+        icon = IconSource(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,

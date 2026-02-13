@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -72,7 +71,7 @@ private fun PrezelFloatingButtonMenuItemPreview() {
             PrezelFloatingButtonMenuItem(
                 label = "Label",
                 onClick = {},
-                iconSource = DrawableIcon(resId = PrezelIcons.Blank),
+                iconSource = IconSource(resId = PrezelIcons.Blank),
             )
 
             PrezelFloatingButtonMenuItem(

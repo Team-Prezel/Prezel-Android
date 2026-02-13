@@ -60,3 +60,7 @@ exceptions:
     active: true
     TooGenericExceptionCaught:
         active: false
+
+performance:
+    SpreadOperator:
+        active: false
