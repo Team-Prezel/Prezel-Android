@@ -16,6 +16,7 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 testOptions.animationsDisabled = true
+                testOptions.unitTests.isIncludeAndroidResources = true
             }
 
             dependencies {

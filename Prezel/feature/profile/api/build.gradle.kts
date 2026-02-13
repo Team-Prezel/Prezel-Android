@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.prezel.android.feature.api)
-    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {

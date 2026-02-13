@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
-    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
