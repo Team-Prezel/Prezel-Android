@@ -22,8 +22,6 @@ ktorfit = "2.7.2"
 kotlinx-serialization = "1.9.0"
 timber = "5.0.1"
 navigation3 = "1.0.0"
-appcompat = "1.7.1"
-material = "1.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,8 +71,6 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 desugarJdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdk" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -96,7 +92,6 @@ prezel-android-feature-impl = { id = "prezel.android.feature.impl" }
 prezel-android-feature-api = { id = "prezel.android.feature.api" }
 prezel-hilt = { id = "prezel.hilt" }
 prezel-jvm-library = { id = "prezel.jvm.library" }
-android-library = { id = "com.android.library", version.ref = "agp" }
 
 [bundles]
 android-compose = [
