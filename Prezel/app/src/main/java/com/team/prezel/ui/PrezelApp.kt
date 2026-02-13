@@ -9,24 +9,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
+import com.team.prezel.core.navigation.LocalNavigator
+import com.team.prezel.core.navigation.LocalSnackbarHostState
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
 
-val LocalNavigator = staticCompositionLocalOf<Navigator> {
-    error("Navigator is not provided")
-}
-
-val LocalSnackbarHostState = staticCompositionLocalOf<SnackbarHostState> {
-    error("SnackbarHostState is not provided")
-}
 
 @Composable
 fun PrezelApp(
