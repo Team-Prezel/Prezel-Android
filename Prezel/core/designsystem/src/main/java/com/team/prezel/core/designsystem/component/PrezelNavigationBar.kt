@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -59,8 +56,8 @@ fun PrezelNavigationBar(
 fun RowScope.PrezelNavigationBarItem(
     selected: Boolean,
     onClick: () -> Unit,
-    label: String,
     icon: IconSource,
+    label: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     alwaysShowLabel: Boolean = true,
@@ -70,7 +67,7 @@ fun RowScope.PrezelNavigationBarItem(
         onClick = onClick,
         icon = {
             Icon(
-                icon.painter(),
+                painter = icon.painter(),
                 contentDescription = icon.contentDescription(),
             )
         },
@@ -128,8 +125,8 @@ class PrezelNavigationScope internal constructor(
     @Composable
     fun item(
         selected: Boolean,
-        label: String,
         icon: IconSource,
+        label: String,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
@@ -138,8 +135,8 @@ class PrezelNavigationScope internal constructor(
         rowScope.PrezelNavigationBarItem(
             selected = selected,
             onClick = onClick,
-            label = label,
             icon = icon,
+            label = label,
             modifier = modifier,
             enabled = enabled,
             alwaysShowLabel = alwaysShowLabel,
@@ -150,35 +147,13 @@ class PrezelNavigationScope internal constructor(
 @ThemePreview
 @Composable
 private fun PrezelNavigationScaffoldPreview() {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    PrezelTheme {
-        PrezelNavigationScaffold(
-            snackbarHostState = snackbarHostState,
-            navigationItems = { PreviewNavigationItems() },
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("Content")
-            }
-        }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun PrezelNavigationBarPreview() {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     val items = listOf(
-        Triple(DrawableIcon(PrezelIcons.Home), stringResource(R.string.untitled), 0),
-        Triple(DrawableIcon(PrezelIcons.Storage), stringResource(R.string.copy), 1),
-        Triple(DrawableIcon(PrezelIcons.Profile), stringResource(R.string.paste), 2),
+        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 0),
+        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 1),
+        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 2),
     )
 
     PrezelTheme {
@@ -189,8 +164,8 @@ private fun PrezelNavigationBarPreview() {
                     item(
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index },
-                        label = label,
                         icon = icon,
+                        label = label,
                     )
                 }
             },
@@ -205,26 +180,4 @@ private fun PrezelNavigationBarPreview() {
             }
         }
     }
-}
-
-@Composable
-private fun PrezelNavigationScope.PreviewNavigationItems() {
-    item(
-        selected = true,
-        onClick = {},
-        label = stringResource(R.string.untitled),
-        icon = DrawableIcon(PrezelIcons.Home, R.string.untitled),
-    )
-    item(
-        selected = false,
-        onClick = {},
-        label = stringResource(R.string.copy),
-        icon = DrawableIcon(PrezelIcons.Storage, R.string.copy),
-    )
-    item(
-        selected = false,
-        onClick = {},
-        label = stringResource(R.string.paste),
-        icon = DrawableIcon(PrezelIcons.Profile, R.string.paste),
-    )
 }

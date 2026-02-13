@@ -3,7 +3,6 @@ package com.team.prezel.core.designsystem.component.chip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -44,7 +43,7 @@ private fun PrezelIconChipPreview() {
 @Composable
 private fun PrezelIconChipPreviewItem(style: PrezelChipStyle) {
     PrezelIconChip(
-        icon = DrawableIcon(resId = PrezelIcons.Blank),
+        icon = IconSource(resId = PrezelIcons.Blank),
         style = style,
     )
 }
