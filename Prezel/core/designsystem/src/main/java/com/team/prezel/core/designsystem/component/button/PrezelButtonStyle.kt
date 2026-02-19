@@ -47,11 +47,10 @@ data class PrezelButtonStyle(
 
 @Composable
 internal fun PrezelButtonIcon(
-    icon: IconSource?,
+    icon: IconSource,
     size: PrezelButtonSize,
     modifier: Modifier = Modifier,
 ) {
-    if (icon == null) return
     Icon(
         painter = icon.painter(),
         contentDescription = icon.contentDescription(),
@@ -67,9 +66,21 @@ internal fun PrezelButtonIcon(
 
 @Composable
 internal fun prezelButtonShape(
+    isIconOnly: Boolean,
     isRounded: Boolean,
+    buttonSize: PrezelButtonSize,
     shapes: PrezelShapes = PrezelTheme.shapes,
-): Shape = if (isRounded) shapes.V1000 else shapes.V4
+): Shape =
+    when (isRounded) {
+        true -> shapes.V1000
+        false -> {
+            when (buttonSize) {
+                PrezelButtonSize.REGULAR -> shapes.V8
+                PrezelButtonSize.SMALL -> if (isIconOnly) shapes.V6 else shapes.V4
+                PrezelButtonSize.XSMALL -> shapes.V4
+            }
+        }
+    }
 
 @Composable
 internal fun prezelButtonBorderStroke(
@@ -138,7 +149,7 @@ internal fun prezelButtonContentColor(
 @Composable
 internal fun prezelButtonContentPadding(
     size: PrezelButtonSize,
-    onlyIcon: Boolean = false,
+    onlyIcon: Boolean,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues {
     if (onlyIcon) return prezelIconButtonContentPadding(size)
