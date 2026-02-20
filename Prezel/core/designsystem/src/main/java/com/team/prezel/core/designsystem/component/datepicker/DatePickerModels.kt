@@ -3,12 +3,12 @@ package com.team.prezel.core.designsystem.component.datepicker
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-data class DayCell(
+internal data class DayCell(
     val date: LocalDate?,
     val isInMonth: Boolean,
 )
 
-data class DayCellUiModel(
+internal data class DayCellUiModel(
     val date: LocalDate,
     val text: String,
     val isSelected: Boolean,

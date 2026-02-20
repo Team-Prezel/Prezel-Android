@@ -3,7 +3,7 @@ package com.team.prezel.core.designsystem.component.datepicker
 import java.time.DayOfWeek
 import java.time.YearMonth
 
-fun buildMonthGrid(
+internal fun buildMonthGrid(
     month: YearMonth,
     firstDayOfWeek: DayOfWeek,
 ): List<DayCell> {

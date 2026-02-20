@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="core_designsystem_close_floating_btn_content_desc">플로팅 버튼 닫기</string>
-    <string name="core_designsystem_close_date_picker_desc">DatePicker 닫기</string>
+    <string name="core_designsystem_close_date_picker_desc">날짜 선택 닫기</string>
     <string name="core_designsystem_checkbox_desc">체크박스</string>
     <string name="core_designsystem_date_picker_confirm_btn">선택하기</string>
+
+    <string-array name="core_designsystem_weekday_labels">
+        <item>일</item>
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+    </string-array>
 </resources>
