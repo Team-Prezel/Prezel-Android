@@ -82,7 +82,7 @@ internal fun TokenRow(
             text = name,
             style = PrezelTheme.typography.body3Medium,
             color = PrezelTheme.colors.textMedium,
-            modifier = Modifier.width(48.dp),
+            modifier = Modifier.width(120.dp),
         )
         Text(
             text = valueLabel,

@@ -18,6 +18,7 @@ internal fun Project.configureAndroidCompose(commonExtension: CommonExtension<*,
             "implementation"(platform(bom))
             "implementation"(libs.findBundle("android-compose").get())
             "androidTestImplementation"(platform(bom))
+            "androidTestImplementation"(libs.findLibrary("androidx.lifecycle.runtimeTesting").get())
             "implementation"(libs.findLibrary("androidx-compose-ui-tooling-preview").get())
             "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
         }

@@ -20,7 +20,6 @@ import com.team.prezel.core.designsystem.component.button.PrezelButtonSize
 import com.team.prezel.core.designsystem.component.button.PrezelButtonStyle
 import com.team.prezel.core.designsystem.component.button.PrezelButtonType
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -91,7 +90,7 @@ private fun PrezelSnackBarPreview_Cases() {
         PreviewScaffold {
             Text("Action O / Icon O")
             PrezelSnackbar(
-                data = previewData(message = "Message", actionLabel = "Action", leadingIcon = DrawableIcon(PrezelIcons.Blank)),
+                data = previewData(message = "Message", actionLabel = "Action", leadingIcon = IconSource(PrezelIcons.Blank)),
             )
 
             Text("Action X / Icon O")
@@ -99,7 +98,7 @@ private fun PrezelSnackBarPreview_Cases() {
                 data = previewData(
                     message = "Message Message Message ",
                     actionLabel = null,
-                    leadingIcon = DrawableIcon(PrezelIcons.Blank),
+                    leadingIcon = IconSource(PrezelIcons.Blank),
                 ),
             )
 

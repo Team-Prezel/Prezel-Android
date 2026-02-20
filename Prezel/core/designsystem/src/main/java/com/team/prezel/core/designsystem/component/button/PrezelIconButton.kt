@@ -2,7 +2,6 @@ package com.team.prezel.core.designsystem.component.button
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -55,7 +54,7 @@ private fun PrezelIconButtonPreviewItem(
     enabled: Boolean,
 ) {
     PrezelIconButton(
-        icon = DrawableIcon(resId = PrezelIcons.Blank),
+        icon = IconSource(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,

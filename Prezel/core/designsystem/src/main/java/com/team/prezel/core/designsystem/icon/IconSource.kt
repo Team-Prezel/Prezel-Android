@@ -3,28 +3,33 @@ package com.team.prezel.core.designsystem.icon
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 
-@Immutable
-interface IconSource {
+@Stable
+class IconSource private constructor(
+    private val painterProvider: @Composable () -> Painter,
+    private val contentDescProvider: @Composable () -> String?,
+) {
     @Composable
-    fun painter(): Painter
+    fun painter(): Painter = painterProvider()
 
     @Composable
-    fun contentDescription(vararg args: String): String?
-}
+    fun contentDescription(): String? = contentDescProvider()
 
-@Immutable
-data class DrawableIcon(
-    @param:DrawableRes val resId: Int,
-    @param:StringRes val contentDescTextId: Int? = null,
-) : IconSource {
-    @Composable
-    override fun painter(): Painter = painterResource(resId)
+    constructor(painter: Painter, contentDescription: String? = null) : this(
+        painterProvider = { painter },
+        contentDescProvider = { contentDescription },
+    )
 
-    @Composable
-    override fun contentDescription(vararg args: String): String? = contentDescTextId?.let { resId -> stringResource(resId, *args) }
+    constructor(
+        @DrawableRes resId: Int,
+        @StringRes contentDescResId: Int? = null,
+        vararg args: String,
+    ) : this(
+        painterProvider = { painterResource(resId) },
+        contentDescProvider = { contentDescResId?.let { stringResource(it, *args) } },
+    )
 }
