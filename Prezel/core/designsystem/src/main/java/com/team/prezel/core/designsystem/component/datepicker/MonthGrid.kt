@@ -19,10 +19,10 @@ internal fun MonthGrid(
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
 ) {
-    val cells = remember(month) {
-        buildMonthGrid(month, firstDayOfWeek = DayOfWeek.SUNDAY)
+    val (cells, lastWeek) = remember(month) {
+        val c = buildMonthGrid(month, firstDayOfWeek = DayOfWeek.SUNDAY)
+        c to lastWeekIndexToRender(c)
     }
-    val lastWeek = remember(cells) { lastWeekIndexToRender(cells) }
 
     Column(modifier = Modifier.padding(vertical = 16.dp)) {
         for (week in 0..lastWeek) {

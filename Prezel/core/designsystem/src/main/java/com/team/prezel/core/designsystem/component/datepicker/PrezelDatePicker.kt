@@ -22,8 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
@@ -52,7 +54,7 @@ fun PrezelDatePicker(
         (0..12).map { initialMonth.plusMonths(it.toLong()) }
     }
 
-    var picked by remember { mutableStateOf(selectedDate) }
+    var selectedDate by remember { mutableStateOf(selectedDate) }
 
     Column(
         modifier = modifier
@@ -66,7 +68,7 @@ fun PrezelDatePicker(
                     IconButton(onClick = onClose) {
                         Icon(
                             painter = painterResource(PrezelIcons.Cancel),
-                            contentDescription = "닫기",
+                            contentDescription = stringResource(R.string.core_designsystem_close_date_picker_desc),
                         )
                     }
                 },
@@ -82,9 +84,9 @@ fun PrezelDatePicker(
             items(months, key = { it.toString() }) { month ->
                 MonthSection(
                     month = month,
-                    selectedDate = picked,
+                    selectedDate = selectedDate,
                     today = today,
-                    onSelect = { picked = it },
+                    onSelect = { selectedDate = it },
                 )
             }
         }
@@ -93,11 +95,11 @@ fun PrezelDatePicker(
             PrezelHorizontalDivider(type = PrezelDividerType.THICK)
             PrezelTextButton(
                 text = "선택하기",
-                onClick = { picked?.let(onConfirm) },
+                onClick = { selectedDate?.let(onConfirm) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
-                enabled = picked != null,
+                enabled = selectedDate != null,
                 PrezelButtonStyle(
                     buttonType = PrezelButtonType.FILLED,
                     buttonHierarchy = PrezelButtonHierarchy.PRIMARY,
