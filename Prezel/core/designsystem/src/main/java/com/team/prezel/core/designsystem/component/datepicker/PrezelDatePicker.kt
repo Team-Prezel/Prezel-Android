@@ -43,18 +43,17 @@ import java.time.YearMonth
 @Composable
 fun PrezelDatePicker(
     title: String,
-    initialMonth: YearMonth = YearMonth.now(),
-    selectedDate: LocalDate? = null,
-    today: LocalDate = LocalDate.now(),
-    onClose: () -> Unit = {},
-    onConfirm: (LocalDate) -> Unit = {},
+    initialMonth: YearMonth,
+    today: LocalDate,
+    selectedDate: LocalDate?,
+    onSelect: (LocalDate) -> Unit,
+    onClose: () -> Unit,
+    onConfirm: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val months = remember(initialMonth) {
         (0..12).map { initialMonth.plusMonths(it.toLong()) }
     }
-
-    var selectedDate by remember { mutableStateOf(selectedDate) }
 
     Column(
         modifier = modifier
@@ -86,7 +85,7 @@ fun PrezelDatePicker(
                     month = month,
                     selectedDate = selectedDate,
                     today = today,
-                    onSelect = { selectedDate = it },
+                    onSelect = onSelect,
                 )
             }
         }
@@ -138,11 +137,16 @@ private fun WeekdayRow() {
 @Composable
 private fun PrezelDatePickerPreview() {
     PrezelTheme {
+        var selected by remember {
+            mutableStateOf(LocalDate.of(2026, 2, 26))
+        }
+
         PrezelDatePicker(
             title = "발표 날짜",
             initialMonth = YearMonth.of(2026, 2),
-            selectedDate = LocalDate.of(2026, 2, 28),
-            today = LocalDate.of(2026, 2, 12),
+            today = LocalDate.of(2026, 2, 20),
+            selectedDate = selected,
+            onSelect = { selected = it },
             onClose = {},
             onConfirm = {},
         )
