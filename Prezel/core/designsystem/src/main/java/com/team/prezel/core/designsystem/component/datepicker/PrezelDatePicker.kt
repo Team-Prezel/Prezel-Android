@@ -60,21 +60,7 @@ fun PrezelDatePicker(
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        Column {
-            PrezelTopAppBar(
-                title = { Text(text = title) },
-                trailingIcons = {
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Cancel),
-                            contentDescription = stringResource(R.string.core_designsystem_close_date_picker_desc),
-                        )
-                    }
-                },
-            )
-            WeekdayRow()
-            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-        }
+        DatePickerHeader(title = title, onClose = onClose)
 
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -90,22 +76,54 @@ fun PrezelDatePicker(
             }
         }
 
-        Column {
-            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-            PrezelTextButton(
-                text = "선택하기",
-                onClick = { selectedDate?.let(onConfirm) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                enabled = selectedDate != null,
-                PrezelButtonStyle(
-                    buttonType = PrezelButtonType.FILLED,
-                    buttonHierarchy = PrezelButtonHierarchy.PRIMARY,
-                    buttonSize = PrezelButtonSize.REGULAR,
-                ),
-            )
-        }
+        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DatePickerHeader(
+    title: String,
+    onClose: () -> Unit,
+) {
+    Column {
+        PrezelTopAppBar(
+            title = { Text(text = title) },
+            trailingIcons = {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Cancel),
+                        contentDescription = stringResource(R.string.core_designsystem_close_date_picker_desc),
+                    )
+                }
+            },
+        )
+        WeekdayRow()
+        PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DatePickerFooter(
+    selectedDate: LocalDate?,
+    onConfirm: (LocalDate) -> Unit,
+) {
+    Column {
+        PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+        PrezelTextButton(
+            text = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
+            onClick = { selectedDate?.let(onConfirm) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            enabled = selectedDate != null,
+            PrezelButtonStyle(
+                buttonType = PrezelButtonType.FILLED,
+                buttonHierarchy = PrezelButtonHierarchy.PRIMARY,
+                buttonSize = PrezelButtonSize.REGULAR,
+            ),
+        )
     }
 }
 

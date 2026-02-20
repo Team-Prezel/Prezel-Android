@@ -1,9 +1,10 @@
 package com.team.prezel.core.designsystem.component.datepicker
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-@androidx.compose.runtime.Composable
+@Composable
 internal fun dayTextColor(ui: DayCellUiModel): Color =
     when {
         ui.isSelected -> PrezelTheme.colors.bgRegular

@@ -3,4 +3,5 @@
     <string name="core_designsystem_close_floating_btn_content_desc">플로팅 버튼 닫기</string>
     <string name="core_designsystem_close_date_picker_desc">DatePicker 닫기</string>
     <string name="core_designsystem_checkbox_desc">체크박스</string>
+    <string name="core_designsystem_date_picker_confirm_btn">선택하기</string>
 </resources>
