@@ -56,7 +56,7 @@ fun PrezelButtonArea(
         } else {
             ButtonAreaHorizontal(
                 modifier = buttonAreaModifier,
-                isStringStrength = isStrongStrength,
+                isStrongStrength = isStrongStrength,
                 mainButton = mainButton,
                 subButton = subButton,
             )
@@ -95,11 +95,11 @@ private fun ButtonAreaVertical(
 @Composable
 private fun ButtonAreaHorizontal(
     modifier: Modifier,
-    isStringStrength: Boolean,
+    isStrongStrength: Boolean,
     mainButton: ButtonAreaButtonSpec,
     subButton: ButtonAreaButtonSpec?,
 ) {
-    val (mainWeight, subWeight) = if (isStringStrength) {
+    val (mainWeight, subWeight) = if (isStrongStrength) {
         107f to 47f
     } else {
         1f to 1f
@@ -129,7 +129,28 @@ private fun ButtonAreaHorizontal(
 
 @ThemePreview
 @Composable
-private fun PrezelButtonAreaPreview() {
+private fun PrezelButtonAreaVerticalPreview() {
+    PrezelButtonAreaTypedPreview(title = "Vertical", isVertical = true, isStrongStrength = true)
+}
+
+@ThemePreview
+@Composable
+private fun PrezelButtonAreaHorizontalStrongPreview() {
+    PrezelButtonAreaTypedPreview(title = "Horizontal & Strong Strength", isVertical = false, isStrongStrength = true)
+}
+
+@ThemePreview
+@Composable
+private fun PrezelButtonAreaHorizontalWeakPreview() {
+    PrezelButtonAreaTypedPreview(title = "Horizontal & Weak Strength", isVertical = false, isStrongStrength = false)
+}
+
+@Composable
+private fun PrezelButtonAreaTypedPreview(
+    title: String,
+    isVertical: Boolean,
+    isStrongStrength: Boolean,
+) {
     val mainButton = ButtonAreaButtonSpec(
         label = "Main Button",
         icon = IconSource(resId = PrezelIcons.Blank),
@@ -143,42 +164,20 @@ private fun PrezelButtonAreaPreview() {
 
     PrezelTheme {
         Column(
-            modifier = Modifier
-                .background(PrezelTheme.colors.bgMedium),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.background(PrezelTheme.colors.bgMedium),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            SectionTitle("PrezelButtonArea - Vertical")
+            SectionTitle(title = title)
             PrezelButtonArea(
-                isVertical = false,
-                isStrongStrength = true,
+                isVertical = isVertical,
+                isStrongStrength = isStrongStrength,
+                showBackground = false,
                 mainButton = mainButton,
                 subButton = subButton,
             )
-
             PrezelButtonArea(
-                isVertical = false,
-                isStrongStrength = false,
-                mainButton = mainButton,
-                subButton = subButton,
-            )
-
-            PrezelButtonArea(
-                isVertical = false,
-                isStrongStrength = true,
-                showBackground = true,
-                mainButton = mainButton,
-                subButton = subButton,
-            )
-
-            SectionTitle("PrezelButtonArea - Horizontal")
-            PrezelButtonArea(
-                isVertical = true,
-                mainButton = mainButton,
-                subButton = subButton,
-            )
-
-            PrezelButtonArea(
-                isVertical = true,
+                isVertical = isVertical,
+                isStrongStrength = isStrongStrength,
                 showBackground = true,
                 mainButton = mainButton,
                 subButton = subButton,
