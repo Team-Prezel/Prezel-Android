@@ -6,7 +6,7 @@ internal object ColorTokens {
     val Common0 = Color(0xFFFFFFFF)
     val Common1000 = Color(0xFF000205)
 
-    val CoolGray10 = Color(0xFFFAFBFC)
+    val CoolGray10 = Color(0xFFF5F6F7)
     val CoolGray50 = Color(0xFFEBEDF0)
     val CoolGray100 = Color(0xFFDCDFE3)
     val CoolGray200 = Color(0xFFC6C9CF)
