@@ -178,4 +178,4 @@ private fun prezelIconButtonContentPadding(
         PrezelButtonSize.XSMALL -> spacing.V8
         PrezelButtonSize.SMALL -> spacing.V10
         PrezelButtonSize.REGULAR -> spacing.V14
-    }.let { spacing -> PaddingValues(all = spacing) }
+    }.let { padding -> PaddingValues(all = padding) }
