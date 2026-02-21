@@ -41,24 +41,23 @@ fun PrezelButtonArea(
     isStrongStrength: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(PrezelTheme.spacing.V20),
 ) {
-    val buttonAreaModifier = modifier
-        .background(if (showBackground) PrezelTheme.colors.bgRegular else Color.Transparent)
-        .padding(contentPadding)
-        .fillMaxWidth()
+    Column(modifier = modifier) {
+        if (showBackground) PrezelHorizontalDivider(type = PrezelDividerType.THICK)
 
-    Column {
-        if (showBackground) {
-            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-        }
+        val contentModifier = Modifier
+            .background(if (showBackground) PrezelTheme.colors.bgRegular else Color.Transparent)
+            .padding(contentPadding)
+            .fillMaxWidth()
+
         if (isVertical) {
             ButtonAreaVertical(
-                modifier = buttonAreaModifier,
+                modifier = contentModifier,
                 mainButton = mainButton,
                 subButton = subButton,
             )
         } else {
             ButtonAreaHorizontal(
-                modifier = buttonAreaModifier,
+                modifier = contentModifier,
                 isStrongStrength = isStrongStrength,
                 mainButton = mainButton,
                 subButton = subButton,
