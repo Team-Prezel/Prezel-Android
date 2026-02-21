@@ -27,6 +27,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 data class ButtonAreaButtonSpec(
     val icon: IconSource? = null,
     val label: String,
+    val enabled: Boolean = true,
     val onClick: () -> Unit,
 )
 
@@ -78,6 +79,7 @@ private fun ButtonAreaVertical(
             text = mainButton.label,
             icon = mainButton.icon,
             onClick = mainButton.onClick,
+            enabled = mainButton.enabled,
             style = PrezelButtonStyle(buttonHierarchy = PrezelButtonHierarchy.PRIMARY),
         )
 
@@ -88,6 +90,7 @@ private fun ButtonAreaVertical(
                 text = subButton.label,
                 icon = subButton.icon,
                 onClick = subButton.onClick,
+                enabled = subButton.enabled,
                 style = PrezelButtonStyle(buttonHierarchy = PrezelButtonHierarchy.SECONDARY),
             )
         }
@@ -105,12 +108,13 @@ private fun ButtonAreaHorizontal(
         val mainModifier = Modifier.weight(1f)
         val subModifier = if (isStrongStrength) Modifier else Modifier.weight(1f)
 
-        subButton?.let { button ->
+        if (subButton != null) {
             PrezelButton(
                 modifier = subModifier,
-                text = button.label,
-                icon = button.icon,
-                onClick = button.onClick,
+                text = subButton.label,
+                icon = subButton.icon,
+                onClick = subButton.onClick,
+                enabled = subButton.enabled,
                 style = PrezelButtonStyle(buttonHierarchy = PrezelButtonHierarchy.SECONDARY),
             )
             Spacer(modifier = Modifier.width(PrezelTheme.spacing.V12))
@@ -121,6 +125,7 @@ private fun ButtonAreaHorizontal(
             text = mainButton.label,
             icon = mainButton.icon,
             onClick = mainButton.onClick,
+            enabled = mainButton.enabled,
             style = PrezelButtonStyle(buttonHierarchy = PrezelButtonHierarchy.PRIMARY),
         )
     }
