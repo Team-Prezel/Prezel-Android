@@ -3,6 +3,7 @@ package com.team.prezel.core.designsystem.component.button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,10 +38,11 @@ fun PrezelButtonArea(
     isVertical: Boolean = true,
     showBackground: Boolean = false,
     isStrongStrength: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(PrezelTheme.spacing.V20),
 ) {
     val buttonAreaModifier = modifier
         .background(if (showBackground) PrezelTheme.colors.bgRegular else Color.Transparent)
-        .padding(PrezelTheme.spacing.V20)
+        .padding(contentPadding)
         .fillMaxWidth()
 
     Column {
