@@ -99,26 +99,23 @@ private fun ButtonAreaHorizontal(
     mainButton: ButtonAreaButtonSpec,
     subButton: ButtonAreaButtonSpec?,
 ) {
-    val (mainWeight, subWeight) = if (isStrongStrength) {
-        107f to 47f
-    } else {
-        1f to 1f
-    }
-
     Row(modifier = modifier) {
-        if (subButton != null) {
+        val mainModifier = Modifier.weight(1f)
+        val subModifier = if (isStrongStrength) Modifier else Modifier.weight(1f)
+
+        subButton?.let { button ->
             PrezelButton(
-                modifier = Modifier.weight(subWeight),
-                text = subButton.label,
-                icon = subButton.icon,
-                onClick = subButton.onClick,
+                modifier = subModifier,
+                text = button.label,
+                icon = button.icon,
+                onClick = button.onClick,
                 style = PrezelButtonStyle(buttonHierarchy = PrezelButtonHierarchy.SECONDARY),
             )
             Spacer(modifier = Modifier.width(PrezelTheme.spacing.V12))
         }
 
         PrezelButton(
-            modifier = Modifier.weight(mainWeight),
+            modifier = mainModifier,
             text = mainButton.label,
             icon = mainButton.icon,
             onClick = mainButton.onClick,
