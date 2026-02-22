@@ -17,15 +17,19 @@ internal data class DayCellUiModel(
     val isToday: Boolean,
     val isSunday: Boolean,
     val isInMonth: Boolean,
+    val isVisible: Boolean,
     val enabled: Boolean,
 )
 
 internal fun DayCell.toUiModel(
     selectedDate: LocalDate?,
     today: LocalDate,
-    enabled: Boolean = isInMonth,
+    enabled: Boolean = true,
 ): DayCellUiModel? {
     if (date == null) return null
+
+    val isPast = date.isBefore(today)
+    val isVisible = isInMonth && !isPast
 
     return DayCellUiModel(
         date = date,
@@ -34,6 +38,7 @@ internal fun DayCell.toUiModel(
         isToday = date == today,
         isSunday = date.dayOfWeek == DayOfWeek.SUNDAY,
         isInMonth = isInMonth,
-        enabled = enabled && isInMonth,
+        isVisible = isVisible,
+        enabled = isVisible && enabled,
     )
 }

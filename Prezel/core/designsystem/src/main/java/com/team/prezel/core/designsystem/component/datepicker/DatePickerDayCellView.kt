@@ -41,16 +41,17 @@ internal fun RowScope.DayCellView(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        if (uiModel != null) {
-            Text(
-                text = uiModel.text,
-                color = uiModel.dayTextColor(),
-                style = if (uiModel.isSelected) {
-                    PrezelTheme.typography.body3Bold
-                } else {
-                    PrezelTheme.typography.body3Medium
-                },
-            )
-        }
+        if (uiModel == null) return@Box
+        if (!uiModel.isVisible) return@Box
+
+        Text(
+            text = uiModel.text,
+            color = uiModel.dayTextColor(),
+            style = if (uiModel.isSelected) {
+                PrezelTheme.typography.body3Bold
+            } else {
+                PrezelTheme.typography.body3Medium
+            },
+        )
     }
 }

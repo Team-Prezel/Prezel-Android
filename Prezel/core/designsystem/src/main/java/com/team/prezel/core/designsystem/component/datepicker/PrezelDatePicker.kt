@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
@@ -44,14 +43,14 @@ import java.time.YearMonth
 @Composable
 fun PrezelDatePicker(
     title: String,
-    initialMonth: YearMonth,
-    today: LocalDate,
     selectedDate: LocalDate?,
     onSelect: (LocalDate) -> Unit,
     onClose: () -> Unit,
     onConfirm: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    today: LocalDate = LocalDate.now(),
 ) {
+    val initialMonth = remember(today) { YearMonth.from(today) }
     val months = remember(initialMonth) {
         (0..12).map { initialMonth.plusMonths(it.toLong()) }
     }
@@ -65,7 +64,7 @@ fun PrezelDatePicker(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(bottom = 16.dp),
+            contentPadding = PaddingValues(bottom = PrezelTheme.spacing.V16),
         ) {
             items(months, key = { it.toString() }) { month ->
                 MonthSection(
@@ -164,8 +163,7 @@ private fun PrezelDatePickerPreview() {
 
         PrezelDatePicker(
             title = "발표 날짜",
-            initialMonth = YearMonth.of(2026, 2),
-            today = LocalDate.of(2026, 2, 20),
+            today = LocalDate.of(2026, 2, 23),
             selectedDate = selected,
             onSelect = { selected = it },
             onClose = {},
