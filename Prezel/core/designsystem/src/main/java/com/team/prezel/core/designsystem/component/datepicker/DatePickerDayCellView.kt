@@ -38,14 +38,14 @@ internal fun RowScope.DayCellView(
                 enabled = uiModel?.enabled == true,
                 onClick = onClick,
                 indication = ripple(),
-                interactionSource = null
+                interactionSource = null,
             ),
         contentAlignment = Alignment.Center,
     ) {
         if (uiModel != null) {
             Text(
                 text = uiModel.text,
-                color = dayTextColor(uiModel),
+                color = uiModel.dayTextColor(),
                 style = if (uiModel.isSelected) {
                     PrezelTheme.typography.body3Bold
                 } else {

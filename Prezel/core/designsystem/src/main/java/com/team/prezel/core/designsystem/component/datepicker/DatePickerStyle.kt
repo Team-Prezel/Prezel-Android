@@ -5,11 +5,11 @@ import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
-internal fun dayTextColor(ui: DayCellUiModel): Color =
+internal fun DayCellUiModel.dayTextColor(): Color =
     when {
-        !ui.enabled -> PrezelTheme.colors.textDisabled
-        ui.isSelected -> PrezelTheme.colors.bgRegular
-        ui.isToday -> PrezelTheme.colors.interactiveRegular
-        ui.isSunday -> PrezelTheme.colors.accentMagentaRegular
+        !this.enabled -> PrezelTheme.colors.textDisabled
+        this.isSelected -> PrezelTheme.colors.bgRegular
+        this.isToday -> PrezelTheme.colors.interactiveRegular
+        this.isSunday -> PrezelTheme.colors.accentMagentaRegular
         else -> PrezelTheme.colors.textMedium
     }

@@ -25,13 +25,14 @@ internal fun DayCell.toUiModel(
     today: LocalDate,
     enabled: Boolean = isInMonth,
 ): DayCellUiModel? {
-    val d = date ?: return null
+    if (date == null) return null
+
     return DayCellUiModel(
-        date = d,
-        text = d.dayOfMonth.toString(),
-        isSelected = d == selectedDate,
-        isToday = d == today,
-        isSunday = d.dayOfWeek == DayOfWeek.SUNDAY,
+        date = date,
+        text = date.dayOfMonth.toString(),
+        isSelected = date == selectedDate,
+        isToday = date == today,
+        isSunday = date.dayOfWeek == DayOfWeek.SUNDAY,
         isInMonth = isInMonth,
         enabled = enabled && isInMonth,
     )
