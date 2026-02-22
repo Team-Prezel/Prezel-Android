@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -26,7 +25,7 @@ internal fun RowScope.DayCellView(
         modifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
-            .padding(6.dp)
+            .padding(PrezelTheme.spacing.V4)
             .clip(CircleShape)
             .background(
                 if (uiModel?.isSelected == true) {

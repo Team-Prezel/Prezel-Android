@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import java.time.LocalDate
 import java.time.YearMonth
@@ -30,6 +31,19 @@ internal fun MonthSection(
             selectedDate = selectedDate,
             today = today,
             onSelect = onSelect,
+        )
+    }
+}
+
+@ThemePreview
+@Composable
+private fun MonthSectionPreview() {
+    PrezelTheme {
+        MonthSection(
+            month = YearMonth.of(2026, 2),
+            selectedDate = LocalDate.of(2026, 2, 26),
+            today = LocalDate.of(2026, 2, 23),
+            onSelect = {},
         )
     }
 }

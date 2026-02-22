@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -38,5 +39,18 @@ internal fun MonthGrid(
                 }
             }
         }
+    }
+}
+
+@ThemePreview
+@Composable
+private fun MonthGridPreview() {
+    PrezelTheme {
+        MonthGrid(
+            month = YearMonth.of(2026, 2),
+            selectedDate = LocalDate.of(2026, 2, 26),
+            today = LocalDate.of(2026, 2, 23),
+            onSelect = {},
+        )
     }
 }
