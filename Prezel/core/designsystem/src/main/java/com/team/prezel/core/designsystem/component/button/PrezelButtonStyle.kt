@@ -149,10 +149,10 @@ internal fun prezelButtonContentColor(
 @Composable
 internal fun prezelButtonContentPadding(
     size: PrezelButtonSize,
-    onlyIcon: Boolean,
+    isOnlyIcon: Boolean,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues {
-    if (onlyIcon) return prezelIconButtonContentPadding(size)
+    if (isOnlyIcon) return prezelIconButtonContentPadding(size)
 
     val horizontal = when (size) {
         PrezelButtonSize.XSMALL -> spacing.V10

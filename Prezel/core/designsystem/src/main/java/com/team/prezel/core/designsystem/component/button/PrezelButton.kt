@@ -49,7 +49,7 @@ fun PrezelButton(
             LocalContentColor provides prezelButtonContentColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
         ) {
             Row(
-                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, onlyIcon = isIconOnly)),
+                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, isOnlyIcon = isIconOnly)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
