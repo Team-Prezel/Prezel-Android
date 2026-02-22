@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,8 @@ internal fun RowScope.DayCellView(
             ).clickable(
                 enabled = uiModel?.enabled == true,
                 onClick = onClick,
+                indication = ripple(),
+                interactionSource = null
             ),
         contentAlignment = Alignment.Center,
     ) {

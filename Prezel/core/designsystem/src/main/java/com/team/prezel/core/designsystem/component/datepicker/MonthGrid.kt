@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.theme.PrezelTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -24,7 +24,7 @@ internal fun MonthGrid(
         c to lastWeekIndexToRender(c)
     }
 
-    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+    Column(modifier = Modifier.padding(top = PrezelTheme.spacing.V16)) {
         for (week in 0..lastWeek) {
             Row(Modifier.fillMaxWidth()) {
                 for (day in 0 until 7) {

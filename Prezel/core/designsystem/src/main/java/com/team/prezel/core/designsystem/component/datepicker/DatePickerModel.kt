@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.datepicker
 
+import androidx.compose.runtime.Immutable
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -8,6 +9,7 @@ internal data class DayCell(
     val isInMonth: Boolean,
 )
 
+@Immutable
 internal data class DayCellUiModel(
     val date: LocalDate,
     val text: String,

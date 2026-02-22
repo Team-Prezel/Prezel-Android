@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import java.time.LocalDate
 import java.time.YearMonth
@@ -18,7 +17,7 @@ internal fun MonthSection(
     onSelect: (LocalDate) -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(20.dp),
+        modifier = Modifier.padding(PrezelTheme.spacing.V20),
     ) {
         Text(
             text = "${month.year}년 ${month.monthValue}월",

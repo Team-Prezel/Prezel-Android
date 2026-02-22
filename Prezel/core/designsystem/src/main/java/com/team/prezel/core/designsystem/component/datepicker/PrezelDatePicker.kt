@@ -116,7 +116,7 @@ private fun DatePickerFooter(
             onClick = { selectedDate?.let(onConfirm) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(PrezelTheme.spacing.V20),
             enabled = selectedDate != null,
             PrezelButtonStyle(
                 buttonType = PrezelButtonType.FILLED,
@@ -134,7 +134,10 @@ private fun WeekdayRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(
+                horizontal = PrezelTheme.spacing.V20,
+                vertical = PrezelTheme.spacing.V12,
+            ),
     ) {
         labels.forEach { text ->
             Box(
