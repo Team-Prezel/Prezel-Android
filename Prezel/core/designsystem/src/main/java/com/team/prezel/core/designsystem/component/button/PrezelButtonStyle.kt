@@ -174,8 +174,10 @@ private fun prezelIconButtonContentPadding(
     size: PrezelButtonSize,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues =
-    when (size) {
-        PrezelButtonSize.XSMALL -> spacing.V8
-        PrezelButtonSize.SMALL -> spacing.V10
-        PrezelButtonSize.REGULAR -> spacing.V14
-    }.let { padding -> PaddingValues(all = padding) }
+    PaddingValues(
+        when (size) {
+            PrezelButtonSize.XSMALL -> spacing.V8
+            PrezelButtonSize.SMALL -> spacing.V10
+            PrezelButtonSize.REGULAR -> spacing.V14
+        },
+    )
