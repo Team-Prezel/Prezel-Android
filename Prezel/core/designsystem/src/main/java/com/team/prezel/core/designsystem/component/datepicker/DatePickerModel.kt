@@ -11,8 +11,7 @@ internal data class DayCell(
 
 @Immutable
 internal data class DayCellUiModel(
-    val date: LocalDate,
-    val text: String,
+    val dayText: String,
     val isSelected: Boolean,
     val isToday: Boolean,
     val isSunday: Boolean,
@@ -32,8 +31,7 @@ internal fun DayCell.toUiModel(
     val isVisible = isInMonth && !isPast
 
     return DayCellUiModel(
-        date = date,
-        text = date.dayOfMonth.toString(),
+        dayText = date.dayOfMonth.toString(),
         isSelected = date == selectedDate,
         isToday = date == today,
         isSunday = date.dayOfWeek == DayOfWeek.SUNDAY,

@@ -45,7 +45,7 @@ internal fun RowScope.DayCellView(
         if (!uiModel.isVisible) return@Box
 
         Text(
-            text = uiModel.text,
+            text = uiModel.dayText,
             color = uiModel.dayTextColor(),
             style = if (uiModel.isSelected) {
                 PrezelTheme.typography.body3Bold
