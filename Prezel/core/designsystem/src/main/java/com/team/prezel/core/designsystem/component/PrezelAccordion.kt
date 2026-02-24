@@ -47,7 +47,7 @@ fun PrezelAccordion(
     enabled: Boolean = true,
     showDivider: Boolean = false,
     header: @Composable (expanded: Boolean) -> Unit,
-    label: @Composable (expanded: Boolean) -> Unit,
+    trailingContent: @Composable (expanded: Boolean) -> Unit,
     content: @Composable () -> Unit,
 ) {
     val rotation by animateFloatAsState(
@@ -62,10 +62,10 @@ fun PrezelAccordion(
         Column {
             PrezelAccordionHeader(
                 enabled = enabled,
-                onClick = { onExpandedChange(!expanded) },
+                onTap = { onExpandedChange(!expanded) },
                 header = { header(expanded) },
-                label = { label(expanded) },
-                chevron = { PrezelAccordionChevron(rotation = rotation) },
+                trailingContent = { trailingContent(expanded) },
+                icon = { PrezelAccordionChevron(rotation = rotation) },
             )
 
             PrezelAccordionDivider(showDivider = showDivider)
@@ -81,10 +81,10 @@ fun PrezelAccordion(
 @Composable
 private fun PrezelAccordionHeader(
     enabled: Boolean,
-    onClick: () -> Unit,
+    onTap: () -> Unit,
     header: @Composable () -> Unit,
-    label: @Composable () -> Unit,
-    chevron: @Composable () -> Unit,
+    trailingContent: @Composable () -> Unit,
+    icon: @Composable () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -94,23 +94,22 @@ private fun PrezelAccordionHeader(
                 enabled = enabled,
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = onClick,
+                onClick = onTap,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .weight(1f),
+            modifier = Modifier.weight(1f),
         ) {
             header()
         }
+        Spacer(Modifier.width(12.dp))
+
+        trailingContent()
+
         Spacer(Modifier.width(8.dp))
 
-        label()
-
-        Spacer(Modifier.width(8.dp))
-
-        chevron()
+        icon()
     }
 }
 
@@ -172,7 +171,7 @@ private fun PrezelAccordionPreview_Collapsed() {
                         color = PrezelTheme.colors.textLarge,
                     )
                 },
-                label = {
+                trailingContent = {
                     Text(
                         text = "Label",
                         style = PrezelTextStyles.Body2Bold.toTextStyle(),
@@ -207,7 +206,7 @@ private fun PrezelAccordionPreview_Expanded() {
                         color = PrezelTheme.colors.textLarge,
                     )
                 },
-                label = {
+                trailingContent = {
                     Text(
                         text = "Label",
                         style = PrezelTextStyles.Body2Bold.toTextStyle(),
@@ -251,7 +250,7 @@ private fun PrezelAccordionPreview_Interactive() {
                         Text(text = "(필수) 이용약관")
                     }
                 },
-                label = {
+                trailingContent = {
                     Text(
                         text = "자세히 보기",
                         style = PrezelTextStyles.Caption2Medium.toTextStyle(),
