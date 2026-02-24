@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -73,9 +72,9 @@ private fun PrezelMainFloatingButton(
 ) {
     val currentIconSource =
         if (isExpanded) {
-            DrawableIcon(
+            IconSource(
                 resId = PrezelIcons.Cancel,
-                contentDescTextId = R.string.core_designsystem_close_floating_btn_content_desc,
+                contentDescResId = R.string.core_designsystem_close_floating_btn_content_desc,
             )
         } else {
             iconSource
@@ -194,7 +193,7 @@ private fun PreviewFloatingMenuButton(
     var isExpanded by remember { mutableStateOf(initialExpanded) }
 
     PrezelFloatingMenuButton(
-        iconSource = DrawableIcon(resId = PrezelIcons.Blank),
+        iconSource = IconSource(resId = PrezelIcons.Blank),
         isExpanded = isExpanded,
         onClick = { isExpanded = !isExpanded },
         style = style,
@@ -218,13 +217,13 @@ private fun PrezelFloatingMenuButtonPreview() {
 
 @Composable
 private fun PreviewFloatingMenuButton(isShowIcon: Boolean) {
-    val iconSource = if (isShowIcon) DrawableIcon(resId = PrezelIcons.Blank) else null
+    val iconSource = if (isShowIcon) IconSource(resId = PrezelIcons.Blank) else null
 
     PrezelFloatingMenuButton(
         modifier = Modifier
             .background(PrezelTheme.colors.bgScrim)
             .padding(16.dp),
-        iconSource = DrawableIcon(resId = PrezelIcons.Blank),
+        iconSource = IconSource(resId = PrezelIcons.Blank),
         isExpanded = true,
         onClick = {},
     ) {

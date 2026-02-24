@@ -49,6 +49,8 @@ data class PrezelColors(
     // 콘텐츠의 주목성과 인지도를 높이기 위해 버튼, 액션, 강조 요소 등에 사용되는 포인트 색상입니다.
     val accentPurpleSmall: Color,
     val accentPurpleRegular: Color,
+    val accentTealSmall: Color,
+    val accentTealRegular: Color,
     val accentMagentaSmall: Color,
     val accentMagentaRegular: Color,
     // Solid

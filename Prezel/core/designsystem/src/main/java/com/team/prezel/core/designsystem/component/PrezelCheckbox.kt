@@ -54,7 +54,7 @@ fun PrezelCheckbox(
 
     val iconColor =
         if (checked) {
-            PrezelTheme.colors.interactiveRegular
+            PrezelTheme.colors.feedbackGoodRegular
         } else {
             PrezelTheme.colors.iconDisabled
         }

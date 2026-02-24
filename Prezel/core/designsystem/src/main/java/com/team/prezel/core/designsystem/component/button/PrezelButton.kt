@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import com.team.prezel.core.designsystem.icon.DrawableIcon
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -35,12 +34,13 @@ fun PrezelButton(
     val hasIcon = icon != null
     require(hasText || hasIcon) { "Button은 text 또는 icon 중 하나는 반드시 필요합니다." }
     val (buttonType, buttonHierarchy, buttonSize, isRounded) = style
+    val isIconOnly = !hasText
 
     Surface(
         onClick = onClick,
         modifier = modifier.semantics { role = Role.Button },
         enabled = enabled,
-        shape = prezelButtonShape(isRounded = isRounded),
+        shape = prezelButtonShape(isIconOnly = isIconOnly, isRounded = isRounded, buttonSize = buttonSize),
         color = prezelButtonContainerColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
         border = prezelButtonBorderStroke(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
     ) {
@@ -49,11 +49,13 @@ fun PrezelButton(
             LocalContentColor provides prezelButtonContentColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
         ) {
             Row(
-                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, onlyIcon = hasIcon && !hasText)),
+                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, isOnlyIcon = isIconOnly)),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PrezelButtonIcon(icon = icon, size = buttonSize)
+                icon?.let { source ->
+                    PrezelButtonIcon(icon = source, size = buttonSize)
+                }
 
                 if (!hasText) return@Row
                 if (hasIcon) {
@@ -98,7 +100,7 @@ private fun PrezelButtonPreviewItem(
 ) {
     PrezelButton(
         text = "Label",
-        icon = DrawableIcon(resId = PrezelIcons.Blank),
+        icon = IconSource(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,

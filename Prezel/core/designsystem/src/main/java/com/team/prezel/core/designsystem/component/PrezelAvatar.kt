@@ -41,7 +41,7 @@ fun PrezelAvatar(
         modifier = modifier
             .size(size = prezelAvatarContainerSize(size))
             .clip(shape = shape)
-            .background(color = PrezelTheme.colors.bgRegular)
+            .background(color = PrezelTheme.colors.bgMedium)
             .border(
                 width = prezelAvatarBorderWidth(size),
                 color = PrezelTheme.colors.borderRegular,

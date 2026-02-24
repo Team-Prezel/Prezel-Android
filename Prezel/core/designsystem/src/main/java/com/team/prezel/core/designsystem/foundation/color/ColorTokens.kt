@@ -6,7 +6,7 @@ internal object ColorTokens {
     val Common0 = Color(0xFFFFFFFF)
     val Common1000 = Color(0xFF000205)
 
-    val CoolGray10 = Color(0xFFFAFBFC)
+    val CoolGray10 = Color(0xFFF5F6F7)
     val CoolGray50 = Color(0xFFEBEDF0)
     val CoolGray100 = Color(0xFFDCDFE3)
     val CoolGray200 = Color(0xFFC6C9CF)
@@ -57,6 +57,19 @@ internal object ColorTokens {
     val Orange800 = Color(0xFF8C2C03)
     val Orange900 = Color(0xFF661B00)
     val Orange950 = Color(0xFF400F00)
+
+    val Teal10 = Color(0xFFDBFFF6)
+    val Teal50 = Color(0xFFC2FFF0)
+    val Teal100 = Color(0xFF8FFFE3)
+    val Teal200 = Color(0xFF5CFFD6)
+    val Teal300 = Color(0xFF38F0C2)
+    val Teal400 = Color(0xFF25D0A5)
+    val Teal500 = Color(0xFF19B38C)
+    val Teal600 = Color(0xFF00A37A)
+    val Teal700 = Color(0xFF008F6B)
+    val Teal800 = Color(0xFF007A5C)
+    val Teal900 = Color(0xFF005C45)
+    val Teal950 = Color(0xFF08352A)
 
     val Purple10 = Color(0xFFFCF0FF)
     val Purple50 = Color(0xFFF2CCFF)

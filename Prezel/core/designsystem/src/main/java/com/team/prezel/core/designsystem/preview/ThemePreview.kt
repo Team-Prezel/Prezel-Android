@@ -8,9 +8,9 @@ import androidx.compose.ui.tooling.preview.Preview
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
-@Preview(
-    name = "DarkTheme",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
+// @Preview(
+//    name = "DarkTheme",
+//    showBackground = true,
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+// )
 annotation class ThemePreview

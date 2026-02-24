@@ -1,5 +1,3 @@
-import kotlin.text.replace
-
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -38,6 +36,14 @@ includeAuto(
     ":core:data",
     ":core:designsystem",
     ":core:network",
+    ":core:navigation",
+    ":core:ui",
+    ":feature:home:api",
+    ":feature:home:impl",
+    ":feature:history:api",
+    ":feature:history:impl",
+    ":feature:profile:api",
+    ":feature:profile:impl",
 )
 
 /**

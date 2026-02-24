@@ -98,7 +98,7 @@ private fun PrezelTopAppBarWithAllIconsPreview() {
     PrezelTheme {
         Surface(color = PrezelTheme.colors.bgRegular) {
             PrezelTopAppBar(
-                title = { Text(text = "제목") },
+                title = { Text(text = "Title") },
                 leadingIcon = {
                     IconButton(onClick = {}) {
                         Icon(
@@ -138,7 +138,7 @@ private fun PrezelTopAppBarScrollTestPreview() {
             containerColor = PrezelTheme.colors.bgRegular,
             topBar = {
                 PrezelTopAppBar(
-                    title = { Text("제목") },
+                    title = { Text("Title") },
                     leadingIcon = {
                         IconButton(onClick = {}) {
                             Icon(
