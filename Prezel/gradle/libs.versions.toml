@@ -21,7 +21,7 @@ navigation3 = "1.0.0"
 
 kotlinxDatetime = "0.7.1"
 kotlinxCoroutines = "1.10.2"
-kotlintxCollectionsImmutable = "0.4.0"
+kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerialization = "1.9.0"
 
 [libraries]
@@ -59,7 +59,7 @@ ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref =
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlintxCollectionsImmutable" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }

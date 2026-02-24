@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.LocalDate
@@ -22,7 +24,11 @@ internal fun MonthSection(
         modifier = Modifier.padding(PrezelTheme.spacing.V20),
     ) {
         Text(
-            text = "${yearMonth.year}년 ${yearMonth.month.number}월",
+            text = stringResource(
+                id = R.string.core_designsystem_date_picker_month_title,
+                yearMonth.year,
+                yearMonth.month.number,
+            ),
             color = PrezelTheme.colors.textLarge,
             style = PrezelTheme.typography.body3Medium,
         )
