@@ -29,11 +29,8 @@ import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
-import com.team.prezel.core.designsystem.component.button.PrezelButtonHierarchy
-import com.team.prezel.core.designsystem.component.button.PrezelButtonSize
-import com.team.prezel.core.designsystem.component.button.PrezelButtonStyle
-import com.team.prezel.core.designsystem.component.button.PrezelButtonType
-import com.team.prezel.core.designsystem.component.button.PrezelTextButton
+import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
+import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import java.time.LocalDate
@@ -76,7 +73,7 @@ fun PrezelDatePicker(
             }
         }
 
-        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm)
+        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm, onClose = onClose)
     }
 }
 
@@ -107,21 +104,21 @@ private fun DatePickerHeader(
 private fun DatePickerFooter(
     selectedDate: LocalDate?,
     onConfirm: (LocalDate) -> Unit,
+    onClose: () -> Unit,
 ) {
     Column {
-        PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-        PrezelTextButton(
-            text = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
-            onClick = { selectedDate?.let(onConfirm) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PrezelTheme.spacing.V20),
-            enabled = selectedDate != null,
-            PrezelButtonStyle(
-                buttonType = PrezelButtonType.FILLED,
-                buttonHierarchy = PrezelButtonHierarchy.PRIMARY,
-                buttonSize = PrezelButtonSize.REGULAR,
+        PrezelButtonArea(
+            mainButton = ButtonAreaButtonSpec(
+                label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
+                onClick = { selectedDate?.let(onConfirm) },
             ),
+            subButton = ButtonAreaButtonSpec(
+                label = stringResource(R.string.core_designsystem_date_picker_close_btn),
+                onClick = onClose,
+            ),
+            isVertical = false,
+            showBackground = true,
+            isStrongStrength = true,
         )
     }
 }
