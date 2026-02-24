@@ -4,39 +4,13 @@ import androidx.compose.runtime.Immutable
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-internal data class DayCell(
-    val date: LocalDate?,
-    val isInMonth: Boolean,
-)
-
 @Immutable
-internal data class DayCellUiModel(
-    val dayText: String,
+internal data class DayCell(
+    val date: LocalDate,
     val isSelected: Boolean,
     val isToday: Boolean,
-    val isSunday: Boolean,
-    val isInMonth: Boolean,
     val isVisible: Boolean,
-    val enabled: Boolean,
-)
-
-internal fun DayCell.toUiModel(
-    selectedDate: LocalDate?,
-    today: LocalDate,
-    enabled: Boolean = true,
-): DayCellUiModel? {
-    if (date == null) return null
-
-    val isPast = date.isBefore(today)
-    val isVisible = isInMonth && !isPast
-
-    return DayCellUiModel(
-        dayText = date.dayOfMonth.toString(),
-        isSelected = date == selectedDate,
-        isToday = date == today,
-        isSunday = date.dayOfWeek == DayOfWeek.SUNDAY,
-        isInMonth = isInMonth,
-        isVisible = isVisible,
-        enabled = isVisible && enabled,
-    )
+) {
+    val dayText: String = date.dayOfMonth.toString()
+    val isSunday: Boolean = date.dayOfWeek == DayOfWeek.SUNDAY
 }

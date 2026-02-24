@@ -18,7 +18,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 internal fun RowScope.DayCellView(
-    uiModel: DayCellUiModel?,
+    uiModel: DayCell?,
     onClick: () -> Unit,
 ) {
     Box(
@@ -34,10 +34,10 @@ internal fun RowScope.DayCellView(
                     Color.Transparent
                 },
             ).clickable(
-                enabled = uiModel?.enabled == true,
-                onClick = onClick,
                 indication = ripple(),
                 interactionSource = null,
+                enabled = uiModel?.isVisible == true,
+                onClick = onClick,
             ),
         contentAlignment = Alignment.Center,
     ) {

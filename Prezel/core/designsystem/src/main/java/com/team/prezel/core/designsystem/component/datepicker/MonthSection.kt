@@ -42,7 +42,7 @@ private fun MonthSectionPreview() {
         MonthSection(
             month = YearMonth.of(2026, 2),
             selectedDate = LocalDate.of(2026, 2, 26),
-            today = LocalDate.of(2026, 2, 23),
+            today = LocalDate.of(2026, 2, 25),
             onSelect = {},
         )
     }

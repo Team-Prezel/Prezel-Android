@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlinx.collections.immutable.ImmutableList
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -27,17 +28,42 @@ internal fun MonthGrid(
 
     Column(modifier = Modifier.padding(top = PrezelTheme.spacing.V16)) {
         for (week in 0..lastWeek) {
-            Row(Modifier.fillMaxWidth()) {
-                for (day in 0 until 7) {
-                    val cell = cells[week * 7 + day]
-                    val uiModel = cell.toUiModel(selectedDate = selectedDate, today = today)
+            WeekRow(cells = cells, week = week, selectedDate = selectedDate, today = today, onSelect = onSelect)
+        }
+    }
+}
 
-                    DayCellView(
-                        uiModel = uiModel,
-                        onClick = { cell.date?.let(onSelect) },
-                    )
-                }
+@Composable
+private fun WeekRow(
+    cells: ImmutableList<LocalDate?>,
+    week: Int,
+    selectedDate: LocalDate?,
+    today: LocalDate,
+    onSelect: (LocalDate) -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        for (day in 0 until 7) {
+            val date = cells[week * 7 + day]
+
+            if (date == null) {
+                DayCellView(
+                    uiModel = null,
+                ) { }
+                continue
             }
+
+            val isPast = date.isBefore(today)
+            val uiModel = DayCell(
+                date = date,
+                isSelected = date == selectedDate,
+                isToday = date == today,
+                isVisible = !isPast,
+            )
+
+            DayCellView(
+                uiModel = uiModel,
+                onClick = { onSelect(date) },
+            )
         }
     }
 }
@@ -49,7 +75,7 @@ private fun MonthGridPreview() {
         MonthGrid(
             month = YearMonth.of(2026, 2),
             selectedDate = LocalDate.of(2026, 2, 26),
-            today = LocalDate.of(2026, 2, 23),
+            today = LocalDate.of(2026, 2, 25),
             onSelect = {},
         )
     }

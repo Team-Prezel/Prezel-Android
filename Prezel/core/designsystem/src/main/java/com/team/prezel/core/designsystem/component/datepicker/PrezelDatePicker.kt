@@ -62,8 +62,9 @@ fun PrezelDatePicker(
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(bottom = PrezelTheme.spacing.V16),
+            overscrollEffect = null,
         ) {
-            items(months, key = { it.toString() }) { month ->
+            items(items = months, key = { it.toString() }) { month ->
                 MonthSection(
                     month = month,
                     selectedDate = selectedDate,
@@ -73,7 +74,7 @@ fun PrezelDatePicker(
             }
         }
 
-        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm, onClose = onClose)
+        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm)
     }
 }
 
@@ -104,23 +105,17 @@ private fun DatePickerHeader(
 private fun DatePickerFooter(
     selectedDate: LocalDate?,
     onConfirm: (LocalDate) -> Unit,
-    onClose: () -> Unit,
 ) {
-    Column {
-        PrezelButtonArea(
-            mainButton = ButtonAreaButtonSpec(
-                label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
-                onClick = { selectedDate?.let(onConfirm) },
-            ),
-            subButton = ButtonAreaButtonSpec(
-                label = stringResource(R.string.core_designsystem_date_picker_close_btn),
-                onClick = onClose,
-            ),
-            isVertical = false,
-            showBackground = true,
-            isStrongStrength = true,
-        )
-    }
+    PrezelButtonArea(
+        mainButton = ButtonAreaButtonSpec(
+            label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
+            enabled = selectedDate != null,
+            onClick = { selectedDate?.let(onConfirm) },
+        ),
+        subButton = null,
+        isVertical = false,
+        showBackground = true,
+    )
 }
 
 @Composable
