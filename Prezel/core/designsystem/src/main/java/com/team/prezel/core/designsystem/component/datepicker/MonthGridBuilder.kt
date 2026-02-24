@@ -2,25 +2,27 @@ package com.team.prezel.core.designsystem.component.datepicker
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.onDay
 
 internal fun buildMonthGrid(
-    month: YearMonth,
+    yearMonth: YearMonth,
     firstDayOfWeek: DayOfWeek,
 ): ImmutableList<LocalDate?> {
-    val firstOfMonth = month.atDay(1)
-    val lastDay = month.lengthOfMonth()
+    val firstOfMonth = yearMonth.onDay(1)
+    val lastDay = yearMonth.numberOfDays
 
-    val shift = ((firstOfMonth.dayOfWeek.value - firstDayOfWeek.value) + 7) % 7
+    val shift = ((firstOfMonth.dayOfWeek.isoDayNumber - firstDayOfWeek.isoDayNumber) + 7) % 7
     val totalCells = 42
 
     return (0 until totalCells)
         .map { index ->
             val dayNumber = index - shift + 1
             if (dayNumber in 1..lastDay) {
-                month.atDay(dayNumber)
+                yearMonth.onDay(dayNumber)
             } else {
                 null
             }

@@ -7,12 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.number
 
 @Composable
 internal fun MonthSection(
-    month: YearMonth,
+    yearMonth: YearMonth,
     selectedDate: LocalDate?,
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
@@ -21,13 +22,13 @@ internal fun MonthSection(
         modifier = Modifier.padding(PrezelTheme.spacing.V20),
     ) {
         Text(
-            text = "${month.year}년 ${month.monthValue}월",
+            text = "${yearMonth.year}년 ${yearMonth.month.number}월",
             color = PrezelTheme.colors.textLarge,
             style = PrezelTheme.typography.body3Medium,
         )
 
         MonthGrid(
-            month = month,
+            yearMonth = yearMonth,
             selectedDate = selectedDate,
             today = today,
             onSelect = onSelect,
@@ -40,9 +41,9 @@ internal fun MonthSection(
 private fun MonthSectionPreview() {
     PrezelTheme {
         MonthSection(
-            month = YearMonth.of(2026, 2),
-            selectedDate = LocalDate.of(2026, 2, 26),
-            today = LocalDate.of(2026, 2, 25),
+            yearMonth = YearMonth(year = 2026, month = 2),
+            selectedDate = LocalDate(year = 2026, month = 2, day = 26),
+            today = LocalDate(year = 2026, month = 2, day = 25),
             onSelect = {},
         )
     }

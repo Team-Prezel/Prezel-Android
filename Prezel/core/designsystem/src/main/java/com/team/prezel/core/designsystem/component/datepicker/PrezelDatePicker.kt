@@ -33,10 +33,14 @@ import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
 import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrezelDatePicker(
     title: String,
@@ -45,11 +49,13 @@ fun PrezelDatePicker(
     onClose: () -> Unit,
     onConfirm: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
-    today: LocalDate = LocalDate.now(),
+    today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
 ) {
-    val initialMonth = remember(today) { YearMonth.from(today) }
+    val initialMonth = remember(today) { YearMonth(today.year, today.month) }
     val months = remember(initialMonth) {
-        (0..12).map { initialMonth.plusMonths(it.toLong()) }
+        List(12) { offset ->
+            initialMonth.plus(value = offset, unit = DateTimeUnit.MONTH)
+        }
     }
 
     Column(
@@ -66,7 +72,7 @@ fun PrezelDatePicker(
         ) {
             items(items = months, key = { it.toString() }) { month ->
                 MonthSection(
-                    month = month,
+                    yearMonth = month,
                     selectedDate = selectedDate,
                     today = today,
                     onSelect = onSelect,
@@ -150,12 +156,12 @@ private fun WeekdayRow() {
 private fun PrezelDatePickerPreview() {
     PrezelTheme {
         var selected by remember {
-            mutableStateOf(LocalDate.of(2026, 2, 26))
+            mutableStateOf(LocalDate(year = 2026, month = 2, day = 26))
         }
 
         PrezelDatePicker(
             title = "발표 날짜",
-            today = LocalDate.of(2026, 2, 23),
+            today = LocalDate(year = 2026, month = 2, day = 23),
             selectedDate = selected,
             onSelect = { selected = it },
             onClose = {},

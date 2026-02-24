@@ -10,19 +10,19 @@ import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.YearMonth
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 
 @Composable
 internal fun MonthGrid(
-    month: YearMonth,
+    yearMonth: YearMonth,
     selectedDate: LocalDate?,
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
 ) {
-    val (cells, lastWeek) = remember(month) {
-        val c = buildMonthGrid(month, firstDayOfWeek = DayOfWeek.SUNDAY)
+    val (cells, lastWeek) = remember(yearMonth) {
+        val c = buildMonthGrid(yearMonth = yearMonth, firstDayOfWeek = DayOfWeek.SUNDAY)
         c to lastWeekIndexToRender(c)
     }
 
@@ -52,7 +52,7 @@ private fun WeekRow(
                 continue
             }
 
-            val isPast = date.isBefore(today)
+            val isPast = date < today
             val uiModel = DayCell(
                 date = date,
                 isSelected = date == selectedDate,
@@ -73,9 +73,9 @@ private fun WeekRow(
 private fun MonthGridPreview() {
     PrezelTheme {
         MonthGrid(
-            month = YearMonth.of(2026, 2),
-            selectedDate = LocalDate.of(2026, 2, 26),
-            today = LocalDate.of(2026, 2, 25),
+            yearMonth = YearMonth(year = 2026, month = 2),
+            selectedDate = LocalDate(year = 2026, month = 2, day = 26),
+            today = LocalDate(year = 2026, month = 2, day = 25),
             onSelect = {},
         )
     }
