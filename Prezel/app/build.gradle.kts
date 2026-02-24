@@ -6,6 +6,23 @@ plugins {
 android {
     namespace = "com.team.prezel"
 
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            resValue("string", "app_name", "Prezel (Dev)")
+            applicationIdSuffix = ".dev"
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
