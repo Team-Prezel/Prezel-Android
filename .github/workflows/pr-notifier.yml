@@ -37,7 +37,6 @@ jobs:
                 "url": "${{ github.event.pull_request.html_url }}",
                 "fields": [
                   {
-                    "name": "Changes",
                     "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
                     "inline": true
                   }
@@ -62,12 +61,11 @@ jobs:
                 "url": "${{ github.event.pull_request.html_url }}",
                 "fields": [
                   {
-                    "name": "Changes",
                     "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
                     "inline": true
                   }
                 ],
-                "color": 9030896
+                "color": 8808445
               }
             ]
 
@@ -87,7 +85,6 @@ jobs:
                 "url": "${{ github.event.pull_request.html_url }}",
                 "fields": [
                   {
-                    "name": "Changes",
                     "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
                     "inline": true
                   }
@@ -112,7 +109,6 @@ jobs:
                 "url": "${{ github.event.pull_request.html_url }}",
                 "fields": [
                   {
-                    "name": "Changes",
                     "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
                     "inline": true
                   }
