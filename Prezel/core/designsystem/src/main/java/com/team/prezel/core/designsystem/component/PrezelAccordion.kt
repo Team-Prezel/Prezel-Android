@@ -103,11 +103,11 @@ private fun PrezelAccordionHeader(
         ) {
             header()
         }
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(PrezelTheme.spacing.V12))
 
         trailingContent()
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(PrezelTheme.spacing.V8))
 
         icon()
     }
@@ -148,7 +148,7 @@ private fun PrezelAccordionContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(PrezelTheme.spacing.V12),
         ) {
             content()
         }
