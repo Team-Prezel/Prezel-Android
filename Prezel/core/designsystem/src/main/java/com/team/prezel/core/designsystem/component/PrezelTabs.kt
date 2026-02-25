@@ -82,9 +82,8 @@ private fun PrezelTabsBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(2.dp)
-                    .tabIndicatorOffset(
-                        selectedTabIndex = pagerState.currentPage,
-                    ).background(PrezelTheme.colors.solidBlack),
+                    .tabIndicatorOffset(selectedTabIndex = pagerState.currentPage)
+                    .background(PrezelTheme.colors.solidBlack),
             )
         },
     ) {
