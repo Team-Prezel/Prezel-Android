@@ -1,0 +1,122 @@
+name: Notify Discord on PR Events
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - release
+    types:
+      - opened
+      - reopened
+      - closed
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      DISCORD_USERNAME: PR Notifier
+      DISCORD_AVATAR: https://avatars.githubusercontent.com/u/254620124?s=200&v=4
+
+    steps:
+      - name: Notify Discord - PR Opened
+        if: ${{ github.event.action == 'opened' }}
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}",
+                  "icon_url": "${{ github.event.pull_request.user.avatar_url }}",
+                  "url": "https://github.com/${{ github.event.pull_request.user.login }}"
+                },
+                "title": "[PR Opened] ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})",
+                "url": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Changes",
+                    "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
+                    "inline": true
+                  }
+                ],
+                "color": 8808445
+              }
+            ]
+
+      - name: Notify Discord - PR Reopened
+        if: ${{ github.event.action == 'reopened' }}
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}",
+                  "icon_url": "${{ github.event.pull_request.user.avatar_url }}",
+                  "url": "https://github.com/${{ github.event.pull_request.user.login }}"
+                },
+                "title": "[PR Reopened] ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})",
+                "url": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Changes",
+                    "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
+                    "inline": true
+                  }
+                ],
+                "color": 9030896
+              }
+            ]
+
+      - name: Notify Discord - PR Closed (Merged)
+        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged == true }}
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}",
+                  "icon_url": "${{ github.event.pull_request.user.avatar_url }}",
+                  "url": "https://github.com/${{ github.event.pull_request.user.login }}"
+                },
+                "title": "[PR Merged] ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})",
+                "url": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Changes",
+                    "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
+                    "inline": true
+                  }
+                ],
+                "color": 16744276
+              }
+            ]
+
+      - name: Notify Discord - PR Closed (Not merged)
+        if: ${{ github.event.action == 'closed' && github.event.pull_request.merged != true }}
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}",
+                  "icon_url": "${{ github.event.pull_request.user.avatar_url }}",
+                  "url": "https://github.com/${{ github.event.pull_request.user.login }}"
+                },
+                "title": "[PR Closed] ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})",
+                "url": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Changes",
+                    "value": "`${{ github.head_ref }}` → `${{ github.base_ref }}`",
+                    "inline": true
+                  }
+                ],
+                "color": 7105645
+              }
+            ]
