@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      DISCORD_WEBHOOK: ${{ secrets.PR_DISCORD_WEBHOOK_URL }}
       DISCORD_USERNAME: PR Notifier
       DISCORD_AVATAR: https://avatars.githubusercontent.com/u/254620124?s=200&v=4
 
