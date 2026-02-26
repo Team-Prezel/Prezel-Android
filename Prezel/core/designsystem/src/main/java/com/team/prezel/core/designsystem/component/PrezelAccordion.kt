@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -45,20 +46,27 @@ fun PrezelAccordion(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     showDivider: Boolean = false,
-    header: @Composable (expanded: Boolean) -> Unit,
-    trailingContent: @Composable (expanded: Boolean) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(horizontal = PrezelTheme.spacing.V12),
+    header: @Composable () -> Unit,
+    trailingContent: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Column(modifier = modifier.background(Color.Transparent)) {
         PrezelAccordionHeader(
             enabled = enabled,
             expanded = expanded,
+            contentPadding = contentPadding,
             onTap = { onExpandedChange(!expanded) },
-            header = { header(expanded) },
-            trailingContent = { trailingContent(expanded) },
+            header = { header() },
+            trailingContent = { trailingContent() },
         )
 
-        PrezelAccordionDivider(showDivider = showDivider)
+        if (showDivider) {
+            PrezelHorizontalDivider(
+                type = PrezelDividerType.THICK,
+                color = PrezelTheme.colors.borderSmall,
+            )
+        }
 
         PrezelAccordionContent(
             expanded = expanded,
@@ -71,6 +79,7 @@ fun PrezelAccordion(
 private fun PrezelAccordionHeader(
     enabled: Boolean,
     expanded: Boolean,
+    contentPadding: PaddingValues,
     onTap: () -> Unit,
     header: @Composable () -> Unit,
     trailingContent: @Composable () -> Unit,
@@ -78,7 +87,7 @@ private fun PrezelAccordionHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = PrezelTheme.spacing.V12)
+            .padding(contentPadding)
             .defaultMinSize(minHeight = 48.dp)
             .clickable(
                 enabled = enabled,
@@ -116,16 +125,6 @@ private fun PrezelAccordionChevron(expanded: Boolean) {
             .size(24.dp)
             .rotate(rotation),
         tint = PrezelTheme.colors.iconRegular,
-    )
-}
-
-@Composable
-private fun PrezelAccordionDivider(showDivider: Boolean) {
-    if (!showDivider) return
-
-    PrezelHorizontalDivider(
-        type = PrezelDividerType.THICK,
-        color = PrezelTheme.colors.borderSmall,
     )
 }
 
@@ -227,6 +226,7 @@ private fun PrezelAccordionPreview_Interactive() {
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
                 showDivider = true,
+                contentPadding = PaddingValues(all = 0.dp),
                 header = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
