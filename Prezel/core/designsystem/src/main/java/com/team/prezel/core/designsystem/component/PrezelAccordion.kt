@@ -6,8 +6,8 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,80 +40,75 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 fun PrezelAccordion(
-    modifier: Modifier = Modifier,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     showDivider: Boolean = false,
     header: @Composable (expanded: Boolean) -> Unit,
     trailingContent: @Composable (expanded: Boolean) -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-        label = "accordionChevronRotation",
-    )
+    Column(modifier = modifier.background(Color.Transparent)) {
+        PrezelAccordionHeader(
+            enabled = enabled,
+            expanded = expanded,
+            onTap = { onExpandedChange(!expanded) },
+            header = { header(expanded) },
+            trailingContent = { trailingContent(expanded) },
+        )
 
-    Surface(
-        modifier = modifier,
-        color = Color.Transparent,
-    ) {
-        Column {
-            PrezelAccordionHeader(
-                enabled = enabled,
-                onTap = { onExpandedChange(!expanded) },
-                header = { header(expanded) },
-                trailingContent = { trailingContent(expanded) },
-                icon = { PrezelAccordionChevron(rotation = rotation) },
-            )
+        PrezelAccordionDivider(showDivider = showDivider)
 
-            PrezelAccordionDivider(showDivider = showDivider)
-
-            PrezelAccordionContent(
-                expanded = expanded,
-                content = content,
-            )
-        }
+        PrezelAccordionContent(
+            expanded = expanded,
+            content = content,
+        )
     }
 }
 
 @Composable
 private fun PrezelAccordionHeader(
     enabled: Boolean,
+    expanded: Boolean,
     onTap: () -> Unit,
     header: @Composable () -> Unit,
     trailingContent: @Composable () -> Unit,
-    icon: @Composable () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = PrezelTheme.spacing.V12)
             .defaultMinSize(minHeight = 48.dp)
             .clickable(
                 enabled = enabled,
                 indication = null,
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = null,
                 onClick = onTap,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier.weight(1f),
-        ) {
-            header()
-        }
+            content = { header() },
+        )
         Spacer(Modifier.width(PrezelTheme.spacing.V12))
 
         trailingContent()
 
         Spacer(Modifier.width(PrezelTheme.spacing.V8))
 
-        icon()
+        PrezelAccordionChevron(expanded = expanded)
     }
 }
 
 @Composable
-private fun PrezelAccordionChevron(rotation: Float) {
+private fun PrezelAccordionChevron(expanded: Boolean) {
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "accordionChevronRotation",
+    )
+
     Icon(
         painter = painterResource(PrezelIcons.ChevronDown),
         contentDescription = stringResource(R.string.core_designsystem_accordion_desc),
@@ -146,9 +140,7 @@ private fun PrezelAccordionContent(
         exit = fadeOut() + shrinkVertically(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PrezelTheme.spacing.V12),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             content()
         }
@@ -201,7 +193,6 @@ private fun PrezelAccordionPreview_Expanded() {
                 header = {
                     Text(
                         text = "Title",
-                        modifier = Modifier.padding(start = 12.dp),
                         style = PrezelTextStyles.Body2Medium.toTextStyle(),
                         color = PrezelTheme.colors.textLarge,
                     )
@@ -216,8 +207,9 @@ private fun PrezelAccordionPreview_Expanded() {
             ) {
                 Text(
                     text = "Content 영역입니다.\n여기에 설명이나 리스트가 들어갑니다.",
-                    style = PrezelTextStyles.Caption2Medium.toTextStyle(),
+                    modifier = Modifier.padding(all = 12.dp),
                     color = PrezelTheme.colors.textLarge,
+                    style = PrezelTextStyles.Caption2Medium.toTextStyle(),
                 )
             }
         }
@@ -245,23 +237,22 @@ private fun PrezelAccordionPreview_Interactive() {
                             onCheckedChange = {},
                         )
 
-                        Spacer(Modifier.width(4.dp))
-
                         Text(text = "(필수) 이용약관")
                     }
                 },
                 trailingContent = {
                     Text(
                         text = "자세히 보기",
-                        style = PrezelTextStyles.Caption2Medium.toTextStyle(),
                         color = PrezelTheme.colors.textMedium,
+                        style = PrezelTextStyles.Caption2Medium.toTextStyle(),
                     )
                 },
             ) {
                 Text(
                     text = "클릭하면 열리고 닫힙니다.",
-                    style = PrezelTextStyles.Caption2Medium.toTextStyle(),
+                    modifier = Modifier.padding(all = 12.dp),
                     color = PrezelTheme.colors.textLarge,
+                    style = PrezelTextStyles.Caption2Medium.toTextStyle(),
                 )
             }
         }
