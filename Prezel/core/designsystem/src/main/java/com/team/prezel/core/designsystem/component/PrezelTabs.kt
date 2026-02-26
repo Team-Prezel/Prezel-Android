@@ -1,10 +1,8 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -110,30 +108,14 @@ private fun PrezelTabContent(
         onClick = onClick,
         modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
         text = {
-            PrezelTabLabel(
-                label = label,
-                size = size,
+            Text(
+                text = label,
+                style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
             )
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,
         unselectedContentColor = PrezelTheme.colors.textDisabled,
     )
-}
-
-@Composable
-private fun PrezelTabLabel(
-    label: String,
-    size: PrezelTabSize,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
-    ) {
-        Text(
-            text = label,
-            style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
-        )
-    }
 }
 
 @Composable
