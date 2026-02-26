@@ -1,10 +1,8 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +14,6 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,18 +28,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-@Immutable
-data class PrezelTabItem(
-    val label: String,
-    val badgeCount: Int? = null,
-    val enabled: Boolean = true,
-)
-
 enum class PrezelTabSize { Small, Regular }
 
 @Composable
 fun PrezelTabs(
-    tabs: ImmutableList<PrezelTabItem>,
+    tabs: ImmutableList<String>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     size: PrezelTabSize = PrezelTabSize.Regular,
@@ -61,8 +51,7 @@ fun PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
             size = size,
-            onTabClick = { index, enabled ->
-                if (!enabled) return@PrezelTabsBar
+            onTabClick = { index ->
                 handleTabClick(scope, pagerState, index)
             },
         )
@@ -77,10 +66,10 @@ fun PrezelTabs(
 
 @Composable
 private fun PrezelTabsBar(
-    tabs: ImmutableList<PrezelTabItem>,
+    tabs: ImmutableList<String>,
     pagerState: PagerState,
     size: PrezelTabSize,
-    onTabClick: (index: Int, enabled: Boolean) -> Unit,
+    onTabClick: (index: Int) -> Unit,
 ) {
     SecondaryTabRow(
         selectedTabIndex = pagerState.currentPage,
@@ -91,18 +80,17 @@ private fun PrezelTabsBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(2.dp)
-                    .tabIndicatorOffset(
-                        selectedTabIndex = pagerState.currentPage,
-                    ).background(PrezelTheme.colors.solidBlack),
+                    .tabIndicatorOffset(selectedTabIndex = pagerState.currentPage)
+                    .background(PrezelTheme.colors.solidBlack),
             )
         },
     ) {
-        tabs.forEachIndexed { index, item ->
+        tabs.forEachIndexed { index, label ->
             PrezelTabContent(
-                item = item,
+                label = label,
                 selected = pagerState.currentPage == index,
                 size = size,
-                onClick = { onTabClick(index, item.enabled) },
+                onClick = { onTabClick(index) },
             )
         }
     }
@@ -110,7 +98,7 @@ private fun PrezelTabsBar(
 
 @Composable
 private fun PrezelTabContent(
-    item: PrezelTabItem,
+    label: String,
     selected: Boolean,
     size: PrezelTabSize,
     onClick: () -> Unit,
@@ -119,45 +107,15 @@ private fun PrezelTabContent(
         selected = selected,
         onClick = onClick,
         modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
-        enabled = item.enabled,
         text = {
-            PrezelTabLabel(
-                label = item.label,
-                size = size,
-                badgeCount = item.badgeCount,
-                selected = selected,
+            Text(
+                text = label,
+                style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
             )
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,
         unselectedContentColor = PrezelTheme.colors.textDisabled,
     )
-}
-
-@Composable
-private fun PrezelTabLabel(
-    label: String,
-    size: PrezelTabSize,
-    selected: Boolean,
-    badgeCount: Int? = null,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            text = label,
-            style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
-        )
-
-        if (badgeCount != null) {
-            PrezelBadge(
-                active = false,
-                count = badgeCount,
-                size = PrezelBadgeSize.REGULAR,
-                disabled = !selected,
-            )
-        }
-    }
 }
 
 @Composable
@@ -195,11 +153,7 @@ private fun handleTabClick(
 @ThemePreview
 @Composable
 private fun PrezelMediumTabPreview() {
-    val tabs = persistentListOf(
-        PrezelTabItem(label = "Label", badgeCount = 0),
-        PrezelTabItem(label = "Label", badgeCount = 0),
-        PrezelTabItem(label = "Label", badgeCount = 0),
-    )
+    val tabs = persistentListOf("Label1", "Label2", "Label3")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
     PrezelTheme {
@@ -228,10 +182,7 @@ private fun PrezelMediumTabPreview() {
 @ThemePreview
 @Composable
 private fun PrezelSmallTabPreview() {
-    val tabs = persistentListOf(
-        PrezelTabItem(label = "Label", badgeCount = 2),
-        PrezelTabItem(label = "Label", badgeCount = 3),
-    )
+    val tabs = persistentListOf("Label1", "Label2")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
     PrezelTheme {
