@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.list
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -37,20 +38,28 @@ internal fun PrezelListIcon(
 }
 
 @Composable
-internal fun prezelListVerticalPadding(
+internal fun prezelListContentPadding(
     size: PrezelListSize,
+    nested: Boolean,
     spacing: PrezelSpacing = PrezelTheme.spacing,
-): Dp =
-    when (size) {
+): PaddingValues {
+    if (nested) {
+        return PaddingValues(spacing.V0)
+    }
+
+    val vertical = when (size) {
         PrezelListSize.SMALL -> spacing.V10
         PrezelListSize.REGULAR -> spacing.V14
     }
 
+    return PaddingValues(
+        horizontal = spacing.V12,
+        vertical = vertical,
+    )
+}
+
 @Composable
-internal fun prezelListTextStyle(
-    size: PrezelListSize,
-    spacing: PrezelSpacing = PrezelTheme.spacing,
-): TextStyle =
+internal fun prezelListTextStyle(size: PrezelListSize): TextStyle =
     when (size) {
         PrezelListSize.SMALL -> PrezelTheme.typography.body3Medium
         PrezelListSize.REGULAR -> PrezelTheme.typography.body2Medium
