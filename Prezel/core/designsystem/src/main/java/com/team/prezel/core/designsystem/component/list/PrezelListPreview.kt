@@ -23,10 +23,10 @@ internal fun NestedCases(size: PrezelListSize) {
 internal fun ShowLeadingCases(size: PrezelListSize) {
     Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
         Text("showLeadingContent off", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showLeading = false)
+        BasePrezelList(size = size)
 
         Text("showLeadingContent on", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showLeading = true)
+        BasePrezelList(size = size)
     }
 }
 
@@ -34,10 +34,10 @@ internal fun ShowLeadingCases(size: PrezelListSize) {
 internal fun ShowTrailingCases(size: PrezelListSize) {
     Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
         Text("showTrailingContent off", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showTrailing = false)
+        BasePrezelList(size = size)
 
         Text("showTrailingContent on", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showTrailing = true, showFirstTrailing = true)
+        BasePrezelList(size = size)
     }
 }
 
@@ -45,10 +45,10 @@ internal fun ShowTrailingCases(size: PrezelListSize) {
 internal fun ShowFirstTrailingCases(size: PrezelListSize) {
     Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
         Text("showFirstTrailingContent off", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showFirstTrailing = false)
+        BasePrezelList(size = size)
 
         Text("showFirstTrailingContent on", style = PrezelTheme.typography.body3Medium)
-        BasePrezelList(size = size, showFirstTrailing = true)
+        BasePrezelList(size = size)
     }
 }
 
@@ -56,41 +56,26 @@ internal fun ShowFirstTrailingCases(size: PrezelListSize) {
 internal fun BasePrezelList(
     size: PrezelListSize,
     nested: Boolean = false,
-    showLeading: Boolean = true,
-    showTrailing: Boolean = true,
-    showFirstTrailing: Boolean = false,
 ) {
     PrezelList(
         title = "Title",
         size = size,
         nested = nested,
-        showLeadingContent = showLeading,
         leadingContent = {
             PrezelListIcon(
                 icon = IconSource(resId = PrezelIcons.Blank),
                 size = size,
             )
         },
-        showTrailingContent = showTrailing,
-        showFirstTrailingContent = showFirstTrailing,
         trailingContent = {
-            if (showTrailing) {
-                if (!showFirstTrailing) {
-                    PrezelListIcon(
-                        icon = IconSource(resId = PrezelIcons.Blank),
-                        size = size,
-                    )
-                } else {
-                    PrezelListIcon(
-                        icon = IconSource(resId = PrezelIcons.Blank),
-                        size = size,
-                    )
-                    PrezelListIcon(
-                        icon = IconSource(resId = PrezelIcons.Blank),
-                        size = size,
-                    )
-                }
-            }
+            PrezelListIcon(
+                icon = IconSource(resId = PrezelIcons.Blank),
+                size = size,
+            )
+            PrezelListIcon(
+                icon = IconSource(resId = PrezelIcons.Blank),
+                size = size,
+            )
         },
     )
 }

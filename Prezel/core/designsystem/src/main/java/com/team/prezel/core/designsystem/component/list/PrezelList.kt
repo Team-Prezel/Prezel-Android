@@ -24,11 +24,8 @@ fun PrezelList(
     modifier: Modifier = Modifier,
     size: PrezelListSize = PrezelListSize.REGULAR,
     nested: Boolean = false,
-    showLeadingContent: Boolean = false,
-    leadingContent: @Composable () -> Unit = {},
-    showTrailingContent: Boolean = true,
-    showFirstTrailingContent: Boolean = true,
-    trailingContent: @Composable () -> Unit = {},
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -36,21 +33,21 @@ fun PrezelList(
             .padding(prezelListContentPadding(size, nested)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PrezelListLeadingSlot(size, showLeadingContent, leadingContent)
+        PrezelListLeadingSlot(size, leadingContent)
         PrezelListTitle(title, size)
-        PrezelListTrailingSlot(size, showTrailingContent, trailingContent)
+        PrezelListTrailingSlot(size, trailingContent)
     }
 }
 
 @Composable
 private fun PrezelListLeadingSlot(
     size: PrezelListSize,
-    showLeadingContent: Boolean,
-    leadingContent: @Composable () -> Unit,
+    leadingContent: (@Composable () -> Unit)?,
 ) {
-    if (!showLeadingContent) return
-    leadingContent()
-    Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+    leadingContent?.let {
+        it()
+        Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+    }
 }
 
 @Composable
@@ -70,17 +67,16 @@ private fun RowScope.PrezelListTitle(
 @Composable
 private fun PrezelListTrailingSlot(
     size: PrezelListSize,
-    showTrailingContent: Boolean,
-    trailingContent: @Composable () -> Unit = {},
+    trailingContent: (@Composable () -> Unit)?,
 ) {
-    if (!showTrailingContent) return
-
-    Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        trailingContent()
+    trailingContent?.let {
+        Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            it()
+        }
     }
 }
 
