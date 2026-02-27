@@ -3,6 +3,7 @@ package com.team.prezel.core.designsystem.component.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun PrezelList(
@@ -32,38 +34,59 @@ fun PrezelList(
     trailingContents: ImmutableList<@Composable () -> Unit> = persistentListOf(),
 ) {
     val visibleTrailingContents =
-        if (!showFirstTrailingContent) trailingContents.take(1) else trailingContents
+        if (!showFirstTrailingContent) trailingContents.take(1).toImmutableList() else trailingContents
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(paddingValues = prezelListContentPadding(size, nested)),
+            .padding(prezelListContentPadding(size, nested)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (showLeadingContent) {
-            leadingContent()
-            Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size = size)))
-        }
+        PrezelListLeadingSlot(size, showLeadingContent, leadingContent)
+        PrezelListTitle(title, size)
+        PrezelListTrailingSlot(size, showTrailingContent, visibleTrailingContents)
+    }
+}
 
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            color = LocalContentColor.current,
-            maxLines = 1,
-            style = prezelListTextStyle(size = size),
-        )
-        Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size = size)))
+@Composable
+private fun PrezelListLeadingSlot(
+    size: PrezelListSize,
+    showLeadingContent: Boolean,
+    leadingContent: @Composable () -> Unit,
+) {
+    if (!showLeadingContent) return
+    leadingContent()
+    Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+}
 
-        if (showTrailingContent) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(
-                    prezelListTrailingIconSpacing(size),
-                ),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                visibleTrailingContents.forEach { it() }
-            }
-        }
+@Composable
+private fun RowScope.PrezelListTitle(
+    title: String,
+    size: PrezelListSize,
+) {
+    Text(
+        text = title,
+        modifier = Modifier.weight(1f),
+        color = LocalContentColor.current,
+        maxLines = 1,
+        style = prezelListTextStyle(size),
+    )
+}
+
+@Composable
+private fun PrezelListTrailingSlot(
+    size: PrezelListSize,
+    showTrailingContent: Boolean,
+    trailingContents: ImmutableList<@Composable () -> Unit>,
+) {
+    if (!showTrailingContent || trailingContents.isEmpty()) return
+
+    Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        trailingContents.forEach { it() }
     }
 }
 
