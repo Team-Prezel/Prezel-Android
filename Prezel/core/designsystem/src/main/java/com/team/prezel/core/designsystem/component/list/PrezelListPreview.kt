@@ -7,8 +7,6 @@ import androidx.compose.runtime.Composable
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 internal fun NestedCases(size: PrezelListSize) {
@@ -55,17 +53,6 @@ internal fun ShowFirstTrailingCases(size: PrezelListSize) {
 }
 
 @Composable
-private fun prezelListTrailingIcons(size: PrezelListSize): ImmutableList<@Composable () -> Unit> =
-    List(2) {
-        @Composable {
-            PrezelListIcon(
-                icon = IconSource(resId = PrezelIcons.Blank),
-                size = size,
-            )
-        }
-    }.toPersistentList()
-
-@Composable
 internal fun BasePrezelList(
     size: PrezelListSize,
     nested: Boolean = false,
@@ -86,6 +73,24 @@ internal fun BasePrezelList(
         },
         showTrailingContent = showTrailing,
         showFirstTrailingContent = showFirstTrailing,
-        trailingContents = prezelListTrailingIcons(size),
+        trailingContent = {
+            if (showTrailing) {
+                if (!showFirstTrailing) {
+                    PrezelListIcon(
+                        icon = IconSource(resId = PrezelIcons.Blank),
+                        size = size,
+                    )
+                } else {
+                    PrezelListIcon(
+                        icon = IconSource(resId = PrezelIcons.Blank),
+                        size = size,
+                    )
+                    PrezelListIcon(
+                        icon = IconSource(resId = PrezelIcons.Blank),
+                        size = size,
+                    )
+                }
+            }
+        },
     )
 }

@@ -17,9 +17,6 @@ import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun PrezelList(
@@ -31,11 +28,8 @@ fun PrezelList(
     leadingContent: @Composable () -> Unit = {},
     showTrailingContent: Boolean = true,
     showFirstTrailingContent: Boolean = true,
-    trailingContents: ImmutableList<@Composable () -> Unit> = persistentListOf(),
+    trailingContent: @Composable () -> Unit = {},
 ) {
-    val visibleTrailingContents =
-        if (!showFirstTrailingContent) trailingContents.take(1).toImmutableList() else trailingContents
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -44,7 +38,7 @@ fun PrezelList(
     ) {
         PrezelListLeadingSlot(size, showLeadingContent, leadingContent)
         PrezelListTitle(title, size)
-        PrezelListTrailingSlot(size, showTrailingContent, visibleTrailingContents)
+        PrezelListTrailingSlot(size, showTrailingContent, trailingContent)
     }
 }
 
@@ -77,16 +71,16 @@ private fun RowScope.PrezelListTitle(
 private fun PrezelListTrailingSlot(
     size: PrezelListSize,
     showTrailingContent: Boolean,
-    trailingContents: ImmutableList<@Composable () -> Unit>,
+    trailingContent: @Composable () -> Unit = {},
 ) {
-    if (!showTrailingContent || trailingContents.isEmpty()) return
+    if (!showTrailingContent) return
 
     Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
     Row(
         horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        trailingContents.forEach { it() }
+        trailingContent()
     }
 }
 
