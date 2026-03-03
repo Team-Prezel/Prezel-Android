@@ -83,10 +83,12 @@ fun PrezelTextField(
 private fun applyTextFieldPolicy(
     value: String,
     maxLength: Int,
-): String =
-    value
+): String {
+    require(maxLength >= 0) { "maxLength must be >= 0" }
+    return value
         .replace("\n", "")
         .take(maxLength)
+}
 
 @Composable
 private fun PrezelTextField(
