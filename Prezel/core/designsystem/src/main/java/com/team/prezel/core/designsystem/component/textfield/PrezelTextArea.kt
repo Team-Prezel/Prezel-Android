@@ -58,7 +58,8 @@ fun PrezelTextArea(
     PrezelTextArea(
         value = value,
         onValueChange = { newValue ->
-            if (newValue.length <= maxLength) onValueChange(newValue)
+            val applied = applyTextAreaPolicy(newValue, maxLength)
+            if (applied != value) onValueChange(applied)
         },
         placeholder = if (focused) "" else placeholder,
         state = state,
@@ -72,6 +73,14 @@ fun PrezelTextArea(
         keyboardActions = keyboardActions,
     )
 }
+
+private fun applyTextAreaPolicy(
+    value: String,
+    maxLength: Int,
+): String =
+    value
+        .replace("\n", "")
+        .take(maxLength)
 
 @Composable
 private fun PrezelTextArea(
@@ -206,7 +215,7 @@ private fun PrezelTextAreaPrezelPreview() {
 
             PrezelTextAreaPreviewItem(
                 label = "Interaction - Disabled / Feedback - Default",
-                value = "typed",
+                value = "",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.DISABLED,
                 ),

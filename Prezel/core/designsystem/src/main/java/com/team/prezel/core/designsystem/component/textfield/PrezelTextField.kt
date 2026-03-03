@@ -1,10 +1,12 @@
 package com.team.prezel.core.designsystem.component.textfield
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,11 +32,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.button.PrezelButton
+import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
+import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldSupportingText
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -48,6 +52,7 @@ fun PrezelTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     feedback: PrezelTextFieldFeedback = PrezelTextFieldFeedback.NO_MESSAGE,
     enabled: Boolean = true,
+    maxLength: Int = Int.MAX_VALUE,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
@@ -61,7 +66,10 @@ fun PrezelTextField(
 
     PrezelTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { newValue ->
+            val applied = applyTextFieldPolicy(newValue, maxLength)
+            if (applied != value) onValueChange(applied)
+        },
         placeholder = if (focused) "" else placeholder,
         state = state,
         onFocusChange = { isFocused -> focused = isFocused },
@@ -74,8 +82,16 @@ fun PrezelTextField(
     )
 }
 
+private fun applyTextFieldPolicy(
+    value: String,
+    maxLength: Int,
+): String =
+    value
+        .replace("\n", "")
+        .take(maxLength)
+
 @Composable
-internal fun PrezelTextField(
+private fun PrezelTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -110,7 +126,7 @@ internal fun PrezelTextField(
             decorationBox = { innerTextField ->
                 PrezelTextFieldDecorationBox(
                     innerTextField = innerTextField,
-                    value = value,
+                    showPlaceholder = value.isEmpty(),
                     placeholder = placeholder,
                     trailingIcon = trailingIcon,
                     state = state,
@@ -127,8 +143,8 @@ internal fun PrezelTextField(
 
 @Composable
 private fun PrezelTextFieldDecorationBox(
+    showPlaceholder: Boolean,
     innerTextField: @Composable () -> Unit,
-    value: String,
     placeholder: String,
     trailingIcon: @Composable (() -> Unit)?,
     state: PrezelTextFieldState,
@@ -149,12 +165,18 @@ private fun PrezelTextFieldDecorationBox(
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 innerTextField()
-                if (value.isEmpty()) {
+                if (showPlaceholder) {
                     Text(
                         text = placeholder,
                         maxLines = 1,
-                        style = PrezelTheme.typography.body2Regular,
+                        style = PrezelTheme.typography.body2Regular.copy(
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None,
+                            ),
+                        ),
                         color = PrezelTheme.colors.textSmall,
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
@@ -170,41 +192,13 @@ private fun PrezelTextFieldDecorationBox(
     }
 }
 
-@Composable
-private fun PrezelTextFieldLabel(
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = label,
-        style = PrezelTheme.typography.body3Medium,
-        color = PrezelTheme.colors.textMedium,
-        modifier = modifier,
-        maxLines = 1,
-    )
-}
-
-@Composable
-private fun PrezelTextFieldSupportingText(
-    state: PrezelTextFieldState,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = state.supportingText,
-        style = PrezelTheme.typography.body3Regular,
-        color = state.supportingTextColor(),
-        modifier = modifier,
-        maxLines = 1,
-    )
-}
-
 @ThemePreview
 @Composable
-private fun DefaultPrezelTextFieldPreview() {
+private fun PrezelTextFieldPreview() {
     PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = "Default / Disabled")
+        PreviewScaffold(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             PreviewTextFieldItem(
+                label = "Interaction - Default / Feedback - Default",
                 value = "",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.DEFAULT,
@@ -213,48 +207,32 @@ private fun DefaultPrezelTextFieldPreview() {
             )
 
             PreviewTextFieldItem(
+                label = "Interaction - Disabled / Feedback - Default",
                 value = "",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.DISABLED,
                     feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
-        }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun TypingPrezelTextFieldPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = "Typing")
             PreviewTextFieldItem(
-                value = "입력 중...",
+                label = "Interaction - Typing / Feedback - Default",
+                value = "typing...",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPING,
                     feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
-        }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun TypedPrezelTextFieldPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = "Typed")
             PreviewTextFieldItem(
-                value = "입력함",
+                label = "Interaction - Typed / Feedback - Default",
+                value = "typed",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
                     feedback = PrezelTextFieldFeedback.Default("헬퍼 메시지"),
                 ),
             )
             PreviewTextFieldItem(
-                value = "입력함",
+                label = "Interaction - Typed / Feedback - Good",
+                value = "typed",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
                     feedback = PrezelTextFieldFeedback.Good("헬퍼 메시지"),
@@ -262,7 +240,8 @@ private fun TypedPrezelTextFieldPreview() {
             )
 
             PreviewTextFieldItem(
-                value = "입력함",
+                label = "Interaction - Typed / Feedback - Bad",
+                value = "typed",
                 state = PrezelTextFieldState(
                     interaction = PrezelTextFieldInteraction.TYPED,
                     feedback = PrezelTextFieldFeedback.Bad("헬퍼 메시지"),
@@ -312,6 +291,7 @@ private fun MainPrezelTextFieldPreview() {
 
 @Composable
 private fun PreviewTextFieldItem(
+    label: String,
     value: String,
     state: PrezelTextFieldState,
     modifier: Modifier = Modifier,
@@ -319,8 +299,8 @@ private fun PreviewTextFieldItem(
     PrezelTextField(
         value = value,
         onValueChange = {},
-        placeholder = "플레이스홀더",
-        label = "레이블",
+        placeholder = "Placeholder",
+        label = label,
         state = state,
         modifier = modifier,
         onFocusChange = {},
