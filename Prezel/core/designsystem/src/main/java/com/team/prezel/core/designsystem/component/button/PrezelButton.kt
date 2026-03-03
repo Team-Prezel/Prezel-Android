@@ -13,9 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -63,9 +67,30 @@ fun PrezelButton(
                     Spacer(modifier = Modifier.width(width = spacing))
                 }
 
-                Text(text = text)
+                Text(
+                    text = text,
+                    modifier = Modifier.applyButtonTextStyle(style),
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun Modifier.applyButtonTextStyle(style: PrezelButtonStyle): Modifier {
+    if (!style.showUnderline) return this
+
+    val px = with(LocalDensity.current) { 1.dp.toPx() }
+    val underlineColor = PrezelTheme.colors.borderLarge
+
+    return this.drawBehind {
+        val y = size.height + px
+        drawLine(
+            color = underlineColor,
+            start = Offset(0f, y),
+            end = Offset(size.width, y),
+            strokeWidth = px,
+        )
     }
 }
 
