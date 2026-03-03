@@ -84,7 +84,7 @@ private fun Modifier.applyButtonTextStyle(style: PrezelButtonStyle): Modifier {
     val underlineColor = PrezelTheme.colors.borderLarge
 
     return this.drawBehind {
-        val y = size.height + px
+        val y = size.height - (px / 2)
         drawLine(
             color = underlineColor,
             start = Offset(0f, y),
