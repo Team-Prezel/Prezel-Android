@@ -43,6 +43,7 @@ data class PrezelButtonStyle(
     val buttonHierarchy: PrezelButtonHierarchy = PrezelButtonHierarchy.PRIMARY,
     val buttonSize: PrezelButtonSize = PrezelButtonSize.REGULAR,
     val isRounded: Boolean = false,
+    val showUnderline: Boolean = false,
 )
 
 @Composable
