@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -32,10 +30,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.button.PrezelButton
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
+import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldPlaceholder
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldSupportingText
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -165,20 +163,7 @@ private fun PrezelTextFieldDecorationBox(
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 innerTextField()
-                if (showPlaceholder) {
-                    Text(
-                        text = placeholder,
-                        maxLines = 1,
-                        style = PrezelTheme.typography.body2Regular.copy(
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.None,
-                            ),
-                        ),
-                        color = PrezelTheme.colors.textSmall,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                if (showPlaceholder) PrezelTextFieldPlaceholder(placeholder = placeholder)
             }
 
             trailingIcon?.let { content ->
