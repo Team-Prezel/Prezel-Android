@@ -1,7 +1,6 @@
 package com.team.prezel.core.designsystem.component.textfield
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +14,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
-import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -131,18 +129,12 @@ data class PrezelTextFieldState(
      * 다크 모드 여부에 따라 일부 색상이 달라질 수 있습니다.
      */
     @Composable
-    internal fun textColor(
-        colors: PrezelColors = PrezelTheme.colors,
-        isDarkTheme: Boolean = isSystemInDarkTheme(),
-    ): Color =
+    internal fun textColor(colors: PrezelColors = PrezelTheme.colors): Color =
         when (interaction) {
-            PrezelTextFieldInteraction.DEFAULT -> colors.textSmall
             PrezelTextFieldInteraction.DISABLED -> colors.textDisabled
+            PrezelTextFieldInteraction.DEFAULT -> colors.textSmall
             PrezelTextFieldInteraction.TYPING -> colors.textLarge
-            PrezelTextFieldInteraction.TYPED -> when (feedback) {
-                is PrezelTextFieldFeedback.Default -> colors.textRegular
-                else -> if (isDarkTheme) PrezelColorScheme.Light.textLarge else colors.textLarge
-            }
+            PrezelTextFieldInteraction.TYPED -> colors.textLarge
         }
 
     /**
