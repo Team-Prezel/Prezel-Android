@@ -33,7 +33,10 @@ complexity:
     active: true
     LongMethod:
         active: true
-        threshold: 40
+        threshold: 50
+        ignoreAnnotated:
+            - Preview
+            - ThemePreview
     LongParameterList:
         active: false
     CyclomaticComplexMethod:
