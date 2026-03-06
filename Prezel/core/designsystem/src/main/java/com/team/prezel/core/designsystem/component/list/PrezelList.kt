@@ -14,6 +14,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
+import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -66,7 +67,6 @@ private fun RowScope.PrezelListTitle(
     Text(
         text = title,
         modifier = Modifier.weight(1f),
-        color = LocalContentColor.current,
         maxLines = 1,
         style = prezelListTextStyle(size),
     )
@@ -77,8 +77,8 @@ private fun RowScope.PrezelListTitle(
 private fun PrezelListSmallPreview() {
     PrezelTheme {
         PreviewScaffold {
-            Text(text = "PrezelList - SMALL", style = PrezelTheme.typography.title2Medium)
-            PrezelListPreviewBySize(size = PrezelListSize.SMALL)
+            SectionTitle("PrezelList - SMALL")
+            PrezelListPreviewBySize(PrezelListSize.SMALL)
         }
     }
 }
@@ -88,8 +88,8 @@ private fun PrezelListSmallPreview() {
 private fun PrezelListRegularPreview() {
     PrezelTheme {
         PreviewScaffold {
-            Text(text = "PrezelList - REGULAR", style = PrezelTheme.typography.title2Medium)
-            PrezelListPreviewBySize(size = PrezelListSize.REGULAR)
+            SectionTitle("PrezelList - REGULAR")
+            PrezelListPreviewBySize(PrezelListSize.REGULAR)
         }
     }
 }

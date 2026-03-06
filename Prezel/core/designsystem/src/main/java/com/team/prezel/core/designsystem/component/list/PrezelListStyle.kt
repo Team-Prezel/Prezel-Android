@@ -1,40 +1,17 @@
 package com.team.prezel.core.designsystem.component.list
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Immutable
 enum class PrezelListSize {
     SMALL,
     REGULAR,
-}
-
-@Composable
-internal fun PrezelListIcon(
-    icon: IconSource,
-    size: PrezelListSize,
-    modifier: Modifier = Modifier,
-) {
-    Icon(
-        painter = icon.painter(),
-        contentDescription = icon.contentDescription(),
-        modifier = modifier.size(
-            when (size) {
-                PrezelListSize.SMALL -> 20.dp
-                PrezelListSize.REGULAR -> 24.dp
-            },
-        ),
-    )
 }
 
 @Composable
