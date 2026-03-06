@@ -2,6 +2,7 @@ package com.team.prezel.core.designsystem.component.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -19,7 +20,7 @@ internal fun PrezelListPreviewItem(
     showTrailingContent: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val leadingContent: (@Composable () -> Unit)? =
+    val leadingContent: (@Composable RowScope.() -> Unit)? =
         if (showLeadingContent) {
             {
                 Icon(
@@ -31,7 +32,7 @@ internal fun PrezelListPreviewItem(
             null
         }
 
-    val trailingContent: (@Composable () -> Unit)? =
+    val trailingContent: (@Composable RowScope.() -> Unit)? =
         if (showTrailingContent) {
             {
                 Icon(

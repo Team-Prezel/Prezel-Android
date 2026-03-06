@@ -24,8 +24,8 @@ fun PrezelList(
     modifier: Modifier = Modifier,
     size: PrezelListSize = PrezelListSize.REGULAR,
     nested: Boolean = false,
-    leadingContent: (@Composable () -> Unit)? = null,
-    trailingContent: (@Composable () -> Unit)? = null,
+    leadingContent: (@Composable RowScope.() -> Unit)? = null,
+    trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -33,17 +33,16 @@ fun PrezelList(
             .padding(prezelListContentPadding(size, nested)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        leadingContent?.let {
+        leadingContent?.let { content ->
             CompositionLocalProvider(
                 LocalContentColor provides PrezelTheme.colors.iconRegular,
-                content = leadingContent,
-            )
+            ) { content() }
             Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
         }
 
         PrezelListTitle(title, size)
 
-        trailingContent?.let {
+        trailingContent?.let { content ->
             Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
 
             Row(
@@ -52,8 +51,7 @@ fun PrezelList(
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides PrezelTheme.colors.iconRegular,
-                    content = trailingContent,
-                )
+                ) { content() }
             }
         }
     }
