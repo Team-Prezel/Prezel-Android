@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -31,21 +32,30 @@ fun PrezelList(
             .padding(prezelListContentPadding(size, nested)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PrezelListLeadingSlot(size, leadingContent)
+        leadingContent?.let {
+            CompositionLocalProvider(
+                LocalContentColor provides PrezelTheme.colors.iconRegular,
+                content = leadingContent,
+            )
+            Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+        }
+
         PrezelListTitle(title, size)
-        PrezelListTrailingSlot(size, trailingContent)
+
+        trailingContent?.let {
+            Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CompositionLocalProvider(
+                    LocalContentColor provides PrezelTheme.colors.iconRegular,
+                    content = trailingContent,
+                )
+            }
+        }
     }
-}
-
-@Composable
-private fun PrezelListLeadingSlot(
-    size: PrezelListSize,
-    leadingContent: (@Composable () -> Unit)?,
-) {
-    if (leadingContent == null) return
-
-    leadingContent()
-    Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
 }
 
 @Composable
@@ -60,23 +70,6 @@ private fun RowScope.PrezelListTitle(
         maxLines = 1,
         style = prezelListTextStyle(size),
     )
-}
-
-@Composable
-private fun PrezelListTrailingSlot(
-    size: PrezelListSize,
-    trailingContent: (@Composable () -> Unit)?,
-) {
-    if (trailingContent == null) return
-
-    Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        trailingContent()
-    }
 }
 
 @ThemePreview
