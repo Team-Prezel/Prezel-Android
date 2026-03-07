@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
@@ -30,15 +34,20 @@ fun PrezelApp(
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var isSplashEnded by rememberSaveable { mutableStateOf(false) }
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
-        PrezelAppContent(
-            appState = appState,
-            entryBuilders = entryBuilders,
-        )
+        if (!isSplashEnded) {
+            SplashScreen(onSplashEnded = { isSplashEnded = true })
+        } else {
+            PrezelAppContent(
+                appState = appState,
+                entryBuilders = entryBuilders,
+            )
+        }
     }
 }
 
