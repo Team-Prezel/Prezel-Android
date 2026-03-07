@@ -3,14 +3,13 @@ package com.team.prezel.core.navigation
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 
 val LocalNavigator = staticCompositionLocalOf<Navigator> {
     error("Navigator is not provided")
 }
 
-val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
+val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope> {
     error("SharedTransitionScope is not provided")
 }
 
