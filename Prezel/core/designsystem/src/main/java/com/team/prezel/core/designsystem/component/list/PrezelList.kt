@@ -27,31 +27,31 @@ fun PrezelList(
     leadingContent: (@Composable RowScope.() -> Unit)? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(prezelListContentPadding(size, nested)),
-        verticalAlignment = Alignment.CenterVertically,
+    CompositionLocalProvider(
+        LocalContentColor provides PrezelTheme.colors.iconRegular,
     ) {
-        leadingContent?.let { content ->
-            CompositionLocalProvider(
-                LocalContentColor provides PrezelTheme.colors.iconRegular,
-            ) { content() }
-            Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
-        }
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(prezelListContentPadding(size, nested)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            leadingContent?.let { content ->
+                content()
+                Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+            }
 
-        PrezelListTitle(title, size)
+            PrezelListTitle(title, size)
 
-        trailingContent?.let { content ->
-            Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
+            trailingContent?.let { content ->
+                Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides PrezelTheme.colors.iconRegular,
-                ) { content() }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    content()
+                }
             }
         }
     }
