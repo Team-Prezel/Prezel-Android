@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -33,6 +34,11 @@ dependencies {
     implementation(projects.coreDesignsystem)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
+
+    implementation(projects.featureSplashApi)
+    implementation(projects.featureSplashImpl)
+    implementation(projects.featureLoginApi)
+    implementation(projects.featureLoginImpl)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
     implementation(projects.featureHistoryApi)
