@@ -1,6 +1,5 @@
 package com.team.prezel.ui
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -45,7 +44,6 @@ fun PrezelApp(
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun PrezelAppContent(
     appState: PrezelAppState,
