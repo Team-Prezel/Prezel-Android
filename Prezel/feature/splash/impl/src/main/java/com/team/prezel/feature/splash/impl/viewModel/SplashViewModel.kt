@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,9 +15,6 @@ import javax.inject.Inject
 internal class SplashViewModel
     @Inject
     constructor() : ViewModel() {
-        private val _uiState = MutableStateFlow(SplashUiState.Loading)
-        val uiState: StateFlow<SplashUiState> = _uiState
-
         private val _uiEffect = Channel<SplashUiEffect>()
         val uiEffect: Flow<SplashUiEffect> = _uiEffect.receiveAsFlow()
 

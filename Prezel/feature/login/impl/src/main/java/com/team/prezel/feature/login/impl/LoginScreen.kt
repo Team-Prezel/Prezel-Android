@@ -80,7 +80,10 @@ private fun SharedTransitionScope.LoginScreen(
             modifier = Modifier.align(Alignment.Center),
         )
 
-        LoginFooter(onLogin = onLogin)
+        LoginFooter(
+            enabled = uiState == LoginUiState.Idle,
+            onLogin = onLogin,
+        )
     }
 }
 
@@ -112,6 +115,7 @@ private fun SharedTransitionScope.LogoImage(
 
 @Composable
 private fun BoxScope.LoginFooter(
+    enabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -140,6 +144,7 @@ private fun BoxScope.LoginFooter(
             modifier = Modifier.fillMaxWidth(),
             text = "시작하기",
             onClick = onLogin,
+            enabled = enabled,
         )
     }
 }
@@ -151,7 +156,7 @@ private fun LoginScreenPreview() {
         SharedTransitionLayout {
             AnimatedVisibility(true) {
                 LoginScreen(
-                    uiState = LoginUiState.Loading,
+                    uiState = LoginUiState.Idle,
                     animatedVisibilityScope = this,
                     onLogin = {},
                 )
