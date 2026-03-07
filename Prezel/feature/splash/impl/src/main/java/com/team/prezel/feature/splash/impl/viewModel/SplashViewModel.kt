@@ -18,7 +18,11 @@ internal class SplashViewModel
         private val _uiEffect = Channel<SplashUiEffect>()
         val uiEffect: Flow<SplashUiEffect> = _uiEffect.receiveAsFlow()
 
-        fun checkLoginStatus() {
+        init {
+            checkLoginStatus()
+        }
+
+        private fun checkLoginStatus() {
             viewModelScope.launch {
                 _uiEffect.send(SplashUiEffect.NavigateToLogin)
             }
