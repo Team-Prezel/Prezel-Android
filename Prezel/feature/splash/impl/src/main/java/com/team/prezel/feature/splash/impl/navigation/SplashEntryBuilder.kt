@@ -26,7 +26,7 @@ internal fun EntryProviderScope<NavKey>.featureSplashEntryBuilder() {
                     navigator.replaceRoot(HomeNavKey)
                 },
                 navigateToLogin = {
-                    navigator.navigate(LoginNavKey)
+                    navigator.replaceRoot(LoginNavKey)
                 },
             )
         }
