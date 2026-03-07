@@ -1,6 +1,5 @@
 package com.team.prezel.feature.login.impl.viewModel
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@Stable
 @HiltViewModel
 class LoginViewModel
     @Inject
