@@ -20,12 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.splash.impl.viewModel.SplashUiEffect
-import com.team.prezel.feature.splash.impl.viewModel.SplashUiState
 import com.team.prezel.feature.splash.impl.viewModel.SplashViewModel
 import com.team.prezel.core.designsystem.R as DSR
 
@@ -37,8 +35,6 @@ internal fun SharedTransitionScope.SplashScreen(
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
@@ -52,16 +48,28 @@ internal fun SharedTransitionScope.SplashScreen(
         viewModel.checkLoginStatus()
     }
 
-    SplashScreen(
-        uiState = uiState,
-        animatedVisibilityScope = animatedVisibilityScope,
-        modifier = modifier,
-    )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(PrezelTheme.colors.bgRegular),
+    ) {
+        Image(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth()
+                .padding(horizontal = 95.dp)
+                .sharedElement(
+                    sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                ),
+            painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
+            contentDescription = null,
+        )
+    }
 }
 
 @Composable
 private fun SharedTransitionScope.SplashScreen(
-    uiState: SplashUiState,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
 ) {
@@ -92,7 +100,6 @@ private fun SplashScreenPreview() {
         SharedTransitionLayout {
             AnimatedVisibility(true) {
                 SplashScreen(
-                    uiState = SplashUiState.Loading,
                     animatedVisibilityScope = this,
                 )
             }

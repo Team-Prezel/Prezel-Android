@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 sealed interface LoginUiState {
-    data object Loading : LoginUiState
+    data object Idle : LoginUiState
 
-    data object Content : LoginUiState
+    data object Loading : LoginUiState
 }
