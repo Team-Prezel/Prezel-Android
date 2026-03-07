@@ -28,12 +28,14 @@ class Navigator(
      * 현재 내비게이션 히스토리를 모두 지우고 목적지를 루트로 교체합니다.
      */
     fun replaceRoot(key: NavKey) {
+        require(key in state.topLevelKeys) {
+            "replaceRoot() only supports top-level keys: $key"
+        }
         state.topLevelStack.clear()
         state.topLevelStack.add(key)
-        if (key in state.topLevelKeys) {
-            state.subStacks[key]?.run {
-                if (size > 1) subList(1, size).clear()
-            }
+
+        state.subStacks.values.forEach { stack ->
+            if (stack.size > 1) stack.subList(1, stack.size).clear()
         }
     }
 
