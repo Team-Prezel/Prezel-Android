@@ -25,22 +25,36 @@ class Navigator(
     }
 
     /**
+     * 현재 내비게이션 히스토리를 모두 지우고 목적지를 루트로 교체합니다.
+     */
+    fun replaceRoot(key: NavKey) {
+        state.topLevelStack.clear()
+        state.topLevelStack.add(key)
+        if (key in state.topLevelKeys) {
+            state.subStacks[key]?.run {
+                if (size > 1) subList(1, size).clear()
+            }
+        }
+    }
+
+    /**
      * 뒤로 이동
      *
      * @return 뒤로가기 내비게이션이 처리되었으면 true를 반환합니다.
      */
     fun goBack(): Boolean =
-        when (state.currentKey) {
-            state.startKey -> false
-            state.currentTopLevelKey -> {
+        when {
+            state.currentKey != state.currentTopLevelKey -> {
+                state.currentSubStack.removeLastOrNull()
+                true
+            }
+
+            state.topLevelStack.size > 1 -> {
                 state.topLevelStack.removeLastOrNull()
                 true
             }
 
-            else -> {
-                state.currentSubStack.removeLastOrNull()
-                true
-            }
+            else -> false
         }
 
     /** 최상위가 아닌 목적지를 push합니다. */
