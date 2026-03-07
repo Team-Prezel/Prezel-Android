@@ -9,8 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -70,14 +68,14 @@ private fun SharedTransitionScope.LoginScreen(
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
         LogoImage(
             animatedVisibilityScope = animatedVisibilityScope,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.weight(1f),
         )
 
         LoginFooter(
@@ -94,9 +92,8 @@ private fun SharedTransitionScope.LogoImage(
 ) {
     Image(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 95.dp)
-            .padding(bottom = 52.dp)
             .sharedElement(
                 sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -114,7 +111,7 @@ private fun SharedTransitionScope.LogoImage(
 }
 
 @Composable
-private fun BoxScope.LoginFooter(
+private fun LoginFooter(
     enabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
@@ -128,7 +125,6 @@ private fun BoxScope.LoginFooter(
     AnimatedVisibility(
         visible = isButtonVisible,
         modifier = modifier
-            .align(Alignment.BottomCenter)
             .fillMaxWidth()
             .padding(PrezelTheme.spacing.V20),
         enter = fadeIn(
