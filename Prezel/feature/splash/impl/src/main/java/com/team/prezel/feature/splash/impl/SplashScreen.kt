@@ -41,24 +41,10 @@ internal fun SharedTransitionScope.SplashScreen(
         }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(PrezelTheme.colors.bgRegular),
-    ) {
-        Image(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .padding(horizontal = 95.dp)
-                .sharedElement(
-                    sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
-                    animatedVisibilityScope = animatedVisibilityScope,
-                ),
-            painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
-            contentDescription = null,
-        )
-    }
+    SplashScreen(
+        animatedVisibilityScope = animatedVisibilityScope,
+        modifier = modifier,
+    )
 }
 
 @Composable
