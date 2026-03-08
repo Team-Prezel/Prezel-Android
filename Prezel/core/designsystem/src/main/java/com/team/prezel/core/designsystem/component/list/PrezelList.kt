@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -27,31 +25,27 @@ fun PrezelList(
     leadingContent: (@Composable RowScope.() -> Unit)? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides PrezelTheme.colors.iconRegular,
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(prezelListContentPadding(size, nested)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(prezelListContentPadding(size, nested)),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            leadingContent?.let { content ->
+        leadingContent?.let { content ->
+            content()
+            Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
+        }
+
+        PrezelListTitle(title, size)
+
+        trailingContent?.let { content ->
+            Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 content()
-                Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
-            }
-
-            PrezelListTitle(title, size)
-
-            trailingContent?.let { content ->
-                Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(prezelListTrailingIconSpacing(size)),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    content()
-                }
             }
         }
     }
