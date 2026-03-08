@@ -53,7 +53,6 @@ fun PrezelButton(
             text = text,
             icon = icon,
             showUnderline = style.showUnderline,
-            buttonSize = style.buttonSize,
             appearance = appearance,
         )
     }
@@ -64,7 +63,6 @@ private fun PrezelButtonContent(
     text: String?,
     icon: IconSource?,
     showUnderline: Boolean,
-    buttonSize: PrezelButtonSize,
     appearance: PrezelButtonAppearance,
 ) {
     CompositionLocalProvider(LocalContentColor provides appearance.contentColor) {
@@ -77,7 +75,7 @@ private fun PrezelButtonContent(
                 Icon(
                     painter = source.painter(),
                     contentDescription = source.contentDescription(),
-                    modifier = Modifier.size(prezelButtonIconSize(size = buttonSize)),
+                    modifier = Modifier.size(appearance.iconSize),
                 )
             }
 

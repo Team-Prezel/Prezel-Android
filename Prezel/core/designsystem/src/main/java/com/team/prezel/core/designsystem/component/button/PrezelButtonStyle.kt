@@ -56,6 +56,7 @@ internal data class PrezelButtonAppearance private constructor(
     val shape: Shape,
     val containerColor: Color,
     val borderStroke: BorderStroke,
+    val iconSize: Dp,
 ) {
     companion object {
         @Composable
@@ -93,6 +94,7 @@ internal data class PrezelButtonAppearance private constructor(
                     hierarchy = buttonHierarchy,
                     enabled = enabled,
                 ),
+                iconSize = prezelButtonIconSize(size = buttonSize),
             )
         }
     }
@@ -106,14 +108,6 @@ internal fun Modifier.applyButtonAppearance(appearance: PrezelButtonAppearance):
             border = appearance.borderStroke,
             shape = appearance.shape,
         )
-
-@Composable
-internal fun prezelButtonIconSize(size: PrezelButtonSize): Dp =
-    when (size) {
-        PrezelButtonSize.XSMALL -> 14.dp
-        PrezelButtonSize.SMALL -> 16.dp
-        PrezelButtonSize.REGULAR -> 20.dp
-    }
 
 @Composable
 private fun prezelButtonIconSpacing(
@@ -243,3 +237,11 @@ private fun prezelIconButtonContentPadding(
             PrezelButtonSize.REGULAR -> spacing.V14
         },
     )
+
+@Composable
+private fun prezelButtonIconSize(size: PrezelButtonSize): Dp =
+    when (size) {
+        PrezelButtonSize.XSMALL -> 14.dp
+        PrezelButtonSize.SMALL -> 16.dp
+        PrezelButtonSize.REGULAR -> 20.dp
+    }
