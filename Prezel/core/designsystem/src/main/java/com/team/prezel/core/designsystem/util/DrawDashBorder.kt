@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -19,14 +19,18 @@ fun Modifier.drawDashBorder(
     width: Float = 1f,
     interval: Float = 10f,
     phase: Float = 0f,
-) = this.drawBehind {
-    drawRoundRect(
-        color = color,
-        style = Stroke(
-            width = width,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(interval, interval), phase),
-        ),
-    )
+) = this.drawWithCache {
+    onDrawBehind {
+        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(interval, interval), phase)
+
+        drawRoundRect(
+            color = color,
+            style = Stroke(
+                width = width,
+                pathEffect = pathEffect,
+            ),
+        )
+    }
 }
 
 @ThemePreview
