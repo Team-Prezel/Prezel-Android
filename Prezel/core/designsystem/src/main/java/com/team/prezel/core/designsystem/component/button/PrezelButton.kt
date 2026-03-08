@@ -48,6 +48,7 @@ fun PrezelButton(
                 indication = ripple(),
                 interactionSource = null,
             ),
+        contentAlignment = Alignment.Center,
     ) {
         PrezelButtonContent(
             text = text,
