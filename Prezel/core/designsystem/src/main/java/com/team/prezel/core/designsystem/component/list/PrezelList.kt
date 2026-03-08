@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -61,6 +62,7 @@ private fun RowScope.PrezelListTitle(
         modifier = Modifier.weight(1f),
         maxLines = 1,
         style = prezelListTextStyle(size),
+        color = LocalContentColor.current,
     )
 }
 
