@@ -137,6 +137,7 @@ private fun PrezelButtonPreviewGhost() {
 private fun PrezelButtonPreviewItem(
     style: PrezelButtonStyle,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     PrezelButton(
         text = "Label",
@@ -144,5 +145,6 @@ private fun PrezelButtonPreviewItem(
         onClick = {},
         enabled = enabled,
         style = style,
+        modifier = modifier,
     )
 }

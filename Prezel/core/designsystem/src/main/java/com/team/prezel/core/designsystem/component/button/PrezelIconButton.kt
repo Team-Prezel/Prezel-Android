@@ -52,11 +52,13 @@ private fun PrezelIconButtonPreviewGhost() {
 private fun PrezelIconButtonPreviewItem(
     style: PrezelButtonStyle,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     PrezelIconButton(
         icon = IconSource(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,
+        modifier = modifier,
     )
 }

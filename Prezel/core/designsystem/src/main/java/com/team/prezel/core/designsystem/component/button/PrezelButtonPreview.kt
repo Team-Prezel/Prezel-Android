@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 import kotlinx.collections.immutable.persistentListOf
 
-internal typealias PrezelButtonPreviewContent = @Composable (PrezelButtonStyle, Boolean) -> Unit
+internal typealias PrezelButtonPreviewContent = @Composable (PrezelButtonStyle, Boolean, Modifier) -> Unit
 
 @Immutable
 private data class PreviewVariant(
@@ -56,6 +57,7 @@ private fun PrezelButtonVariantSection(
     isRounded: Boolean,
     content: PrezelButtonPreviewContent,
     modifier: Modifier = Modifier,
+    contentModifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -68,6 +70,7 @@ private fun PrezelButtonVariantSection(
             enabled = enabled,
             isRounded = isRounded,
             content = content,
+            contentModifier = contentModifier,
         )
         Text(text = "Hierarchy: Secondary | Enabled: $enabled | Radius: $isRounded", style = PrezelTheme.typography.body3Medium)
         PrezelButtonPreviewHierarchyBlock(
@@ -76,6 +79,7 @@ private fun PrezelButtonVariantSection(
             enabled = enabled,
             isRounded = isRounded,
             content = content,
+            contentModifier = contentModifier,
         )
     }
 }
@@ -88,6 +92,7 @@ private fun PrezelButtonPreviewHierarchyBlock(
     isRounded: Boolean,
     content: PrezelButtonPreviewContent,
     modifier: Modifier = Modifier,
+    contentModifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
@@ -95,14 +100,21 @@ private fun PrezelButtonPreviewHierarchyBlock(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         PrezelButtonSize.entries.forEach { size ->
+            val style = PrezelButtonStyle(
+                buttonType = type,
+                buttonHierarchy = hierarchy,
+                buttonSize = size,
+                isRounded = isRounded,
+            )
+            val appearance = PrezelButtonAppearance.of(style = style, isIconOnly = false, enabled = enabled)
+
             content(
-                PrezelButtonStyle(
-                    buttonType = type,
-                    buttonHierarchy = hierarchy,
-                    buttonSize = size,
-                    isRounded = isRounded,
-                ),
+                style,
                 enabled,
+                contentModifier
+                    .then(
+                        if (type == PrezelButtonType.GHOST) Modifier.drawDashBorder(shape = appearance.shape) else Modifier,
+                    ),
             )
         }
     }
