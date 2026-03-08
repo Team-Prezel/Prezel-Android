@@ -1,26 +1,29 @@
 package com.team.prezel.core.designsystem.component.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 @Composable
 fun PrezelList(
@@ -28,8 +31,8 @@ fun PrezelList(
     modifier: Modifier = Modifier,
     size: PrezelListSize = PrezelListSize.REGULAR,
     nested: Boolean = false,
-    leadingContent: (@Composable RowScope.() -> Unit)? = null,
-    trailingContent: (@Composable RowScope.() -> Unit)? = null,
+    leadingContent: @Composable (RowScope.() -> Unit)? = null,
+    trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -76,15 +79,7 @@ private fun RowScope.PrezelListTitle(
 private fun PrezelListSmallPreview() {
     PrezelTheme {
         PreviewScaffold {
-            SectionTitle("PrezelList - SMALL")
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = false, showLeadingContent = true, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = false, showLeadingContent = true, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = false, showLeadingContent = false, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = false, showLeadingContent = false, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = true, showLeadingContent = true, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = true, showLeadingContent = true, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = true, showLeadingContent = false, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.SMALL, nested = true, showLeadingContent = false, showTrailingContent = false)
+            PrezelListPreviewBySize(PrezelListSize.SMALL)
         }
     }
 }
@@ -94,15 +89,7 @@ private fun PrezelListSmallPreview() {
 private fun PrezelListRegularPreview() {
     PrezelTheme {
         PreviewScaffold {
-            SectionTitle("PrezelList - REGULAR")
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = false, showLeadingContent = true, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = false, showLeadingContent = true, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = false, showLeadingContent = false, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = false, showLeadingContent = false, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = true, showLeadingContent = true, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = true, showLeadingContent = true, showTrailingContent = false)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = true, showLeadingContent = false, showTrailingContent = true)
-            PrezelListPreviewItem(size = PrezelListSize.REGULAR, nested = true, showLeadingContent = false, showTrailingContent = false)
+            PrezelListPreviewBySize(PrezelListSize.REGULAR)
         }
     }
 }
@@ -113,49 +100,58 @@ private fun PrezelListPreviewItem(
     nested: Boolean,
     showLeadingContent: Boolean,
     showTrailingContent: Boolean,
-    modifier: Modifier = Modifier,
 ) {
-    val leadingContent: (@Composable RowScope.() -> Unit)? =
-        if (showLeadingContent) {
-            {
-                Icon(
-                    painter = painterResource(id = PrezelIcons.Blank),
-                    contentDescription = "leading",
-                )
-            }
-        } else {
-            null
-        }
-
-    val trailingContent: (@Composable RowScope.() -> Unit)? =
-        if (showTrailingContent) {
-            {
-                Icon(
-                    painter = painterResource(id = PrezelIcons.Blank),
-                    contentDescription = "trailing",
-                )
-            }
-        } else {
-            null
-        }
-
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
-    ) {
-        Text(
-            text = "Nested: $nested | Leading: $showLeadingContent | Trailing: $showTrailingContent",
-            style = PrezelTheme.typography.body3Medium,
+    val leadingContent: @Composable RowScope.() -> Unit = {
+        Icon(
+            painter = painterResource(id = PrezelIcons.Blank),
+            contentDescription = "leading",
         )
-
-        PrezelList(
-            title = "Title",
-            size = size,
-            nested = nested,
-            leadingContent = leadingContent,
-            trailingContent = trailingContent,
-        )
-
-        HorizontalDivider()
     }
+
+    val trailingContent: @Composable RowScope.() -> Unit = {
+        Icon(
+            painter = painterResource(id = PrezelIcons.Blank),
+            contentDescription = "trailing",
+        )
+        Icon(
+            painter = painterResource(id = PrezelIcons.Blank),
+            contentDescription = "trailing",
+        )
+    }
+
+    PrezelList(
+        title = "Title",
+        size = size,
+        nested = nested,
+        leadingContent = if (showLeadingContent) leadingContent else null,
+        trailingContent = if (showTrailingContent) trailingContent else null,
+        modifier = Modifier.drawDashBorder(),
+    )
+}
+
+@Composable
+private fun PrezelListPreviewBySize(size: PrezelListSize) {
+    SectionTitle(title = "PrezelList - $size")
+    Text(
+        text = "점선 테두리는 컴포넌트 경계를 의미하며,\nnested 상태별 leading/trailing 조합을 확인할 수 있습니다.",
+        style = PrezelTheme.typography.body3Regular,
+        color = PrezelTheme.colors.textMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray.copy(alpha = 0.5f))
+            .padding(8.dp),
+    )
+
+    Text(text = "Nested: False", style = PrezelTheme.typography.body2Bold)
+    PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = true)
+    PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = false)
+    PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = true)
+    PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = false)
+
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(text = "Nested: True", style = PrezelTheme.typography.body2Bold)
+    PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = true)
+    PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = false)
+    PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = true)
+    PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = false)
 }
