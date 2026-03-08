@@ -1,22 +1,23 @@
 package com.team.prezel.core.designsystem.component.button
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.foundation.number.PrezelShapes
 import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -46,27 +47,87 @@ data class PrezelButtonStyle(
     val showUnderline: Boolean = false,
 )
 
-@Composable
-internal fun PrezelButtonIcon(
-    icon: IconSource,
-    size: PrezelButtonSize,
-    modifier: Modifier = Modifier,
+@Immutable
+internal data class PrezelButtonAppearance private constructor(
+    val textStyle: TextStyle,
+    val contentColor: Color,
+    val contentPadding: PaddingValues,
+    val iconSpacing: Dp,
+    val shape: Shape,
+    val containerColor: Color,
+    val borderStroke: BorderStroke,
 ) {
-    Icon(
-        painter = icon.painter(),
-        contentDescription = icon.contentDescription(),
-        modifier = modifier.size(
-            when (size) {
-                PrezelButtonSize.XSMALL -> 14.dp
-                PrezelButtonSize.SMALL -> 16.dp
-                PrezelButtonSize.REGULAR -> 20.dp
-            },
-        ),
-    )
+    companion object {
+        @Composable
+        fun of(
+            style: PrezelButtonStyle,
+            isIconOnly: Boolean,
+            enabled: Boolean,
+        ): PrezelButtonAppearance {
+            val (buttonType, buttonHierarchy, buttonSize, isRounded) = style
+
+            return PrezelButtonAppearance(
+                textStyle = prezelButtonTextStyle(size = buttonSize),
+                contentColor = prezelButtonContentColor(
+                    type = buttonType,
+                    hierarchy = buttonHierarchy,
+                    enabled = enabled,
+                ),
+                contentPadding = prezelButtonContentPadding(
+                    size = buttonSize,
+                    isIconOnly = isIconOnly,
+                ),
+                iconSpacing = prezelButtonIconSpacing(size = buttonSize),
+                shape = prezelButtonShape(
+                    isIconOnly = isIconOnly,
+                    isRounded = isRounded,
+                    buttonSize = buttonSize,
+                ),
+                containerColor = prezelButtonContainerColor(
+                    type = buttonType,
+                    hierarchy = buttonHierarchy,
+                    enabled = enabled,
+                ),
+                borderStroke = prezelButtonBorderStroke(
+                    type = buttonType,
+                    hierarchy = buttonHierarchy,
+                    enabled = enabled,
+                ),
+            )
+        }
+    }
 }
 
+internal fun Modifier.applyButtonAppearance(appearance: PrezelButtonAppearance): Modifier =
+    this
+        .clip(appearance.shape)
+        .background(appearance.containerColor)
+        .border(
+            border = appearance.borderStroke,
+            shape = appearance.shape,
+        )
+
 @Composable
-internal fun prezelButtonShape(
+internal fun prezelButtonIconSize(size: PrezelButtonSize): Dp =
+    when (size) {
+        PrezelButtonSize.XSMALL -> 14.dp
+        PrezelButtonSize.SMALL -> 16.dp
+        PrezelButtonSize.REGULAR -> 20.dp
+    }
+
+@Composable
+private fun prezelButtonIconSpacing(
+    size: PrezelButtonSize,
+    spacing: PrezelSpacing = PrezelTheme.spacing,
+): Dp =
+    when (size) {
+        PrezelButtonSize.XSMALL -> spacing.V4
+        PrezelButtonSize.SMALL -> spacing.V4
+        PrezelButtonSize.REGULAR -> spacing.V8
+    }
+
+@Composable
+private fun prezelButtonShape(
     isIconOnly: Boolean,
     isRounded: Boolean,
     buttonSize: PrezelButtonSize,
@@ -84,7 +145,7 @@ internal fun prezelButtonShape(
     }
 
 @Composable
-internal fun prezelButtonBorderStroke(
+private fun prezelButtonBorderStroke(
     type: PrezelButtonType,
     hierarchy: PrezelButtonHierarchy,
     enabled: Boolean,
@@ -103,7 +164,7 @@ internal fun prezelButtonBorderStroke(
 }
 
 @Composable
-internal fun prezelButtonTextStyle(size: PrezelButtonSize): TextStyle =
+private fun prezelButtonTextStyle(size: PrezelButtonSize): TextStyle =
     when (size) {
         PrezelButtonSize.XSMALL -> PrezelTheme.typography.caption2Medium
         PrezelButtonSize.SMALL -> PrezelTheme.typography.body3Medium
@@ -111,7 +172,7 @@ internal fun prezelButtonTextStyle(size: PrezelButtonSize): TextStyle =
     }
 
 @Composable
-internal fun prezelButtonContainerColor(
+private fun prezelButtonContainerColor(
     type: PrezelButtonType,
     hierarchy: PrezelButtonHierarchy,
     enabled: Boolean,
@@ -131,7 +192,7 @@ internal fun prezelButtonContainerColor(
     }
 
 @Composable
-internal fun prezelButtonContentColor(
+private fun prezelButtonContentColor(
     type: PrezelButtonType,
     hierarchy: PrezelButtonHierarchy,
     enabled: Boolean,
@@ -148,12 +209,12 @@ internal fun prezelButtonContentColor(
 }
 
 @Composable
-internal fun prezelButtonContentPadding(
+private fun prezelButtonContentPadding(
     size: PrezelButtonSize,
-    isOnlyIcon: Boolean,
+    isIconOnly: Boolean,
     spacing: PrezelSpacing = PrezelTheme.spacing,
 ): PaddingValues {
-    if (isOnlyIcon) return prezelIconButtonContentPadding(size)
+    if (isIconOnly) return prezelIconButtonContentPadding(size)
 
     val horizontal = when (size) {
         PrezelButtonSize.XSMALL -> spacing.V10

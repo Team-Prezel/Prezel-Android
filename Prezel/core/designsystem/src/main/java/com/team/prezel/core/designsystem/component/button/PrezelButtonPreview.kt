@@ -7,6 +7,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
@@ -26,12 +27,6 @@ private val PreviewVariants = persistentListOf(
     PreviewVariant(enabled = true, isRounded = true),
     PreviewVariant(enabled = false, isRounded = true),
     PreviewVariant(enabled = false, isRounded = false),
-)
-
-private val PreviewSizes = persistentListOf(
-    PrezelButtonSize.XSMALL,
-    PrezelButtonSize.SMALL,
-    PrezelButtonSize.REGULAR,
 )
 
 @Composable
@@ -97,8 +92,9 @@ private fun PrezelButtonPreviewHierarchyBlock(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        PreviewSizes.forEach { size ->
+        PrezelButtonSize.entries.forEach { size ->
             content(
                 PrezelButtonStyle(
                     buttonType = type,
