@@ -23,7 +23,7 @@ import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.LocalSnackbarHostState
-import com.team.prezel.navigation.TOP_LEVEL_NAV_ITEMS
+import com.team.prezel.navigation.MAIN_NAV_ITEMS
 
 @Composable
 fun PrezelApp(
@@ -64,7 +64,7 @@ private fun PrezelAppContent(
                 showNavigationBar = appState.shouldShowNavigationBar,
                 snackbarHostState = snackbarHostState,
                 navigationItems = {
-                    TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
+                    MAIN_NAV_ITEMS.forEach { (key, item) ->
                         item(
                             selected = key == appState.navigationState.currentTopLevelKey,
                             onClick = { navigator.navigate(key) },

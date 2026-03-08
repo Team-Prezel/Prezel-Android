@@ -7,10 +7,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.navigation.rememberNavigationState
-import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
+import com.team.prezel.navigation.MAIN_NAV_KEYS
 import com.team.prezel.navigation.TOP_LEVEL_KEYS
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,7 @@ fun rememberPrezelAppState(
 ): PrezelAppState {
     val navigationState = rememberNavigationState(
         startKey = SplashNavKey,
-        topLevelKeys = (TOP_LEVEL_KEYS.toMutableSet() + SplashNavKey + LoginNavKey).toImmutableSet(),
+        topLevelKeys = TOP_LEVEL_KEYS,
     )
 
     return remember(
@@ -47,7 +46,7 @@ class PrezelAppState(
     networkMonitor: NetworkMonitor,
 ) {
     val shouldShowNavigationBar
-        get() = navigationState.currentKey in TOP_LEVEL_KEYS
+        get() = navigationState.currentKey in MAIN_NAV_KEYS
 
     val isOffline: StateFlow<Boolean> =
         networkMonitor.isOnline
