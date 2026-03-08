@@ -15,7 +15,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 import kotlinx.collections.immutable.persistentListOf
 
-internal typealias PrezelButtonPreviewContent = @Composable (PrezelButtonStyle, Boolean, Modifier) -> Unit
+internal typealias PrezelButtonPreviewContent = @Composable (style: PrezelButtonStyle, enabled: Boolean, contentModifier: Modifier) -> Unit
 
 @Immutable
 private data class PreviewVariant(
@@ -34,6 +34,7 @@ private val PreviewVariants = persistentListOf(
 internal fun PrezelButtonPreviewByType(
     type: PrezelButtonType,
     content: PrezelButtonPreviewContent,
+    isIconOnly: Boolean = false,
 ) {
     PreviewScaffold {
         Text(text = type.name, style = PrezelTheme.typography.title2Medium)
@@ -44,6 +45,7 @@ internal fun PrezelButtonPreviewByType(
                 type = type,
                 enabled = variant.enabled,
                 isRounded = variant.isRounded,
+                isIconOnly = isIconOnly,
                 content = content,
             )
         }
@@ -55,6 +57,7 @@ private fun PrezelButtonVariantSection(
     type: PrezelButtonType,
     enabled: Boolean,
     isRounded: Boolean,
+    isIconOnly: Boolean,
     content: PrezelButtonPreviewContent,
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
@@ -69,6 +72,7 @@ private fun PrezelButtonVariantSection(
             hierarchy = PrezelButtonHierarchy.PRIMARY,
             enabled = enabled,
             isRounded = isRounded,
+            isIconOnly = isIconOnly,
             content = content,
             contentModifier = contentModifier,
         )
@@ -78,6 +82,7 @@ private fun PrezelButtonVariantSection(
             hierarchy = PrezelButtonHierarchy.SECONDARY,
             enabled = enabled,
             isRounded = isRounded,
+            isIconOnly = isIconOnly,
             content = content,
             contentModifier = contentModifier,
         )
@@ -90,6 +95,7 @@ private fun PrezelButtonPreviewHierarchyBlock(
     hierarchy: PrezelButtonHierarchy,
     enabled: Boolean,
     isRounded: Boolean,
+    isIconOnly: Boolean,
     content: PrezelButtonPreviewContent,
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
@@ -106,7 +112,7 @@ private fun PrezelButtonPreviewHierarchyBlock(
                 buttonSize = size,
                 isRounded = isRounded,
             )
-            val appearance = PrezelButtonAppearance.of(style = style, isIconOnly = false, enabled = enabled)
+            val appearance = PrezelButtonAppearance.of(style = style, isIconOnly = isIconOnly, enabled = enabled)
 
             content(
                 style,
