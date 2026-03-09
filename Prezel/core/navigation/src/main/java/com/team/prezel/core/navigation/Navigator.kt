@@ -6,7 +6,7 @@ import androidx.navigation3.runtime.NavKey
  * 내비게이션 이벤트를 처리하며 [NavigationState]를 변경합니다.
  *
  * 정책 요약:
- * - 최상위 키(top-level)는 [topLevelStack][NavigationState.topLevelStack]에서 히스토리를 관리합니다.
+ * - 최상위 키(top-level)는 [topLevelStack][NavigationState.topLevelStack]에 "현재 탭 1개"만 유지합니다.
  * - 각 최상위 키의 상세 이동은 [subStacks][NavigationState.subStacks]에서 관리합니다.
  * - 동일 키 재진입 시에는 스택 중복을 만들지 않고 기존 항목을 재정렬하거나 하위 스택을 초기화합니다.
  */
@@ -59,7 +59,7 @@ class Navigator(
      *
      * 처리 순서:
      * 1) 현재 하위 스택에 상세 목적지가 있으면 하위 스택에서 pop 합니다.
-     * 2) 아니고 최상위 스택 히스토리가 있으면 최상위 스택에서 pop 합니다.
+     * 2) 아니고 최상위 스택 히스토리가 있으면 최상위 스택에서 pop 합니다. (레거시 상태 호환)
      * 3) 둘 다 불가능하면 아무 동작도 하지 않습니다.
      *
      * @return 뒤로가기 내비게이션이 처리되었으면 true를 반환합니다.
@@ -98,17 +98,13 @@ class Navigator(
      * 최상위 목적지로 전환합니다.
      *
      * 정책:
-     * - state.startKey로 이동하면 최상위 스택을 완전히 초기화한 뒤 startKey만 남깁니다.
-     * - 그 외 최상위 키는 기존 위치에서 제거 후 스택 끝에 추가합니다.
-     * - 즉, startKey는 "히스토리 리셋", 나머지는 "move-to-top"으로 동작합니다.
+     * - 최상위 스택은 항상 현재 키 1개만 유지합니다.
+     * - 탭 간 이동 히스토리를 보관하지 않아, 최상위 루트 화면에서 뒤로가기 시
+     *   "이전 탭으로 복귀" 대신 시스템 back(앱 종료/상위 핸들러)로 이어지도록 합니다.
      */
     private fun goToTopLevel(key: NavKey) {
         state.topLevelStack.apply {
-            if (key == state.startKey) {
-                clear()
-            } else {
-                remove(key)
-            }
+            clear()
             add(key)
         }
     }
