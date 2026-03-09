@@ -12,12 +12,12 @@ class LoggingDecorator<T : Any> :
             DisposableEffect(entry.contentKey, entry.metadata) {
                 Timber
                     .tag(NAVIGATION_LOGGING_TAG)
-                    .d("[Navigation] SCREEN_ENTER | screen=${entry.contentKey} | metadata=${entry.metadata}")
+                    .d("SCREEN_ENTER | screen=${entry.contentKey} | metadata=${entry.metadata}")
 
                 onDispose {
                     Timber
                         .tag(NAVIGATION_LOGGING_TAG)
-                        .d(message = "[Navigation] SCREEN_EXIT | screen=${entry.contentKey} | metadata=${entry.metadata}")
+                        .d(message = "SCREEN_EXIT | screen=${entry.contentKey} | metadata=${entry.metadata}")
                 }
             }
 
