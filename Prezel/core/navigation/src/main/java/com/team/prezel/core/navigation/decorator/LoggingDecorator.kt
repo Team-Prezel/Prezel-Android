@@ -6,20 +6,21 @@ import timber.log.Timber
 
 private const val NAVIGATION_LOGGING_TAG = "Navigation"
 
-class LoggingDecorator<T : Any> : NavEntryDecorator<T>(
-    decorate = { entry ->
-        DisposableEffect(entry.contentKey, entry.metadata) {
-            Timber
-                .tag(NAVIGATION_LOGGING_TAG)
-                .d("[Navigation] SCREEN_ENTER | screen=${entry.contentKey} | metadata=${entry.metadata}")
-
-            onDispose {
+class LoggingDecorator<T : Any> :
+    NavEntryDecorator<T>(
+        decorate = { entry ->
+            DisposableEffect(entry.contentKey, entry.metadata) {
                 Timber
                     .tag(NAVIGATION_LOGGING_TAG)
-                    .d(message = "[Navigation] SCREEN_EXIT | screen=${entry.contentKey} | metadata=${entry.metadata}")
-            }
-        }
+                    .d("[Navigation] SCREEN_ENTER | screen=${entry.contentKey} | metadata=${entry.metadata}")
 
-        entry.Content()
-    },
-)
+                onDispose {
+                    Timber
+                        .tag(NAVIGATION_LOGGING_TAG)
+                        .d(message = "[Navigation] SCREEN_EXIT | screen=${entry.contentKey} | metadata=${entry.metadata}")
+                }
+            }
+
+            entry.Content()
+        },
+    )
