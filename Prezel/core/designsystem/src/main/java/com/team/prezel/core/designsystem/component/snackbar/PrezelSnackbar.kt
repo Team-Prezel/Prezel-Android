@@ -62,14 +62,12 @@ fun PrezelSnackbar(
                     .padding(vertical = PrezelTheme.spacing.V14),
             )
 
-            visuals.actionLabel.let { label ->
-                Spacer(Modifier.width(PrezelTheme.spacing.V16))
-                PrezelButton(
-                    text = label,
-                    onClick = { data.performAction() },
-                    style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
-                )
-            }
+            Spacer(Modifier.width(PrezelTheme.spacing.V16))
+            PrezelButton(
+                text = visuals.actionLabel,
+                onClick = { data.performAction() },
+                style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
+            )
         }
     }
 }
