@@ -50,6 +50,7 @@ class NavigationState(
 ) {
     val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
     val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
+    val isTopLevel: Boolean by derivedStateOf { topLevelKeys.contains(currentKey) }
 
     val topLevelKeys: Set<NavKey>
         get() = subStacks.keys
@@ -57,9 +58,6 @@ class NavigationState(
     val currentSubStack: NavBackStack<NavKey>
         get() = subStacks[currentTopLevelKey]
             ?: error("Sub stack for $currentTopLevelKey does not exist")
-
-    val isTopLevel: Boolean
-        get() = topLevelKeys.contains(currentKey)
 }
 
 /**
