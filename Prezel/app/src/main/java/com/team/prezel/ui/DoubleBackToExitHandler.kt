@@ -26,7 +26,6 @@ private sealed interface BackPressState {
 @Composable
 internal fun DoubleBackToExitHandler(appState: PrezelAppState) {
     var backPressState by remember { mutableStateOf<BackPressState>(BackPressState.Idle) }
-
     val snackbarState = LocalSnackbarHostState.current
     val resources = LocalResources.current
     val isTopLevelScreen = appState.navigationState.isTopLevel
