@@ -16,6 +16,7 @@ internal data class PrezelSnackbarVisuals(
     override val actionLabel: String,
     override val withDismissAction: Boolean = false,
     override val duration: SnackbarDuration,
+    val id: String? = null,
     val leadingIcon: IconSource?,
     val offsetY: Dp,
 ) : SnackbarVisuals
@@ -26,6 +27,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     onAction: () -> Unit,
     leadingIcon: IconSource? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
+    id: String? = null,
     onDismiss: (() -> Unit)? = null,
     offsetY: Dp = 0.dp,
 ) {
@@ -34,6 +36,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
             message = message,
             actionLabel = actionLabel,
             duration = duration,
+            id = id,
             leadingIcon = leadingIcon,
             offsetY = offsetY,
         ),
@@ -56,4 +59,9 @@ fun PrezelSnackbarHost(
     ) { data ->
         PrezelSnackbar(data = data)
     }
+}
+
+fun SnackbarHostState.dismissById(id: String) {
+    val visuals = currentSnackbarData?.visuals as? PrezelSnackbarVisuals ?: return
+    if (visuals.id == id) currentSnackbarData?.dismiss()
 }
