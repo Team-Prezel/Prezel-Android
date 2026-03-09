@@ -24,11 +24,12 @@ import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
+import kotlinx.collections.immutable.ImmutableSet
 
 @Composable
 fun PrezelApp(
     appState: PrezelAppState,
-    entryBuilders: Set<EntryProviderScope<NavKey>.() -> Unit>,
+    entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -37,6 +38,8 @@ fun PrezelApp(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
+        DoubleBackToExitHandler(appState = appState)
+
         PrezelAppContent(
             appState = appState,
             entryBuilders = entryBuilders,
@@ -47,7 +50,7 @@ fun PrezelApp(
 @Composable
 private fun PrezelAppContent(
     appState: PrezelAppState,
-    entryBuilders: Set<EntryProviderScope<NavKey>.() -> Unit>,
+    entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
     val snackbarHostState = LocalSnackbarHostState.current
