@@ -60,15 +60,13 @@ fun PrezelCheckbox(
         }
 
     Box(
-        modifier = modifier
-            .size(48.dp)
-            .toggleable(
-                value = checked,
-                interactionSource = null,
-                indication = null,
-                role = Role.Checkbox,
-                onValueChange = onCheckedChange,
-            ),
+        modifier = modifier.toggleable(
+            value = checked,
+            interactionSource = null,
+            indication = null,
+            role = Role.Checkbox,
+            onValueChange = onCheckedChange,
+        ),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -93,14 +91,16 @@ private fun PrezelRegularCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    size = CheckboxSize.REGULAR,
                     checked = checkState,
+                    modifier = Modifier.size(48.dp),
+                    size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    size = CheckboxSize.REGULAR,
                     checked = !checkState,
+                    modifier = Modifier.size(48.dp),
+                    size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
             }
@@ -121,14 +121,16 @@ private fun PrezelLargeCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    size = CheckboxSize.LARGE,
                     checked = checkState,
+                    modifier = Modifier.size(48.dp),
+                    size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    size = CheckboxSize.LARGE,
                     checked = !checkState,
+                    modifier = Modifier.size(48.dp),
+                    size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )
             }
