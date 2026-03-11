@@ -25,7 +25,10 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-internal fun PreviewScaffold(content: @Composable () -> Unit) {
+internal fun PreviewScaffold(
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(16.dp),
+    content: @Composable () -> Unit,
+) {
     Scaffold(
         containerColor = PrezelTheme.colors.bgRegular,
         contentColor = PrezelTheme.colors.textLarge,
@@ -36,7 +39,7 @@ internal fun PreviewScaffold(content: @Composable () -> Unit) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = verticalArrangement,
         ) {
             content()
         }
