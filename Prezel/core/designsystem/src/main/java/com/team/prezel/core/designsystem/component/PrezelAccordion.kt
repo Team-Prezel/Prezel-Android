@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -91,6 +92,23 @@ fun PrezelAccordion(
 }
 
 @Composable
+private fun PrezelAccordionChevron(expanded: Boolean) {
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "accordionChevronRotation",
+    )
+
+    Icon(
+        painter = painterResource(PrezelIcons.ChevronDown),
+        contentDescription = stringResource(R.string.core_designsystem_accordion_desc),
+        modifier = Modifier
+            .size(24.dp)
+            .rotate(rotation),
+        tint = PrezelTheme.colors.iconRegular,
+    )
+}
+
+@Composable
 private fun PrezelAccordionContent(
     expanded: Boolean,
     content: @Composable () -> Unit,
@@ -110,107 +128,76 @@ private fun PrezelAccordionContent(
 
 @ThemePreview
 @Composable
-private fun PrezelAccordionPreview_Collapsed() {
-    PrezelTheme {
-        PreviewScaffold {
-            PrezelAccordion(
-                title = "Title",
-                expanded = false,
-                onExpandedChange = {},
-                showDivider = true,
-                content = {
-                    Text(
-                        text = "Content",
-                        style = PrezelTextStyles.Body3Regular.toTextStyle(),
-                        color = PrezelTheme.colors.textRegular,
-                    )
-                },
-            )
-        }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun PrezelAccordionPreview_Expanded() {
-    PrezelTheme {
-        PreviewScaffold {
-            PrezelAccordion(
-                title = "Title",
-                expanded = true,
-                onExpandedChange = {},
-                showDivider = true,
-                content = {
-                    Text(
-                        text = "Content 영역입니다.\n여기에 설명이나 리스트가 들어갑니다.",
-                        modifier = Modifier.padding(all = 12.dp),
-                        color = PrezelTheme.colors.textLarge,
-                        style = PrezelTextStyles.Caption2Medium.toTextStyle(),
-                    )
-                },
-            )
-        }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun PrezelListAccordionPreview_Interactive() {
+private fun PrezelAccordionPreview() {
     PrezelTheme {
         var expanded by remember { mutableStateOf(false) }
 
         PreviewScaffold {
-            PrezelAccordion(
-                title = "(필수) 이용약관",
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                showDivider = false,
-                leadingContent = {
-                    PrezelCheckbox(
-                        checked = false,
-                        size = CheckboxSize.REGULAR,
-                        onCheckedChange = {},
-                    )
-                },
-                trailingContent = {
-                    Text(
-                        text = "자세히 보기",
-                        color = PrezelTheme.colors.textMedium,
-                        style = PrezelTextStyles.Caption2Medium.toTextStyle(),
-                    )
-                },
-                content = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(PrezelTheme.colors.bgMedium)
-                            .padding(all = 12.dp),
-                    ) {
+            Column(verticalArrangement = Arrangement.spacedBy(40.dp)) {
+                PrezelAccordion(
+                    title = "Collapsed Accordion",
+                    expanded = false,
+                    onExpandedChange = {},
+                    showDivider = true,
+                    content = {
                         Text(
-                            text = "본 약관은 서비스 이용과 관련한 기본적인 권리·의무 및 책임사항을 규정합니다.",
-                            color = PrezelTheme.colors.textLarge,
-                            style = PrezelTextStyles.Caption2Regular.toTextStyle(),
+                            text = "Content",
+                            style = PrezelTextStyles.Body3Regular.toTextStyle(),
+                            color = PrezelTheme.colors.textRegular,
                         )
-                    }
-                },
-            )
+                    },
+                )
+
+                PrezelAccordion(
+                    title = "Expanded Accordion",
+                    expanded = true,
+                    onExpandedChange = {},
+                    showDivider = true,
+                    content = {
+                        Text(
+                            text = "Content 영역입니다.\n여기에 설명이나 리스트가 들어갑니다.",
+                            modifier = Modifier.padding(all = 12.dp),
+                            color = PrezelTheme.colors.textLarge,
+                            style = PrezelTextStyles.Caption2Medium.toTextStyle(),
+                        )
+                    },
+                )
+
+                PrezelAccordion(
+                    title = "(필수) 이용약관",
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    showDivider = false,
+                    leadingContent = {
+                        PrezelCheckbox(
+                            checked = false,
+                            size = CheckboxSize.REGULAR,
+                            onCheckedChange = {},
+                        )
+                    },
+                    trailingContent = {
+                        Text(
+                            text = "자세히 보기",
+                            color = PrezelTheme.colors.textMedium,
+                            style = PrezelTextStyles.Caption2Medium.toTextStyle(),
+                        )
+                    },
+                    content = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(PrezelTheme.colors.bgMedium)
+                                .padding(all = 12.dp),
+                        ) {
+                            Text(
+                                text = "본 약관은 서비스 이용과 관련한 기본적인 권리·의무 및 책임사항을 규정합니다.",
+                                color = PrezelTheme.colors.textLarge,
+                                style = PrezelTextStyles.Caption2Regular.toTextStyle(),
+                            )
+                        }
+                    },
+                )
+            }
         }
     }
-}
-
-@Composable
-private fun PrezelAccordionChevron(expanded: Boolean) {
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-        label = "accordionChevronRotation",
-    )
-
-    Icon(
-        painter = painterResource(PrezelIcons.ChevronDown),
-        contentDescription = stringResource(R.string.core_designsystem_accordion_desc),
-        modifier = Modifier
-            .size(24.dp)
-            .rotate(rotation),
-        tint = PrezelTheme.colors.iconRegular,
-    )
 }
