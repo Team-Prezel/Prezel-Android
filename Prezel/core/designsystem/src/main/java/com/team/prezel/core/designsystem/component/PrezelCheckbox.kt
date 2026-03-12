@@ -27,6 +27,7 @@ import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 enum class CheckboxSize {
     REGULAR,
@@ -60,13 +61,15 @@ fun PrezelCheckbox(
         }
 
     Box(
-        modifier = modifier.toggleable(
-            value = checked,
-            interactionSource = null,
-            indication = null,
-            role = Role.Checkbox,
-            onValueChange = onCheckedChange,
-        ),
+        modifier = modifier
+            .padding(all = PrezelTheme.spacing.V8)
+            .toggleable(
+                value = checked,
+                interactionSource = null,
+                indication = null,
+                role = Role.Checkbox,
+                onValueChange = onCheckedChange,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -92,14 +95,14 @@ private fun PrezelRegularCheckboxPreview() {
 
                 PrezelCheckbox(
                     checked = checkState,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.drawDashBorder(),
                     size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
                     checked = !checkState,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.drawDashBorder(),
                     size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
@@ -122,14 +125,14 @@ private fun PrezelLargeCheckboxPreview() {
 
                 PrezelCheckbox(
                     checked = checkState,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.drawDashBorder(),
                     size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
                     checked = !checkState,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.drawDashBorder(),
                     size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )

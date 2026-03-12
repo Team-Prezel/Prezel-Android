@@ -102,7 +102,7 @@ private fun PrezelTopAppBarWithAllIconsPreview() {
                 leadingIcon = {
                     IconButton(onClick = {}) {
                         Icon(
-                            painter = painterResource(PrezelIcons.ArrowLeft),
+                            painter = painterResource(PrezelIcons.Blank),
                             contentDescription = "뒤로가기",
                         )
                     }
@@ -110,13 +110,13 @@ private fun PrezelTopAppBarWithAllIconsPreview() {
                 trailingIcons = {
                     IconButton(onClick = {}) {
                         Icon(
-                            painter = painterResource(PrezelIcons.Search),
+                            painter = painterResource(PrezelIcons.Blank),
                             contentDescription = "검색",
                         )
                     }
                     IconButton(onClick = {}) {
                         Icon(
-                            painter = painterResource(PrezelIcons.Menu),
+                            painter = painterResource(PrezelIcons.Blank),
                             contentDescription = "메뉴",
                         )
                     }
@@ -142,7 +142,7 @@ private fun PrezelTopAppBarScrollTestPreview() {
                     leadingIcon = {
                         IconButton(onClick = {}) {
                             Icon(
-                                painter = painterResource(PrezelIcons.ArrowLeft),
+                                painter = painterResource(PrezelIcons.Blank),
                                 contentDescription = "뒤로가기",
                             )
                         }
