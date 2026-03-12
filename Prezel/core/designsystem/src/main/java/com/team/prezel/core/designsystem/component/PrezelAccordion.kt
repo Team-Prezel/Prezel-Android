@@ -12,23 +12,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
+import com.team.prezel.core.designsystem.component.button.PrezelHyperlinkButton
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
@@ -36,58 +40,57 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 @Composable
 fun PrezelAccordion(
     title: String,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    showDivider: Boolean = false,
-    size: PrezelListSize = PrezelListSize.REGULAR,
+    initiallyExpanded: Boolean = false,
     nested: Boolean = false,
-    leadingContent: (@Composable RowScope.() -> Unit)? = null,
-    trailingContent: (@Composable RowScope.() -> Unit)? = null,
-    content: @Composable (() -> Unit)? = null,
+    showDivider: Boolean = false,
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+    content: @Composable (() -> Unit),
 ) {
+    var expanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize(),
     ) {
-        PrezelList(
-            title = title,
-            modifier = Modifier
-                .clickable(
-                    enabled = enabled,
-                    indication = null,
-                    interactionSource = null,
-                ) {
-                    onExpandedChange(!expanded)
+        CompositionLocalProvider(
+            LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+        ) {
+            PrezelList(
+                title = title,
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = null,
+                        indication = null,
+                        onClick = { expanded = !expanded },
+                    ),
+                size = if (nested) PrezelListSize.SMALL else PrezelListSize.REGULAR,
+                nested = nested,
+                leadingContent = leadingContent,
+                trailingContent = {
+                    trailingContent?.invoke()
+                    PrezelAccordionChevron(expanded = expanded)
                 },
-            size = size,
-            nested = nested,
-            leadingContent = leadingContent,
-            trailingContent = {
-                trailingContent?.invoke(this)
-                PrezelAccordionChevron(expanded = expanded)
-            },
-        )
+            )
+        }
 
         if (showDivider) {
             PrezelHorizontalDivider(
                 type = PrezelDividerType.THICK,
-                color = PrezelTheme.colors.borderSmall,
             )
         }
 
-        if (content != null) {
-            PrezelAccordionContent(
-                expanded = expanded,
-                content = content,
-            )
-        }
+        PrezelAccordionContent(
+            expanded = expanded,
+            content = content,
+        )
     }
 }
 
@@ -130,14 +133,10 @@ private fun PrezelAccordionContent(
 @Composable
 private fun PrezelAccordionPreview() {
     PrezelTheme {
-        var expanded by remember { mutableStateOf(false) }
-
         PreviewScaffold {
             Column(verticalArrangement = Arrangement.spacedBy(40.dp)) {
                 PrezelAccordion(
                     title = "Collapsed Accordion",
-                    expanded = false,
-                    onExpandedChange = {},
                     showDivider = true,
                     content = {
                         Text(
@@ -150,8 +149,7 @@ private fun PrezelAccordionPreview() {
 
                 PrezelAccordion(
                     title = "Expanded Accordion",
-                    expanded = true,
-                    onExpandedChange = {},
+                    initiallyExpanded = true,
                     showDivider = true,
                     content = {
                         Text(
@@ -165,21 +163,25 @@ private fun PrezelAccordionPreview() {
 
                 PrezelAccordion(
                     title = "(필수) 이용약관",
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    showDivider = false,
+                    modifier = Modifier
+                        .padding(start = 24.dp)
+                        .drawDashBorder(),
+                    nested = true,
                     leadingContent = {
+                        var state by remember { mutableStateOf(false) }
+
                         PrezelCheckbox(
-                            checked = false,
+                            checked = state,
+                            modifier = Modifier.drawDashBorder(),
                             size = CheckboxSize.REGULAR,
-                            onCheckedChange = {},
+                            onCheckedChange = { state = !state },
                         )
                     },
                     trailingContent = {
-                        Text(
+                        PrezelHyperlinkButton(
                             text = "자세히 보기",
-                            color = PrezelTheme.colors.textMedium,
-                            style = PrezelTextStyles.Caption2Medium.toTextStyle(),
+                            onClick = {},
+                            modifier = Modifier.drawDashBorder(),
                         )
                     },
                     content = {
