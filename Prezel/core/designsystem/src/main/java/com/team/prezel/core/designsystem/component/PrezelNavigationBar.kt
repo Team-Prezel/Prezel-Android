@@ -24,12 +24,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbarHost
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.NoRippleInteractionSource
 
 @Composable
 fun PrezelNavigationBar(
@@ -85,8 +87,9 @@ fun RowScope.PrezelNavigationBarItem(
             unselectedIconColor = PrezelTheme.colors.iconDisabled,
             selectedTextColor = PrezelTheme.colors.textLarge,
             unselectedTextColor = PrezelTheme.colors.textDisabled,
-            indicatorColor = PrezelTheme.colors.bgRegular,
+            indicatorColor = Color.Transparent,
         ),
+        interactionSource = NoRippleInteractionSource,
     )
 }
 
@@ -123,7 +126,7 @@ class PrezelNavigationScope internal constructor(
     private val rowScope: RowScope,
 ) {
     @Composable
-    fun item(
+    fun Item(
         selected: Boolean,
         icon: IconSource,
         label: String,
@@ -161,7 +164,7 @@ private fun PrezelNavigationScaffoldPreview() {
             snackbarHostState = snackbarHostState,
             navigationItems = {
                 items.forEach { (icon, label, index) ->
-                    item(
+                    Item(
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index },
                         icon = icon,
