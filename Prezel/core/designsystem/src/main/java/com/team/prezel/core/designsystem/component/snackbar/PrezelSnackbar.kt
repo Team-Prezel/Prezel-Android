@@ -1,15 +1,18 @@
 package com.team.prezel.core.designsystem.component.snackbar
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarVisuals
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +25,6 @@ import com.team.prezel.core.designsystem.component.button.PrezelButtonType
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -32,37 +34,39 @@ fun PrezelSnackbar(
     data: SnackbarData,
     modifier: Modifier = Modifier,
 ) {
-    val visuals = data.visuals
-    val leadingIcon = visuals.leadingIconOrNull()
-    val actionLabel = visuals.actionLabel
+    val visuals = data.visuals as? PrezelSnackbarVisuals ?: error("PrezelSnackbar를 사용해주세요.")
 
-    Snackbar(
-        modifier = modifier,
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(PrezelTheme.spacing.V20)
+            .offset(y = visuals.offsetY),
         shape = PrezelTheme.shapes.V12,
-        containerColor = PrezelColorScheme.Dark.bgMedium,
+        color = PrezelColorScheme.Dark.bgMedium,
         contentColor = PrezelColorScheme.Dark.textLarge,
-        action = actionLabel?.let { label ->
-            {
-                PrezelButton(
-                    text = label,
-                    onClick = { data.performAction() },
-                    style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
-                )
-            }
-        },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.padding(start = PrezelTheme.spacing.V16, end = PrezelTheme.spacing.V8),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            leadingIcon?.let {
-                PrezelSnackbarLeadingIcon(icon = it)
+            visuals.leadingIcon?.let { leadingIcon ->
+                PrezelSnackbarLeadingIcon(icon = leadingIcon)
                 Spacer(Modifier.width(PrezelTheme.spacing.V8))
             }
 
             Text(
                 text = visuals.message,
                 style = PrezelTextStyles.Body3Regular.toTextStyle(),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = PrezelTheme.spacing.V14),
+            )
+
+            Spacer(Modifier.width(PrezelTheme.spacing.V16))
+            PrezelButton(
+                text = visuals.actionLabel,
+                onClick = { data.performAction() },
+                style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
             )
         }
     }
@@ -81,35 +85,17 @@ private fun PrezelSnackbarLeadingIcon(
     )
 }
 
-private fun SnackbarVisuals.leadingIconOrNull(): IconSource? = (this as? PrezelSnackbarVisuals)?.leadingIcon
-
 @ThemePreview
 @Composable
 private fun PrezelSnackBarPreview_Cases() {
     PrezelTheme {
-        PreviewScaffold {
-            Text("Action O / Icon O")
+        Column {
             PrezelSnackbar(
                 data = previewData(message = "Message", actionLabel = "Action", leadingIcon = IconSource(PrezelIcons.Blank)),
             )
 
-            Text("Action X / Icon O")
-            PrezelSnackbar(
-                data = previewData(
-                    message = "Message Message Message ",
-                    actionLabel = null,
-                    leadingIcon = IconSource(PrezelIcons.Blank),
-                ),
-            )
-
-            Text("Action O / Icon X")
             PrezelSnackbar(
                 data = previewData(message = "Message Message Message Message Message", actionLabel = "Action"),
-            )
-
-            Text("Action X / Icon X")
-            PrezelSnackbar(
-                data = previewData(message = "Message Message Message Message Message", actionLabel = null),
             )
         }
     }
@@ -118,7 +104,7 @@ private fun PrezelSnackBarPreview_Cases() {
 @Composable
 private fun previewData(
     message: String,
-    actionLabel: String?,
+    actionLabel: String,
     leadingIcon: IconSource? = null,
 ): SnackbarData =
     PreviewSnackbarData(
@@ -128,14 +114,14 @@ private fun previewData(
             withDismissAction = false,
             duration = SnackbarDuration.Short,
             leadingIcon = leadingIcon,
+            offsetY = 0.dp,
         ),
     )
 
-@Suppress("EmptyFunctionBlock")
 private class PreviewSnackbarData(
     override val visuals: SnackbarVisuals,
 ) : SnackbarData {
-    override fun dismiss() {}
+    override fun dismiss() = Unit
 
-    override fun performAction() {}
+    override fun performAction() = Unit
 }

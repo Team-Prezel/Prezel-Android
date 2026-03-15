@@ -34,6 +34,11 @@ dependencies {
     implementation(projects.coreDesignsystem)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
+
+    implementation(projects.featureSplashApi)
+    implementation(projects.featureSplashImpl)
+    implementation(projects.featureLoginApi)
+    implementation(projects.featureLoginImpl)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
     implementation(projects.featureHistoryApi)
