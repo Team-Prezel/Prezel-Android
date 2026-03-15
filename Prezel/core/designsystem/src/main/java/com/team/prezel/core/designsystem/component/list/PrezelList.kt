@@ -31,8 +31,8 @@ fun PrezelList(
     modifier: Modifier = Modifier,
     size: PrezelListSize = PrezelListSize.REGULAR,
     nested: Boolean = false,
-    leadingContent: @Composable (RowScope.() -> Unit)? = null,
-    trailingContent: @Composable (RowScope.() -> Unit)? = null,
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -101,14 +101,14 @@ private fun PrezelListPreviewItem(
     showLeadingContent: Boolean,
     showTrailingContent: Boolean,
 ) {
-    val leadingContent: @Composable RowScope.() -> Unit = {
+    val leadingContent: @Composable () -> Unit = {
         Icon(
             painter = painterResource(id = PrezelIcons.Blank),
             contentDescription = "leading",
         )
     }
 
-    val trailingContent: @Composable RowScope.() -> Unit = {
+    val trailingContent: @Composable () -> Unit = {
         Icon(
             painter = painterResource(id = PrezelIcons.Blank),
             contentDescription = "trailing",
