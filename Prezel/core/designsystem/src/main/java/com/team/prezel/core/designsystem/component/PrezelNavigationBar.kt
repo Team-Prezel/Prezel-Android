@@ -14,7 +14,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbarHost
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -108,7 +108,7 @@ fun PrezelNavigationScaffold(
             }
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            PrezelSnackbarHost(hostState = snackbarHostState)
         },
         containerColor = PrezelTheme.colors.bgRegular,
         content = content,

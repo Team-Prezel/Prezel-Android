@@ -11,6 +11,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.ui.PrezelApp
 import com.team.prezel.ui.rememberPrezelAppState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.collections.immutable.toImmutableSet
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
                 PrezelApp(
                     appState = appState,
-                    entryBuilders = entryBuilders,
+                    entryBuilders = entryBuilders.toImmutableSet(),
                 )
             }
         }
