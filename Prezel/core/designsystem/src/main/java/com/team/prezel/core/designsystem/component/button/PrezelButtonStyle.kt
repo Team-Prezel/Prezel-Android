@@ -63,39 +63,36 @@ internal data class PrezelButtonAppearance(
             style: PrezelButtonStyle,
             isIconOnly: Boolean,
             enabled: Boolean,
-        ): PrezelButtonAppearance {
-            val (buttonType, buttonHierarchy, buttonSize, isRounded) = style
-
-            return PrezelButtonAppearance(
-                textStyle = prezelButtonTextStyle(size = buttonSize),
+        ): PrezelButtonAppearance =
+            PrezelButtonAppearance(
+                textStyle = prezelButtonTextStyle(size = style.buttonSize),
                 contentColor = prezelButtonContentColor(
-                    type = buttonType,
-                    hierarchy = buttonHierarchy,
+                    type = style.buttonType,
+                    hierarchy = style.buttonHierarchy,
                     enabled = enabled,
                 ),
                 contentPadding = prezelButtonContentPadding(
-                    size = buttonSize,
+                    size = style.buttonSize,
                     isIconOnly = isIconOnly,
                 ),
-                iconSpacing = prezelButtonIconSpacing(size = buttonSize),
+                iconSpacing = prezelButtonIconSpacing(size = style.buttonSize),
                 shape = prezelButtonShape(
                     isIconOnly = isIconOnly,
-                    isRounded = isRounded,
-                    buttonSize = buttonSize,
+                    isRounded = style.isRounded,
+                    buttonSize = style.buttonSize,
                 ),
                 containerColor = prezelButtonContainerColor(
-                    type = buttonType,
-                    hierarchy = buttonHierarchy,
+                    type = style.buttonType,
+                    hierarchy = style.buttonHierarchy,
                     enabled = enabled,
                 ),
                 borderStroke = prezelButtonBorderStroke(
-                    type = buttonType,
-                    hierarchy = buttonHierarchy,
+                    type = style.buttonType,
+                    hierarchy = style.buttonHierarchy,
                     enabled = enabled,
                 ),
-                iconSize = prezelButtonIconSize(size = buttonSize),
+                iconSize = prezelButtonIconSize(size = style.buttonSize),
             )
-        }
     }
 }
 
