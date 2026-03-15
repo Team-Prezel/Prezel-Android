@@ -1,14 +1,17 @@
 package com.team.prezel.core.designsystem.component.button
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -17,8 +20,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -34,42 +35,59 @@ fun PrezelButton(
     enabled: Boolean = true,
     style: PrezelButtonStyle = PrezelButtonStyle(),
 ) {
-    val hasText = text != null
-    val hasIcon = icon != null
-    require(hasText || hasIcon) { "Button은 text 또는 icon 중 하나는 반드시 필요합니다." }
-    val (buttonType, buttonHierarchy, buttonSize, isRounded) = style
-    val isIconOnly = !hasText
+    require(text != null || icon != null) { "버튼은 텍스트 또는 아이콘 중 하나는 반드시 필요합니다." }
+    val appearance = PrezelButtonAppearance.of(style = style, isIconOnly = text == null, enabled = enabled)
 
-    Surface(
-        onClick = onClick,
-        modifier = modifier.semantics { role = Role.Button },
-        enabled = enabled,
-        shape = prezelButtonShape(isIconOnly = isIconOnly, isRounded = isRounded, buttonSize = buttonSize),
-        color = prezelButtonContainerColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
-        border = prezelButtonBorderStroke(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
+    Box(
+        modifier = modifier
+            .applyButtonAppearance(appearance)
+            .clickable(
+                enabled = enabled,
+                onClick = onClick,
+                role = Role.Button,
+                indication = ripple(),
+                interactionSource = null,
+            ),
+        contentAlignment = Alignment.Center,
     ) {
-        CompositionLocalProvider(
-            LocalTextStyle provides prezelButtonTextStyle(buttonSize),
-            LocalContentColor provides prezelButtonContentColor(type = buttonType, hierarchy = buttonHierarchy, enabled = enabled),
+        PrezelButtonContent(
+            text = text,
+            icon = icon,
+            showUnderline = style.showUnderline,
+            appearance = appearance,
+        )
+    }
+}
+
+@Composable
+private fun PrezelButtonContent(
+    text: String?,
+    icon: IconSource?,
+    showUnderline: Boolean,
+    appearance: PrezelButtonAppearance,
+) {
+    CompositionLocalProvider(LocalContentColor provides appearance.contentColor) {
+        Row(
+            modifier = Modifier.padding(appearance.contentPadding),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.padding(prezelButtonContentPadding(size = buttonSize, isOnlyIcon = isIconOnly)),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                icon?.let { source ->
-                    PrezelButtonIcon(icon = source, size = buttonSize)
-                }
+            icon?.let { source ->
+                Icon(
+                    painter = source.painter(),
+                    contentDescription = source.contentDescription(),
+                    modifier = Modifier.size(appearance.iconSize),
+                )
+            }
 
-                if (!hasText) return@Row
-                if (hasIcon) {
-                    val spacing = if (buttonSize == PrezelButtonSize.REGULAR) PrezelTheme.spacing.V8 else PrezelTheme.spacing.V4
-                    Spacer(modifier = Modifier.width(width = spacing))
+            text?.let { label ->
+                if (icon != null) {
+                    Spacer(modifier = Modifier.width(width = appearance.iconSpacing))
                 }
-
                 Text(
-                    text = text,
-                    modifier = Modifier.applyButtonTextStyle(style),
+                    text = label,
+                    style = appearance.textStyle,
+                    modifier = if (showUnderline) Modifier.prezelButtonUnderline() else Modifier,
                 )
             }
         }
@@ -77,19 +95,17 @@ fun PrezelButton(
 }
 
 @Composable
-private fun Modifier.applyButtonTextStyle(style: PrezelButtonStyle): Modifier {
-    if (!style.showUnderline) return this
-
-    val px = with(LocalDensity.current) { 1.dp.toPx() }
+private fun Modifier.prezelButtonUnderline(): Modifier {
+    val underlineThickness = with(LocalDensity.current) { 1.dp.toPx() }
     val underlineColor = PrezelTheme.colors.borderLarge
 
     return this.drawBehind {
-        val y = size.height - (px / 2)
+        val y = size.height - (underlineThickness / 2)
         drawLine(
             color = underlineColor,
             start = Offset(0f, y),
             end = Offset(size.width, y),
-            strokeWidth = px,
+            strokeWidth = underlineThickness,
         )
     }
 }
@@ -122,6 +138,7 @@ private fun PrezelButtonPreviewGhost() {
 private fun PrezelButtonPreviewItem(
     style: PrezelButtonStyle,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     PrezelButton(
         text = "Label",
@@ -129,5 +146,6 @@ private fun PrezelButtonPreviewItem(
         onClick = {},
         enabled = enabled,
         style = style,
+        modifier = modifier,
     )
 }

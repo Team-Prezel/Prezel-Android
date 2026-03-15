@@ -28,7 +28,7 @@ fun PrezelIconButton(
 @Composable
 private fun PrezelIconButtonPreviewFilled() {
     PrezelTheme {
-        PrezelButtonPreviewByType(type = PrezelButtonType.FILLED, content = ::PrezelIconButtonPreviewItem)
+        PrezelButtonPreviewByType(type = PrezelButtonType.FILLED, content = ::PrezelIconButtonPreviewItem, isIconOnly = true)
     }
 }
 
@@ -36,7 +36,7 @@ private fun PrezelIconButtonPreviewFilled() {
 @Composable
 private fun PrezelIconButtonPreviewOutlined() {
     PrezelTheme {
-        PrezelButtonPreviewByType(type = PrezelButtonType.OUTLINED, content = ::PrezelIconButtonPreviewItem)
+        PrezelButtonPreviewByType(type = PrezelButtonType.OUTLINED, content = ::PrezelIconButtonPreviewItem, isIconOnly = true)
     }
 }
 
@@ -44,7 +44,7 @@ private fun PrezelIconButtonPreviewOutlined() {
 @Composable
 private fun PrezelIconButtonPreviewGhost() {
     PrezelTheme {
-        PrezelButtonPreviewByType(type = PrezelButtonType.GHOST, content = ::PrezelIconButtonPreviewItem)
+        PrezelButtonPreviewByType(type = PrezelButtonType.GHOST, content = ::PrezelIconButtonPreviewItem, isIconOnly = true)
     }
 }
 
@@ -52,11 +52,13 @@ private fun PrezelIconButtonPreviewGhost() {
 private fun PrezelIconButtonPreviewItem(
     style: PrezelButtonStyle,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     PrezelIconButton(
         icon = IconSource(resId = PrezelIcons.Blank),
         onClick = {},
         enabled = enabled,
         style = style,
+        modifier = modifier,
     )
 }
