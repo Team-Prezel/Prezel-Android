@@ -3,6 +3,7 @@ package com.team.prezel.core.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -24,15 +25,27 @@ fun rememberNavigationState(
     startKey: NavKey,
     topLevelKeys: ImmutableSet<NavKey>,
 ): NavigationState {
-    val topLevelStack = rememberNavBackStack(startKey)
-    val subStacks = topLevelKeys.associateWith { key -> rememberNavBackStack(key) }
+    require(startKey in topLevelKeys) {
+        "startKey must be included in topLevelKeys: $startKey"
+    }
 
-    return remember(startKey, topLevelKeys) {
-        NavigationState(
-            startKey = startKey,
-            topLevelStack = topLevelStack,
-            subStacks = subStacks,
-        )
+    return key(startKey, topLevelKeys) {
+        val topLevelStack = rememberNavBackStack(startKey)
+        val orderedTopLevelKeys = topLevelKeys.toList()
+
+        val subStacks = orderedTopLevelKeys.associateWith { topLevelKey ->
+            key(topLevelKey) {
+                rememberNavBackStack(topLevelKey)
+            }
+        }
+
+        remember(topLevelKeys, subStacks) {
+            NavigationState(
+                startKey = startKey,
+                topLevelStack = topLevelStack,
+                subStacks = subStacks,
+            )
+        }
     }
 }
 
@@ -43,10 +56,10 @@ fun rememberNavigationState(
  * @param topLevelStack - 최상위 백 스택입니다. 최상위 키만을 보관합니다.
  * @param subStacks - 각 최상위 키에 대응하는 하위 백 스택들입니다.
  */
-class NavigationState(
+class NavigationState internal constructor(
     val startKey: NavKey,
-    val topLevelStack: NavBackStack<NavKey>,
-    val subStacks: Map<NavKey, NavBackStack<NavKey>>,
+    internal val topLevelStack: NavBackStack<NavKey>,
+    internal val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
     val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
     val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
@@ -55,7 +68,7 @@ class NavigationState(
     val topLevelKeys: Set<NavKey>
         get() = subStacks.keys
 
-    val currentSubStack: NavBackStack<NavKey>
+    internal val currentSubStack: NavBackStack<NavKey>
         get() = subStacks[currentTopLevelKey]
             ?: error("Sub stack for $currentTopLevelKey does not exist")
 }
