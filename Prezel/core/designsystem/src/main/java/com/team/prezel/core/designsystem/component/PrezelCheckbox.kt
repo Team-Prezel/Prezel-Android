@@ -27,6 +27,7 @@ import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 enum class CheckboxSize {
     REGULAR,
@@ -61,7 +62,7 @@ fun PrezelCheckbox(
 
     Box(
         modifier = modifier
-            .size(48.dp)
+            .padding(all = PrezelTheme.spacing.V8)
             .toggleable(
                 value = checked,
                 interactionSource = null,
@@ -93,14 +94,16 @@ private fun PrezelRegularCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    size = CheckboxSize.REGULAR,
                     checked = checkState,
+                    modifier = Modifier.drawDashBorder(),
+                    size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    size = CheckboxSize.REGULAR,
                     checked = !checkState,
+                    modifier = Modifier.drawDashBorder(),
+                    size = CheckboxSize.REGULAR,
                     onCheckedChange = { checkState = it },
                 )
             }
@@ -121,14 +124,16 @@ private fun PrezelLargeCheckboxPreview() {
                 var checkState by remember { mutableStateOf(true) }
 
                 PrezelCheckbox(
-                    size = CheckboxSize.LARGE,
                     checked = checkState,
+                    modifier = Modifier.drawDashBorder(),
+                    size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )
 
                 PrezelCheckbox(
-                    size = CheckboxSize.LARGE,
                     checked = !checkState,
+                    modifier = Modifier.drawDashBorder(),
+                    size = CheckboxSize.LARGE,
                     onCheckedChange = { checkState = it },
                 )
             }
