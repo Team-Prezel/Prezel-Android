@@ -117,7 +117,7 @@ private fun PrezelTopAppBarWithAllIconsPreview() {
                     IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "더보기",
+                            contentDescription = "메뉴",
                         )
                     }
                 },
