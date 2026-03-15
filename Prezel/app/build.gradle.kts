@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -39,6 +40,8 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureProfileApi)
     implementation(projects.featureProfileImpl)
+    implementation(projects.featureLoginApi)
+    implementation(projects.featureLoginImpl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
