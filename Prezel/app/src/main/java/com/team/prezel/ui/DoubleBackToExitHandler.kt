@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalResources
 import com.team.prezel.R
 import com.team.prezel.core.designsystem.component.snackbar.dismissById
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
+import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.ui.LocalSnackbarHostState
 
 private const val SNACKBAR_IDENTIFIER = "DoubleBackToExitHandler"
@@ -24,11 +25,11 @@ private sealed interface BackPressState {
 }
 
 @Composable
-internal fun DoubleBackToExitHandler(appState: PrezelAppState) {
+internal fun DoubleBackToExitHandler(navigationState: NavigationState) {
     var backPressState by remember { mutableStateOf<BackPressState>(BackPressState.Idle) }
     val snackbarState = LocalSnackbarHostState.current
     val resources = LocalResources.current
-    val isTopLevelScreen = appState.navigationState.isTopLevel
+    val isTopLevelScreen = navigationState.currentKey in navigationState.topLevelKeys
 
     LaunchedEffect(backPressState, isTopLevelScreen) {
         if (backPressState == BackPressState.Idle) {
@@ -50,7 +51,7 @@ internal fun DoubleBackToExitHandler(appState: PrezelAppState) {
         )
     }
 
-    LaunchedEffect(appState.navigationState.currentTopLevelKey) {
+    LaunchedEffect(navigationState.currentTopLevelKey) {
         backPressState = BackPressState.Idle
     }
 

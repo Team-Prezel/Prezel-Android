@@ -1,8 +1,7 @@
 package com.team.prezel.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -56,14 +55,17 @@ fun rememberNavigationState(
  * @param topLevelStack - 최상위 백 스택입니다. 최상위 키만을 보관합니다.
  * @param subStacks - 각 최상위 키에 대응하는 하위 백 스택들입니다.
  */
+@Stable
 class NavigationState internal constructor(
     val startKey: NavKey,
     internal val topLevelStack: NavBackStack<NavKey>,
     internal val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
-    val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
-    val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
-    val isTopLevel: Boolean by derivedStateOf { topLevelKeys.contains(currentKey) }
+    val currentTopLevelKey: NavKey
+        get() = topLevelStack.last()
+
+    val currentKey: NavKey
+        get() = currentSubStack.last()
 
     val topLevelKeys: Set<NavKey>
         get() = subStacks.keys

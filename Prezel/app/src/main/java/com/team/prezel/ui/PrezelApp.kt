@@ -38,7 +38,7 @@ fun PrezelApp(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
-        DoubleBackToExitHandler(appState = appState)
+        DoubleBackToExitHandler(navigationState = appState.navigationState)
 
         PrezelAppContent(
             appState = appState,
