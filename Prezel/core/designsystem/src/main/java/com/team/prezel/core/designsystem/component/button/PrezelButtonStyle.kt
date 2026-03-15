@@ -17,6 +17,7 @@ import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.foundation.number.PrezelShapes
 import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
+import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 enum class PrezelButtonType {
@@ -194,7 +195,7 @@ private fun prezelButtonContentColor(
     if (hierarchy == PrezelButtonHierarchy.SECONDARY) return colors.textMedium
 
     return when (type) {
-        PrezelButtonType.FILLED -> colors.textLarge
+        PrezelButtonType.FILLED -> PrezelColorScheme.Dark.textLarge
         PrezelButtonType.OUTLINED -> colors.interactiveRegular
         PrezelButtonType.GHOST -> colors.interactiveRegular
     }
