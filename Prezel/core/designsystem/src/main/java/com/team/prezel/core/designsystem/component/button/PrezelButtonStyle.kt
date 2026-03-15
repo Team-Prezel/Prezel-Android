@@ -3,7 +3,6 @@ package com.team.prezel.core.designsystem.component.button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -18,7 +17,6 @@ import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.foundation.number.PrezelShapes
 import com.team.prezel.core.designsystem.foundation.number.PrezelSpacing
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
-import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 enum class PrezelButtonType {
@@ -196,7 +194,7 @@ private fun prezelButtonContentColor(
     if (hierarchy == PrezelButtonHierarchy.SECONDARY) return colors.textMedium
 
     return when (type) {
-        PrezelButtonType.FILLED -> if (isSystemInDarkTheme()) colors.textLarge else PrezelColorScheme.Dark.textLarge
+        PrezelButtonType.FILLED -> colors.textLarge
         PrezelButtonType.OUTLINED -> colors.interactiveRegular
         PrezelButtonType.GHOST -> colors.interactiveRegular
     }
