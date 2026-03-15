@@ -1,8 +1,8 @@
 package com.team.prezel.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import com.team.prezel.core.navigation.decorator.LoggingDecorator
 import kotlinx.collections.immutable.ImmutableSet
 
 /**
@@ -23,15 +24,27 @@ fun rememberNavigationState(
     startKey: NavKey,
     topLevelKeys: ImmutableSet<NavKey>,
 ): NavigationState {
-    val topLevelStack = rememberNavBackStack(startKey)
-    val subStacks = topLevelKeys.associateWith { key -> rememberNavBackStack(key) }
+    require(startKey in topLevelKeys) {
+        "startKey must be included in topLevelKeys: $startKey"
+    }
 
-    return remember(startKey, topLevelKeys) {
-        NavigationState(
-            startKey = startKey,
-            topLevelStack = topLevelStack,
-            subStacks = subStacks,
-        )
+    return key(startKey, topLevelKeys) {
+        val topLevelStack = rememberNavBackStack(startKey)
+        val orderedTopLevelKeys = topLevelKeys.toList()
+
+        val subStacks = orderedTopLevelKeys.associateWith { topLevelKey ->
+            key(topLevelKey) {
+                rememberNavBackStack(topLevelKey)
+            }
+        }
+
+        remember(topLevelKeys, subStacks) {
+            NavigationState(
+                startKey = startKey,
+                topLevelStack = topLevelStack,
+                subStacks = subStacks,
+            )
+        }
     }
 }
 
@@ -42,23 +55,24 @@ fun rememberNavigationState(
  * @param topLevelStack - 최상위 백 스택입니다. 최상위 키만을 보관합니다.
  * @param subStacks - 각 최상위 키에 대응하는 하위 백 스택들입니다.
  */
-class NavigationState(
+@Stable
+class NavigationState internal constructor(
     val startKey: NavKey,
-    val topLevelStack: NavBackStack<NavKey>,
-    val subStacks: Map<NavKey, NavBackStack<NavKey>>,
+    internal val topLevelStack: NavBackStack<NavKey>,
+    internal val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
-    val currentTopLevelKey: NavKey by derivedStateOf {
-        topLevelStack.last()
-    }
+    val currentTopLevelKey: NavKey
+        get() = topLevelStack.last()
+
+    val currentKey: NavKey
+        get() = currentSubStack.last()
 
     val topLevelKeys: Set<NavKey>
         get() = subStacks.keys
 
-    val currentSubStack: NavBackStack<NavKey>
+    internal val currentSubStack: NavBackStack<NavKey>
         get() = subStacks[currentTopLevelKey]
             ?: error("Sub stack for $currentTopLevelKey does not exist")
-
-    val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
 }
 
 /**
@@ -70,6 +84,7 @@ fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): Snap
         val decorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
             rememberViewModelStoreNavEntryDecorator<NavKey>(),
+            LoggingDecorator(),
         )
 
         rememberDecoratedNavEntries(

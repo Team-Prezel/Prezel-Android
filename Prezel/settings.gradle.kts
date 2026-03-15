@@ -44,6 +44,10 @@ includeAuto(
     ":feature:history:impl",
     ":feature:profile:api",
     ":feature:profile:impl",
+    ":feature:login:api",
+    ":feature:login:impl",
+    ":feature:splash:api",
+    ":feature:splash:impl",
 )
 
 /**

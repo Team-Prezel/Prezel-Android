@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.timber)
 }
