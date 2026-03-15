@@ -48,7 +48,7 @@ data class PrezelButtonStyle(
 )
 
 @Immutable
-internal data class PrezelButtonAppearance private constructor(
+internal data class PrezelButtonAppearance(
     val textStyle: TextStyle,
     val contentColor: Color,
     val contentPadding: PaddingValues,
