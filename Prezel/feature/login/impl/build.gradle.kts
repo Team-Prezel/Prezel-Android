@@ -9,4 +9,5 @@ android {
 dependencies {
     implementation(projects.featureLoginApi)
     implementation(projects.featureHomeApi)
+    implementation(libs.kakao.user)
 }

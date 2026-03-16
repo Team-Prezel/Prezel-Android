@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+private val kakaoNativeAppKey = project.findProperty("KAKAO_NATIVE_APP_KEY") as String? ?: ""
+
 android {
     namespace = "com.team.prezel"
 
@@ -26,6 +28,11 @@ android {
 
     buildFeatures {
         buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
     }
 }
 
@@ -53,4 +60,5 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.kakao.user)
 }

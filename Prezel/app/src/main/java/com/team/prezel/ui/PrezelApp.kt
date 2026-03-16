@@ -68,7 +68,7 @@ private fun PrezelAppContent(
                 snackbarHostState = snackbarHostState,
                 navigationItems = {
                     MAIN_NAV_ITEMS.forEach { (key, item) ->
-                        item(
+                        Item(
                             selected = key == appState.navigationState.currentTopLevelKey,
                             onClick = { navigator.navigate(key) },
                             label = stringResource(item.titleTextId),
