@@ -9,27 +9,39 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.designsystem.component.button.PrezelButton
+import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
+import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
+import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.icon.IconSource
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.clickOnce
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
+import com.team.prezel.feature.login.impl.kakao.KakaoLoginManager
+import com.team.prezel.feature.login.impl.kakao.KakaoLoginResult
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
-import com.team.prezel.feature.login.impl.viewModel.LoginUiState
+import com.team.prezel.feature.login.impl.viewModel.LoginUiIntent
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
 import com.team.prezel.core.designsystem.R as DSR
 
@@ -43,44 +55,80 @@ internal fun SharedTransitionScope.LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val kakaoLoginManager = remember { KakaoLoginManager() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                is LoginUiEffect.NavigateToHome -> navigateToHome()
+                LoginUiEffect.LaunchKakaoLogin -> {
+                    when (kakaoLoginManager.login(context)) {
+                        is KakaoLoginResult.Success -> {
+                            viewModel.onIntent(LoginUiIntent.LoginSucceeded)
+                        }
+
+                        is KakaoLoginResult.Failure -> {
+                            viewModel.onIntent(
+                                LoginUiIntent.LoginFailed(
+                                    message = "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
+                                ),
+                            )
+                        }
+                    }
+                }
+
+                LoginUiEffect.NavigateToHome -> navigateToHome()
+
+                is LoginUiEffect.ShowSnackbar -> {
+                    snackbarHostState.showPrezelSnackbar(
+                        message = effect.message,
+                    )
+                }
             }
         }
     }
 
     LoginScreen(
-        uiState = uiState,
         animatedVisibilityScope = animatedVisibilityScope,
-        onLogin = viewModel::login,
+        isLoading = uiState.isLoading,
+        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
+        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
 
 @Composable
 private fun SharedTransitionScope.LoginScreen(
-    uiState: LoginUiState,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    isLoading: Boolean,
     onLogin: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        LogoImage(
-            animatedVisibilityScope = animatedVisibilityScope,
-            modifier = Modifier.weight(1f),
-        )
+        Column(
+            modifier = modifier.fillMaxSize(),
+        ) {
+            LogoImage(
+                animatedVisibilityScope = animatedVisibilityScope,
+                modifier = Modifier.weight(1f),
+            )
 
-        LoginFooter(
-            enabled = uiState == LoginUiState.Idle,
-            onLogin = onLogin,
+            LoginFooter(isLoading = isLoading, onLogin = onLogin)
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data ->
+                PrezelSnackbar(data = data)
+            },
         )
     }
 }
@@ -112,7 +160,7 @@ private fun SharedTransitionScope.LogoImage(
 
 @Composable
 private fun LoginFooter(
-    enabled: Boolean,
+    isLoading: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -124,9 +172,7 @@ private fun LoginFooter(
 
     AnimatedVisibility(
         visible = isButtonVisible,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(PrezelTheme.spacing.V20),
+        modifier = modifier,
         enter = fadeIn(
             animationSpec = tween(
                 durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
@@ -135,12 +181,14 @@ private fun LoginFooter(
             ),
         ),
     ) {
-        // todo: 카카오 로그인으로 수정 필요
-        PrezelButton(
-            modifier = Modifier.fillMaxWidth(),
-            text = "시작하기",
-            onClick = onLogin,
-            enabled = enabled,
+        PrezelButtonArea(
+            mainButton = ButtonAreaButtonSpec(
+                icon = IconSource(painter = painterResource(PrezelIcons.Kakao)),
+                label = "카카오로 시작하기",
+                enabled = !isLoading,
+                onClick = onLogin.clickOnce(),
+            ),
+            subButton = null,
         )
     }
 }
@@ -149,12 +197,15 @@ private fun LoginFooter(
 @Composable
 private fun LoginScreenPreview() {
     PrezelTheme {
+        val snackbarHostState = remember { SnackbarHostState() }
+
         SharedTransitionLayout {
             AnimatedVisibility(true) {
                 LoginScreen(
-                    uiState = LoginUiState.Idle,
                     animatedVisibilityScope = this,
+                    isLoading = false,
                     onLogin = {},
+                    snackbarHostState = snackbarHostState,
                 )
             }
         }
