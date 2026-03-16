@@ -162,9 +162,7 @@ private fun PrezelDatePickerPreview() {
         mutableStateOf(LocalDate(year = 2026, month = 2, day = 26))
     }
 
-    PreviewSurface(
-        defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
-    ) {
+    PreviewSurface(defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp))) {
         PrezelDatePicker(
             title = "발표 날짜",
             today = LocalDate(year = 2026, month = 2, day = 23),

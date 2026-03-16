@@ -52,8 +52,8 @@ private fun MonthSectionPreview() {
     ) {
         MonthSection(
             yearMonth = YearMonth(year = 2026, month = 2),
-            selectedDate = LocalDate(year = 2026, month = 2, day = 26),
-            today = LocalDate(year = 2026, month = 2, day = 25),
+            selectedDate = LocalDate(year = 2026, month = 2, day = 28),
+            today = LocalDate(year = 2026, month = 2, day = 18),
             onSelect = {},
         )
     }
