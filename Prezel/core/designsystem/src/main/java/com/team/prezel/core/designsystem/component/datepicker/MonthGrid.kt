@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -22,35 +20,38 @@ internal fun MonthGrid(
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
 ) {
-    val (cells, lastWeek) = remember(yearMonth) {
-        val c = buildMonthGrid(yearMonth = yearMonth, firstDayOfWeek = DayOfWeek.SUNDAY)
-        c to lastWeekIndexToRender(c)
+    val visibleWeeks = remember(yearMonth, today) {
+        buildMonthGrid(
+            yearMonth = yearMonth,
+            firstDayOfWeek = DayOfWeek.SUNDAY,
+        ).chunked(7)
+            .filter { week -> week.hasVisibleDate(today) }
     }
 
     Column(modifier = Modifier.padding(top = PrezelTheme.spacing.V16)) {
-        for (week in 0..lastWeek) {
-            WeekRow(cells = cells, week = week, selectedDate = selectedDate, today = today, onSelect = onSelect)
+        visibleWeeks.forEach { week ->
+            WeekRow(
+                week = week,
+                selectedDate = selectedDate,
+                today = today,
+                onSelect = onSelect,
+            )
         }
     }
 }
 
 @Composable
 private fun WeekRow(
-    cells: ImmutableList<LocalDate?>,
-    week: Int,
+    week: List<LocalDate?>,
     selectedDate: LocalDate?,
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
-        for (day in 0 until 7) {
-            val date = cells[week * 7 + day]
-
+        week.forEach { date ->
             if (date == null) {
-                DayCellView(
-                    uiModel = null,
-                ) { }
-                continue
+                DayCellView(uiModel = null) { }
+                return@forEach
             }
 
             val isPast = date < today
@@ -69,17 +70,16 @@ private fun WeekRow(
     }
 }
 
-@BasicPreview
+private fun List<LocalDate?>.hasVisibleDate(today: LocalDate): Boolean = any { date -> date != null && date >= today }
+
+@ThemePreview
 @Composable
 private fun MonthGridPreview() {
-    PreviewSection(
-        title = "DatePicker/MonthGrid",
-        description = "DatePicker에 사용되는 리소스입니다.",
-    ) {
+    PrezelTheme {
         MonthGrid(
-            yearMonth = YearMonth(year = 2026, month = 2),
-            selectedDate = LocalDate(year = 2026, month = 2, day = 26),
-            today = LocalDate(year = 2026, month = 2, day = 25),
+            yearMonth = YearMonth(year = 2026, month = 3),
+            selectedDate = LocalDate(year = 2026, month = 3, day = 22),
+            today = LocalDate(year = 2026, month = 3, day = 16),
             onSelect = {},
         )
     }

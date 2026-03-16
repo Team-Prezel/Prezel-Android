@@ -28,13 +28,3 @@ internal fun buildMonthGrid(
             }
         }.toPersistentList()
 }
-
-internal fun lastWeekIndexToRender(cells: List<LocalDate?>): Int {
-    // 마지막으로 실제 날짜가 존재하는 셀 인덱스 (0..41)
-    val last = cells.indexOfLast { it != null }
-    // month가 비정상일 경우 방어
-    if (last < 0) return 0
-
-    // 주 단위로 올림 → 마지막 날짜가 포함된 주 index (0..5)
-    return (last / 7).coerceIn(0, 5)
-}
