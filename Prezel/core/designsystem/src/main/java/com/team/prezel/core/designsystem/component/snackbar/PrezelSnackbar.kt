@@ -62,12 +62,17 @@ fun PrezelSnackbar(
                     .padding(vertical = PrezelTheme.spacing.V14),
             )
 
-            Spacer(Modifier.width(PrezelTheme.spacing.V16))
-            PrezelButton(
-                text = visuals.actionLabel,
-                onClick = { data.performAction() },
-                style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
-            )
+            visuals.actionLabel?.let { actionLabel ->
+                Spacer(Modifier.width(PrezelTheme.spacing.V16))
+                PrezelButton(
+                    text = actionLabel,
+                    onClick = { data.performAction() },
+                    style = PrezelButtonStyle(
+                        buttonType = PrezelButtonType.GHOST,
+                        buttonSize = PrezelButtonSize.SMALL,
+                    ),
+                )
+            }
         }
     }
 }
@@ -87,7 +92,7 @@ private fun PrezelSnackbarLeadingIcon(
 
 @ThemePreview
 @Composable
-private fun PrezelSnackBarPreview_Cases() {
+private fun PrezelSnackBarPreview() {
     PrezelTheme {
         Column {
             PrezelSnackbar(
@@ -101,10 +106,26 @@ private fun PrezelSnackBarPreview_Cases() {
     }
 }
 
+@ThemePreview
+@Composable
+private fun PrezelToastPreview() {
+    PrezelTheme {
+        Column {
+            PrezelSnackbar(
+                data = previewData(message = "Message", leadingIcon = IconSource(PrezelIcons.Blank)),
+            )
+
+            PrezelSnackbar(
+                data = previewData(message = "Message Message Message Message Message"),
+            )
+        }
+    }
+}
+
 @Composable
 private fun previewData(
     message: String,
-    actionLabel: String,
+    actionLabel: String? = null,
     leadingIcon: IconSource? = null,
 ): SnackbarData =
     PreviewSnackbarData(

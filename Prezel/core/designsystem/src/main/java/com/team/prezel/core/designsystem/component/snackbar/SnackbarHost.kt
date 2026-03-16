@@ -13,7 +13,7 @@ import com.team.prezel.core.designsystem.icon.IconSource
 
 internal data class PrezelSnackbarVisuals(
     override val message: String,
-    override val actionLabel: String,
+    override val actionLabel: String?,
     override val withDismissAction: Boolean = false,
     override val duration: SnackbarDuration,
     val id: String? = null,
@@ -23,14 +23,18 @@ internal data class PrezelSnackbarVisuals(
 
 suspend fun SnackbarHostState.showPrezelSnackbar(
     message: String,
-    actionLabel: String,
-    onAction: () -> Unit,
     leadingIcon: IconSource? = null,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
     id: String? = null,
     onDismiss: (() -> Unit)? = null,
     offsetY: Dp = 0.dp,
 ) {
+    require((actionLabel == null) == (onAction == null)) {
+        "actionLabel과 onAction은 둘 다 있거나 둘 다 없어야 합니다."
+    }
+
     val result = showSnackbar(
         visuals = PrezelSnackbarVisuals(
             message = message,
@@ -43,7 +47,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     )
 
     when (result) {
-        SnackbarResult.ActionPerformed -> onAction.invoke()
+        SnackbarResult.ActionPerformed -> onAction?.invoke()
         SnackbarResult.Dismissed -> onDismiss?.invoke()
     }
 }
