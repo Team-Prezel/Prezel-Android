@@ -9,9 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.onDay
 
 @Composable
 internal fun MonthGrid(
@@ -68,6 +72,27 @@ private fun WeekRow(
             )
         }
     }
+}
+
+private fun buildMonthGrid(
+    yearMonth: YearMonth,
+    firstDayOfWeek: DayOfWeek,
+): ImmutableList<LocalDate?> {
+    val firstOfMonth = yearMonth.onDay(1)
+    val lastDay = yearMonth.numberOfDays
+
+    val shift = ((firstOfMonth.dayOfWeek.isoDayNumber - firstDayOfWeek.isoDayNumber) + 7) % 7
+    val totalCells = 42
+
+    return (0 until totalCells)
+        .map { index ->
+            val dayNumber = index - shift + 1
+            if (dayNumber in 1..lastDay) {
+                yearMonth.onDay(dayNumber)
+            } else {
+                null
+            }
+        }.toPersistentList()
 }
 
 private fun List<LocalDate?>.hasVisibleDate(today: LocalDate): Boolean = any { date -> date != null && date >= today }
