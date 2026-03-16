@@ -1,10 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
     alias(libs.plugins.kotlinx.serialization)
 }
 
-private val kakaoNativeAppKey = project.findProperty("KAKAO_NATIVE_APP_KEY") as String? ?: ""
+val localProperties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+
+val kakaoNativeAppKey =
+    localProperties.getProperty("KAKAO_NATIVE_APP_KEY")
+        ?: error("KAKAO_NATIVE_APP_KEY가 local.properties에 없습니다.")
 
 android {
     namespace = "com.team.prezel"
