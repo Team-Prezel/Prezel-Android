@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,9 +57,10 @@ internal fun SharedTransitionScope.LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val kakaoLoginManager = remember { KakaoLoginManager() }
     val snackbarHostState = remember { SnackbarHostState() }
+    val kakaoLoginManager = remember { KakaoLoginManager() }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -71,9 +73,7 @@ internal fun SharedTransitionScope.LoginScreen(
 
                         is KakaoLoginResult.Failure -> {
                             viewModel.onIntent(
-                                LoginUiIntent.LoginFailed(
-                                    message = "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
-                                ),
+                                LoginUiIntent.LoginFailed(message = loginFailureMessage),
                             )
                         }
                     }
@@ -113,7 +113,7 @@ private fun SharedTransitionScope.LoginScreen(
             .background(PrezelTheme.colors.bgRegular),
     ) {
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
         ) {
             LogoImage(
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -126,9 +126,7 @@ private fun SharedTransitionScope.LoginScreen(
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
-            snackbar = { data ->
-                PrezelSnackbar(data = data)
-            },
+            snackbar = { data -> PrezelSnackbar(data = data) },
         )
     }
 }
