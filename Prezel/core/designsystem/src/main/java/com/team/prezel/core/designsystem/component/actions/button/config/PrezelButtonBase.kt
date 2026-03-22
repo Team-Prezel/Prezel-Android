@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.actions.button
+package com.team.prezel.core.designsystem.component.actions.button.config
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -20,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefault
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 
 @Composable
