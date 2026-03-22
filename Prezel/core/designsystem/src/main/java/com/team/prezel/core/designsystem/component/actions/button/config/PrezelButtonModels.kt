@@ -1,10 +1,6 @@
 package com.team.prezel.core.designsystem.component.actions.button.config
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
  * 버튼의 시각적 타입을 정의합니다.
@@ -53,28 +49,3 @@ enum class ButtonHierarchy {
     /** 보조 액션에 사용되는 계층입니다. */
     SECONDARY,
 }
-
-@Composable
-internal fun Modifier.buttonContentPadding(size: ButtonSize): Modifier =
-    this.padding(
-        horizontal = when (size) {
-            ButtonSize.XSMALL -> PrezelTheme.spacing.V10
-            ButtonSize.SMALL -> PrezelTheme.spacing.V12
-            ButtonSize.REGULAR -> PrezelTheme.spacing.V16
-        },
-        vertical = when (size) {
-            ButtonSize.XSMALL -> PrezelTheme.spacing.V6
-            ButtonSize.SMALL -> PrezelTheme.spacing.V8
-            ButtonSize.REGULAR -> PrezelTheme.spacing.V12
-        },
-    )
-
-@Composable
-internal fun Modifier.iconButtonContentPadding(size: ButtonSize): Modifier =
-    this.padding(
-        all = when (size) {
-            ButtonSize.XSMALL -> PrezelTheme.spacing.V8
-            ButtonSize.SMALL -> PrezelTheme.spacing.V10
-            ButtonSize.REGULAR -> PrezelTheme.spacing.V14
-        },
-    )
