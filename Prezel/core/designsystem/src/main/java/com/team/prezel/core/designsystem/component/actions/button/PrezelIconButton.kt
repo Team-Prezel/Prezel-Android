@@ -97,8 +97,7 @@ private fun PrezelIconButtonContent(
                 } else {
                     Modifier
                 },
-            )
-            .iconButtonContentPadding(size = buttonDefault.size),
+            ).iconButtonContentPadding(size = buttonDefault.size),
         horizontalArrangement = Arrangement.Center,
         leadingIcon = {
             PrezelButtonIcon(
@@ -107,7 +106,6 @@ private fun PrezelIconButtonContent(
             )
         },
     )
-
 }
 
 @Preview(device = "spec:width=1080dp,height=1500dp")
