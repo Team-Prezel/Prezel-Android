@@ -23,21 +23,21 @@ fun PrezelIconButton(
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
     enabled: Boolean = true,
     isRounded: Boolean = false,
-    buttonDefault: PrezelButtonDefault? = null,
+    buttonDefault: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
+        isIconOnly = true,
+        isRounded = isRounded,
+        type = type,
+        size = size,
+        hierarchy = hierarchy,
+        enabled = enabled,
+    ),
     onClick: () -> Unit,
 ) {
     PrezelButtonBase(
         iconResId = iconResId,
         modifier = modifier,
         onClick = onClick,
-        buttonDefault = buttonDefault ?: PrezelButtonDefaults.getDefault(
-            isIconOnly = true,
-            isRounded = isRounded,
-            type = type,
-            size = size,
-            hierarchy = hierarchy,
-            enabled = enabled,
-        ),
+        buttonDefault = buttonDefault,
     )
 }
 

@@ -17,14 +17,21 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 @Composable
 fun PrezelButton(
     text: String,
-    @DrawableRes iconResId: Int,
     modifier: Modifier = Modifier,
+    @DrawableRes iconResId: Int? = null,
     type: ButtonType = ButtonType.FILLED,
     size: ButtonSize = ButtonSize.REGULAR,
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
     enabled: Boolean = true,
     isRounded: Boolean = false,
-    buttonDefault: PrezelButtonDefault? = null,
+    buttonDefault: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
+        isIconOnly = false,
+        isRounded = isRounded,
+        type = type,
+        size = size,
+        hierarchy = hierarchy,
+        enabled = enabled,
+    ),
     onClick: () -> Unit,
 ) {
     PrezelButtonBase(
@@ -32,14 +39,7 @@ fun PrezelButton(
         iconResId = iconResId,
         modifier = modifier,
         onClick = onClick,
-        buttonDefault = buttonDefault ?: PrezelButtonDefaults.getDefault(
-            isIconOnly = false,
-            isRounded = isRounded,
-            type = type,
-            size = size,
-            hierarchy = hierarchy,
-            enabled = enabled,
-        ),
+        buttonDefault = buttonDefault,
     )
 }
 
