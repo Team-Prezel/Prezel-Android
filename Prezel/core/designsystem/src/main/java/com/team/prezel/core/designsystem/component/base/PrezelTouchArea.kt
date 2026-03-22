@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,7 +35,6 @@ fun PrezelTouchArea(
 ) {
     Box(
         modifier = modifier
-            .wrapContentSize()
             .clip(shape = shape)
             .clickable(
                 enabled = enabled,

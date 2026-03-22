@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
@@ -31,14 +30,15 @@ internal fun PrezelButtonBase(
     @DrawableRes iconResId: Int? = null,
 ) {
     PrezelTouchArea(
-        modifier = modifier,
+        modifier = modifier.buttonContainer(buttonDefault),
+        extraTouchPadding = buttonDefault.contentPadding,
         onClick = onClick,
         enabled = buttonDefault.enabled,
         shape = buttonDefault.shape,
         isUseRipple = true,
     ) {
         ButtonContentLayout(
-            modifier = Modifier.buttonContent(buttonDefault),
+            modifier = Modifier,
             horizontalArrangement = buttonDefault.contentArrangement(
                 hasText = text != null,
                 hasIcon = iconResId != null,
@@ -125,11 +125,6 @@ private fun PrezelButtonDefault.contentArrangement(
     hasText: Boolean,
     hasIcon: Boolean,
 ): Arrangement.Horizontal = if (hasText && hasIcon) Arrangement.spacedBy(iconSpacing) else Arrangement.Center
-
-private fun Modifier.buttonContent(buttonDefault: PrezelButtonDefault): Modifier =
-    this
-        .buttonContainer(buttonDefault)
-        .padding(buttonDefault.contentPadding)
 
 private fun Modifier.buttonContainer(buttonDefault: PrezelButtonDefault): Modifier =
     this
