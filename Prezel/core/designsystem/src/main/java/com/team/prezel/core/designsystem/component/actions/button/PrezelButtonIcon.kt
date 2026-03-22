@@ -11,9 +11,9 @@ import androidx.compose.ui.res.painterResource
 
 @Composable
 internal fun PrezelButtonIcon(
-    modifier: Modifier,
     @DrawableRes drawableRes: Int,
     tint: Color,
+    modifier: Modifier = Modifier,
 ) {
     Image(
         modifier = modifier,
