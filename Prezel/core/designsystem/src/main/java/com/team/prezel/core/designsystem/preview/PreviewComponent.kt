@@ -9,15 +9,20 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -84,12 +89,23 @@ internal fun PreviewSurface(
 internal fun PreviewColumn(
     modifier: Modifier = Modifier,
     defaults: PreviewDefaults = PreviewDefaults(),
+    scrollable: Boolean = false,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(defaults.itemSpacing),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val scrollModifier =
+        if (scrollable) {
+            Modifier.verticalScroll(rememberScrollState())
+        } else {
+            Modifier
+        }
+
     Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(scrollModifier),
+        verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         content = content,
     )
@@ -165,6 +181,7 @@ internal fun PreviewSection(
     modifier: Modifier = Modifier,
     defaults: PreviewDefaults = PreviewDefaults(),
     description: String? = null,
+    showDivider: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -176,6 +193,10 @@ internal fun PreviewSection(
             style = PrezelTheme.typography.title2Medium,
             color = PrezelTheme.colors.textLarge,
         )
+
+        if (showDivider) {
+            HorizontalDivider(color = PrezelTheme.colors.borderRegular)
+        }
 
         description?.let { value ->
             Text(
@@ -189,6 +210,45 @@ internal fun PreviewSection(
             defaults = defaults,
             content = content,
         )
+    }
+}
+
+/**
+ * Preview에서 토큰처럼 이름, 값, 샘플 UI를 한 줄에 보여줄 때 사용하는 행 레이아웃입니다.
+ */
+@Composable
+internal fun PreviewValueRow(
+    name: String,
+    valueLabel: String,
+    modifier: Modifier = Modifier,
+    nameWidth: Dp = 120.dp,
+    preview: @Composable () -> Unit,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = name,
+            style = PrezelTheme.typography.body3Medium,
+            color = PrezelTheme.colors.textMedium,
+            modifier = Modifier.width(nameWidth),
+        )
+        Text(
+            text = valueLabel,
+            style = PrezelTheme.typography.body3Regular,
+            color = PrezelTheme.colors.textSmall,
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(4.dp),
+        ) {
+            preview()
+        }
     }
 }
 
