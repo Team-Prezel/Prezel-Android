@@ -150,7 +150,7 @@ private fun PrezelAvatarPreview() {
         ) {
             PrezelAvatar(
                 imageUrl = "https://picsum.photos/200",
-                contentDescription = "Image Type",
+                contentDescription = "이미지",
                 size = PrezelAvatarSize.SMALL,
             )
         }
