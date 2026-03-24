@@ -21,6 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 
+/**
+ * 버튼 계열 컴포넌트가 공통으로 사용하는 실제 렌더링 구현입니다.
+ */
 @Composable
 internal fun PrezelButtonBase(
     text: String?,

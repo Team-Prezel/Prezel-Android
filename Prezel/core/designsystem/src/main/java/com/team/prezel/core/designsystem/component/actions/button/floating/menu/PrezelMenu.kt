@@ -15,6 +15,9 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 플로팅 액션 메뉴 항목을 세로로 배치하는 컨테이너입니다.
+ */
 @Composable
 fun PrezelMenu(
     modifier: Modifier = Modifier,

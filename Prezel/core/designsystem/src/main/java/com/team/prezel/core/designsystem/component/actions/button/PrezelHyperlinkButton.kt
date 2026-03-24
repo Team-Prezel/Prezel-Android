@@ -17,6 +17,9 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 텍스트 링크처럼 보이는 보조 액션 버튼입니다.
+ */
 @Composable
 fun PrezelHyperlinkButton(
     text: String,

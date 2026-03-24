@@ -29,6 +29,12 @@ import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 하단 액션 영역에 주요 버튼과 보조 버튼을 함께 배치합니다.
+ *
+ * `content`에서는 `MainButton`을 먼저 선언하고 이어서 보조 버튼 하나를 추가합니다.
+ * `isVertical`과 `showBackground` 조합에 따라 배치와 기본 스타일이 함께 달라집니다.
+ */
 @Composable
 fun PrezelButtonArea(
     modifier: Modifier = Modifier,

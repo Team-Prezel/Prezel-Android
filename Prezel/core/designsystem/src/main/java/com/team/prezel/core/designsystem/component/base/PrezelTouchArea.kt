@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 시각 크기보다 넓은 터치 여유 영역을 줄 수 있는 클릭 컨테이너입니다.
+ *
+ * `extraTouchPadding`으로 터치 영역을 확보하고 필요할 때 ripple 표시를 끌 수 있습니다.
+ */
 @Composable
 fun PrezelTouchArea(
     modifier: Modifier = Modifier,

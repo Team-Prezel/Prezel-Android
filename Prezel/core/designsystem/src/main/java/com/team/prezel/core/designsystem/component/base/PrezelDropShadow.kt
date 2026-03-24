@@ -34,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 디자인 시스템 그림자 토큰을 적용하고 같은 모서리 반경의 배경을 함께 그립니다.
+ */
 @Composable
 fun Modifier.prezelDropShadow(style: PrezelDropShadowDefaults.PrezelShadowStyle): Modifier {
     val cachedShadows = remember(style) { style.getShadow() }
@@ -270,7 +273,13 @@ private data class ResolvedShadow(
     val maskFilter: BlurMaskFilter?,
 )
 
+/**
+ * [prezelDropShadow]에 전달할 그림자 스타일 프리셋을 제공합니다.
+ */
 object PrezelDropShadowDefaults {
+    /**
+     * 그림자 레이어와 배경 처리를 함께 정의하는 스타일 계약입니다.
+     */
     sealed class PrezelShadowStyle(
         open val borderRadius: Dp,
         open val backgroundColor: Color,
@@ -278,6 +287,7 @@ object PrezelDropShadowDefaults {
         abstract fun getShadow(): List<PrezelShadowToken>
     }
 
+    /** 그림자를 그리지 않는 스타일입니다. */
     data object None : PrezelShadowStyle(
         borderRadius = 0.dp,
         backgroundColor = Color.Transparent,
@@ -285,6 +295,7 @@ object PrezelDropShadowDefaults {
         override fun getShadow(): List<PrezelShadowToken> = emptyList()
     }
 
+    /** 기본 elevation 느낌의 단일 그림자를 적용하는 스타일입니다. */
     data class Regular(
         override val borderRadius: Dp = 0.dp,
         override val backgroundColor: Color = Color.Transparent,
@@ -305,16 +316,7 @@ object PrezelDropShadowDefaults {
     }
 
     /**
-     * data class PrezelShadowToken
-     *
-     * Shadow의 개별 속성을 정의하는 데이터 클래스입니다.
-     * Shadow의 위치, 크기, 색상 등을 설정할 수 있습니다.
-     *
-     * @param offsetX Dp: Shadow의 수평 오프셋입니다.
-     * @param offsetY Dp: Shadow의 수직 오프셋입니다.
-     * @param blurRadius Dp: Shadow의 블러 반경입니다.
-     * @param spreadRadius Dp: Shadow의 확산 반경입니다.
-     * @param color Color: Shadow의 색상입니다.
+     * 개별 그림자 레이어의 오프셋, blur, spread, 색상을 정의합니다.
      */
     data class PrezelShadowToken(
         val offsetX: Dp,

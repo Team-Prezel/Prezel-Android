@@ -9,9 +9,15 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonH
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefault
 
+/**
+ * [PrezelButtonArea] 안에서 액션 버튼을 선언할 때 사용하는 scope입니다.
+ *
+ * `MainButton`을 먼저 선언하고 이어서 보조 버튼 하나를 추가하는 구성을 전제로 합니다.
+ */
 @LayoutScopeMarker
 @Suppress("FunctionName")
 interface ButtonAreaScope {
+    /** 주요 액션 버튼을 추가합니다. */
     fun MainButton(
         @DrawableRes iconResId: Int? = null,
         label: String,
@@ -19,6 +25,7 @@ interface ButtonAreaScope {
         onClick: () -> Unit,
     )
 
+    /** 보조 액션 버튼을 추가합니다. */
     fun SubButton(
         @DrawableRes iconResId: Int? = null,
         label: String,
@@ -26,6 +33,7 @@ interface ButtonAreaScope {
         onClick: () -> Unit,
     )
 
+    /** 버튼 프리셋을 직접 지정해 커스텀 액션 버튼을 추가합니다. */
     fun CustomButton(
         @DrawableRes iconResId: Int? = null,
         label: String,

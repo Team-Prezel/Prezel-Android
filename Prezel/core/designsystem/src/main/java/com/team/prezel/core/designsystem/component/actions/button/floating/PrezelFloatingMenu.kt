@@ -26,6 +26,9 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 확장 가능한 메뉴와 토글 버튼을 함께 배치하는 플로팅 액션 메뉴입니다.
+ */
 @Composable
 fun PrezelFloatingMenu(
     isExpanded: Boolean,

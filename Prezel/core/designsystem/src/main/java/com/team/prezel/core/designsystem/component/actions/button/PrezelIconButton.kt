@@ -14,6 +14,9 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.actions.button.config.previewGhostBorder
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 
+/**
+ * 아이콘만 노출하는 액션 버튼입니다.
+ */
 @Composable
 fun PrezelIconButton(
     @DrawableRes iconResId: Int,

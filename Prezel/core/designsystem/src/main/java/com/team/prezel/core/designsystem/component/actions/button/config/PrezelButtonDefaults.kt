@@ -11,6 +11,9 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 버튼 컴포넌트가 공통으로 사용하는 시각 속성 묶음입니다.
+ */
 @Immutable
 data class PrezelButtonDefault(
     private val contentColor: Color,
@@ -35,7 +38,15 @@ data class PrezelButtonDefault(
     fun borderColor(enabled: Boolean): Color = if (enabled) borderColor else disabledBorderColor
 }
 
+/**
+ * 버튼 타입과 크기에 맞는 기본 스타일 값을 제공합니다.
+ */
 object PrezelButtonDefaults {
+    /**
+     * 버튼 종류와 사용 형태에 맞는 기본 스타일을 계산합니다.
+     *
+     * 커스텀 `config`를 만들 때 기준값으로 사용할 수 있습니다.
+     */
     @Composable
     fun getDefault(
         isIconOnly: Boolean,

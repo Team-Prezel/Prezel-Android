@@ -20,6 +20,9 @@ import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
+/**
+ * 메뉴 scope가 실제로 그리는 클릭 가능한 단일 메뉴 아이템입니다.
+ */
 @Composable
 internal fun PrezelMenuItem(
     label: String,

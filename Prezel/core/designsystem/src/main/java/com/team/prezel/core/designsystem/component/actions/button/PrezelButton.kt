@@ -14,6 +14,9 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.actions.button.config.previewGhostBorder
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 
+/**
+ * 아이콘과 텍스트를 함께 표시할 수 있는 기본 버튼입니다.
+ */
 @Composable
 fun PrezelButton(
     text: String,

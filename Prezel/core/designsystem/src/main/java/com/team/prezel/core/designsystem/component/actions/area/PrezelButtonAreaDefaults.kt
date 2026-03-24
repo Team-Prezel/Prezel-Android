@@ -6,6 +6,9 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 버튼 영역의 배경, 구분선, 내부 여백을 묶은 스타일 값입니다.
+ */
 @Immutable
 data class PrezelButtonAreaDefault(
     val backgroundColor: Color,
@@ -13,7 +16,13 @@ data class PrezelButtonAreaDefault(
     val contentPadding: PaddingValues,
 )
 
+/**
+ * [PrezelButtonArea]의 기본 스타일 값을 계산합니다.
+ */
 object PrezelButtonAreaDefaults {
+    /**
+     * 배경 노출 여부와 중첩 여부에 맞는 기본 스타일을 반환합니다.
+     */
     @Composable
     fun getDefault(
         showBackground: Boolean = false,

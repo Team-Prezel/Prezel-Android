@@ -12,6 +12,9 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonPreviewContent
 import com.team.prezel.core.designsystem.component.actions.button.config.previewGhostBorder
 
+/**
+ * 텍스트만 표시하는 버튼입니다.
+ */
 @Composable
 fun PrezelTextButton(
     text: String,

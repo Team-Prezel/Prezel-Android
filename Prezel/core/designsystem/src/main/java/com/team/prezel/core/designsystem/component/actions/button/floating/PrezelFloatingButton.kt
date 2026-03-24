@@ -21,6 +21,9 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+/**
+ * 확장 상태에 따라 아이콘이 바뀌는 플로팅 액션 버튼입니다.
+ */
 @Composable
 fun PrezelFloatingButton(
     isExpanded: Boolean,
