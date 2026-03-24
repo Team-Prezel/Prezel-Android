@@ -47,9 +47,10 @@ fun PrezelFloatingMenu(
         if (isExpanded) {
             PrezelMenu(
                 size = when (size) {
-                    ButtonSize.SMALL -> MenuSize.SMALL
                     ButtonSize.REGULAR -> MenuSize.REGULAR
-                    else -> MenuSize.REGULAR
+                    ButtonSize.SMALL,
+                    ButtonSize.XSMALL,
+                    -> MenuSize.SMALL
                 },
                 content = items,
             )
