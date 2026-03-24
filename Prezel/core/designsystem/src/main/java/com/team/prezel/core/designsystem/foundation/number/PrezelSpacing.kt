@@ -9,10 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.preview.TokenList
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.persistentListOf
 
@@ -39,11 +40,11 @@ object PrezelSpacing {
     val V80 = 80.dp
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun SpacingTokensPreview() {
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             SpacingSection()
         }
     }
@@ -51,9 +52,11 @@ private fun SpacingTokensPreview() {
 
 @Composable
 private fun SpacingSection() {
-    SectionTitle(title = "Spacing")
-    TokenList(
-        items = persistentListOf(
+    PreviewSection(
+        title = "Spacing",
+        showDivider = true,
+    ) {
+        persistentListOf(
             "V0" to PrezelSpacing.V0,
             "V2" to PrezelSpacing.V2,
             "V4" to PrezelSpacing.V4,
@@ -74,16 +77,20 @@ private fun SpacingSection() {
             "V64" to PrezelSpacing.V64,
             "V72" to PrezelSpacing.V72,
             "V80" to PrezelSpacing.V80,
-        ),
-        preview = { spacing ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .height(8.dp)
-                        .width(spacing)
-                        .background(PrezelTheme.colors.interactiveRegular),
-                )
+        ).forEach { (name, spacing) ->
+            PreviewValueRow(
+                name = name,
+                valueLabel = "${spacing.value}dp",
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .height(8.dp)
+                            .width(spacing)
+                            .background(PrezelTheme.colors.interactiveRegular),
+                    )
+                }
             }
-        },
-    )
+        }
+    }
 }

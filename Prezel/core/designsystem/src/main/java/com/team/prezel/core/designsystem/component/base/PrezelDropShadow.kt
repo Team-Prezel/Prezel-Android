@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -327,7 +327,7 @@ object PrezelDropShadowDefaults {
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelDropShadowPreview() {
     val styles = listOf(

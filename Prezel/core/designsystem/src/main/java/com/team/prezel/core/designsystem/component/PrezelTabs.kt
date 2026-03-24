@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -150,7 +150,7 @@ private fun handleTabClick(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelMediumTabPreview() {
     val tabs = persistentListOf("Label1", "Label2", "Label3")
@@ -179,7 +179,7 @@ private fun PrezelMediumTabPreview() {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelSmallTabPreview() {
     val tabs = persistentListOf("Label1", "Label2")

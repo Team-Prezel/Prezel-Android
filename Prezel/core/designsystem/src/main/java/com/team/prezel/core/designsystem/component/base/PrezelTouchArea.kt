@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -53,7 +53,7 @@ fun PrezelTouchArea(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTouchAreaPreview() {
     PrezelTheme {

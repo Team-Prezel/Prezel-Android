@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.splash.impl.viewModel.SplashUiEffect
@@ -72,7 +72,7 @@ private fun SharedTransitionScope.SplashScreen(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun SplashScreenPreview() {
     PrezelTheme {

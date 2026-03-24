@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.preview.TokenRow
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -29,11 +30,11 @@ object PrezelShapes {
     val V1000 = RoundedCornerShape(PrezelRadius.V1000)
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun ShapesTokensPreview() {
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             ShapesSection()
         }
     }
@@ -41,37 +42,40 @@ private fun ShapesTokensPreview() {
 
 @Composable
 private fun ShapesSection() {
-    SectionTitle(title = "Shapes")
-    ShapeList(
-        items = persistentListOf(
-            "V2" to PrezelShapes.V2,
-            "V4" to PrezelShapes.V4,
-            "V6" to PrezelShapes.V6,
-            "V8" to PrezelShapes.V8,
-            "V12" to PrezelShapes.V12,
-            "V16" to PrezelShapes.V16,
-            "V1000" to PrezelShapes.V1000,
-        ),
-    )
+    PreviewSection(
+        title = "Shapes",
+        showDivider = true,
+    ) {
+        ShapeList(
+            items = persistentListOf(
+                "V2" to PrezelShapes.V2,
+                "V4" to PrezelShapes.V4,
+                "V6" to PrezelShapes.V6,
+                "V8" to PrezelShapes.V8,
+                "V12" to PrezelShapes.V12,
+                "V16" to PrezelShapes.V16,
+                "V1000" to PrezelShapes.V1000,
+            ),
+        )
+    }
 }
 
 @Composable
 private fun ShapeList(items: ImmutableList<Pair<String, RoundedCornerShape>>) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.forEach { (name, shape) ->
-            TokenRow(
+            PreviewValueRow(
                 name = name,
                 valueLabel = "shape",
-                preview = {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(shape)
-                            .background(PrezelTheme.colors.bgLarge)
-                            .border(PrezelStroke.V1, PrezelTheme.colors.borderRegular, shape),
-                    )
-                },
-            )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(shape)
+                        .background(PrezelTheme.colors.bgLarge)
+                        .border(PrezelStroke.V1, PrezelTheme.colors.borderRegular, shape),
+                )
+            }
         }
     }
 }

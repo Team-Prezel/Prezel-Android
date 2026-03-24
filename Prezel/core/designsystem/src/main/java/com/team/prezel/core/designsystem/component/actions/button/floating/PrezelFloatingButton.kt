@@ -18,7 +18,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonS
 import com.team.prezel.core.designsystem.component.base.PrezelDropShadowDefaults
 import com.team.prezel.core.designsystem.component.base.prezelDropShadow
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -48,7 +48,7 @@ fun PrezelFloatingButton(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelFloatingButtonPreview() {
     var expanded by remember { mutableStateOf(false) }

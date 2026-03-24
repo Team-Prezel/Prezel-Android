@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -109,7 +109,7 @@ private fun DefaultAvatarIcon(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelAvatarSizePreview() {
     PrezelTheme {
@@ -133,7 +133,7 @@ private fun PrezelAvatarSizePreview() {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelAvatarTypePreview() {
     PrezelTheme {

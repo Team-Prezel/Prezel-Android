@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -81,7 +81,7 @@ fun PrezelCheckbox(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelRegularCheckboxPreview() {
     PrezelTheme {
@@ -111,7 +111,7 @@ private fun PrezelRegularCheckboxPreview() {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelLargeCheckboxPreview() {
     PrezelTheme {

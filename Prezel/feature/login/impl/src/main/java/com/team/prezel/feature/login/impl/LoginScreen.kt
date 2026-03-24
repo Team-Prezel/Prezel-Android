@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
@@ -145,7 +145,7 @@ private fun LoginFooter(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun LoginScreenPreview() {
     PrezelTheme {

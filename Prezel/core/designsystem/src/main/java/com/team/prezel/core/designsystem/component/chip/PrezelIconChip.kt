@@ -5,9 +5,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 
 @Composable
 fun PrezelIconChip(
@@ -22,11 +22,11 @@ fun PrezelIconChip(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelIconChipPreview() {
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             PrezelChipPreviewByType(
                 type = PrezelChipType.FILLED,
             ) { style -> PrezelIconChipPreviewItem(style) }

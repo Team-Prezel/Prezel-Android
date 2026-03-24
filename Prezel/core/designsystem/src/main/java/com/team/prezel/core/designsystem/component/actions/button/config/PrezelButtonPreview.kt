@@ -15,15 +15,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
-private data class PreviewSection(
+private data class ButtonPreviewGroup(
     val title: String,
     val enabled: Boolean,
     val isRounded: Boolean,
@@ -31,10 +31,10 @@ private data class PreviewSection(
 
 private val previewSections =
     listOf(
-        PreviewSection(title = "Enabled / Default", enabled = true, isRounded = false),
-        PreviewSection(title = "Enabled / Rounded", enabled = true, isRounded = true),
-        PreviewSection(title = "Disabled / Default", enabled = false, isRounded = false),
-        PreviewSection(title = "Disabled / Rounded", enabled = false, isRounded = true),
+        ButtonPreviewGroup(title = "Enabled / Default", enabled = true, isRounded = false),
+        ButtonPreviewGroup(title = "Enabled / Rounded", enabled = true, isRounded = true),
+        ButtonPreviewGroup(title = "Disabled / Default", enabled = false, isRounded = false),
+        ButtonPreviewGroup(title = "Disabled / Rounded", enabled = false, isRounded = true),
     )
 
 @Composable
@@ -42,26 +42,21 @@ internal fun PrezelButtonPreviewContent(
     title: String,
     content: @Composable (ButtonType, ButtonHierarchy, ButtonSize, Boolean, Boolean) -> Unit,
 ) {
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = title)
-            Text(
-                text = "행은 Size, 열은 Type과 Hierarchy 조합입니다. 각 섹션은 Enabled와 Rounded 상태를 구분합니다.",
-                style = PrezelTheme.typography.body3Regular,
-                color = PrezelTheme.colors.textMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray.copy(alpha = 0.4f))
-                    .padding(8.dp),
-            )
-
-            previewSections.forEach { section ->
-                ButtonPreviewSection(
-                    title = section.title,
-                    enabled = section.enabled,
-                    isRounded = section.isRounded,
-                    content = content,
-                )
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            PreviewSection(
+                title = title,
+                description = "행은 Size, 열은 Type과 Hierarchy 조합입니다. 각 섹션은 Enabled와 Rounded 상태를 구분합니다.",
+                showDivider = true,
+            ) {
+                previewSections.forEach { section ->
+                    ButtonPreviewSection(
+                        title = section.title,
+                        enabled = section.enabled,
+                        isRounded = section.isRounded,
+                        content = content,
+                    )
+                }
             }
         }
     }

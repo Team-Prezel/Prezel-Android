@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.DayOfWeek
@@ -68,7 +68,7 @@ private fun WeekRow(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun MonthGridPreview() {
     PrezelTheme {

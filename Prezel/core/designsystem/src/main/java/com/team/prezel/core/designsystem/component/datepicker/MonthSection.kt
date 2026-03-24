@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -42,7 +42,7 @@ internal fun MonthSection(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun MonthSectionPreview() {
     PrezelTheme {

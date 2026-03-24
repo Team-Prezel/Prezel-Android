@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.LocalDate
 
@@ -61,7 +61,7 @@ internal fun RowScope.DayCellView(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun DayCellViewPreview() {
     PrezelTheme {

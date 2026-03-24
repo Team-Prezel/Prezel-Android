@@ -23,7 +23,7 @@ import com.team.prezel.core.designsystem.component.actions.button.floating.menu.
 import com.team.prezel.core.designsystem.component.actions.button.floating.menu.PrezelMenu
 import com.team.prezel.core.designsystem.component.actions.button.floating.menu.PrezelMenuScope
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -68,7 +68,7 @@ fun PrezelFloatingMenu(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelFloatingMenuPreview() {
     var expanded by remember { mutableStateOf(true) }

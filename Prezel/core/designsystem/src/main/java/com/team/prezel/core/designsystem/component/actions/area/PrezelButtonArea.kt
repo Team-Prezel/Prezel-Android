@@ -18,15 +18,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -130,21 +130,16 @@ private val buttonAreaPreviewStates =
 @Preview(device = "spec:width=1080dp,height=1800dp")
 @Composable
 private fun PrezelButtonAreaPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = "Button Area")
-            Text(
-                text = "행은 버튼 상태, 열은 배경 여부입니다. 각 섹션은 배치 방향과 강도 옵션을 구분합니다.",
-                style = PrezelTheme.typography.body3Regular,
-                color = PrezelTheme.colors.textMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray.copy(alpha = 0.4f))
-                    .padding(8.dp),
-            )
-
-            buttonAreaPreviewVariants.forEach { variant ->
-                ButtonAreaPreviewSection(variant = variant)
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            PreviewSection(
+                title = "Button Area",
+                description = "행은 버튼 상태, 열은 배경 여부입니다. 각 섹션은 배치 방향과 강도 옵션을 구분합니다.",
+                showDivider = true,
+            ) {
+                buttonAreaPreviewVariants.forEach { variant ->
+                    ButtonAreaPreviewSection(variant = variant)
+                }
             }
         }
     }
@@ -152,13 +147,7 @@ private fun PrezelButtonAreaPreview() {
 
 @Composable
 private fun ButtonAreaPreviewSection(variant: ButtonAreaPreviewVariant) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = variant.title,
-            style = PrezelTheme.typography.body3Bold,
-            color = PrezelTheme.colors.textLarge,
-        )
-
+    PreviewSection(title = variant.title) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(0.dp),

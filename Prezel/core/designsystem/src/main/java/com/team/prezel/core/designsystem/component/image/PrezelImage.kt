@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelAsyncImage
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -85,7 +85,7 @@ private fun Modifier.prezelImageContainer(
         .then(if (borderStroke != null) Modifier.border(borderStroke, shape) else Modifier)
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelImagePreview() {
     PrezelTheme {

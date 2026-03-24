@@ -25,7 +25,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonS
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -86,7 +86,7 @@ private fun PrezelSnackbarLeadingIcon(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelSnackBarPreview_Cases() {
     PrezelTheme {

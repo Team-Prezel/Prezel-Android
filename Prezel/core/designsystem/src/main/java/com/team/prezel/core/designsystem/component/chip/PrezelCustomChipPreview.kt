@@ -12,28 +12,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelChip_CustomColors_Preview() {
-    PrezelTheme {
-        PreviewScaffold {
-            CustomChipHeader()
-            CustomChipLabelSection()
-            CustomChipIconOnlySection()
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            PreviewSection(
+                title = "Custom Chip",
+                showDivider = true,
+            ) {
+                CustomChipLabelSection()
+                CustomChipIconOnlySection()
+            }
         }
     }
-}
-
-@Composable
-private fun CustomChipHeader() {
-    Text(
-        text = "Custom Chip",
-        style = PrezelTheme.typography.title2Medium,
-    )
 }
 
 @Composable

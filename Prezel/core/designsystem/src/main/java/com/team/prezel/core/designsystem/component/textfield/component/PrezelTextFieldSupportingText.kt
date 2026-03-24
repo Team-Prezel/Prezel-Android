@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldFeedback
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldInteraction
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldState
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -27,7 +27,7 @@ internal fun PrezelTextFieldSupportingText(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTextFieldSupportingTextPreview() {
     PrezelTheme {

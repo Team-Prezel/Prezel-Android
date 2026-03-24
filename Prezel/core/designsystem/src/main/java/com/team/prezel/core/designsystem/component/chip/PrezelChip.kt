@@ -19,9 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 
 @Composable
 fun PrezelChip(
@@ -98,11 +98,11 @@ private fun PrezelChipIcon(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelChipPreview() {
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             PrezelChipPreviewByType(
                 type = PrezelChipType.FILLED,
             ) { style -> PrezelChipPreviewItem(style) }

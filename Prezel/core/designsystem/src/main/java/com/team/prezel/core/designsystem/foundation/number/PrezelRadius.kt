@@ -9,10 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.preview.TokenList
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.persistentListOf
 
@@ -26,19 +27,23 @@ object PrezelRadius {
     val V1000 = 1000.dp
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun RadiusTokensPreview() {
-    PrezelTheme {
-        PreviewScaffold { RadiusSection() }
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            RadiusSection()
+        }
     }
 }
 
 @Composable
 private fun RadiusSection() {
-    SectionTitle(title = "Radius")
-    TokenList(
-        items = persistentListOf(
+    PreviewSection(
+        title = "Radius",
+        showDivider = true,
+    ) {
+        persistentListOf(
             "V2" to PrezelRadius.V2,
             "V4" to PrezelRadius.V4,
             "V6" to PrezelRadius.V6,
@@ -46,20 +51,24 @@ private fun RadiusSection() {
             "V12" to PrezelRadius.V12,
             "V16" to PrezelRadius.V16,
             "V1000" to PrezelRadius.V1000,
-        ),
-        preview = { radius ->
-            val shape = RoundedCornerShape(radius)
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(shape)
-                    .background(PrezelTheme.colors.bgLarge)
-                    .border(
-                        width = PrezelStroke.V1,
-                        color = PrezelTheme.colors.borderRegular,
-                        shape = shape,
-                    ),
-            )
-        },
-    )
+        ).forEach { (name, radius) ->
+            PreviewValueRow(
+                name = name,
+                valueLabel = "${radius.value}dp",
+            ) {
+                val shape = RoundedCornerShape(radius)
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(shape)
+                        .background(PrezelTheme.colors.bgLarge)
+                        .border(
+                            width = PrezelStroke.V1,
+                            color = PrezelTheme.colors.borderRegular,
+                            shape = shape,
+                        ),
+                )
+            }
+        }
+    }
 }

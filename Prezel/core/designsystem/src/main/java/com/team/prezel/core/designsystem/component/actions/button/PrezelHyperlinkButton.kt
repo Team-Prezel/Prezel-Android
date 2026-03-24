@@ -14,7 +14,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonBase
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefault
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -62,7 +62,7 @@ private fun Modifier.prezelButtonUnderline(): Modifier {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelHyperlinkButtonPreview() {
     PrezelTheme {

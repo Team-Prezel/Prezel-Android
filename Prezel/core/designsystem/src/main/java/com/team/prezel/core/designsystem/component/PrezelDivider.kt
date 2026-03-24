@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -10,9 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 enum class PrezelDividerType(
@@ -59,24 +59,30 @@ private fun PrezelDivider(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelDividerPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle(title = "PrezelDivider - Horizontal")
-            Text("PrezelDividerType.DEFAULT")
-            PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
-            Text("PrezelDividerType.THICK")
-            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            PreviewSection(
+                title = "PrezelDivider - Horizontal",
+                showDivider = true,
+            ) {
+                Text("PrezelDividerType.DEFAULT")
+                PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
+                Text("PrezelDividerType.THICK")
+                PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            SectionTitle(title = "PrezelDivider - Vertical")
-            Text("PrezelDividerType.DEFAULT")
-            PrezelVerticalDivider(type = PrezelDividerType.DEFAULT, modifier = Modifier.height(100.dp))
-            Text("PrezelDividerType.THICK")
-            PrezelVerticalDivider(type = PrezelDividerType.THICK, modifier = Modifier.height(100.dp))
+            PreviewSection(
+                title = "PrezelDivider - Vertical",
+                showDivider = true,
+            ) {
+                Text("PrezelDividerType.DEFAULT")
+                PrezelVerticalDivider(type = PrezelDividerType.DEFAULT, modifier = Modifier.height(100.dp))
+                Text("PrezelDividerType.THICK")
+                PrezelVerticalDivider(type = PrezelDividerType.THICK, modifier = Modifier.height(100.dp))
+            }
         }
     }
 }

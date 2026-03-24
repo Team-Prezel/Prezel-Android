@@ -15,8 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -51,17 +52,16 @@ internal object PrezelTypographyScheme {
 )
 @Composable
 private fun PrezelTypographyTitlePreview() {
-    PrezelTheme {
-        PrezelTypographyPreviewContent(
-            title = "Title",
-            items = persistentListOf(
-                "Title1 Medium" to PrezelTheme.typography.title1Medium,
-                "Title1 Bold" to PrezelTheme.typography.title1Bold,
-                "Title2 Medium" to PrezelTheme.typography.title2Medium,
-                "Title2 Bold" to PrezelTheme.typography.title2Bold,
-            ),
-        )
-    }
+    val typography = PrezelTypographyScheme.Default()
+    PrezelTypographyPreviewContent(
+        title = "Title",
+        items = persistentListOf(
+            "Title1 Medium" to typography.title1Medium,
+            "Title1 Bold" to typography.title1Bold,
+            "Title2 Medium" to typography.title2Medium,
+            "Title2 Bold" to typography.title2Bold,
+        ),
+    )
 }
 
 @Preview(
@@ -71,22 +71,21 @@ private fun PrezelTypographyTitlePreview() {
 )
 @Composable
 private fun PrezelTypographyBodyPreview() {
-    PrezelTheme {
-        PrezelTypographyPreviewContent(
-            title = "Body",
-            items = persistentListOf(
-                "Body1 Regular" to PrezelTheme.typography.body1Regular,
-                "Body1 Medium" to PrezelTheme.typography.body1Medium,
-                "Body1 Bold" to PrezelTheme.typography.body1Bold,
-                "Body2 Regular" to PrezelTheme.typography.body2Regular,
-                "Body2 Medium" to PrezelTheme.typography.body2Medium,
-                "Body2 Bold" to PrezelTheme.typography.body2Bold,
-                "Body3 Regular" to PrezelTheme.typography.body3Regular,
-                "Body3 Medium" to PrezelTheme.typography.body3Medium,
-                "Body3 Bold" to PrezelTheme.typography.body3Bold,
-            ),
-        )
-    }
+    val typography = PrezelTypographyScheme.Default()
+    PrezelTypographyPreviewContent(
+        title = "Body",
+        items = persistentListOf(
+            "Body1 Regular" to typography.body1Regular,
+            "Body1 Medium" to typography.body1Medium,
+            "Body1 Bold" to typography.body1Bold,
+            "Body2 Regular" to typography.body2Regular,
+            "Body2 Medium" to typography.body2Medium,
+            "Body2 Bold" to typography.body2Bold,
+            "Body3 Regular" to typography.body3Regular,
+            "Body3 Medium" to typography.body3Medium,
+            "Body3 Bold" to typography.body3Bold,
+        ),
+    )
 }
 
 @Preview(
@@ -96,17 +95,16 @@ private fun PrezelTypographyBodyPreview() {
 )
 @Composable
 private fun PrezelTypographyCaptionPreview() {
-    PrezelTheme {
-        PrezelTypographyPreviewContent(
-            title = "Caption",
-            items = persistentListOf(
-                "Caption1 Regular" to PrezelTheme.typography.caption1Regular,
-                "Caption1 Medium" to PrezelTheme.typography.caption1Medium,
-                "Caption2 Regular" to PrezelTheme.typography.caption2Regular,
-                "Caption2 Medium" to PrezelTheme.typography.caption2Medium,
-            ),
-        )
-    }
+    val typography = PrezelTypographyScheme.Default()
+    PrezelTypographyPreviewContent(
+        title = "Caption",
+        items = persistentListOf(
+            "Caption1 Regular" to typography.caption1Regular,
+            "Caption1 Medium" to typography.caption1Medium,
+            "Caption2 Regular" to typography.caption2Regular,
+            "Caption2 Medium" to typography.caption2Medium,
+        ),
+    )
 }
 
 @Composable
@@ -114,13 +112,16 @@ private fun PrezelTypographyPreviewContent(
     title: String,
     items: ImmutableList<Pair<String, TextStyle>>,
 ) {
-    PreviewScaffold {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            SectionTitle(title = title)
-
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items.forEach { (name, style) ->
-                    TypographyRow(name = name, style = style)
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
+            PreviewSection(
+                title = title,
+                showDivider = true,
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items.forEach { (name, style) ->
+                        TypographyRow(name = name, style = style)
+                    }
                 }
             }
         }
