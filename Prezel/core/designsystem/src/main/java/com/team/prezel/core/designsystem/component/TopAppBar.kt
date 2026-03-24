@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,10 +57,8 @@ private fun prezelTopAppBarColors() =
 @BasicPreview
 @Composable
 private fun PrezelTopAppBarTitleOnlyPreview() {
-    PreviewSurface {
-        PreviewSection(title = "Title Only") {
-            PrezelTopAppBar(title = { Text(text = "제목") })
-        }
+    PreviewSection(title = "Title Only") {
+        PrezelTopAppBar(title = { Text(text = "제목") })
     }
 }
 
@@ -69,20 +66,18 @@ private fun PrezelTopAppBarTitleOnlyPreview() {
 @BasicPreview
 @Composable
 private fun PrezelTopAppBarWithLeadingPreview() {
-    PreviewSurface {
-        PreviewSection(title = "With Leading") {
-            PrezelTopAppBar(
-                title = { Text(text = "제목") },
-                leadingIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "뒤로가기",
-                        )
-                    }
-                },
-            )
-        }
+    PreviewSection(title = "With Leading") {
+        PrezelTopAppBar(
+            title = { Text(text = "제목") },
+            leadingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "뒤로가기",
+                    )
+                }
+            },
+        )
     }
 }
 
@@ -90,33 +85,31 @@ private fun PrezelTopAppBarWithLeadingPreview() {
 @BasicPreview
 @Composable
 private fun PrezelTopAppBarWithAllIconsPreview() {
-    PreviewSurface {
-        PreviewSection(title = "With All Icons") {
-            PrezelTopAppBar(
-                title = { Text(text = "Title") },
-                leadingIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "뒤로가기",
-                        )
-                    }
-                },
-                trailingIcons = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "검색",
-                        )
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "메뉴",
-                        )
-                    }
-                },
-            )
-        }
+    PreviewSection(title = "With All Icons") {
+        PrezelTopAppBar(
+            title = { Text(text = "Title") },
+            leadingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "뒤로가기",
+                    )
+                }
+            },
+            trailingIcons = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "검색",
+                    )
+                }
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "메뉴",
+                    )
+                }
+            },
+        )
     }
 }

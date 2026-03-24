@@ -127,11 +127,11 @@ internal fun PreviewSection(
     description: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    PreviewSurface {
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
-        ) {
+    PreviewSurface(
+        modifier = modifier.fillMaxWidth(),
+        defaults = defaults,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing)) {
             Text(
                 text = title,
                 style = PrezelTheme.typography.title2Medium,
@@ -187,7 +187,7 @@ internal fun PreviewValueRow(
                 )
             }
         }
-        Box(contentAlignment = Alignment.CenterEnd) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
             preview()
         }
     }
