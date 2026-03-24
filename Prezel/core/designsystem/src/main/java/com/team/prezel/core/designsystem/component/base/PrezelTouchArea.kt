@@ -19,7 +19,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 /**
  * 시각 크기보다 넓은 터치 여유 영역을 줄 수 있는 클릭 컨테이너입니다.
@@ -56,13 +58,32 @@ fun PrezelTouchArea(
 @BasicPreview
 @Composable
 private fun PrezelTouchAreaPreview() {
-    PrezelTheme {
-        PrezelTouchArea(onClick = {}) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.Cyan),
-            )
+    PreviewSection(
+        title = "Touch Area",
+        description = "시각 크기와 별도로 터치 가능한 영역을 확인합니다.",
+    ) {
+        PreviewValueRow(name = "Extra Touch Padding (0.dp)") {
+            PrezelTouchArea(onClick = {}) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color.Cyan),
+                )
+            }
+        }
+
+        PreviewValueRow(name = "Extra Touch Padding (12.dp)") {
+            PrezelTouchArea(
+                onClick = {},
+                extraTouchPadding = PaddingValues(12.dp),
+                modifier = Modifier.drawDashBorder(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color.Cyan),
+                )
+            }
         }
     }
 }

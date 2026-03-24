@@ -18,9 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -76,21 +74,13 @@ private fun RowScope.PrezelListTitle(
 @BasicPreview
 @Composable
 private fun PrezelListSmallPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PrezelListPreviewBySize(PrezelListSize.SMALL)
-        }
-    }
+    PrezelListPreviewBySize(PrezelListSize.SMALL)
 }
 
 @BasicPreview
 @Composable
 private fun PrezelListRegularPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PrezelListPreviewBySize(PrezelListSize.REGULAR)
-        }
-    }
+    PrezelListPreviewBySize(PrezelListSize.REGULAR)
 }
 
 @Composable
@@ -133,7 +123,6 @@ private fun PrezelListPreviewBySize(size: PrezelListSize) {
     PreviewSection(
         title = "PrezelList - $size",
         description = "점선 테두리는 컴포넌트 경계를 의미하며,\nnested 상태별 leading/trailing 조합을 확인할 수 있습니다.",
-        showDivider = true,
     ) {
         Text(text = "Nested: False", style = PrezelTheme.typography.body2Bold)
         PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = true)

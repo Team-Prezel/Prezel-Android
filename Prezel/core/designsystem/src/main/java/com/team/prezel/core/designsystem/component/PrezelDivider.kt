@@ -2,7 +2,6 @@ package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,9 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 enum class PrezelDividerType(
@@ -61,28 +59,32 @@ private fun PrezelDivider(
 
 @BasicPreview
 @Composable
-private fun PrezelDividerPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PreviewSection(
-                title = "PrezelDivider - Horizontal",
-                showDivider = true,
-            ) {
-                Text("PrezelDividerType.DEFAULT")
-                PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
-                Text("PrezelDividerType.THICK")
-                PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-            }
+private fun PrezelHorizontalDividerPreview() {
+    PreviewSection(
+        title = "PrezelDivider - Horizontal",
+        description = "Divider는 두 요소 사이를 구분합니다.",
+    ) {
+        PreviewValueRow(name = "DEFAULT") {
+            PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
+        }
+        PreviewValueRow(name = "THICK") {
+            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+        }
+    }
+}
 
-            PreviewSection(
-                title = "PrezelDivider - Vertical",
-                showDivider = true,
-            ) {
-                Text("PrezelDividerType.DEFAULT")
-                PrezelVerticalDivider(type = PrezelDividerType.DEFAULT, modifier = Modifier.height(100.dp))
-                Text("PrezelDividerType.THICK")
-                PrezelVerticalDivider(type = PrezelDividerType.THICK, modifier = Modifier.height(100.dp))
-            }
+@BasicPreview
+@Composable
+private fun PrezelVerticalDividerPreview() {
+    PreviewSection(
+        title = "PrezelDivider - Vertical",
+        description = "Divider는 두 요소 사이를 구분합니다.",
+    ) {
+        PreviewValueRow(name = "DEFAULT", modifier = Modifier.height(100.dp)) {
+            PrezelVerticalDivider(type = PrezelDividerType.DEFAULT)
+        }
+        PreviewValueRow(name = "THICK", modifier = Modifier.height(100.dp)) {
+            PrezelVerticalDivider(type = PrezelDividerType.THICK)
         }
     }
 }

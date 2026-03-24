@@ -24,9 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -61,14 +59,14 @@ fun PrezelButtonArea(
         if (isVertical) {
             ButtonAreaVertical(
                 mainButton = scope.buttons[0],
-                subButton = scope.buttons[1],
+                subButton = scope.buttons.getOrNull(1),
                 modifier = Modifier.padding(config.contentPadding),
             )
         } else {
             ButtonAreaHorizontal(
                 isStrongStrength = isStrongStrength,
                 mainButton = scope.buttons[0],
-                subButton = scope.buttons[1],
+                subButton = scope.buttons.getOrNull(1),
                 modifier = Modifier.padding(config.contentPadding),
             )
         }
@@ -109,17 +107,9 @@ private fun ButtonAreaHorizontal(
 }
 
 private data class ButtonAreaPreviewVariant(
-    val title: String,
     val isVertical: Boolean,
     val isStrongStrength: Boolean,
 )
-
-private val buttonAreaPreviewVariants =
-    listOf(
-        ButtonAreaPreviewVariant(title = "Vertical", isVertical = true, isStrongStrength = true),
-        ButtonAreaPreviewVariant(title = "Horizontal / Strong Strength", isVertical = false, isStrongStrength = true),
-        ButtonAreaPreviewVariant(title = "Horizontal / Weak Strength", isVertical = false, isStrongStrength = false),
-    )
 
 private val buttonAreaPreviewStates =
     listOf(
@@ -129,34 +119,52 @@ private val buttonAreaPreviewStates =
 
 @Preview(device = "spec:width=1080dp,height=1800dp")
 @Composable
-private fun PrezelButtonAreaPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PreviewSection(
-                title = "Button Area",
-                description = "행은 버튼 상태, 열은 배경 여부입니다. 각 섹션은 배치 방향과 강도 옵션을 구분합니다.",
-                showDivider = true,
-            ) {
-                buttonAreaPreviewVariants.forEach { variant ->
-                    ButtonAreaPreviewSection(variant = variant)
-                }
+private fun PrezelButtonAreaVerticalPreview() {
+    PreviewSection(
+        title = "Button Area - Vertical",
+        description = "행은 버튼 상태, 열은 배경 여부입니다. 각 섹션은 배치 방향과 강도 옵션을 구분합니다.",
+    ) {
+        Column {
+            ButtonAreaPreviewHeaderRow()
+
+            buttonAreaPreviewStates.forEach { (enabled, label) ->
+                ButtonAreaPreviewRow(
+                    variant = ButtonAreaPreviewVariant(
+                        isVertical = true,
+                        isStrongStrength = false,
+                    ),
+                    enabled = enabled,
+                    label = label,
+                )
             }
         }
     }
 }
 
+@Preview(device = "spec:width=1080dp,height=1800dp")
 @Composable
-private fun ButtonAreaPreviewSection(variant: ButtonAreaPreviewVariant) {
-    PreviewSection(title = variant.title) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
+private fun PrezelButtonAreaHorizontalPreview() {
+    PreviewSection(
+        title = "Button Area - Horizontal",
+        description = "행은 버튼 상태, 열은 배경 여부입니다. 각 섹션은 배치 방향과 강도 옵션을 구분합니다.",
+    ) {
+        Column {
             ButtonAreaPreviewHeaderRow()
 
             buttonAreaPreviewStates.forEach { (enabled, label) ->
                 ButtonAreaPreviewRow(
-                    variant = variant,
+                    variant = ButtonAreaPreviewVariant(
+                        isVertical = false,
+                        isStrongStrength = true,
+                    ),
+                    enabled = enabled,
+                    label = label,
+                )
+                ButtonAreaPreviewRow(
+                    variant = ButtonAreaPreviewVariant(
+                        isVertical = false,
+                        isStrongStrength = false,
+                    ),
                     enabled = enabled,
                     label = label,
                 )

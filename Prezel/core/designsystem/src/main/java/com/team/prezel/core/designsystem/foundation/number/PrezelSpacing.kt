@@ -2,20 +2,16 @@ package com.team.prezel.core.designsystem.foundation.number
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.persistentListOf
 
 object PrezelSpacing {
     val V0 = 0.dp
@@ -43,46 +39,37 @@ object PrezelSpacing {
 @BasicPreview
 @Composable
 private fun SpacingTokensPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            SpacingSection()
-        }
-    }
-}
-
-@Composable
-private fun SpacingSection() {
     PreviewSection(
         title = "Spacing",
-        showDivider = true,
+        description = "간격에 사용하는 숫자입니다.",
     ) {
-        persistentListOf(
-            "V0" to PrezelSpacing.V0,
-            "V2" to PrezelSpacing.V2,
-            "V4" to PrezelSpacing.V4,
-            "V6" to PrezelSpacing.V6,
-            "V8" to PrezelSpacing.V8,
-            "V10" to PrezelSpacing.V10,
-            "V12" to PrezelSpacing.V12,
-            "V14" to PrezelSpacing.V14,
-            "V16" to PrezelSpacing.V16,
-            "V20" to PrezelSpacing.V20,
-            "V24" to PrezelSpacing.V24,
-            "V28" to PrezelSpacing.V28,
-            "V32" to PrezelSpacing.V32,
-            "V36" to PrezelSpacing.V36,
-            "V40" to PrezelSpacing.V40,
-            "V48" to PrezelSpacing.V48,
-            "V56" to PrezelSpacing.V56,
-            "V64" to PrezelSpacing.V64,
-            "V72" to PrezelSpacing.V72,
-            "V80" to PrezelSpacing.V80,
-        ).forEach { (name, spacing) ->
-            PreviewValueRow(
-                name = name,
-                valueLabel = "${spacing.value}dp",
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+        PreviewColumn(scrollable = true) {
+            listOf(
+                "V0" to PrezelSpacing.V0,
+                "V2" to PrezelSpacing.V2,
+                "V4" to PrezelSpacing.V4,
+                "V6" to PrezelSpacing.V6,
+                "V8" to PrezelSpacing.V8,
+                "V10" to PrezelSpacing.V10,
+                "V12" to PrezelSpacing.V12,
+                "V14" to PrezelSpacing.V14,
+                "V16" to PrezelSpacing.V16,
+                "V20" to PrezelSpacing.V20,
+                "V24" to PrezelSpacing.V24,
+                "V28" to PrezelSpacing.V28,
+                "V32" to PrezelSpacing.V32,
+                "V36" to PrezelSpacing.V36,
+                "V40" to PrezelSpacing.V40,
+                "V48" to PrezelSpacing.V48,
+                "V56" to PrezelSpacing.V56,
+                "V64" to PrezelSpacing.V64,
+                "V72" to PrezelSpacing.V72,
+                "V80" to PrezelSpacing.V80,
+            ).forEach { (name, spacing) ->
+                PreviewValueRow(
+                    name = name,
+                    valueLabel = "${spacing.value}dp",
+                ) {
                     Box(
                         modifier = Modifier
                             .height(8.dp)

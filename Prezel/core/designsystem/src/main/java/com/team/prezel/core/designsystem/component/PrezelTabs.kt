@@ -3,6 +3,7 @@ package com.team.prezel.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewDefaults
+import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -156,24 +159,20 @@ private fun PrezelMediumTabPreview() {
     val tabs = persistentListOf("Label1", "Label2", "Label3")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
-    PrezelTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PrezelTheme.colors.bgRegular),
-        ) {
-            PrezelTabs(
-                tabs = tabs,
-                pagerState = pagerState,
-                size = PrezelTabSize.Regular,
-                modifier = Modifier,
-            ) { page ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("Page: $page")
-                }
+    PreviewScaffold(
+        defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
+    ) {
+        PrezelTabs(
+            tabs = tabs,
+            pagerState = pagerState,
+            size = PrezelTabSize.Regular,
+            modifier = Modifier,
+        ) { page ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Page: $page")
             }
         }
     }
@@ -185,23 +184,19 @@ private fun PrezelSmallTabPreview() {
     val tabs = persistentListOf("Label1", "Label2")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
-    PrezelTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PrezelTheme.colors.bgRegular),
-        ) {
-            PrezelTabs(
-                tabs = tabs,
-                pagerState = pagerState,
-                size = PrezelTabSize.Small,
-            ) { page ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("Page: $page")
-                }
+    PreviewScaffold(
+        defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
+    ) {
+        PrezelTabs(
+            tabs = tabs,
+            pagerState = pagerState,
+            size = PrezelTabSize.Small,
+        ) { page ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Page: $page")
             }
         }
     }

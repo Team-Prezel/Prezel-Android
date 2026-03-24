@@ -10,12 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.persistentListOf
 
 object PrezelRadius {
     val V2 = 2.dp
@@ -30,20 +27,11 @@ object PrezelRadius {
 @BasicPreview
 @Composable
 private fun RadiusTokensPreview() {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            RadiusSection()
-        }
-    }
-}
-
-@Composable
-private fun RadiusSection() {
     PreviewSection(
         title = "Radius",
-        showDivider = true,
+        description = "둥근 정도에 사용하는 숫자입니다.",
     ) {
-        persistentListOf(
+        listOf(
             "V2" to PrezelRadius.V2,
             "V4" to PrezelRadius.V4,
             "V6" to PrezelRadius.V6,
@@ -71,4 +59,8 @@ private fun RadiusSection() {
             }
         }
     }
+}
+
+@Composable
+private fun RadiusSection() {
 }

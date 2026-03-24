@@ -2,20 +2,11 @@ package com.team.prezel.core.designsystem.component.base
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.RoundRect
@@ -32,7 +23,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 
 /**
  * 디자인 시스템 그림자 토큰을 적용하고 같은 모서리 반경의 배경을 함께 그립니다.
@@ -335,31 +327,17 @@ private fun PrezelDropShadowPreview() {
         PrezelDropShadowDefaults.Regular(),
     )
 
-    PrezelTheme {
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = "PrezelDropShadow",
-                style = PrezelTheme.typography.body1Bold,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            styles.forEach { style ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .prezelDropShadow(style = style),
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(text = style.javaClass.simpleName)
-                }
+    PreviewSection(title = "Drop Shadow") {
+        styles.forEach { style ->
+            PreviewValueRow(
+                name = style.javaClass.simpleName,
+                valueLabel = "",
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .prezelDropShadow(style = style),
+                )
             }
         }
     }

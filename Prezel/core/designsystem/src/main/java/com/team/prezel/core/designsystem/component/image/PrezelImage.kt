@@ -3,16 +3,11 @@ package com.team.prezel.core.designsystem.component.image
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelAsyncImage
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -88,52 +85,48 @@ private fun Modifier.prezelImageContainer(
 @BasicPreview
 @Composable
 private fun PrezelImagePreview() {
-    PrezelTheme {
-        Column(
-            modifier = Modifier
-                .background(PrezelTheme.colors.bgRegular)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            PrezelImagePreviewItem(
-                label = "Drawable / No Round / No Border",
+    PreviewSection(
+        title = "Image",
+        description = "round/border 조합별 이미지 콘텐츠를 보여줍니다.",
+    ) {
+        PreviewValueRow(name = "No Round / No Border") {
+            PrezelImage(
+                resId = PrezelIcons.Blank,
+                contentDescription = "",
+                modifier = Modifier.size(100.dp),
                 rounded = false,
                 border = false,
             )
+        }
 
-            PrezelImagePreviewItem(
-                label = "Drawable / Round / No Border",
+        PreviewValueRow(name = "Round / No Border") {
+            PrezelImage(
+                resId = PrezelIcons.Blank,
+                contentDescription = "",
+                modifier = Modifier.size(100.dp),
                 rounded = true,
                 border = false,
             )
+        }
 
-            PrezelImagePreviewItem(
-                label = "Drawable / No Round / Border",
+        PreviewValueRow(name = "No Round / Border") {
+            PrezelImage(
+                resId = PrezelIcons.Blank,
+                contentDescription = "",
+                modifier = Modifier.size(100.dp),
                 rounded = false,
                 border = true,
             )
+        }
 
-            PrezelImagePreviewItem(
-                label = "Drawable / Round / Border",
+        PreviewValueRow(name = "Round / Border") {
+            PrezelImage(
+                resId = PrezelIcons.Blank,
+                contentDescription = "",
+                modifier = Modifier.size(100.dp),
                 rounded = true,
                 border = true,
             )
         }
     }
-}
-
-@Composable
-private fun PrezelImagePreviewItem(
-    label: String,
-    rounded: Boolean,
-    border: Boolean,
-) {
-    Text(text = label)
-    PrezelImage(
-        resId = PrezelIcons.Blank,
-        contentDescription = label,
-        modifier = Modifier.size(100.dp),
-        rounded = rounded,
-        border = border,
-    )
 }

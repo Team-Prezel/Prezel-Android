@@ -1,7 +1,6 @@
 package com.team.prezel.core.designsystem.component.snackbar
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +25,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -89,16 +89,17 @@ private fun PrezelSnackbarLeadingIcon(
 @BasicPreview
 @Composable
 private fun PrezelSnackBarPreview_Cases() {
-    PrezelTheme {
-        Column {
-            PrezelSnackbar(
-                data = previewData(message = "Message", actionLabel = "Action", iconResId = PrezelIcons.Blank),
-            )
+    PreviewSection(
+        title = "Snackbar",
+        description = "유저에게 현재 단계에 대한 정보를 버튼과 함께 제공합니다.",
+    ) {
+        PrezelSnackbar(
+            data = previewData(message = "Message", actionLabel = "Action", iconResId = PrezelIcons.Blank),
+        )
 
-            PrezelSnackbar(
-                data = previewData(message = "Message Message Message Message Message", actionLabel = "Action"),
-            )
-        }
+        PrezelSnackbar(
+            data = previewData(message = "Message Message Message Message Message", actionLabel = "Action"),
+        )
     }
 }
 

@@ -17,9 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -42,22 +40,17 @@ internal fun PrezelButtonPreviewContent(
     title: String,
     content: @Composable (ButtonType, ButtonHierarchy, ButtonSize, Boolean, Boolean) -> Unit,
 ) {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PreviewSection(
-                title = title,
-                description = "행은 Size, 열은 Type과 Hierarchy 조합입니다. 각 섹션은 Enabled와 Rounded 상태를 구분합니다.",
-                showDivider = true,
-            ) {
-                previewSections.forEach { section ->
-                    ButtonPreviewSection(
-                        title = section.title,
-                        enabled = section.enabled,
-                        isRounded = section.isRounded,
-                        content = content,
-                    )
-                }
-            }
+    PreviewSection(
+        title = title,
+        description = "행은 Size, 열은 Type과 Hierarchy 조합입니다. 각 섹션은 Enabled와 Rounded 상태를 구분합니다.",
+    ) {
+        previewSections.forEach { section ->
+            ButtonPreviewSection(
+                title = section.title,
+                enabled = section.enabled,
+                isRounded = section.isRounded,
+                content = content,
+            )
         }
     }
 }

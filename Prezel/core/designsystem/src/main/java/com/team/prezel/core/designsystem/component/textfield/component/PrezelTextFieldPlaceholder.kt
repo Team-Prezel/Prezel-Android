@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -31,10 +33,12 @@ internal fun PrezelTextFieldPlaceholder(
 @BasicPreview
 @Composable
 private fun PrezelTextFieldPlaceholderPreview() {
-    PrezelTheme {
-        PrezelTextFieldPlaceholder(
-            placeholder = "Placeholder",
-            modifier = Modifier.padding(16.dp),
-        )
+    PreviewSurface {
+        PreviewSection(title = "TextField Placeholder") {
+            PrezelTextFieldPlaceholder(
+                placeholder = "Placeholder",
+                modifier = Modifier.padding(16.dp),
+            )
+        }
     }
 }

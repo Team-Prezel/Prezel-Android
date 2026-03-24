@@ -9,17 +9,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -47,34 +39,26 @@ internal data class PreviewDefaults(
 /**
  * 디자인시스템 Preview의 기본 배경, 패딩, 테마를 제공합니다.
  *
- * 대부분의 Preview는 이 컴포넌트로 감싸는 것을 권장합니다.
+ * 대부분의 Preview는 이 컴포넌트를 기본 루트로 사용합니다.
+ * 화면 전체 문맥이 필요한 경우에만 `PreviewScaffold`를 사용합니다.
  */
 @Composable
 internal fun PreviewSurface(
     modifier: Modifier = Modifier,
     defaults: PreviewDefaults = PreviewDefaults(),
-    useSystemInsets: Boolean = false,
     contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable BoxScope.() -> Unit,
 ) {
     PrezelTheme {
         Surface(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxWidth(),
             color = PrezelTheme.colors.bgRegular,
         ) {
-            val containerModifier = Modifier
-                .fillMaxSize()
-                .background(PrezelTheme.colors.bgRegular)
-                .then(
-                    if (useSystemInsets) {
-                        Modifier.padding(WindowInsets.safeDrawing.asPaddingValues())
-                    } else {
-                        Modifier
-                    },
-                ).padding(defaults.screenPadding)
-
             Box(
-                modifier = containerModifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(PrezelTheme.colors.bgRegular)
+                    .padding(defaults.screenPadding),
                 contentAlignment = contentAlignment,
                 content = content,
             )
@@ -94,21 +78,22 @@ internal fun PreviewColumn(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val scrollModifier =
-        if (scrollable) {
-            Modifier.verticalScroll(rememberScrollState())
-        } else {
-            Modifier
-        }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(scrollModifier),
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        content = content,
-    )
+    PrezelTheme {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .then(
+                    if (scrollable) {
+                        Modifier.verticalScroll(rememberScrollState())
+                    } else {
+                        Modifier
+                    },
+                ),
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment,
+            content = content,
+        )
+    }
 }
 
 /**
@@ -121,54 +106,13 @@ internal fun PreviewRow(
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable RowScope.() -> Unit,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
-        verticalAlignment = verticalAlignment,
-        content = content,
-    )
-}
-
-/**
- * Preview에서 반복 가능한 작은 컴포넌트를 그리드 형태로 보여줍니다.
- *
- * 칩, 아이콘 버튼, 배지처럼 여러 변형을 한 번에 확인할 때 유용합니다.
- */
-@Composable
-internal fun <T> PreviewGrid(
-    items: List<T>,
-    modifier: Modifier = Modifier,
-    columns: Int = 2,
-    defaults: PreviewDefaults = PreviewDefaults(),
-    key: ((T) -> Any)? = null,
-    itemContent: @Composable (T) -> Unit,
-) {
-    require(columns > 0) {
-        "columns는 1 이상이어야 합니다."
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(columns),
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
-        verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
-        userScrollEnabled = true,
-    ) {
-        if (key == null) {
-            items(items) { item ->
-                itemContent(item)
-            }
-            return@LazyVerticalGrid
-        }
-
-        items(
-            items = items,
-            key = key,
-        ) { item ->
-            itemContent(item)
-        }
+    PrezelTheme {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
+            verticalAlignment = verticalAlignment,
+            content = content,
+        )
     }
 }
 
@@ -181,35 +125,34 @@ internal fun PreviewSection(
     modifier: Modifier = Modifier,
     defaults: PreviewDefaults = PreviewDefaults(),
     description: String? = null,
-    showDivider: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
-    ) {
-        Text(
-            text = title,
-            style = PrezelTheme.typography.title2Medium,
-            color = PrezelTheme.colors.textLarge,
-        )
-
-        if (showDivider) {
-            HorizontalDivider(color = PrezelTheme.colors.borderRegular)
-        }
-
-        description?.let { value ->
+    PreviewSurface {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
+        ) {
             Text(
-                text = value,
-                style = PrezelTheme.typography.body3Regular,
-                color = PrezelTheme.colors.textRegular,
+                text = title,
+                style = PrezelTheme.typography.title2Medium,
+                color = PrezelTheme.colors.textLarge,
+            )
+
+            description?.let { value ->
+                Text(
+                    text = value,
+                    style = PrezelTheme.typography.body3Regular,
+                    color = PrezelTheme.colors.textRegular,
+                )
+            }
+
+            HorizontalDivider(color = PrezelTheme.colors.borderRegular)
+
+            PreviewColumn(
+                defaults = defaults,
+                content = content,
             )
         }
-
-        PreviewColumn(
-            defaults = defaults,
-            content = content,
-        )
     }
 }
 
@@ -219,9 +162,8 @@ internal fun PreviewSection(
 @Composable
 internal fun PreviewValueRow(
     name: String,
-    valueLabel: String,
     modifier: Modifier = Modifier,
-    nameWidth: Dp = 120.dp,
+    valueLabel: String? = null,
     preview: @Composable () -> Unit,
 ) {
     Row(
@@ -229,24 +171,23 @@ internal fun PreviewValueRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = name,
-            style = PrezelTheme.typography.body3Medium,
-            color = PrezelTheme.colors.textMedium,
-            modifier = Modifier.width(nameWidth),
-        )
-        Text(
-            text = valueLabel,
-            style = PrezelTheme.typography.body3Regular,
-            color = PrezelTheme.colors.textSmall,
-            modifier = Modifier.weight(1f),
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .background(PrezelTheme.colors.bgRegular)
-                .padding(4.dp),
-        ) {
+        Row(modifier = Modifier.weight(1f)) {
+            Text(
+                text = name,
+                style = PrezelTheme.typography.body3Medium,
+                color = PrezelTheme.colors.textMedium,
+                modifier = Modifier.weight(1f),
+            )
+            valueLabel?.let { label ->
+                Text(
+                    text = label,
+                    style = PrezelTheme.typography.body3Regular,
+                    color = PrezelTheme.colors.textSmall,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Box(contentAlignment = Alignment.CenterEnd) {
             preview()
         }
     }

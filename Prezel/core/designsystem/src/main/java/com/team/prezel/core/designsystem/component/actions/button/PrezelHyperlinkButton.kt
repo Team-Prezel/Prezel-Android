@@ -1,7 +1,5 @@
 package com.team.prezel.core.designsystem.component.actions.button
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -15,7 +13,9 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefault
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.drawDashBorder
 
 /**
  * 텍스트 링크처럼 보이는 보조 액션 버튼입니다.
@@ -65,12 +65,14 @@ private fun Modifier.prezelButtonUnderline(): Modifier {
 @BasicPreview
 @Composable
 private fun PrezelHyperlinkButtonPreview() {
-    PrezelTheme {
-        Box(modifier = Modifier.padding(8.dp)) {
-            PrezelHyperlinkButton(
-                text = "자세히 보기",
-                onClick = {},
-            )
-        }
+    PreviewSection(
+        title = "Hyperlink Button",
+        description = "텍스트 링크처럼 보이는 보조 액션 버튼입니다.",
+    ) {
+        PrezelHyperlinkButton(
+            text = "자세히 보기",
+            onClick = {},
+            modifier = Modifier.drawDashBorder(),
+        )
     }
 }

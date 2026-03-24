@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import com.team.prezel.core.designsystem.component.actions.button.floating.menu.
 import com.team.prezel.core.designsystem.component.actions.button.floating.menu.PrezelMenuScope
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -73,11 +73,13 @@ fun PrezelFloatingMenu(
 private fun PrezelFloatingMenuPreview() {
     var expanded by remember { mutableStateOf(true) }
 
-    PrezelTheme {
+    PreviewSection(
+        title = "Floating Menu",
+        description = "확장된 메뉴와 토글 버튼의 배치를 확인합니다.",
+    ) {
         Box(
             modifier = Modifier
                 .background(Color.LightGray)
-                .size(width = 200.dp, height = 300.dp)
                 .padding(8.dp),
         ) {
             PrezelFloatingMenu(

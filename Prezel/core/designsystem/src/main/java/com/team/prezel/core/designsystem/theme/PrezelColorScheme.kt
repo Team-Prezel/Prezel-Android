@@ -14,9 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.ColorTokens
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -230,29 +228,23 @@ private fun PrezelColorsPreviewSection(
     title: String,
     description: String,
     items: ImmutableList<Pair<String, Color>>,
-    colors: PrezelColors = PrezelTheme.colors,
 ) {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PreviewSection(
-                title = title,
-                description = description,
-                showDivider = true,
+    PreviewSection(
+        title = title,
+        description = description,
+    ) {
+        items.forEach { (name, color) ->
+            PreviewValueRow(
+                name = name,
+                valueLabel = String.format(Locale.ROOT, "#%08X", color.toArgb()),
             ) {
-                items.forEach { (name, color) ->
-                    PreviewValueRow(
-                        name = name,
-                        valueLabel = String.format(Locale.ROOT, "#%08X", color.toArgb()),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(color)
-                                .border(0.3.dp, PrezelTheme.colors.solidBlack, RoundedCornerShape(8.dp)),
-                        )
-                    }
-                }
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color)
+                        .border(0.3.dp, PrezelTheme.colors.solidBlack, RoundedCornerShape(8.dp)),
+                )
             }
         }
     }

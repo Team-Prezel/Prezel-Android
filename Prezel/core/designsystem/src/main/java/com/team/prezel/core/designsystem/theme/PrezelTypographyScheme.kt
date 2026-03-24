@@ -1,9 +1,7 @@
 package com.team.prezel.core.designsystem.theme
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -12,12 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
-import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSection
-import com.team.prezel.core.designsystem.preview.PreviewSurface
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -47,14 +43,17 @@ internal object PrezelTypographyScheme {
 
 @Preview(
     showBackground = true,
-    device = "spec:width=800dp,height=600dp",
-    fontScale = 10f,
+    device = "spec:width=900dp,height=600dp",
 )
+private annotation class TypographyPreview
+
+@TypographyPreview
 @Composable
 private fun PrezelTypographyTitlePreview() {
     val typography = PrezelTypographyScheme.Default()
     PrezelTypographyPreviewContent(
         title = "Title",
+        description = "페이지나 섹션의 주요 제목 등 핵심 정보를 강조하는 데 사용하는 스타일입니다.",
         items = persistentListOf(
             "Title1 Medium" to typography.title1Medium,
             "Title1 Bold" to typography.title1Bold,
@@ -64,16 +63,13 @@ private fun PrezelTypographyTitlePreview() {
     )
 }
 
-@Preview(
-    showBackground = true,
-    device = "spec:width=800dp,height=1000dp",
-    fontScale = 10f,
-)
+@TypographyPreview
 @Composable
 private fun PrezelTypographyBodyPreview() {
     val typography = PrezelTypographyScheme.Default()
     PrezelTypographyPreviewContent(
         title = "Body",
+        description = "일반 본문과 설명, 단일 문장 또는 단락 등의 주된 콘텐츠 전달에 사용하는 스타일입니다.",
         items = persistentListOf(
             "Body1 Regular" to typography.body1Regular,
             "Body1 Medium" to typography.body1Medium,
@@ -88,16 +84,13 @@ private fun PrezelTypographyBodyPreview() {
     )
 }
 
-@Preview(
-    showBackground = true,
-    device = "spec:width=800dp,height=600dp",
-    fontScale = 10f,
-)
+@TypographyPreview
 @Composable
 private fun PrezelTypographyCaptionPreview() {
     val typography = PrezelTypographyScheme.Default()
     PrezelTypographyPreviewContent(
         title = "Caption",
+        description = "부가 정보, 안내, 설명, 작성 시간 등 메인 콘텐츠를 보조하는 짧은 정보를 전달할 때 사용하는 스타일입니다.",
         items = persistentListOf(
             "Caption1 Regular" to typography.caption1Regular,
             "Caption1 Medium" to typography.caption1Medium,
@@ -110,59 +103,18 @@ private fun PrezelTypographyCaptionPreview() {
 @Composable
 private fun PrezelTypographyPreviewContent(
     title: String,
+    description: String,
     items: ImmutableList<Pair<String, TextStyle>>,
 ) {
-    PreviewSurface {
-        PreviewColumn(scrollable = true) {
-            PreviewSection(
-                title = title,
-                showDivider = true,
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items.forEach { (name, style) ->
-                        TypographyRow(name = name, style = style)
-                    }
-                }
+    PreviewSection(
+        title = title,
+        description = description,
+    ) {
+        items.forEach { (name, style) ->
+            PreviewValueRow(name = name) {
+                TypographySampleText(style = style)
             }
         }
-    }
-}
-
-@Composable
-private fun TypographyRow(
-    name: String,
-    style: TextStyle,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = PrezelTheme.colors.bgRegular,
-                shape = RoundedCornerShape(12.dp),
-            ),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            val fontSize = style.fontSize
-            val lineHeight = style.lineHeight
-            val letterSpacing = style.letterSpacing
-            val fontWeight = style.fontWeight
-
-            Text(
-                text = buildString {
-                    append("$name (")
-                    append("size: $fontSize")
-                    if (lineHeight.isSpecified) append(" · lh: $lineHeight")
-                    if (letterSpacing.isSpecified) append(" · ls: $letterSpacing")
-                    if (fontWeight != null) append(" · w: ${fontWeight.weight}")
-                    append(")")
-                },
-                style = PrezelTheme.typography.body3Bold,
-                color = PrezelTheme.colors.textMedium,
-            )
-        }
-
-        TypographySampleText(style = style)
     }
 }
 

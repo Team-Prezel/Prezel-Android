@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.PreviewSection
 
 /**
  * 점선 테두리를 그리는 [Modifier] 확장 함수.
@@ -73,7 +73,10 @@ fun Modifier.drawDashBorder(
 @BasicPreview
 @Composable
 private fun DrawDashBorderPreview() {
-    PrezelTheme {
+    PreviewSection(
+        title = "Dashed Border",
+        description = "테두리 외곽선을 점선으로 표시합니다.",
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

@@ -1,10 +1,8 @@
 package com.team.prezel.core.designsystem.component.actions.button.floating.menu
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -13,11 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
-import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
 /**
@@ -77,34 +75,24 @@ private fun PrezelMenuItemLayout(
 @BasicPreview
 @Composable
 private fun PrezelMenuMenuItemPreview() {
-    PrezelTheme {
-        Column(modifier = Modifier.padding(8.dp)) {
-            PrezelMenu(
-                size = MenuSize.REGULAR,
-                modifier = Modifier.drawDashBorder(
-                    shape = PrezelMenuDefaults.getDefault(size = MenuSize.REGULAR).shape,
-                ),
-            ) {
-                MenuItem(
-                    label = "Label",
-                    iconResId = PrezelIcons.Blank,
-                    onClick = {},
-                )
-            }
-
-            PrezelMenu(
-                size = MenuSize.SMALL,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .drawDashBorder(
-                        shape = PrezelMenuDefaults.getDefault(size = MenuSize.SMALL).shape,
+    PreviewSection(
+        title = "Floating Menu Item",
+        description = "Floating Menu Item의 크기를 조절합니다.",
+    ) {
+        MenuSize.entries.forEach { size ->
+            PreviewValueRow(name = size.name) {
+                PrezelMenu(
+                    size = size,
+                    modifier = Modifier.drawDashBorder(
+                        shape = PrezelMenuDefaults.getDefault(size = size).shape,
                     ),
-            ) {
-                MenuItem(
-                    label = "Label",
-                    iconResId = PrezelIcons.Blank,
-                    onClick = {},
-                )
+                ) {
+                    MenuItem(
+                        label = "Label",
+                        iconResId = PrezelIcons.Blank,
+                        onClick = {},
+                    )
+                }
             }
         }
     }
