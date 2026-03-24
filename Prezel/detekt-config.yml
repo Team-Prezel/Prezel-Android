@@ -3,61 +3,53 @@ build:
 
 config:
     validation: true
-    warningsAsErrors: false
-    checkExhaustiveness: false
-
-processors:
-    active: true
 
 style:
-    active: true
+    ReturnCount:
+        active: false
     MaxLineLength:
         active: true
         maxLineLength: 150
     MagicNumber:
         active: false
-    ReturnCount:
-        active: true
-        max: 3
     UnusedPrivateMember:
-        active: true
         ignoreAnnotated:
             - Preview
             - ThemePreview
-    WildcardImport:
-        active: true
-    DestructuringDeclarationWithTooManyEntries:
-        active: false
 
 complexity:
-    active: true
     LongMethod:
-        active: true
         threshold: 50
         ignoreAnnotated:
             - Preview
             - ThemePreview
-    LongParameterList:
-        active: false
-    CyclomaticComplexMethod:
-        active: true
-        threshold: 15
     NestedBlockDepth:
-        active: true
         threshold: 4
+    LongParameterList:
+        active: true
+        functionThreshold: 10
+        constructorThreshold: 10
+        ignoreAnnotated:
+            - Composable
+
+    TooManyFunctions:
+        active: true
+        thresholdInFiles: 20
+        thresholdInClasses: 15
+        thresholdInInterfaces: 12
+        thresholdInObjects: 20
+        thresholdInEnums: 10
+        ignoreAnnotatedFunctions:
+            - Preview
 
 naming:
-    active: true
-    MatchingDeclarationName:
-        active: false
     FunctionNaming:
         active: true
         ignoreAnnotated:
             - Composable
             - Preview
-
-potential-bugs:
-    active: true
+    MatchingDeclarationName:
+        active: false
 
 exceptions:
     active: true
