@@ -67,15 +67,8 @@ internal fun SharedTransitionScope.LoginScreen(
             when (effect) {
                 LoginUiEffect.LaunchKakaoLogin -> {
                     when (kakaoLoginManager.login(context)) {
-                        is KakaoLoginResult.Success -> {
-                            viewModel.onIntent(LoginUiIntent.LoginSucceeded)
-                        }
-
-                        is KakaoLoginResult.Failure -> {
-                            viewModel.onIntent(
-                                LoginUiIntent.LoginFailed(message = loginFailureMessage),
-                            )
-                        }
+                        is KakaoLoginResult.Success -> viewModel.onLoginSuccess()
+                        is KakaoLoginResult.Failure -> viewModel.onLoginFailure(message = loginFailureMessage)
                     }
                 }
 

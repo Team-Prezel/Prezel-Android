@@ -25,8 +25,24 @@ class LoginViewModel
         fun onIntent(intent: LoginUiIntent) {
             when (intent) {
                 LoginUiIntent.OnClickLogin -> handleClickLogin()
-                LoginUiIntent.LoginSucceeded -> handleLoginSuccess()
-                is LoginUiIntent.LoginFailed -> handleLoginFailure(intent.message)
+            }
+        }
+
+        fun onLoginSuccess() {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = false) }
+                _uiEffect.send(LoginUiEffect.NavigateToHome)
+            }
+        }
+
+        fun onLoginFailure(message: String?) {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = false) }
+                _uiEffect.send(
+                    LoginUiEffect.ShowSnackbar(
+                        message ?: "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
+                    ),
+                )
             }
         }
 
@@ -36,24 +52,6 @@ class LoginViewModel
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
                 _uiEffect.send(LoginUiEffect.LaunchKakaoLogin)
-            }
-        }
-
-        private fun handleLoginSuccess() {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(LoginUiEffect.NavigateToHome)
-            }
-        }
-
-        private fun handleLoginFailure(message: String?) {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(
-                    LoginUiEffect.ShowSnackbar(
-                        message ?: "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
-                    ),
-                )
             }
         }
     }
