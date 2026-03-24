@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component.actions.area
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,58 +24,46 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
-import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefault
-import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.SectionTitle
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-@Immutable
-data class ButtonAreaButtonSpec(
-    @param:DrawableRes val iconResId: Int? = null,
-    val label: String,
-    val enabled: Boolean = true,
-    val onClick: () -> Unit,
-)
-
 @Composable
 fun PrezelButtonArea(
-    mainButton: ButtonAreaButtonSpec,
     modifier: Modifier = Modifier,
-    subButton: ButtonAreaButtonSpec? = null,
     isVertical: Boolean = true,
-    showBackground: Boolean = false,
     isStrongStrength: Boolean = true,
+    showBackground: Boolean = false,
     isNested: Boolean = false,
     config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(
         showBackground = showBackground,
         isNested = isNested,
     ),
+    content: @Composable ButtonAreaScope.() -> Unit,
 ) {
-    Column(modifier = modifier) {
-        if (showBackground) PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+    val scope = remember { DefaultButtonAreaScope() }
+    scope.content()
 
-        val contentModifier = Modifier
-            .background(config.backgroundColor)
-            .padding(config.contentPadding)
+    Column(
+        modifier = modifier
             .fillMaxWidth()
+            .background(config.backgroundColor),
+    ) {
+        PrezelHorizontalDivider(type = PrezelDividerType.THICK, color = config.borderColor)
 
         if (isVertical) {
             ButtonAreaVertical(
-                modifier = contentModifier,
-                mainButton = mainButton,
-                subButton = subButton,
-                buttonAreaDefault = config,
+                mainButton = scope.buttons[0],
+                subButton = scope.buttons[1],
+                modifier = Modifier.padding(config.contentPadding),
             )
         } else {
             ButtonAreaHorizontal(
-                modifier = contentModifier,
                 isStrongStrength = isStrongStrength,
-                mainButton = mainButton,
-                subButton = subButton,
-                buttonAreaDefault = config,
+                mainButton = scope.buttons[0],
+                subButton = scope.buttons[1],
+                modifier = Modifier.padding(config.contentPadding),
             )
         }
     }
@@ -84,90 +71,35 @@ fun PrezelButtonArea(
 
 @Composable
 private fun ButtonAreaVertical(
-    modifier: Modifier,
-    mainButton: ButtonAreaButtonSpec,
-    subButton: ButtonAreaButtonSpec?,
-    buttonAreaDefault: PrezelButtonAreaDefault,
+    mainButton: @Composable (Modifier) -> Unit,
+    subButton: @Composable ((Modifier) -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        PrezelButton(
-            modifier = Modifier.fillMaxWidth(),
-            text = mainButton.label,
-            iconResId = mainButton.iconResId,
-            onClick = mainButton.onClick,
-            enabled = mainButton.enabled,
-            buttonDefault = buttonAreaDefault.mainButtonDefault.applyEnabled(mainButton.enabled),
-        )
+        mainButton(Modifier.fillMaxWidth())
 
         if (subButton != null) {
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
-            PrezelButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = subButton.label,
-                iconResId = subButton.iconResId,
-                onClick = subButton.onClick,
-                enabled = subButton.enabled,
-                buttonDefault = buttonAreaDefault.subButtonDefault.applyEnabled(subButton.enabled),
-            )
+            subButton(Modifier.fillMaxWidth())
         }
     }
 }
 
 @Composable
 private fun ButtonAreaHorizontal(
-    modifier: Modifier,
-    mainButton: ButtonAreaButtonSpec,
-    subButton: ButtonAreaButtonSpec?,
     isStrongStrength: Boolean,
-    buttonAreaDefault: PrezelButtonAreaDefault,
+    mainButton: @Composable (Modifier) -> Unit,
+    subButton: @Composable ((Modifier) -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
         if (subButton != null) {
-            PrezelButton(
-                modifier = if (isStrongStrength) Modifier else Modifier.weight(1f),
-                text = subButton.label,
-                iconResId = subButton.iconResId,
-                onClick = subButton.onClick,
-                enabled = subButton.enabled,
-                buttonDefault = buttonAreaDefault.subButtonDefault.applyEnabled(subButton.enabled),
-            )
+            subButton(if (isStrongStrength) Modifier else Modifier.weight(1f))
             Spacer(modifier = Modifier.width(PrezelTheme.spacing.V12))
         }
 
-        PrezelButton(
-            modifier = Modifier.weight(1f),
-            text = mainButton.label,
-            iconResId = mainButton.iconResId,
-            onClick = mainButton.onClick,
-            enabled = mainButton.enabled,
-            buttonDefault = buttonAreaDefault.mainButtonDefault.applyEnabled(mainButton.enabled),
-        )
+        mainButton(Modifier.weight(1f))
     }
-}
-
-@Composable
-private fun PrezelButtonDefault.applyEnabled(enabled: Boolean): PrezelButtonDefault {
-    if (this.enabled == enabled) return this
-
-    val resolvedStateDefault = PrezelButtonDefaults.getDefault(
-        isIconOnly = false,
-        type = type,
-        size = size,
-        hierarchy = hierarchy,
-        enabled = enabled,
-    )
-
-    return copy(
-        contentColor = resolvedStateDefault.contentColor,
-        backgroundColor = resolvedStateDefault.backgroundColor,
-        borderColor = resolvedStateDefault.borderColor,
-        borderWidth = resolvedStateDefault.borderWidth,
-        shape = resolvedStateDefault.shape,
-        textStyle = resolvedStateDefault.textStyle,
-        contentPadding = resolvedStateDefault.contentPadding,
-        iconSpacing = resolvedStateDefault.iconSpacing,
-        iconSize = resolvedStateDefault.iconSize,
-    )
 }
 
 private data class ButtonAreaPreviewVariant(
@@ -302,21 +234,26 @@ private fun ButtonAreaPreviewSample(
     enabled: Boolean,
     showBackground: Boolean,
 ) {
-    val button = ButtonAreaButtonSpec(
-        label = "Label",
-        iconResId = PrezelIcons.Blank,
-        enabled = enabled,
-        onClick = {},
-    )
-
     PrezelButtonArea(
         modifier = Modifier.fillMaxWidth(),
         isVertical = variant.isVertical,
         isStrongStrength = variant.isStrongStrength,
         showBackground = showBackground,
-        mainButton = button,
-        subButton = button,
-    )
+    ) {
+        MainButton(
+            iconResId = PrezelIcons.Blank,
+            label = "Label",
+            enabled = enabled,
+            onClick = {},
+        )
+
+        SubButton(
+            iconResId = PrezelIcons.Blank,
+            label = "Label",
+            enabled = enabled,
+            onClick = {},
+        )
+    }
 }
 
 @Composable
