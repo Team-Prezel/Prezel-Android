@@ -29,8 +29,7 @@ import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
-import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
-import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.DateTimeUnit
@@ -113,15 +112,15 @@ private fun DatePickerFooter(
     onConfirm: (LocalDate) -> Unit,
 ) {
     PrezelButtonArea(
-        mainButton = ButtonAreaButtonSpec(
+        isVertical = false,
+        showBackground = true,
+    ) {
+        MainButton(
             label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
             enabled = selectedDate != null,
             onClick = { selectedDate?.let(onConfirm) },
-        ),
-        subButton = null,
-        isVertical = false,
-        showBackground = true,
-    )
+        )
+    }
 }
 
 @Composable

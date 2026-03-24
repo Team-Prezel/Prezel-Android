@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.component.button.PrezelHyperlinkButton
+import com.team.prezel.core.designsystem.component.actions.button.PrezelHyperlinkButton
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles

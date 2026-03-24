@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldPlaceholder
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldSupportingText
