@@ -23,23 +23,26 @@ import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 
 @Composable
 internal fun PrezelButtonBase(
+    text: String?,
+    @DrawableRes iconResId: Int?,
+    enabled: Boolean,
     onClick: () -> Unit,
-    buttonDefault: PrezelButtonDefault,
+    config: PrezelButtonDefault,
     modifier: Modifier = Modifier,
-    text: String? = null,
-    @DrawableRes iconResId: Int? = null,
+    layoutModifier: Modifier = Modifier,
+    isUseRipple: Boolean = true,
 ) {
     PrezelTouchArea(
-        modifier = modifier.buttonContainer(buttonDefault),
-        extraTouchPadding = buttonDefault.contentPadding,
+        modifier = modifier.buttonContainer(enabled = enabled, config = config),
+        extraTouchPadding = config.contentPadding,
         onClick = onClick,
-        enabled = buttonDefault.enabled,
-        shape = buttonDefault.shape,
-        isUseRipple = true,
+        enabled = enabled,
+        shape = config.shape,
+        isUseRipple = isUseRipple,
     ) {
         ButtonContentLayout(
-            modifier = Modifier,
-            horizontalArrangement = buttonDefault.contentArrangement(
+            modifier = layoutModifier,
+            horizontalArrangement = config.contentArrangement(
                 hasText = text != null,
                 hasIcon = iconResId != null,
             ),
@@ -47,7 +50,8 @@ internal fun PrezelButtonBase(
                 {
                     ButtonLabel(
                         text = buttonText,
-                        buttonDefault = buttonDefault,
+                        enabled = enabled,
+                        config = config,
                     )
                 }
             },
@@ -55,7 +59,8 @@ internal fun PrezelButtonBase(
                 {
                     ButtonLeadingIcon(
                         drawableRes = drawableRes,
-                        buttonDefault = buttonDefault,
+                        enabled = enabled,
+                        config = config,
                     )
                 }
             },
@@ -95,12 +100,13 @@ private fun ButtonContentLayout(
 @Composable
 private fun ButtonLabel(
     text: String,
-    buttonDefault: PrezelButtonDefault,
+    enabled: Boolean,
+    config: PrezelButtonDefault,
 ) {
     Text(
         text = text,
-        style = buttonDefault.textStyle,
-        color = buttonDefault.contentColor,
+        style = config.textStyle,
+        color = config.contentColor(enabled = enabled),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center,
@@ -110,13 +116,14 @@ private fun ButtonLabel(
 @Composable
 private fun ButtonLeadingIcon(
     @DrawableRes drawableRes: Int,
-    buttonDefault: PrezelButtonDefault,
+    enabled: Boolean,
+    config: PrezelButtonDefault,
 ) {
     Image(
-        modifier = Modifier.size(buttonDefault.iconSize),
+        modifier = Modifier.size(config.iconSize),
         painter = painterResource(id = drawableRes),
         contentScale = ContentScale.FillHeight,
-        colorFilter = ColorFilter.tint(color = buttonDefault.contentColor),
+        colorFilter = ColorFilter.tint(color = config.contentColor(enabled = enabled)),
         contentDescription = null,
     )
 }
@@ -126,16 +133,19 @@ private fun PrezelButtonDefault.contentArrangement(
     hasIcon: Boolean,
 ): Arrangement.Horizontal = if (hasText && hasIcon) Arrangement.spacedBy(iconSpacing) else Arrangement.Center
 
-private fun Modifier.buttonContainer(buttonDefault: PrezelButtonDefault): Modifier =
+private fun Modifier.buttonContainer(
+    enabled: Boolean,
+    config: PrezelButtonDefault,
+): Modifier =
     this
-        .clip(shape = buttonDefault.shape)
-        .background(color = buttonDefault.backgroundColor)
+        .clip(shape = config.shape)
+        .background(color = config.backgroundColor(enabled = enabled))
         .then(
-            if (buttonDefault.hasBorder) {
+            if (config.hasBorder) {
                 Modifier.border(
-                    width = buttonDefault.borderWidth,
-                    color = buttonDefault.borderColor,
-                    shape = buttonDefault.shape,
+                    width = config.borderWidth,
+                    color = config.borderColor(enabled = enabled),
+                    shape = config.shape,
                 )
             } else {
                 Modifier

@@ -13,13 +13,12 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Immutable
 data class PrezelButtonDefault(
-    val type: ButtonType,
-    val size: ButtonSize,
-    val hierarchy: ButtonHierarchy,
-    val enabled: Boolean,
-    val contentColor: Color,
-    val backgroundColor: Color,
-    val borderColor: Color,
+    private val contentColor: Color,
+    private val disabledContentColor: Color,
+    private val backgroundColor: Color,
+    private val disabledBackgroundColor: Color,
+    private val borderColor: Color,
+    private val disabledBorderColor: Color,
     val borderWidth: Dp,
     val shape: RoundedCornerShape,
     val textStyle: TextStyle,
@@ -28,20 +27,28 @@ data class PrezelButtonDefault(
     val iconSize: Dp,
 ) {
     val hasBorder: Boolean = borderWidth > 0.dp
+
+    fun contentColor(enabled: Boolean): Color = if (enabled) contentColor else disabledContentColor
+
+    fun backgroundColor(enabled: Boolean): Color = if (enabled) backgroundColor else disabledBackgroundColor
+
+    fun borderColor(enabled: Boolean): Color = if (enabled) borderColor else disabledBorderColor
 }
 
 object PrezelButtonDefaults {
     @Composable
     fun getDefault(
         isIconOnly: Boolean,
-        type: ButtonType = ButtonType.FILLED,
-        size: ButtonSize = ButtonSize.REGULAR,
-        hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
-        enabled: Boolean = true,
-        isRounded: Boolean = false,
-        contentColor: Color = getContentColor(type = type, hierarchy = hierarchy, enabled = enabled),
-        backgroundColor: Color = getBackgroundColor(type = type, hierarchy = hierarchy, enabled = enabled),
-        borderColor: Color = getBorderColor(type = type, hierarchy = hierarchy, enabled = enabled),
+        type: ButtonType,
+        size: ButtonSize,
+        hierarchy: ButtonHierarchy,
+        isRounded: Boolean,
+        contentColor: Color = getContentColor(type = type, hierarchy = hierarchy),
+        disabledContentColor: Color = getDisabledContentColor(),
+        backgroundColor: Color = getBackgroundColor(type = type, hierarchy = hierarchy),
+        disabledBackgroundColor: Color = getDisabledBackgroundColor(type = type),
+        borderColor: Color = getBorderColor(type = type, hierarchy = hierarchy),
+        disabledBorderColor: Color = getDisabledBorderColor(type = type),
         borderWidth: Dp = getBorderWidth(type = type),
         shape: RoundedCornerShape = getShape(isRounded = isRounded, isIconOnly = isIconOnly, size = size),
         textStyle: TextStyle = getTextStyle(size = size),
@@ -49,13 +56,12 @@ object PrezelButtonDefaults {
         iconSpacing: Dp = getIconSpacing(size = size),
         iconSize: Dp = getIconSize(size = size),
     ) = PrezelButtonDefault(
-        type = type,
-        size = size,
-        hierarchy = hierarchy,
-        enabled = enabled,
         contentColor = contentColor,
+        disabledContentColor = disabledContentColor,
         backgroundColor = backgroundColor,
+        disabledBackgroundColor = disabledBackgroundColor,
         borderColor = borderColor,
+        disabledBorderColor = disabledBorderColor,
         borderWidth = borderWidth,
         shape = shape,
         textStyle = textStyle,
@@ -68,9 +74,7 @@ object PrezelButtonDefaults {
     private fun getContentColor(
         type: ButtonType,
         hierarchy: ButtonHierarchy,
-        enabled: Boolean,
     ): Color {
-        if (!enabled) return PrezelTheme.colors.textDisabled
         if (hierarchy == ButtonHierarchy.SECONDARY) return PrezelTheme.colors.textMedium
 
         return when (type) {
@@ -82,10 +86,12 @@ object PrezelButtonDefaults {
     }
 
     @Composable
+    private fun getDisabledContentColor(): Color = PrezelTheme.colors.textDisabled
+
+    @Composable
     private fun getBackgroundColor(
         type: ButtonType,
         hierarchy: ButtonHierarchy,
-        enabled: Boolean,
     ): Color =
         when (type) {
             ButtonType.OUTLINED,
@@ -93,27 +99,38 @@ object PrezelButtonDefaults {
             -> Color.Transparent
 
             ButtonType.FILLED -> {
-                if (!enabled || hierarchy == ButtonHierarchy.SECONDARY) {
-                    PrezelTheme.colors.bgLarge
-                } else {
-                    PrezelTheme.colors.interactiveRegular
-                }
+                if (hierarchy == ButtonHierarchy.SECONDARY) PrezelTheme.colors.bgLarge else PrezelTheme.colors.interactiveRegular
             }
+        }
+
+    @Composable
+    private fun getDisabledBackgroundColor(type: ButtonType): Color =
+        when (type) {
+            ButtonType.OUTLINED,
+            ButtonType.GHOST,
+            -> Color.Transparent
+
+            ButtonType.FILLED -> PrezelTheme.colors.bgLarge
         }
 
     @Composable
     private fun getBorderColor(
         type: ButtonType,
         hierarchy: ButtonHierarchy,
-        enabled: Boolean,
     ): Color {
         if (type != ButtonType.OUTLINED) return Color.Transparent
-        if (!enabled) return PrezelTheme.colors.borderDisabled
 
         return when (hierarchy) {
             ButtonHierarchy.PRIMARY -> PrezelTheme.colors.interactiveRegular
             ButtonHierarchy.SECONDARY -> PrezelTheme.colors.borderMedium
         }
+    }
+
+    @Composable
+    private fun getDisabledBorderColor(type: ButtonType): Color {
+        if (type != ButtonType.OUTLINED) return Color.Transparent
+
+        return PrezelTheme.colors.borderDisabled
     }
 
     @Composable

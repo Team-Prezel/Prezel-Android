@@ -24,22 +24,22 @@ fun PrezelButton(
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
     enabled: Boolean = true,
     isRounded: Boolean = false,
-    buttonDefault: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
+    config: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
         isRounded = isRounded,
         type = type,
         size = size,
         hierarchy = hierarchy,
-        enabled = enabled,
     ),
     onClick: () -> Unit,
 ) {
     PrezelButtonBase(
         text = text,
         iconResId = iconResId,
-        modifier = modifier,
+        enabled = enabled,
         onClick = onClick,
-        buttonDefault = buttonDefault,
+        modifier = modifier,
+        config = config,
     )
 }
 
@@ -60,7 +60,6 @@ private fun PrezelButtonPreview() {
                 type = type,
                 hierarchy = hierarchy,
                 size = size,
-                enabled = enabled,
                 isRounded = isRounded,
                 isIconOnly = false,
             ),

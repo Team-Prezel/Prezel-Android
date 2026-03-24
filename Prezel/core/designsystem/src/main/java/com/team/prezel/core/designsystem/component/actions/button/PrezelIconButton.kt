@@ -29,15 +29,16 @@ fun PrezelIconButton(
         type = type,
         size = size,
         hierarchy = hierarchy,
-        enabled = enabled,
     ),
     onClick: () -> Unit,
 ) {
     PrezelButtonBase(
+        text = null,
         iconResId = iconResId,
-        modifier = modifier,
+        enabled = enabled,
         onClick = onClick,
-        buttonDefault = buttonDefault,
+        modifier = modifier,
+        config = buttonDefault,
     )
 }
 
@@ -57,7 +58,6 @@ private fun PrezelIconButtonPreview() {
                 type = type,
                 hierarchy = hierarchy,
                 size = size,
-                enabled = enabled,
                 isRounded = isRounded,
                 isIconOnly = true,
             ),

@@ -72,25 +72,22 @@ internal fun Modifier.previewGhostBorder(
     type: ButtonType,
     hierarchy: ButtonHierarchy,
     size: ButtonSize,
-    enabled: Boolean,
     isRounded: Boolean,
     isIconOnly: Boolean,
-): Modifier =
-    if (type == ButtonType.GHOST) {
-        this.drawDashBorder(
-            shape = PrezelButtonDefaults
-                .getDefault(
-                    isIconOnly = isIconOnly,
-                    isRounded = isRounded,
-                    type = type,
-                    size = size,
-                    hierarchy = hierarchy,
-                    enabled = enabled,
-                ).shape,
-        )
-    } else {
-        Modifier
-    }
+): Modifier {
+    if (type != ButtonType.GHOST) return this
+
+    return this.drawDashBorder(
+        shape = PrezelButtonDefaults
+            .getDefault(
+                isIconOnly = isIconOnly,
+                isRounded = isRounded,
+                type = type,
+                size = size,
+                hierarchy = hierarchy,
+            ).shape,
+    )
+}
 
 @Composable
 private fun ButtonPreviewSection(
