@@ -25,7 +25,6 @@ fun PrezelHyperlinkButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     size: ButtonSize = ButtonSize.XSMALL,
     config: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
@@ -38,8 +37,8 @@ fun PrezelHyperlinkButton(
     PrezelButtonBase(
         text = text,
         iconResId = null,
+        enabled = true,
         onClick = onClick,
-        enabled = enabled,
         modifier = modifier,
         layoutModifier = Modifier.prezelButtonUnderline(),
         config = config,
