@@ -5,20 +5,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -39,108 +49,225 @@ fun Modifier.prezelDropShadow(style: PrezelDropShadowDefaults.PrezelShadowStyle)
         )
 }
 
+/**
+ * 여러 개의 shadow 토큰을 기반으로 컴포넌트 외곽에 그림자를 그립니다.
+ */
 private fun Modifier.dropShadow(
     shadows: List<PrezelDropShadowDefaults.PrezelShadowToken>,
-    borderRadius: Dp = 0.dp,
+    borderRadius: Dp,
     isBackgroundTransparent: Boolean = false,
-) = this.then(
-    Modifier.drawBehind {
-        // Early return으로 불필요한 연산 방지
-        if (shadows.isEmpty()) return@drawBehind
+): Modifier =
+    drawWithCache {
+        if (shadows.isEmpty()) {
+            return@drawWithCache onDrawBehind {}
+        }
 
-        // BlurMaskFilter 캐시 - dropShadow 함수 내부에서만 사용
-        val blurMaskFilterCache = mutableMapOf<Float, BlurMaskFilter>()
+        val borderRadiusPx = borderRadius.toPx()
+        val paint = Paint()
+        val frameworkPaint = paint.asFrameworkPaint()
+        val clipPath = createShadowClipPath(
+            isBackgroundTransparent = isBackgroundTransparent,
+            borderRadiusPx = borderRadiusPx,
+            width = size.width,
+            height = size.height,
+        )
+        val resolvedShadows = toResolvedShadows(shadows = shadows, size = size)
 
-        this.drawIntoCanvas { canvas ->
-            val paint = Paint()
-            val frameworkPaint = paint.asFrameworkPaint()
+        onDrawBehind {
+            drawShadows(
+                shadows = resolvedShadows,
+                paint = paint,
+                frameworkPaint = frameworkPaint,
+                clipPath = clipPath,
+                borderRadiusPx = borderRadiusPx,
+                isBackgroundTransparent = isBackgroundTransparent,
+            )
+        }
+    }
 
-            // transparent 배경인 경우를 위한 Path - 재사용 가능하도록 미리 생성
-            var clipPath: Path? = null
-            val borderRadiusPx = borderRadius.toPx()
+/**
+ * 투명 배경에서 내부 영역을 제외하기 위한 clip path를 생성합니다.
+ */
+private fun createShadowClipPath(
+    isBackgroundTransparent: Boolean,
+    borderRadiusPx: Float,
+    width: Float,
+    height: Float,
+): Path? {
+    if (!isBackgroundTransparent || borderRadiusPx <= 0f) return null
 
-            if (isBackgroundTransparent && borderRadiusPx > 0f) {
-                clipPath = Path().apply {
-                    addRoundRect(
-                        androidx.compose.ui.geometry.RoundRect(
-                            left = 0f,
-                            top = 0f,
-                            right = size.width,
-                            bottom = size.height,
-                            radiusX = borderRadiusPx,
-                            radiusY = borderRadiusPx,
-                        ),
-                    )
-                }
-            }
+    return Path().apply {
+        addRoundRect(
+            roundRect = RoundRect(
+                left = 0f,
+                top = 0f,
+                right = width,
+                bottom = height,
+                radiusX = borderRadiusPx,
+                radiusY = borderRadiusPx,
+            ),
+        )
+    }
+}
 
-            // shadow를 뒤에서부터 그려서 올바른 layering 구현
-            for (i in shadows.size - 1 downTo 0) {
-                val shadow = shadows[i]
+/**
+ * shadow 토큰 목록을 실제 draw에 사용할 값으로 변환합니다.
+ */
+private fun Density.toResolvedShadows(
+    shadows: List<PrezelDropShadowDefaults.PrezelShadowToken>,
+    size: Size,
+): List<ResolvedShadow> {
+    val maskFiltersByBlurRadius = mapBlurMaskFilters(shadows)
 
-                // 색상 설정
-                frameworkPaint.color = shadow.color.toArgb()
+    return shadows.map { shadow ->
+        val spreadRadiusPx = shadow.spreadRadius.toPx()
+        val offsetXPx = shadow.offsetX.toPx()
+        val offsetYPx = shadow.offsetY.toPx()
+        val blurRadiusPx = shadow.blurRadius.toPx()
 
-                // BlurMaskFilter 캐싱 및 재사용 - 같은 drawBehind 호출 내에서만 캐싱
-                val blurRadiusPx = shadow.blurRadius.toPx()
-                if (blurRadiusPx > 0f) {
-                    frameworkPaint.maskFilter = blurMaskFilterCache.getOrPut(blurRadiusPx) {
-                        BlurMaskFilter(blurRadiusPx, BlurMaskFilter.Blur.NORMAL)
-                    }
-                } else {
-                    frameworkPaint.maskFilter = null
-                }
+        ResolvedShadow(
+            color = shadow.color.toArgb(),
+            left = -spreadRadiusPx + offsetXPx,
+            top = -spreadRadiusPx + offsetYPx,
+            right = size.width + spreadRadiusPx + offsetXPx,
+            bottom = size.height + spreadRadiusPx + offsetYPx,
+            maskFilter = maskFiltersByBlurRadius.getValue(blurRadiusPx),
+        )
+    }
+}
 
-                // 그리기 영역 계산 - 변수 재사용으로 메모리 할당 최소화
-                val spreadPixel = shadow.spreadRadius.toPx()
-                val offsetXPx = shadow.offsetX.toPx()
-                val offsetYPx = shadow.offsetY.toPx()
-
-                val left = -spreadPixel + offsetXPx
-                val top = -spreadPixel + offsetYPx
-                val right = size.width + spreadPixel + offsetXPx
-                val bottom = size.height + spreadPixel + offsetYPx
-
-                // Clipping 처리 최적화
-                var needsRestore = false
-                if (isBackgroundTransparent) {
-                    canvas.save()
-                    needsRestore = true
-
-                    // 미리 생성된 clipPath 재사용
-                    clipPath?.let { path ->
-                        canvas.clipPath(path, ClipOp.Difference)
-                    }
-                }
-
-                // 그리기 - 조건부 radius 최적화
-                if (borderRadiusPx > 0f) {
-                    canvas.drawRoundRect(
-                        left = left,
-                        top = top,
-                        right = right,
-                        bottom = bottom,
-                        radiusX = borderRadiusPx,
-                        radiusY = borderRadiusPx,
-                        paint = paint,
-                    )
-                } else {
-                    // radius가 0이면 더 빠른 drawRect 사용
-                    canvas.drawRect(
-                        left = left,
-                        top = top,
-                        right = right,
-                        bottom = bottom,
-                        paint = paint,
-                    )
-                }
-
-                if (needsRestore) {
-                    canvas.restore()
-                }
+/**
+ * blur 반경별로 재사용 가능한 mask filter를 생성합니다.
+ */
+private fun Density.mapBlurMaskFilters(shadows: List<PrezelDropShadowDefaults.PrezelShadowToken>): Map<Float, BlurMaskFilter?> =
+    shadows
+        .map { it.blurRadius.toPx() }
+        .distinct()
+        .associateWith { blurRadiusPx ->
+            if (blurRadiusPx <= 0f) {
+                null
+            } else {
+                BlurMaskFilter(blurRadiusPx, BlurMaskFilter.Blur.NORMAL)
             }
         }
-    },
+
+/**
+ * 준비된 shadow 목록을 뒤쪽 레이어부터 순서대로 그립니다.
+ */
+private fun DrawScope.drawShadows(
+    shadows: List<ResolvedShadow>,
+    paint: Paint,
+    frameworkPaint: android.graphics.Paint,
+    clipPath: Path?,
+    borderRadiusPx: Float,
+    isBackgroundTransparent: Boolean,
+) {
+    drawIntoCanvas { drawCanvas ->
+        for (index in shadows.indices.reversed()) {
+            val shadow = shadows[index]
+            frameworkPaint.color = shadow.color
+            frameworkPaint.maskFilter = shadow.maskFilter
+
+            drawCanvas.drawShadowLayer(
+                shadow = shadow,
+                paint = paint,
+                clipPath = clipPath,
+                borderRadiusPx = borderRadiusPx,
+                width = size.width,
+                height = size.height,
+                isBackgroundTransparent = isBackgroundTransparent,
+            )
+        }
+
+        frameworkPaint.maskFilter = null
+    }
+}
+
+/**
+ * 단일 shadow 레이어를 그리기 전에 clip을 적용하고 실제 도형을 렌더링합니다.
+ */
+private fun Canvas.drawShadowLayer(
+    shadow: ResolvedShadow,
+    paint: Paint,
+    clipPath: Path?,
+    borderRadiusPx: Float,
+    width: Float,
+    height: Float,
+    isBackgroundTransparent: Boolean,
+) {
+    applyTransparentClip(
+        clipPath = clipPath,
+        borderRadiusPx = borderRadiusPx,
+        width = width,
+        height = height,
+        isBackgroundTransparent = isBackgroundTransparent,
+    )
+
+    if (borderRadiusPx > 0f) {
+        drawRoundRect(
+            left = shadow.left,
+            top = shadow.top,
+            right = shadow.right,
+            bottom = shadow.bottom,
+            radiusX = borderRadiusPx,
+            radiusY = borderRadiusPx,
+            paint = paint,
+        )
+    } else {
+        drawRect(
+            left = shadow.left,
+            top = shadow.top,
+            right = shadow.right,
+            bottom = shadow.bottom,
+            paint = paint,
+        )
+    }
+
+    if (isBackgroundTransparent) {
+        restore()
+    }
+}
+
+/**
+ * 투명 배경인 경우 내부 영역을 제외하도록 clip을 적용합니다.
+ */
+private fun Canvas.applyTransparentClip(
+    clipPath: Path?,
+    borderRadiusPx: Float,
+    width: Float,
+    height: Float,
+    isBackgroundTransparent: Boolean,
+) {
+    if (!isBackgroundTransparent) return
+
+    save()
+
+    if (borderRadiusPx > 0f) {
+        clipPath?.let { path ->
+            clipPath(path, ClipOp.Difference)
+        }
+        return
+    }
+
+    clipRect(
+        left = 0f,
+        top = 0f,
+        right = width,
+        bottom = height,
+        clipOp = ClipOp.Difference,
+    )
+}
+
+/**
+ * shadow 하나를 draw 가능한 좌표와 paint 정보로 보관합니다.
+ */
+private data class ResolvedShadow(
+    val color: Int,
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float,
+    val maskFilter: BlurMaskFilter?,
 )
 
 object PrezelDropShadowDefaults {
@@ -158,8 +285,8 @@ object PrezelDropShadowDefaults {
         override fun getShadow(): List<PrezelShadowToken> = emptyList()
     }
 
-    data class Default(
-        override val borderRadius: Dp,
+    data class Regular(
+        override val borderRadius: Dp = 0.dp,
         override val backgroundColor: Color = Color.Transparent,
     ) : PrezelShadowStyle(borderRadius, backgroundColor) {
         private val shadowList by lazy {
@@ -200,31 +327,37 @@ object PrezelDropShadowDefaults {
 
 @ThemePreview
 @Composable
-private fun WantedDropShadowPreview() {
+private fun PrezelDropShadowPreview() {
+    val styles = listOf(
+        PrezelDropShadowDefaults.None,
+        PrezelDropShadowDefaults.Regular(),
+    )
+
     PrezelTheme {
-        Surface {
-            Column(
-                modifier = Modifier
-                    .background(PrezelTheme.colors.bgRegular)
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                Box(
-                    Modifier
-                        .size(100.dp)
-                        .background(color = Color.Green, shape = RoundedCornerShape(10.dp))
-                        .prezelDropShadow(style = PrezelDropShadowDefaults.None),
-                )
-                Box(
-                    Modifier
-                        .size(100.dp)
-                        .prezelDropShadow(
-                            style = PrezelDropShadowDefaults.Default(
-                                borderRadius = 10.dp,
-                                backgroundColor = Color.Green,
-                            ),
-                        ),
-                )
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                text = "PrezelDropShadow",
+                style = PrezelTheme.typography.body1Bold,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            styles.forEach { style ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .prezelDropShadow(style = style),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(text = style.javaClass.simpleName)
+                }
             }
         }
     }

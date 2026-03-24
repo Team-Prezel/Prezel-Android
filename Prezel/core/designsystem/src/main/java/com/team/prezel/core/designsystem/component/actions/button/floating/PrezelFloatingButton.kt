@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
+import com.team.prezel.core.designsystem.component.base.PrezelDropShadowDefaults
+import com.team.prezel.core.designsystem.component.base.prezelDropShadow
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -34,7 +36,11 @@ fun PrezelFloatingButton(
         size = size,
         hierarchy = hierarchy,
         isRounded = true,
-        modifier = modifier,
+        modifier = modifier.prezelDropShadow(
+            style = PrezelDropShadowDefaults.Regular(
+                borderRadius = PrezelTheme.radius.V1000,
+            ),
+        ),
         onClick = { onChangeExpanded(!isExpanded) },
     )
 }
