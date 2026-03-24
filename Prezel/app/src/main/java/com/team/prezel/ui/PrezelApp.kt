@@ -17,7 +17,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
@@ -68,11 +67,11 @@ private fun PrezelAppContent(
                 snackbarHostState = snackbarHostState,
                 navigationItems = {
                     MAIN_NAV_ITEMS.forEach { (key, item) ->
-                        item(
+                        Item(
                             selected = key == appState.navigationState.currentTopLevelKey,
                             onClick = { navigator.navigate(key) },
                             label = stringResource(item.titleTextId),
-                            icon = IconSource(item.iconRes),
+                            iconResId = item.iconRes,
                         )
                     }
                 },

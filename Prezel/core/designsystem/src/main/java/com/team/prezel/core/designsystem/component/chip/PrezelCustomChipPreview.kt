@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -71,7 +70,7 @@ private fun CustomChipIconOnlySection() {
 private fun CustomYellowLabelChip() {
     PrezelChip(
         text = "느려요",
-        icon = IconSource(resId = PrezelIcons.Blank),
+        iconResId = PrezelIcons.Blank,
         style = PrezelChipStyle(
             type = PrezelChipType.FILLED,
             size = PrezelChipSize.REGULAR,
@@ -89,7 +88,7 @@ private fun CustomYellowLabelChip() {
 private fun CustomRedLabelChip() {
     PrezelChip(
         text = "빨라요",
-        icon = null,
+        iconResId = null,
         style = PrezelChipStyle(
             type = PrezelChipType.OUTLINED,
             size = PrezelChipSize.REGULAR,
@@ -107,7 +106,7 @@ private fun CustomRedLabelChip() {
 private fun CustomGreenLabelChip() {
     PrezelChip(
         text = "적당해요",
-        icon = null,
+        iconResId = null,
         style = PrezelChipStyle(
             type = PrezelChipType.FILLED,
             size = PrezelChipSize.SMALL,
@@ -125,7 +124,7 @@ private fun CustomGreenLabelChip() {
 private fun CustomYellowIconChip() {
     PrezelChip(
         text = null,
-        icon = IconSource(resId = PrezelIcons.Blank),
+        iconResId = PrezelIcons.Blank,
         style = PrezelChipStyle(
             type = PrezelChipType.FILLED,
             size = PrezelChipSize.REGULAR,
@@ -143,7 +142,7 @@ private fun CustomYellowIconChip() {
 private fun CustomRedIconChip() {
     PrezelChip(
         text = null,
-        icon = IconSource(resId = PrezelIcons.Blank),
+        iconResId = PrezelIcons.Blank,
         style = PrezelChipStyle(
             type = PrezelChipType.OUTLINED,
             size = PrezelChipSize.REGULAR,
@@ -161,7 +160,7 @@ private fun CustomRedIconChip() {
 private fun CustomGreenIconChip() {
     PrezelChip(
         text = null,
-        icon = IconSource(resId = PrezelIcons.Blank),
+        iconResId = PrezelIcons.Blank,
         style = PrezelChipStyle(
             type = PrezelChipType.FILLED,
             size = PrezelChipSize.SMALL,

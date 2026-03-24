@@ -130,7 +130,7 @@ private fun PrezelImagePreviewItem(
 ) {
     Text(text = label)
     PrezelImage(
-        resId = PrezelIcons.Calendar,
+        resId = PrezelIcons.Blank,
         contentDescription = label,
         modifier = Modifier.size(100.dp),
         rounded = rounded,

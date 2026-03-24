@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.chip
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.icon.IconSource
+import androidx.compose.ui.res.painterResource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.preview.ThemePreview
@@ -26,11 +27,11 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 fun PrezelChip(
     modifier: Modifier = Modifier,
     text: String? = null,
-    icon: IconSource? = null,
+    @DrawableRes iconResId: Int? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
 ) {
     val hasText = text != null
-    val hasIcon = icon != null
+    val hasIcon = iconResId != null
     val iconOnly = hasIcon && !hasText
     require(hasText || hasIcon) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
 
@@ -49,7 +50,9 @@ fun PrezelChip(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                PrezelChipIcon(icon = icon, style = style)
+                iconResId?.let { resId ->
+                    PrezelChipIcon(iconResId = resId, style = style)
+                }
 
                 if (hasText) {
                     if (hasIcon) {
@@ -66,7 +69,7 @@ fun PrezelChip(
 fun PrezelChip(
     modifier: Modifier = Modifier,
     text: String? = null,
-    icon: IconSource? = null,
+    @DrawableRes iconResId: Int? = null,
     style: PrezelChipStyle = PrezelChipStyle(),
     customColors: PrezelChipColors = LocalPrezelChipColors.current,
 ) {
@@ -76,7 +79,7 @@ fun PrezelChip(
         PrezelChip(
             modifier = modifier,
             text = text,
-            icon = icon,
+            iconResId = iconResId,
             style = style,
         )
     }
@@ -84,15 +87,13 @@ fun PrezelChip(
 
 @Composable
 private fun PrezelChipIcon(
-    icon: IconSource?,
+    @DrawableRes iconResId: Int,
     style: PrezelChipStyle,
     modifier: Modifier = Modifier,
 ) {
-    if (icon == null) return
-
     Icon(
-        painter = icon.painter(),
-        contentDescription = icon.contentDescription(),
+        painter = painterResource(id = iconResId),
+        contentDescription = null,
         modifier = modifier.size(style.iconSize()),
     )
 }
@@ -119,7 +120,7 @@ private fun PrezelChipPreview() {
 private fun PrezelChipPreviewItem(style: PrezelChipStyle) {
     PrezelChip(
         text = "Label",
-        icon = IconSource(resId = PrezelIcons.Blank),
+        iconResId = PrezelIcons.Blank,
         style = style,
     )
 }
