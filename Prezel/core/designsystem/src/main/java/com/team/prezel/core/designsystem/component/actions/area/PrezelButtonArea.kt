@@ -49,6 +49,11 @@ fun PrezelButtonArea(
     val scope = remember { DefaultButtonAreaScope() }
     scope.content()
 
+    val mainButton = requireNotNull(scope.buttons.firstOrNull()) {
+        "PrezelButtonArea에는 최소 1개의 버튼이 필요합니다."
+    }
+    val subButton = scope.buttons.getOrNull(1)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -58,15 +63,15 @@ fun PrezelButtonArea(
 
         if (isVertical) {
             ButtonAreaVertical(
-                mainButton = scope.buttons[0],
-                subButton = scope.buttons.getOrNull(1),
+                mainButton = mainButton,
+                subButton = subButton,
                 modifier = Modifier.padding(config.contentPadding),
             )
         } else {
             ButtonAreaHorizontal(
                 isStrongStrength = isStrongStrength,
-                mainButton = scope.buttons[0],
-                subButton = scope.buttons.getOrNull(1),
+                mainButton = mainButton,
+                subButton = subButton,
                 modifier = Modifier.padding(config.contentPadding),
             )
         }
