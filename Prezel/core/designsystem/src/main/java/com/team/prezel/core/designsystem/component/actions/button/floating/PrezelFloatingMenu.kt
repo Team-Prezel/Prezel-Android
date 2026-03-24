@@ -53,9 +53,8 @@ fun PrezelFloatingMenu(
                 },
                 content = items,
             )
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
         }
-
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 
         PrezelFloatingButton(
             isExpanded = isExpanded,
