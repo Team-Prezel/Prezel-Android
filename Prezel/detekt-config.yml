@@ -15,14 +15,15 @@ style:
     UnusedPrivateMember:
         ignoreAnnotated:
             - Preview
-            - ThemePreview
+            - BasicPreview
+            - TypographyPreview
 
 complexity:
     LongMethod:
         threshold: 50
         ignoreAnnotated:
             - Preview
-            - ThemePreview
+            - BasicPreview
     NestedBlockDepth:
         threshold: 4
     LongParameterList:
@@ -31,7 +32,6 @@ complexity:
         constructorThreshold: 10
         ignoreAnnotated:
             - Composable
-
     TooManyFunctions:
         active: true
         thresholdInFiles: 20

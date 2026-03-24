@@ -60,7 +60,3 @@ private fun RadiusTokensPreview() {
         }
     }
 }
-
-@Composable
-private fun RadiusSection() {
-}
