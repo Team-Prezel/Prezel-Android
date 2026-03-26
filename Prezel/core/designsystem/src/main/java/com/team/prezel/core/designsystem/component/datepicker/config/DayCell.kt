@@ -25,7 +25,7 @@ internal fun DayCell(
     modifier: Modifier = Modifier,
 ) {
     PrezelTouchArea(
-        enabled = dayCell !is DayCellType.Past,
+        enabled = dayCell != null && dayCell !is DayCellType.Past,
         modifier = modifier
             .aspectRatio(1f)
             .padding(PrezelTheme.spacing.V4)
