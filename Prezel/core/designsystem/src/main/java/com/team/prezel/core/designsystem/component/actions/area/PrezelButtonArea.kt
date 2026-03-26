@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -41,10 +40,11 @@ fun PrezelButtonArea(
     showBackground: Boolean = false,
     isNested: Boolean = false,
     config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(),
-    content: @Composable ButtonAreaScope.() -> Unit,
+    content: ButtonAreaScope.() -> Unit,
 ) {
-    val scope = remember { DefaultButtonAreaScope() }
-    scope.content()
+    val scope = DefaultButtonAreaScope().apply {
+        this.content()
+    }
 
     val mainButton = requireNotNull(scope.buttons.firstOrNull()) {
         "PrezelButtonArea에는 최소 1개의 버튼이 필요합니다."
