@@ -24,12 +24,13 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldPlaceholder
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldSupportingText
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -188,11 +189,14 @@ private fun PrezelTextAreaDecorationBox(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTextAreaPrezelPreview() {
-    PrezelTheme {
-        PreviewScaffold(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    PreviewSurface {
+        PreviewColumn(
+            scrollable = true,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             PrezelTextAreaPreviewItem(
                 label = "Interaction - Default / Feedback - Default",
                 value = "",
@@ -246,14 +250,14 @@ private fun PrezelTextAreaPrezelPreview() {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun MainPrezelTextAreaPreview() {
     var value by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             PrezelTextArea(
                 value = value,
                 onValueChange = { newValue -> value = newValue },

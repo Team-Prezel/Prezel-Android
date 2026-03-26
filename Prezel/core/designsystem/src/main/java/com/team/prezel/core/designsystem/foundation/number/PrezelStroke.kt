@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.preview.TokenList
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import kotlinx.collections.immutable.persistentListOf
 
 object PrezelStroke {
     val V1 = 1.dp
@@ -19,35 +17,31 @@ object PrezelStroke {
     val V4 = 4.dp
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun StrokeTokensPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            StrokeSection()
-        }
-    }
-}
-
-@Composable
-private fun StrokeSection() {
-    SectionTitle(title = "Stroke")
-    TokenList(
-        items = persistentListOf(
+    PreviewSection(
+        title = "Stroke",
+        description = "테두리 굵기에 사용하는 숫자입니다.",
+    ) {
+        listOf(
             "V1" to PrezelStroke.V1,
             "V2" to PrezelStroke.V2,
             "V4" to PrezelStroke.V4,
-        ),
-        preview = { stroke ->
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .border(
-                        width = stroke,
-                        color = PrezelTheme.colors.borderLarge,
-                        shape = PrezelShapes.V8,
-                    ),
-            )
-        },
-    )
+        ).forEach { (name, stroke) ->
+            PreviewValueRow(
+                name = name,
+                valueLabel = "${stroke.value}dp",
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .border(
+                            width = stroke,
+                            color = PrezelTheme.colors.borderLarge,
+                        ),
+                )
+            }
+        }
+    }
 }

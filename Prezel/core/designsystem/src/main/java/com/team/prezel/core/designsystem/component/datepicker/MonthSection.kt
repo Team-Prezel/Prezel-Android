@@ -7,7 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -42,10 +43,13 @@ internal fun MonthSection(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun MonthSectionPreview() {
-    PrezelTheme {
+    PreviewSection(
+        title = "Month Section",
+        description = "DatePicker에 사용되는 리소스입니다.",
+    ) {
         MonthSection(
             yearMonth = YearMonth(year = 2026, month = 2),
             selectedDate = LocalDate(year = 2026, month = 2, day = 26),

@@ -1,15 +1,10 @@
 package com.team.prezel.core.designsystem.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -17,12 +12,11 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,105 +54,62 @@ private fun prezelTopAppBarColors() =
     )
 
 @OptIn(ExperimentalMaterial3Api::class)
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTopAppBarTitleOnlyPreview() {
-    PrezelTheme {
-        Surface(color = PrezelTheme.colors.bgRegular) {
-            PrezelTopAppBar(title = { Text(text = "제목") })
-        }
+    PreviewSection(title = "Title Only") {
+        PrezelTopAppBar(title = { Text(text = "제목") })
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTopAppBarWithLeadingPreview() {
-    PrezelTheme {
-        Surface(color = PrezelTheme.colors.bgRegular) {
-            PrezelTopAppBar(
-                title = { Text(text = "제목") },
-                leadingIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "뒤로가기",
-                        )
-                    }
-                },
-            )
-        }
+    PreviewSection(title = "With Leading") {
+        PrezelTopAppBar(
+            title = { Text(text = "제목") },
+            leadingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "뒤로가기",
+                    )
+                }
+            },
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelTopAppBarWithAllIconsPreview() {
-    PrezelTheme {
-        Surface(color = PrezelTheme.colors.bgRegular) {
-            PrezelTopAppBar(
-                title = { Text(text = "Title") },
-                leadingIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "뒤로가기",
-                        )
-                    }
-                },
-                trailingIcons = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "검색",
-                        )
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Blank),
-                            contentDescription = "메뉴",
-                        )
-                    }
-                },
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@ThemePreview
-@Composable
-private fun PrezelTopAppBarScrollTestPreview() {
-    PrezelTheme {
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            containerColor = PrezelTheme.colors.bgRegular,
-            topBar = {
-                PrezelTopAppBar(
-                    title = { Text("Title") },
-                    leadingIcon = {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                painter = painterResource(PrezelIcons.Blank),
-                                contentDescription = "뒤로가기",
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
+    PreviewSection(title = "With All Icons") {
+        PrezelTopAppBar(
+            title = { Text(text = "Title") },
+            leadingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "뒤로가기",
+                    )
+                }
             },
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                items(30) { index -> Text(text = "Item $index") }
-            }
-        }
+            trailingIcons = {
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "검색",
+                    )
+                }
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Blank),
+                        contentDescription = "메뉴",
+                    )
+                }
+            },
+        )
     }
 }

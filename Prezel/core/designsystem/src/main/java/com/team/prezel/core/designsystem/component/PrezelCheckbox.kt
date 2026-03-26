@@ -1,16 +1,10 @@
 package com.team.prezel.core.designsystem.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,9 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -81,81 +76,30 @@ fun PrezelCheckbox(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
-private fun PrezelRegularCheckboxPreview() {
-    PrezelTheme {
-        Column(
-            modifier = Modifier
-                .background(PrezelTheme.colors.bgRegular)
-                .padding(16.dp),
-        ) {
-            CheckboxRowPreview(title = "Regular Checkbox") {
-                var checkState by remember { mutableStateOf(true) }
+private fun PrezelCheckboxPreview() {
+    var checkState by remember { mutableStateOf(true) }
 
-                PrezelCheckbox(
-                    checked = checkState,
-                    modifier = Modifier.drawDashBorder(),
-                    size = CheckboxSize.REGULAR,
-                    onCheckedChange = { checkState = it },
-                )
-
-                PrezelCheckbox(
-                    checked = !checkState,
-                    modifier = Modifier.drawDashBorder(),
-                    size = CheckboxSize.REGULAR,
-                    onCheckedChange = { checkState = it },
-                )
-            }
+    PreviewSection(
+        title = "Checkbox",
+        description = "Checkbox는 목록에서 선택할 항목이 여러 개 있을 때 사용됩니다.",
+    ) {
+        PreviewValueRow(name = "Regular") {
+            PrezelCheckbox(
+                checked = checkState,
+                modifier = Modifier.drawDashBorder(),
+                size = CheckboxSize.REGULAR,
+                onCheckedChange = { checkState = it },
+            )
         }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun PrezelLargeCheckboxPreview() {
-    PrezelTheme {
-        Column(
-            modifier = Modifier
-                .background(PrezelTheme.colors.bgRegular)
-                .padding(16.dp),
-        ) {
-            CheckboxRowPreview(title = "Large Checkbox") {
-                var checkState by remember { mutableStateOf(true) }
-
-                PrezelCheckbox(
-                    checked = checkState,
-                    modifier = Modifier.drawDashBorder(),
-                    size = CheckboxSize.LARGE,
-                    onCheckedChange = { checkState = it },
-                )
-
-                PrezelCheckbox(
-                    checked = !checkState,
-                    modifier = Modifier.drawDashBorder(),
-                    size = CheckboxSize.LARGE,
-                    onCheckedChange = { checkState = it },
-                )
-            }
+        PreviewValueRow(name = "Large") {
+            PrezelCheckbox(
+                checked = !checkState,
+                modifier = Modifier.drawDashBorder(),
+                size = CheckboxSize.LARGE,
+                onCheckedChange = { checkState = it },
+            )
         }
-    }
-}
-
-@Composable
-private fun CheckboxRowPreview(
-    title: String,
-    content: @Composable RowScope.() -> Unit,
-) {
-    Column(modifier = Modifier.padding(bottom = 16.dp)) {
-        Text(
-            text = title,
-            style = PrezelTextStyles.Caption2Regular.toTextStyle(),
-            color = PrezelTheme.colors.textLarge,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            content = content,
-        )
     }
 }

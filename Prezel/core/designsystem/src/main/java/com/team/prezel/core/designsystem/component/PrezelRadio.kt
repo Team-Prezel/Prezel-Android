@@ -3,7 +3,6 @@ package com.team.prezel.core.designsystem.component
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,9 +25,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewRow
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 /**
@@ -128,30 +127,25 @@ private fun PrezelRadioIcon(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelRadioPreview() {
     var checked by remember { mutableStateOf(false) }
 
-    PrezelTheme {
-        PreviewScaffold {
-            SectionTitle("PrezelRadioSize.REGULAR")
-            Text("Checked: true")
+    PreviewSection(
+        title = "PrezelRadio",
+        description = "라디오 버튼은 목록에서 선택할 항목이 한 개 있을 때 사용됩니다.",
+    ) {
+        PreviewRow {
             PrezelRadio(checked = true, onCheckedChange = {}, size = PrezelRadioSize.REGULAR)
-            Text("Checked: false")
             PrezelRadio(checked = false, onCheckedChange = {}, size = PrezelRadioSize.REGULAR)
-            Text("PrezelRadio with text")
-            PrezelRadio(checked = checked, onCheckedChange = { checked = it }, text = "텍스트", size = PrezelRadioSize.REGULAR)
+            PrezelRadio(checked = checked, onCheckedChange = { checked = it }, text = "Label", size = PrezelRadioSize.REGULAR)
+        }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            SectionTitle("PrezelRadioSize.LARGE")
-            Text("Checked: true")
+        PreviewRow {
             PrezelRadio(checked = true, onCheckedChange = {}, size = PrezelRadioSize.LARGE)
-            Text("Checked: false")
             PrezelRadio(checked = false, onCheckedChange = {}, size = PrezelRadioSize.LARGE)
-            Text("PrezelRadio with text")
-            PrezelRadio(checked = checked, onCheckedChange = { checked = it }, text = "텍스트", size = PrezelRadioSize.LARGE)
+            PrezelRadio(checked = checked, onCheckedChange = { checked = it }, text = "Label", size = PrezelRadioSize.LARGE)
         }
     }
 }

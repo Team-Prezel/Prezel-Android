@@ -25,13 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
-import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
-import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.PreviewDefaults
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -113,15 +115,15 @@ private fun DatePickerFooter(
     onConfirm: (LocalDate) -> Unit,
 ) {
     PrezelButtonArea(
-        mainButton = ButtonAreaButtonSpec(
+        isVertical = false,
+        showBackground = true,
+    ) {
+        MainButton(
             label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
             enabled = selectedDate != null,
             onClick = { selectedDate?.let(onConfirm) },
-        ),
-        subButton = null,
-        isVertical = false,
-        showBackground = true,
-    )
+        )
+    }
 }
 
 @Composable
@@ -154,11 +156,13 @@ private fun WeekdayRow() {
 @Preview(showBackground = true)
 @Composable
 private fun PrezelDatePickerPreview() {
-    PrezelTheme {
-        var selected by remember {
-            mutableStateOf(LocalDate(year = 2026, month = 2, day = 26))
-        }
+    var selected by remember {
+        mutableStateOf(LocalDate(year = 2026, month = 2, day = 26))
+    }
 
+    PreviewSurface(
+        defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
+    ) {
         PrezelDatePicker(
             title = "발표 날짜",
             today = LocalDate(year = 2026, month = 2, day = 23),

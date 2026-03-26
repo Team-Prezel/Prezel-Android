@@ -3,11 +3,9 @@ package com.team.prezel.core.designsystem.component.datepicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -16,8 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewRow
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.datetime.LocalDate
 
@@ -61,11 +60,14 @@ internal fun RowScope.DayCellView(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun DayCellViewPreview() {
-    PrezelTheme {
-        Row(modifier = Modifier.width(320.dp)) {
+    PreviewSection(
+        title = "DatePicker/Day",
+        description = "DatePicker에 사용되는 리소스입니다.",
+    ) {
+        PreviewRow {
             DayCellView(
                 uiModel = DayCell(
                     date = LocalDate(2024, 1, 1),

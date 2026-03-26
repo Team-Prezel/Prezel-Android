@@ -32,13 +32,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
-import com.team.prezel.core.designsystem.component.button.PrezelHyperlinkButton
+import com.team.prezel.core.designsystem.component.actions.button.PrezelHyperlinkButton
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -129,11 +130,11 @@ private fun PrezelAccordionContent(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelAccordionPreview() {
-    PrezelTheme {
-        PreviewScaffold {
+    PreviewSurface {
+        PreviewColumn(scrollable = true) {
             Column(verticalArrangement = Arrangement.spacedBy(40.dp)) {
                 PrezelAccordion(
                     title = "Collapsed Accordion",

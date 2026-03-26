@@ -36,6 +36,8 @@ import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.clickOnce
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
@@ -184,12 +186,10 @@ private fun LoginFooter(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun LoginScreenPreview() {
     PrezelTheme {
-        val snackbarHostState = remember { SnackbarHostState() }
-
         SharedTransitionLayout {
             AnimatedVisibility(true) {
                 LoginScreen(
