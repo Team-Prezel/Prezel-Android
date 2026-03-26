@@ -1,6 +1,6 @@
 package com.team.prezel.core.designsystem.component.snackbar
 
-import androidx.compose.foundation.layout.Column
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +17,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.button.PrezelButton
-import com.team.prezel.core.designsystem.component.button.PrezelButtonSize
-import com.team.prezel.core.designsystem.component.button.PrezelButtonStyle
-import com.team.prezel.core.designsystem.component.button.PrezelButtonType
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
@@ -49,8 +49,8 @@ fun PrezelSnackbar(
             modifier = Modifier.padding(start = PrezelTheme.spacing.V16, end = PrezelTheme.spacing.V8),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            visuals.leadingIcon?.let { leadingIcon ->
-                PrezelSnackbarLeadingIcon(icon = leadingIcon)
+            visuals.leadingIconResId?.let { resId ->
+                PrezelSnackbarLeadingIcon(iconResId = resId)
                 Spacer(Modifier.width(PrezelTheme.spacing.V8))
             }
 
@@ -65,8 +65,9 @@ fun PrezelSnackbar(
             Spacer(Modifier.width(PrezelTheme.spacing.V16))
             PrezelButton(
                 text = visuals.actionLabel,
+                type = ButtonType.GHOST,
+                size = ButtonSize.SMALL,
                 onClick = { data.performAction() },
-                style = PrezelButtonStyle(buttonType = PrezelButtonType.GHOST, buttonSize = PrezelButtonSize.SMALL),
             )
         }
     }
@@ -74,30 +75,31 @@ fun PrezelSnackbar(
 
 @Composable
 private fun PrezelSnackbarLeadingIcon(
-    icon: IconSource,
+    @DrawableRes iconResId: Int,
     modifier: Modifier = Modifier,
 ) {
     Icon(
-        painter = icon.painter(),
-        contentDescription = icon.contentDescription(),
+        painter = painterResource(id = iconResId),
+        contentDescription = null,
         modifier = modifier.size(20.dp),
         tint = PrezelColorScheme.Dark.iconLarge,
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelSnackBarPreview_Cases() {
-    PrezelTheme {
-        Column {
-            PrezelSnackbar(
-                data = previewData(message = "Message", actionLabel = "Action", leadingIcon = IconSource(PrezelIcons.Blank)),
-            )
+    PreviewSection(
+        title = "Snackbar",
+        description = "유저에게 현재 단계에 대한 정보를 버튼과 함께 제공합니다.",
+    ) {
+        PrezelSnackbar(
+            data = previewData(message = "Message", actionLabel = "Action", iconResId = PrezelIcons.Blank),
+        )
 
-            PrezelSnackbar(
-                data = previewData(message = "Message Message Message Message Message", actionLabel = "Action"),
-            )
-        }
+        PrezelSnackbar(
+            data = previewData(message = "Message Message Message Message Message", actionLabel = "Action"),
+        )
     }
 }
 
@@ -105,7 +107,7 @@ private fun PrezelSnackBarPreview_Cases() {
 private fun previewData(
     message: String,
     actionLabel: String,
-    leadingIcon: IconSource? = null,
+    @DrawableRes iconResId: Int? = null,
 ): SnackbarData =
     PreviewSnackbarData(
         visuals = PrezelSnackbarVisuals(
@@ -113,7 +115,7 @@ private fun previewData(
             actionLabel = actionLabel,
             withDismissAction = false,
             duration = SnackbarDuration.Short,
-            leadingIcon = leadingIcon,
+            leadingIconResId = iconResId,
             offsetY = 0.dp,
         ),
     )

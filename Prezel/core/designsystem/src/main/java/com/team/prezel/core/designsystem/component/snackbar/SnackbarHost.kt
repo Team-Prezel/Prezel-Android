@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component.snackbar
 
+import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -9,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.icon.IconSource
 
 internal data class PrezelSnackbarVisuals(
     override val message: String,
@@ -17,7 +17,7 @@ internal data class PrezelSnackbarVisuals(
     override val withDismissAction: Boolean = false,
     override val duration: SnackbarDuration,
     val id: String? = null,
-    val leadingIcon: IconSource?,
+    @param:DrawableRes val leadingIconResId: Int?,
     val offsetY: Dp,
 ) : SnackbarVisuals
 
@@ -25,7 +25,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     message: String,
     actionLabel: String,
     onAction: () -> Unit,
-    leadingIcon: IconSource? = null,
+    @DrawableRes leadingIconResId: Int? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
     id: String? = null,
     onDismiss: (() -> Unit)? = null,
@@ -37,7 +37,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
             actionLabel = actionLabel,
             duration = duration,
             id = id,
-            leadingIcon = leadingIcon,
+            leadingIconResId = leadingIconResId,
             offsetY = offsetY,
         ),
     )

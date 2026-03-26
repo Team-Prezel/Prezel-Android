@@ -2,14 +2,10 @@ package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +20,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.foundation.number.PrezelStroke
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
+import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -109,50 +107,52 @@ private fun DefaultAvatarIcon(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
-private fun PrezelAvatarSizePreview() {
-    PrezelTheme {
-        Surface(color = PrezelTheme.colors.bgRegular) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp),
-            ) {
-                PrezelAvatar(
-                    imageUrl = null,
-                    contentDescription = "기본 아바타",
-                    size = PrezelAvatarSize.SMALL,
-                )
-                PrezelAvatar(
-                    imageUrl = null,
-                    contentDescription = "기본 아바타",
-                    size = PrezelAvatarSize.REGULAR,
-                )
-            }
+private fun PrezelAvatarPreview() {
+    PreviewSection(
+        title = "Avatar",
+        description = "Avatar는 사용자를 대신하는 그래픽 요소입니다.",
+    ) {
+        PreviewValueRow(
+            name = "Regular",
+            valueLabel = "기본 아바타",
+        ) {
+            PrezelAvatar(
+                imageUrl = null,
+                contentDescription = "기본 아바타",
+                size = PrezelAvatarSize.REGULAR,
+            )
         }
-    }
-}
-
-@ThemePreview
-@Composable
-private fun PrezelAvatarTypePreview() {
-    PrezelTheme {
-        Surface(color = PrezelTheme.colors.bgRegular) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(16.dp),
-            ) {
-                PrezelAvatar(
-                    imageUrl = null,
-                    contentDescription = "Default Type",
-                    size = PrezelAvatarSize.SMALL,
-                )
-                PrezelAvatar(
-                    imageUrl = "https://picsum.photos/200",
-                    contentDescription = "Image Type",
-                    size = PrezelAvatarSize.SMALL,
-                )
-            }
+        PreviewValueRow(
+            name = "Regular",
+            valueLabel = "이미지",
+        ) {
+            PrezelAvatar(
+                imageUrl = "https://picsum.photos/200",
+                contentDescription = "기본 아바타",
+                size = PrezelAvatarSize.REGULAR,
+            )
+        }
+        PreviewValueRow(
+            name = "Small",
+            valueLabel = "기본 아바타",
+        ) {
+            PrezelAvatar(
+                imageUrl = null,
+                contentDescription = "기본 아바타",
+                size = PrezelAvatarSize.SMALL,
+            )
+        }
+        PreviewValueRow(
+            name = "Small",
+            valueLabel = "이미지",
+        ) {
+            PrezelAvatar(
+                imageUrl = "https://picsum.photos/200",
+                contentDescription = "이미지",
+                size = PrezelAvatarSize.SMALL,
+            )
         }
     }
 }

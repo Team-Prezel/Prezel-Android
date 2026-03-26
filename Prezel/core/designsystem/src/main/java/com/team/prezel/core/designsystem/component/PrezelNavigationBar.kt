@@ -1,5 +1,6 @@
 package com.team.prezel.core.designsystem.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,11 +25,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbarHost
-import com.team.prezel.core.designsystem.icon.IconSource
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
@@ -56,7 +57,7 @@ fun PrezelNavigationBar(
 fun RowScope.PrezelNavigationBarItem(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: IconSource,
+    @DrawableRes iconResId: Int,
     label: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -67,8 +68,8 @@ fun RowScope.PrezelNavigationBarItem(
         onClick = onClick,
         icon = {
             Icon(
-                painter = icon.painter(),
-                contentDescription = icon.contentDescription(),
+                painter = painterResource(id = iconResId),
+                contentDescription = null,
             )
         },
         modifier = modifier,
@@ -123,9 +124,9 @@ class PrezelNavigationScope internal constructor(
     private val rowScope: RowScope,
 ) {
     @Composable
-    fun item(
+    fun Item(
         selected: Boolean,
-        icon: IconSource,
+        @DrawableRes iconResId: Int,
         label: String,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
@@ -135,7 +136,7 @@ class PrezelNavigationScope internal constructor(
         rowScope.PrezelNavigationBarItem(
             selected = selected,
             onClick = onClick,
-            icon = icon,
+            iconResId = iconResId,
             label = label,
             modifier = modifier,
             enabled = enabled,
@@ -144,28 +145,22 @@ class PrezelNavigationScope internal constructor(
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelNavigationScaffoldPreview() {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val items = listOf(
-        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 0),
-        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 1),
-        Triple(IconSource(resId = PrezelIcons.Blank), "Label", 2),
-    )
-
     PrezelTheme {
         PrezelNavigationScaffold(
             snackbarHostState = snackbarHostState,
             navigationItems = {
-                items.forEach { (icon, label, index) ->
-                    item(
+                repeat(3) { index ->
+                    Item(
                         selected = selectedIndex == index,
                         onClick = { selectedIndex = index },
-                        icon = icon,
-                        label = label,
+                        iconResId = PrezelIcons.Blank,
+                        label = "Tab $index",
                     )
                 }
             },

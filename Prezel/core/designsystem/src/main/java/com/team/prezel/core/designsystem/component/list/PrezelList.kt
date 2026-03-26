@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -15,13 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.preview.SectionTitle
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
 
@@ -74,24 +71,16 @@ private fun RowScope.PrezelListTitle(
     )
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelListSmallPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            PrezelListPreviewBySize(PrezelListSize.SMALL)
-        }
-    }
+    PrezelListPreviewBySize(PrezelListSize.SMALL)
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelListRegularPreview() {
-    PrezelTheme {
-        PreviewScaffold {
-            PrezelListPreviewBySize(PrezelListSize.REGULAR)
-        }
-    }
+    PrezelListPreviewBySize(PrezelListSize.REGULAR)
 }
 
 @Composable
@@ -131,27 +120,21 @@ private fun PrezelListPreviewItem(
 
 @Composable
 private fun PrezelListPreviewBySize(size: PrezelListSize) {
-    SectionTitle(title = "PrezelList - $size")
-    Text(
-        text = "점선 테두리는 컴포넌트 경계를 의미하며,\nnested 상태별 leading/trailing 조합을 확인할 수 있습니다.",
-        style = PrezelTheme.typography.body3Regular,
-        color = PrezelTheme.colors.textMedium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray.copy(alpha = 0.5f))
-            .padding(8.dp),
-    )
+    PreviewSection(
+        title = "PrezelList - $size",
+        description = "점선 테두리는 컴포넌트 경계를 의미하며,\nnested 상태별 leading/trailing 조합을 확인할 수 있습니다.",
+    ) {
+        Text(text = "Nested: False", style = PrezelTheme.typography.body2Bold)
+        PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = true)
+        PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = false)
+        PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = true)
+        PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = false)
 
-    Text(text = "Nested: False", style = PrezelTheme.typography.body2Bold)
-    PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = true)
-    PrezelListPreviewItem(size, nested = false, showLeadingContent = true, showTrailingContent = false)
-    PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = true)
-    PrezelListPreviewItem(size, nested = false, showLeadingContent = false, showTrailingContent = false)
-
-    Spacer(modifier = Modifier.height(8.dp))
-    Text(text = "Nested: True", style = PrezelTheme.typography.body2Bold)
-    PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = true)
-    PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = false)
-    PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = true)
-    PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = false)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Nested: True", style = PrezelTheme.typography.body2Bold)
+        PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = true)
+        PrezelListPreviewItem(size, nested = true, showLeadingContent = true, showTrailingContent = false)
+        PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = true)
+        PrezelListPreviewItem(size, nested = true, showLeadingContent = false, showTrailingContent = false)
+    }
 }
