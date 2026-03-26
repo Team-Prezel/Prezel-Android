@@ -32,7 +32,7 @@ internal fun DatePickerMonth(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.padding(PrezelTheme.spacing.V20)) {
-        MonthSectionHeader(yearMonth = yearMonth)
+        MonthHeader(yearMonth = yearMonth)
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 
@@ -47,7 +47,7 @@ internal fun DatePickerMonth(
 }
 
 @Composable
-private fun MonthSectionHeader(
+private fun MonthHeader(
     yearMonth: YearMonth,
     modifier: Modifier = Modifier,
 ) {
@@ -72,9 +72,8 @@ private fun MonthGrid(
     config: DatePickerDefault,
     modifier: Modifier = Modifier,
 ) {
-    val dates = remember(yearMonth) { buildMonthGrid(yearMonth) }
-    val weeks = remember(dates, selectedDate, today) {
-        dates
+    val weeks = remember(yearMonth, selectedDate, today) {
+        buildMonthGrid(yearMonth)
             .map { date ->
                 if (date == null) return@map null
                 DayCellType.from(date = date, selectedDate = selectedDate, today = today)
