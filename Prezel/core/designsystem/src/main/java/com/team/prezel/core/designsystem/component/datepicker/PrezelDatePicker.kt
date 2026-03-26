@@ -114,12 +114,14 @@ private fun DatePickerFooter(
     selectedDate: LocalDate?,
     onConfirm: (LocalDate) -> Unit,
 ) {
+    val buttonLabel = stringResource(R.string.core_designsystem_date_picker_confirm_btn)
+
     PrezelButtonArea(
         isVertical = false,
         showBackground = true,
     ) {
         MainButton(
-            label = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
+            label = buttonLabel,
             enabled = selectedDate != null,
             onClick = { selectedDate?.let(onConfirm) },
         )

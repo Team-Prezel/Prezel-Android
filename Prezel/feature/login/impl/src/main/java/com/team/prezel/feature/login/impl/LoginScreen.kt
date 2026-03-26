@@ -24,7 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
@@ -135,13 +136,14 @@ private fun LoginFooter(
             ),
         ),
     ) {
-        // todo: 카카오 로그인으로 수정 필요
-        PrezelButton(
-            modifier = Modifier.fillMaxWidth(),
-            text = "시작하기",
-            onClick = onLogin,
-            enabled = enabled,
-        )
+        PrezelButtonArea(isNested = true) {
+            MainButton(
+                iconResId = PrezelIcons.Blank,
+                label = "시작하기",
+                enabled = enabled,
+                onClick = onLogin,
+            )
+        }
     }
 }
 
