@@ -2,9 +2,6 @@ package com.team.prezel.core.designsystem.component.datepicker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefault
-import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefaults
-import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerMonth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,6 +34,8 @@ import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefault
+import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerMonth
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewDefaults
 import com.team.prezel.core.designsystem.preview.PreviewSurface
@@ -56,7 +58,8 @@ fun PrezelDatePicker(
     initialSelectedDate: LocalDate = today,
     config: DatePickerDefault = DatePickerDefaults.default(),
 ) {
-    var selectedDate = remember(initialSelectedDate) { initialSelectedDate }
+    var selectedDate by remember(initialSelectedDate) { mutableStateOf(initialSelectedDate) }
+
     val months = remember(today) {
         List(12) { offset ->
             YearMonth(today.year, today.month).plus(value = offset, unit = DateTimeUnit.MONTH)
