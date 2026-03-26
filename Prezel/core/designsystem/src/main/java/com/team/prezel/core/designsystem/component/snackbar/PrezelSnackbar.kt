@@ -63,12 +63,14 @@ fun PrezelSnackbar(
             )
 
             Spacer(Modifier.width(PrezelTheme.spacing.V16))
-            PrezelButton(
-                text = visuals.actionLabel,
-                type = ButtonType.GHOST,
-                size = ButtonSize.SMALL,
-                onClick = { data.performAction() },
-            )
+            visuals.actionLabel?.let {
+                PrezelButton(
+                    text = visuals.actionLabel,
+                    type = ButtonType.GHOST,
+                    size = ButtonSize.SMALL,
+                    onClick = { data.performAction() },
+                )
+            }
         }
     }
 }
@@ -103,26 +105,26 @@ private fun PrezelSnackBarPreview_Cases() {
     }
 }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun PrezelToastPreview() {
-    PrezelTheme {
-        Column {
-            PrezelSnackbar(
-                data = previewData(message = "Message", leadingIcon = IconSource(PrezelIcons.Blank)),
-            )
-
-            PrezelSnackbar(
-                data = previewData(message = "Message Message Message Message Message"),
-            )
-        }
+    PreviewSection(
+        title = "Toast",
+        description = "유저에게 현재 단계에 대한 정보를 버튼없이 제공합니다.",
+    ) {
+        PrezelSnackbar(
+            data = previewData(message = "Message", iconResId = PrezelIcons.Blank),
+        )
+        PrezelSnackbar(
+            data = previewData(message = "Message Message Message Message Message"),
+        )
     }
 }
 
 @Composable
 private fun previewData(
     message: String,
-    actionLabel: String,
+    actionLabel: String? = null,
     @DrawableRes iconResId: Int? = null,
 ): SnackbarData =
     PreviewSnackbarData(

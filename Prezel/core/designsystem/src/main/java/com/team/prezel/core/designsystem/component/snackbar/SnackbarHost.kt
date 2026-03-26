@@ -26,18 +26,11 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     actionLabel: String,
     onAction: () -> Unit,
     @DrawableRes leadingIconResId: Int? = null,
-    leadingIcon: IconSource? = null,
-    actionLabel: String? = null,
-    onAction: (() -> Unit)? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
     id: String? = null,
     onDismiss: (() -> Unit)? = null,
     offsetY: Dp = 0.dp,
 ) {
-    require((actionLabel == null) == (onAction == null)) {
-        "actionLabel과 onAction은 둘 다 있거나 둘 다 없어야 합니다."
-    }
-
     val result = showSnackbar(
         visuals = PrezelSnackbarVisuals(
             message = message,

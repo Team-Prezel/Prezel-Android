@@ -29,17 +29,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.designsystem.component.button.ButtonAreaButtonSpec
-import com.team.prezel.core.designsystem.component.button.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
-import com.team.prezel.core.designsystem.icon.IconSource
-import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.preview.ThemePreview
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.designsystem.util.clickOnce
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.kakao.KakaoLoginManager
 import com.team.prezel.feature.login.impl.kakao.KakaoLoginResult
@@ -79,6 +72,8 @@ internal fun SharedTransitionScope.LoginScreen(
                 is LoginUiEffect.ShowSnackbar -> {
                     snackbarHostState.showPrezelSnackbar(
                         message = effect.message,
+                        actionLabel = "확인",
+                        onAction = { },
                     )
                 }
             }
@@ -174,21 +169,20 @@ private fun LoginFooter(
             ),
         ),
     ) {
-        PrezelButtonArea(
-            mainButton = ButtonAreaButtonSpec(
-                icon = IconSource(painter = painterResource(PrezelIcons.Kakao)),
-                label = "카카오로 시작하기",
-                enabled = !isLoading,
-                onClick = onLogin.clickOnce(),
-            ),
-            subButton = null,
-        )
+//        PrezelButton(
+//            modifier = Modifier.fillMaxWidth(),
+//            text = "시작하기",
+//            onClick = onLogin,
+//            enabled = true,
+//        )
     }
 }
 
 @BasicPreview
 @Composable
 private fun LoginScreenPreview() {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     PrezelTheme {
         SharedTransitionLayout {
             AnimatedVisibility(true) {
