@@ -187,7 +187,7 @@ internal fun PreviewValueRow(
                 )
             }
         }
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+        Box(modifier = Modifier, contentAlignment = Alignment.CenterEnd) {
             preview()
         }
     }

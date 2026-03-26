@@ -1,6 +1,8 @@
 package com.team.prezel.core.designsystem.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -65,10 +67,14 @@ private fun PrezelHorizontalDividerPreview() {
         description = "Divider는 두 요소 사이를 구분합니다.",
     ) {
         PreviewValueRow(name = "DEFAULT") {
-            PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
+            Box(Modifier.width(100.dp)) {
+                PrezelHorizontalDivider(type = PrezelDividerType.DEFAULT)
+            }
         }
         PreviewValueRow(name = "THICK") {
-            PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+            Box(Modifier.width(100.dp)) {
+                PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+            }
         }
     }
 }
