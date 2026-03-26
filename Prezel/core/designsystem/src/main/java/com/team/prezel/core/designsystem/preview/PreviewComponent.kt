@@ -163,12 +163,13 @@ internal fun PreviewSection(
 internal fun PreviewValueRow(
     name: String,
     modifier: Modifier = Modifier,
+    defaults: PreviewDefaults = PreviewDefaults(),
     valueLabel: String? = null,
     preview: @Composable () -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(defaults.itemSpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(modifier = Modifier.weight(1f)) {
