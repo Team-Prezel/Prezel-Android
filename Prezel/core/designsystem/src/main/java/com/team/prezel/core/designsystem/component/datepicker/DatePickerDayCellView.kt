@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewRow
 import com.team.prezel.core.designsystem.preview.PreviewSection
@@ -32,11 +31,10 @@ internal fun RowScope.DayCellView(
             .padding(PrezelTheme.spacing.V4)
             .clip(CircleShape)
             .background(
-                if (uiModel?.isSelected == true) {
-                    PrezelTheme.colors.interactiveRegular
-                } else {
-                    Color.Transparent
-                },
+                color = DatePickerDefaults.dayContainerColor(
+                    uiModel = uiModel,
+                    colors = PrezelTheme.colors,
+                ),
             ).clickable(
                 indication = ripple(),
                 interactionSource = null,
@@ -45,17 +43,18 @@ internal fun RowScope.DayCellView(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        if (uiModel == null) return@Box
-        if (!uiModel.isVisible) return@Box
+        if (uiModel == null || !uiModel.isVisible) return@Box
 
         Text(
             text = uiModel.dayText,
-            color = uiModel.dayTextColor(),
-            style = if (uiModel.isSelected) {
-                PrezelTheme.typography.body3Bold
-            } else {
-                PrezelTheme.typography.body3Medium
-            },
+            color = DatePickerDefaults.dayTextColor(
+                uiModel = uiModel,
+                colors = PrezelTheme.colors,
+            ),
+            style = DatePickerDefaults.dayTextStyle(
+                uiModel = uiModel,
+                typography = PrezelTheme.typography,
+            ),
         )
     }
 }

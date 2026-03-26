@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.preview.ThemePreview
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
@@ -97,10 +98,13 @@ private fun buildMonthGrid(
 
 private fun List<LocalDate?>.hasVisibleDate(today: LocalDate): Boolean = any { date -> date != null && date >= today }
 
-@ThemePreview
+@BasicPreview
 @Composable
 private fun MonthGridPreview() {
-    PrezelTheme {
+    PreviewSection(
+        title = "DatePicker/MonthGrid",
+        description = "DatePicker에 사용되는 리소스입니다.",
+    ) {
         MonthGrid(
             yearMonth = YearMonth(year = 2026, month = 3),
             selectedDate = LocalDate(year = 2026, month = 3, day = 22),
