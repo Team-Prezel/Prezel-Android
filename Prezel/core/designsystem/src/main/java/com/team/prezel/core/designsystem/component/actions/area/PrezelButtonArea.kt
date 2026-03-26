@@ -40,10 +40,7 @@ fun PrezelButtonArea(
     isStrongStrength: Boolean = true,
     showBackground: Boolean = false,
     isNested: Boolean = false,
-    config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(
-        showBackground = showBackground,
-        isNested = isNested,
-    ),
+    config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(),
     content: @Composable ButtonAreaScope.() -> Unit,
 ) {
     val scope = remember { DefaultButtonAreaScope() }
@@ -53,26 +50,29 @@ fun PrezelButtonArea(
         "PrezelButtonArea에는 최소 1개의 버튼이 필요합니다."
     }
     val subButton = scope.buttons.getOrNull(1)
+    val contentModifier = if (isNested) Modifier else Modifier.padding(config.contentPadding)
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(config.backgroundColor),
+            .then(if (showBackground) Modifier.background(config.backgroundColor) else Modifier),
     ) {
-        PrezelHorizontalDivider(type = PrezelDividerType.THICK, color = config.borderColor)
+        if (showBackground) {
+            PrezelHorizontalDivider(type = PrezelDividerType.THICK, color = config.borderColor)
+        }
 
         if (isVertical) {
             ButtonAreaVertical(
                 mainButton = mainButton,
                 subButton = subButton,
-                modifier = Modifier.padding(config.contentPadding),
+                modifier = contentModifier,
             )
         } else {
             ButtonAreaHorizontal(
                 isStrongStrength = isStrongStrength,
                 mainButton = mainButton,
                 subButton = subButton,
-                modifier = Modifier.padding(config.contentPadding),
+                modifier = contentModifier,
             )
         }
     }

@@ -21,15 +21,13 @@ data class PrezelButtonAreaDefault(
  */
 object PrezelButtonAreaDefaults {
     /**
-     * 배경 노출 여부와 중첩 여부에 맞는 기본 스타일을 반환합니다.
+     * 버튼 영역에 사용할 기본 스타일을 반환합니다.
      */
     @Composable
     fun getDefault(
-        showBackground: Boolean = false,
-        isNested: Boolean = false,
-        backgroundColor: Color = getBackgroundColor(showBackground = showBackground),
-        borderColor: Color = getBorderColor(showBackground = showBackground),
-        contentPadding: PaddingValues = getContentPadding(isNested = isNested),
+        backgroundColor: Color = getBackgroundColor(),
+        borderColor: Color = getBorderColor(),
+        contentPadding: PaddingValues = getContentPadding(),
     ): PrezelButtonAreaDefault =
         PrezelButtonAreaDefault(
             backgroundColor = backgroundColor,
@@ -38,11 +36,11 @@ object PrezelButtonAreaDefaults {
         )
 
     @Composable
-    private fun getBackgroundColor(showBackground: Boolean): Color = if (showBackground) PrezelTheme.colors.bgRegular else Color.Transparent
+    private fun getBackgroundColor(): Color = PrezelTheme.colors.bgRegular
 
     @Composable
-    private fun getBorderColor(showBackground: Boolean): Color = if (showBackground) PrezelTheme.colors.borderRegular else Color.Transparent
+    private fun getBorderColor(): Color = PrezelTheme.colors.borderRegular
 
     @Composable
-    private fun getContentPadding(isNested: Boolean): PaddingValues = PaddingValues(if (isNested) PrezelTheme.spacing.V0 else PrezelTheme.spacing.V20)
+    private fun getContentPadding(): PaddingValues = PaddingValues(PrezelTheme.spacing.V20)
 }
