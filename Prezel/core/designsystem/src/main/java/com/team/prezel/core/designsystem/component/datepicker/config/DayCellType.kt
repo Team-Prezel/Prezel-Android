@@ -36,7 +36,7 @@ internal sealed interface DayCellType {
     companion object {
         fun from(
             date: LocalDate,
-            selectedDate: LocalDate,
+            selectedDate: LocalDate?,
             today: LocalDate,
         ): DayCellType {
             val isSelected = date == selectedDate

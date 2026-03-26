@@ -55,7 +55,7 @@ fun PrezelDatePicker(
     onConfirm: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
-    initialSelectedDate: LocalDate = today,
+    initialSelectedDate: LocalDate? = null,
     config: DatePickerDefault = DatePickerDefaults.default(),
 ) {
     var selectedDate by remember(initialSelectedDate) { mutableStateOf(initialSelectedDate) }
@@ -87,7 +87,7 @@ fun PrezelDatePicker(
 
         DatePickerFooter(
             enabled = initialSelectedDate != selectedDate,
-            onClick = { onConfirm(selectedDate) },
+            onClick = { selectedDate?.let(onConfirm) },
         )
     }
 }
@@ -171,6 +171,7 @@ private fun PrezelDatePickerPreview() {
         PrezelDatePicker(
             title = "발표 날짜",
             today = LocalDate(year = 2026, month = 3, day = 16),
+            initialSelectedDate = LocalDate(year = 2026, month = 3, day = 25),
             onClose = {},
             onConfirm = {},
         )

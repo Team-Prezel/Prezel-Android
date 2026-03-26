@@ -25,7 +25,7 @@ import kotlinx.datetime.onDay
 @Composable
 internal fun DatePickerMonth(
     yearMonth: YearMonth,
-    selectedDate: LocalDate,
+    selectedDate: LocalDate?,
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
     config: DatePickerDefault,
@@ -66,7 +66,7 @@ private fun MonthHeader(
 @Composable
 private fun MonthGrid(
     yearMonth: YearMonth,
-    selectedDate: LocalDate,
+    selectedDate: LocalDate?,
     today: LocalDate,
     onSelect: (LocalDate) -> Unit,
     config: DatePickerDefault,
