@@ -8,10 +8,7 @@ import com.team.prezel.core.data.auth.KakaoLoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,8 +16,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val kakaoLoginManager: KakaoLoginManager,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState
+    private var isLoginInProgress = false
 
     private val _uiEffect = Channel<LoginUiEffect>()
     val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
@@ -29,19 +25,19 @@ class LoginViewModel @Inject constructor(
         context: Context,
         failureMessage: String,
     ) {
-        if (_uiState.value.isLoading) return
+        if (isLoginInProgress) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            isLoginInProgress = true
 
             when (kakaoLoginManager.login(context)) {
                 is KakaoLoginResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false) }
+                    isLoginInProgress = false
                     _uiEffect.send(LoginUiEffect.NavigateToHome)
                 }
 
                 is KakaoLoginResult.Failure -> {
-                    _uiState.update { it.copy(isLoading = false) }
+                    isLoginInProgress = false
                     _uiEffect.send(LoginUiEffect.ShowSnackbar(failureMessage))
                 }
             }
