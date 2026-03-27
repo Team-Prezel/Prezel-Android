@@ -38,8 +38,6 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
-import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
-import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
@@ -164,6 +162,15 @@ private fun LoginFooter(
     modifier: Modifier = Modifier,
 ) {
     var isButtonVisible by remember { mutableStateOf(false) }
+    val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
+        isIconOnly = false,
+        type = ButtonType.FILLED,
+        size = ButtonSize.REGULAR,
+        hierarchy = ButtonHierarchy.SECONDARY,
+        isRounded = false,
+        backgroundColor = Color(0xFFFEE500),
+        contentColor = PrezelTheme.colors.textLarge,
+    )
 
     LaunchedEffect(Unit) {
         isButtonVisible = true
@@ -180,21 +187,13 @@ private fun LoginFooter(
             ),
         ),
     ) {
-        PrezelButtonArea(isNested = true) {
+        PrezelButtonArea {
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
                 label = "카카오로 시작하기",
                 enabled = !isLoading,
                 onClick = onLogin,
-                config = PrezelButtonDefaults.getDefault(
-                    isIconOnly = false,
-                    type = ButtonType.FILLED,
-                    size = ButtonSize.REGULAR,
-                    hierarchy = ButtonHierarchy.SECONDARY,
-                    isRounded = false,
-                    backgroundColor = Color(0xFFFEE500),
-                    contentColor = PrezelTheme.colors.textLarge,
-                ),
+                config = kakaoButtonConfig,
             )
         }
     }
