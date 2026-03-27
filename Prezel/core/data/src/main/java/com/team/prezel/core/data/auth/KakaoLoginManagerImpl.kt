@@ -1,13 +1,16 @@
-package com.team.prezel.feature.login.impl.kakao
+package com.team.prezel.core.data.auth
 
 import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.suspendCancellableCoroutine
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 
-class KakaoLoginManager {
-    suspend fun login(context: Context): KakaoLoginResult =
+@Singleton
+class KakaoLoginManagerImpl @Inject constructor() : KakaoLoginManager {
+    override suspend fun login(context: Context): KakaoLoginResult =
         suspendCancellableCoroutine { continuation ->
             val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
                 when {
@@ -28,7 +31,7 @@ class KakaoLoginManager {
             }
         }
 
-    suspend fun logout(): Result<Unit> =
+    override suspend fun logout(): Result<Unit> =
         suspendCancellableCoroutine { continuation ->
             UserApiClient.instance.logout { error ->
                 if (error != null) {

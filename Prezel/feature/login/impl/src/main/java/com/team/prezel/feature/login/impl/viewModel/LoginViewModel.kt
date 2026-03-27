@@ -1,7 +1,10 @@
 package com.team.prezel.feature.login.impl.viewModel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.data.auth.KakaoLoginManager
+import com.team.prezel.core.data.auth.KakaoLoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -13,45 +16,35 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel
-    @Inject
-    constructor() : ViewModel() {
-        private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
-        val uiState: StateFlow<LoginUiState> = _uiState
+class LoginViewModel @Inject constructor(
+    private val kakaoLoginManager: KakaoLoginManager,
+) : ViewModel() {
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState
 
-        private val _uiEffect = Channel<LoginUiEffect>()
-        val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
+    private val _uiEffect = Channel<LoginUiEffect>()
+    val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
-        fun onIntent(intent: LoginUiIntent) {
-            when (intent) {
-                LoginUiIntent.OnClickLogin -> handleClickLogin()
-            }
-        }
+    fun onClickLogin(
+        context: Context,
+        failureMessage: String,
+    ) {
+        if (_uiState.value.isLoading) return
 
-        fun onLoginSuccess() {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(LoginUiEffect.NavigateToHome)
-            }
-        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
 
-        fun onLoginFailure(message: String?) {
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(
-                    LoginUiEffect.ShowSnackbar(
-                        message ?: "카카오 로그인에 실패했습니다. 다시 시도해주세요.",
-                    ),
-                )
-            }
-        }
+            when (kakaoLoginManager.login(context)) {
+                is KakaoLoginResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEffect.send(LoginUiEffect.NavigateToHome)
+                }
 
-        private fun handleClickLogin() {
-            if (_uiState.value.isLoading) return
-
-            viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
-                _uiEffect.send(LoginUiEffect.LaunchKakaoLogin)
+                is KakaoLoginResult.Failure -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEffect.send(LoginUiEffect.ShowSnackbar(failureMessage))
+                }
             }
         }
     }
+}

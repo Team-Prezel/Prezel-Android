@@ -41,10 +41,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
-import com.team.prezel.feature.login.impl.kakao.KakaoLoginManager
-import com.team.prezel.feature.login.impl.kakao.KakaoLoginResult
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
-import com.team.prezel.feature.login.impl.viewModel.LoginUiIntent
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
 import com.team.prezel.core.designsystem.R as DSR
 
@@ -62,18 +59,10 @@ internal fun SharedTransitionScope.LoginScreen(
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val kakaoLoginManager = remember { KakaoLoginManager() }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                LoginUiEffect.LaunchKakaoLogin -> {
-                    when (kakaoLoginManager.login(context)) {
-                        is KakaoLoginResult.Success -> viewModel.onLoginSuccess()
-                        is KakaoLoginResult.Failure -> viewModel.onLoginFailure(message = loginFailureMessage)
-                    }
-                }
-
                 LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 is LoginUiEffect.ShowSnackbar -> {
@@ -90,7 +79,7 @@ internal fun SharedTransitionScope.LoginScreen(
     LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
         isLoading = uiState.isLoading,
-        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
+        onLogin = { viewModel.onClickLogin(context, loginFailureMessage) },
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
