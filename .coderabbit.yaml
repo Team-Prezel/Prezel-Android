@@ -1,13 +1,17 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: ko-KR
+
 reviews:
-  collapse_walkthrough: false
-  changed_files_summary: false
+  profile: chill
+  high_level_summary: true
+  changed_files_summary: true
+  collapse_walkthrough: true
   sequence_diagrams: false
   estimate_code_review_effort: false
   suggested_reviewers: false
   in_progress_fortune: false
   poem: false
+
   finishing_touches:
     docstrings:
       enabled: false

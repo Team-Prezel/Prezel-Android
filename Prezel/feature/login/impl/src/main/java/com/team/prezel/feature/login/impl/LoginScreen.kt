@@ -38,6 +38,8 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
@@ -135,29 +137,24 @@ private fun SharedTransitionScope.LogoImage(
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 95.dp)
-                .sharedElement(
-                    sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    boundsTransform = { _, _ ->
-                        tween(
-                            durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
-                            easing = EaseOut,
-                            delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
-                        )
-                    },
-                ),
-            painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
-            contentDescription = null,
-        )
-    }
+    Image(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 95.dp)
+            .sharedElement(
+                sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(
+                        durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
+                        easing = EaseOut,
+                        delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
+                    )
+                },
+            ),
+        painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
+        contentDescription = null,
+    )
 }
 
 @Composable
@@ -183,7 +180,7 @@ private fun LoginFooter(
             ),
         ),
     ) {
-        PrezelButtonArea {
+        PrezelButtonArea(isNested = true) {
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
                 label = "카카오로 시작하기",
