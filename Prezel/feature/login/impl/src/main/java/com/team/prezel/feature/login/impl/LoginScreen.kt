@@ -60,6 +60,7 @@ internal fun SharedTransitionScope.LoginScreen(
     val context = LocalContext.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
+    val confirmText = stringResource(R.string.confirm)
     val snackbarHostState = remember { SnackbarHostState() }
     var isNavigatingToHome by remember { mutableStateOf(false) }
 
@@ -75,7 +76,7 @@ internal fun SharedTransitionScope.LoginScreen(
                 is LoginUiEffect.ShowSnackbar -> {
                     snackbarHostState.showPrezelSnackbar(
                         message = effect.message,
-                        actionLabel = "확인",
+                        actionLabel = confirmText,
                         onAction = { },
                     )
                 }
@@ -158,6 +159,7 @@ private fun LoginFooter(
     modifier: Modifier = Modifier,
 ) {
     var hasEntered by remember { mutableStateOf(false) }
+    val startWithKakaoText = stringResource(R.string.start_with_kakao)
     val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
         type = ButtonType.FILLED,
@@ -189,7 +191,7 @@ private fun LoginFooter(
         PrezelButtonArea {
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
-                label = "카카오로 시작하기",
+                label = startWithKakaoText,
                 enabled = true,
                 onClick = onLogin,
                 config = kakaoButtonConfig,
