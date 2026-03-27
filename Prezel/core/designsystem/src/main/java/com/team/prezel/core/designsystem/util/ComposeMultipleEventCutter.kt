@@ -5,12 +5,10 @@ fun (() -> Unit).clickOnce(time: Long = 200L): () -> Unit =
         ComposeMultipleEventCutter.processEvent(time) { this() }
     }
 
-fun <T> ((T) -> Unit).clickOnce(
-    value: T,
-    time: Long = 200L,
-) {
-    ComposeMultipleEventCutter.processEvent(time) { this(value) }
-}
+fun <T> ((T) -> Unit).clickOnce(time: Long = 200L): (T) -> Unit =
+    { value ->
+        ComposeMultipleEventCutter.processEvent(time) { this(value) }
+    }
 
 internal object ComposeMultipleEventCutter {
     private val now: Long

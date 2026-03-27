@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.emptyFlow
 object NoRippleInteractionSource : MutableInteractionSource {
     override suspend fun emit(interaction: Interaction) = Unit
 
-    override fun tryEmit(interaction: Interaction): Boolean = true
+    override fun tryEmit(interaction: Interaction): Boolean = false
 
     override val interactions: Flow<Interaction> = emptyFlow()
 }
