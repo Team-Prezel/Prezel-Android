@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +35,11 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonH
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
-import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
@@ -58,9 +58,9 @@ internal fun SharedTransitionScope.LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
-    val snackbarHostState = remember { SnackbarHostState() }
     var isNavigatingToHome by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -87,7 +87,6 @@ internal fun SharedTransitionScope.LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
         showLoginButton = !isNavigatingToHome,
         onLogin = { viewModel.onClickLogin(context, loginFailureMessage, loginRateLimitMessage) },
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
@@ -97,7 +96,6 @@ private fun SharedTransitionScope.LoginScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     showLoginButton: Boolean,
     onLogin: () -> Unit,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -116,12 +114,6 @@ private fun SharedTransitionScope.LoginScreen(
             showLoginButton = showLoginButton,
             onLogin = onLogin,
             modifier = Modifier.align(Alignment.BottomCenter),
-        )
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            snackbar = { data -> PrezelSnackbar(data = data) },
         )
     }
 }
@@ -204,14 +196,15 @@ private fun LoginScreenPreview() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     PrezelTheme {
-        SharedTransitionLayout {
-            AnimatedVisibility(visible = true) {
-                LoginScreen(
-                    animatedVisibilityScope = this,
-                    showLoginButton = true,
-                    onLogin = {},
-                    snackbarHostState = snackbarHostState,
-                )
+        CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+            SharedTransitionLayout {
+                AnimatedVisibility(visible = true) {
+                    LoginScreen(
+                        animatedVisibilityScope = this,
+                        showLoginButton = true,
+                        onLogin = {},
+                    )
+                }
             }
         }
     }
