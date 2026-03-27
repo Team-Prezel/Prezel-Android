@@ -13,4 +13,5 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kakao.user)
+    implementation(libs.timber)
 }

@@ -24,16 +24,22 @@ class LoginViewModel @Inject constructor(
     fun onClickLogin(
         context: Context,
         failureMessage: String,
+        rateLimitMessage: String,
     ) {
         if (isLoginInProgress) return
 
         viewModelScope.launch {
             isLoginInProgress = true
 
-            when (kakaoLoginManager.login(context)) {
+            when (val result = kakaoLoginManager.login(context)) {
                 is KakaoLoginResult.Success -> {
                     isLoginInProgress = false
                     _uiEffect.send(LoginUiEffect.NavigateToHome)
+                }
+
+                is KakaoLoginResult.RateLimited -> {
+                    isLoginInProgress = false
+                    _uiEffect.send(LoginUiEffect.ShowSnackbar(rateLimitMessage))
                 }
 
                 is KakaoLoginResult.Failure -> {

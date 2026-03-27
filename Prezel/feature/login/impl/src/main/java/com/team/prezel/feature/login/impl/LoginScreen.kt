@@ -2,12 +2,12 @@ package com.team.prezel.feature.login.impl
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -59,6 +59,7 @@ internal fun SharedTransitionScope.LoginScreen(
 ) {
     val context = LocalContext.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
+    val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
     val snackbarHostState = remember { SnackbarHostState() }
     var isNavigatingToHome by remember { mutableStateOf(false) }
 
@@ -85,7 +86,7 @@ internal fun SharedTransitionScope.LoginScreen(
     LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
         showLoginButton = !isNavigatingToHome,
-        onLogin = { viewModel.onClickLogin(context, loginFailureMessage) },
+        onLogin = { viewModel.onClickLogin(context, loginFailureMessage, loginRateLimitMessage) },
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -183,9 +184,7 @@ private fun LoginFooter(
                 delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
             ),
         ),
-        exit = fadeOut(
-            animationSpec = tween(durationMillis = LOGIN_EXIT_DURATION),
-        ),
+        exit = ExitTransition.None
     ) {
         PrezelButtonArea {
             CustomButton(
