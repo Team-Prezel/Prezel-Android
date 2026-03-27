@@ -184,7 +184,7 @@ private fun LoginFooter(
                 delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
             ),
         ),
-        exit = ExitTransition.None
+        exit = ExitTransition.None,
     ) {
         PrezelButtonArea {
             CustomButton(

@@ -13,40 +13,42 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val kakaoLoginManager: KakaoLoginManager,
-) : ViewModel() {
-    private var isLoginInProgress = false
+class LoginViewModel
+    @Inject
+    constructor(
+        private val kakaoLoginManager: KakaoLoginManager,
+    ) : ViewModel() {
+        private var isLoginInProgress = false
 
-    private val _uiEffect = Channel<LoginUiEffect>()
-    val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
+        private val _uiEffect = Channel<LoginUiEffect>()
+        val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
-    fun onClickLogin(
-        context: Context,
-        failureMessage: String,
-        rateLimitMessage: String,
-    ) {
-        if (isLoginInProgress) return
+        fun onClickLogin(
+            context: Context,
+            failureMessage: String,
+            rateLimitMessage: String,
+        ) {
+            if (isLoginInProgress) return
 
-        viewModelScope.launch {
-            isLoginInProgress = true
+            viewModelScope.launch {
+                isLoginInProgress = true
 
-            when (val result = kakaoLoginManager.login(context)) {
-                is KakaoLoginResult.Success -> {
-                    isLoginInProgress = false
-                    _uiEffect.send(LoginUiEffect.NavigateToHome)
-                }
+                when (val result = kakaoLoginManager.login(context)) {
+                    is KakaoLoginResult.Success -> {
+                        isLoginInProgress = false
+                        _uiEffect.send(LoginUiEffect.NavigateToHome)
+                    }
 
-                is KakaoLoginResult.RateLimited -> {
-                    isLoginInProgress = false
-                    _uiEffect.send(LoginUiEffect.ShowSnackbar(rateLimitMessage))
-                }
+                    is KakaoLoginResult.RateLimited -> {
+                        isLoginInProgress = false
+                        _uiEffect.send(LoginUiEffect.ShowSnackbar(rateLimitMessage))
+                    }
 
-                is KakaoLoginResult.Failure -> {
-                    isLoginInProgress = false
-                    _uiEffect.send(LoginUiEffect.ShowSnackbar(failureMessage))
+                    is KakaoLoginResult.Failure -> {
+                        isLoginInProgress = false
+                        _uiEffect.send(LoginUiEffect.ShowSnackbar(failureMessage))
+                    }
                 }
             }
         }
     }
-}
