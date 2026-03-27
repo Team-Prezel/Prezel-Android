@@ -35,7 +35,7 @@ androidComponents {
     onVariants { variant ->
         val buildType = variant.buildType ?: return@onVariants
         val buildConfigFields = variant.buildConfigFields ?: return@onVariants
-        val baseUrlKey = "${buildType.uppercase()}_BASE_URL"
+        val baseUrlKey = "${buildType}.base.url"
 
         buildConfigFields.put(
             "BASE_URL",

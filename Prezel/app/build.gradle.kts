@@ -11,8 +11,8 @@ val localProperties = Properties().apply {
 }
 
 val kakaoNativeAppKey =
-    localProperties.getProperty("KAKAO_NATIVE_APP_KEY")
-        ?: error("KAKAO_NATIVE_APP_KEY가 local.properties에 없습니다.")
+    localProperties.getProperty("kakao.native.app.key")
+        ?: error("kakao.native.app.key가 local.properties에 없습니다.")
 
 android {
     namespace = "com.team.prezel"
