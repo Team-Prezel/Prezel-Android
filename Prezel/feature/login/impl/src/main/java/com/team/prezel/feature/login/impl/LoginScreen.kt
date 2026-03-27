@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -42,6 +43,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
+import com.team.prezel.feature.login.impl.viewModel.LoginUiIntent
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
 import kotlinx.coroutines.delay
 import com.team.prezel.core.designsystem.R as DSR
@@ -58,6 +60,7 @@ internal fun SharedTransitionScope.LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
@@ -86,7 +89,16 @@ internal fun SharedTransitionScope.LoginScreen(
     LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
         showLoginButton = !isNavigatingToHome,
-        onLogin = { viewModel.onClickLogin(context, loginFailureMessage, loginRateLimitMessage) },
+        isLoginEnabled = !uiState.isLoading,
+        onLogin = {
+            viewModel.onIntent(
+                LoginUiIntent.OnClickLogin(
+                    context = context,
+                    failureMessage = loginFailureMessage,
+                    rateLimitMessage = loginRateLimitMessage,
+                ),
+            )
+        },
         modifier = modifier,
     )
 }
@@ -95,6 +107,7 @@ internal fun SharedTransitionScope.LoginScreen(
 private fun SharedTransitionScope.LoginScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     showLoginButton: Boolean,
+    isLoginEnabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -112,6 +125,7 @@ private fun SharedTransitionScope.LoginScreen(
 
         LoginFooter(
             showLoginButton = showLoginButton,
+            isLoginEnabled = isLoginEnabled,
             onLogin = onLogin,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
@@ -146,6 +160,7 @@ private fun SharedTransitionScope.LogoImage(
 @Composable
 private fun LoginFooter(
     showLoginButton: Boolean,
+    isLoginEnabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -182,7 +197,7 @@ private fun LoginFooter(
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
                 label = "카카오로 시작하기",
-                enabled = true,
+                enabled = isLoginEnabled,
                 onClick = onLogin,
                 config = kakaoButtonConfig,
             )
@@ -202,6 +217,7 @@ private fun LoginScreenPreview() {
                     LoginScreen(
                         animatedVisibilityScope = this,
                         showLoginButton = true,
+                        isLoginEnabled = true,
                         onLogin = {},
                     )
                 }

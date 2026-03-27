@@ -33,29 +33,24 @@ class LoginViewModel
         }
 
         private fun handleClickLogin(intent: LoginUiIntent.OnClickLogin) {
-            if (_uiState.value.isLoginInProgress) return
+            if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoginInProgress = true) }
+                _uiState.update { it.copy(isLoading = true) }
 
                 when (kakaoLoginManager.login(intent.context)) {
                     is KakaoLoginResult.Success -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoginInProgress = false,
-                                isNavigatingToHome = true,
-                            )
-                        }
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEffect.send(LoginUiEffect.NavigateToHome)
                     }
 
                     is KakaoLoginResult.RateLimited -> {
-                        _uiState.update { it.copy(isLoginInProgress = false) }
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEffect.send(LoginUiEffect.ShowSnackbar(intent.rateLimitMessage))
                     }
 
                     is KakaoLoginResult.Failure -> {
-                        _uiState.update { it.copy(isLoginInProgress = false) }
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEffect.send(LoginUiEffect.ShowSnackbar(intent.failureMessage))
                     }
                 }
