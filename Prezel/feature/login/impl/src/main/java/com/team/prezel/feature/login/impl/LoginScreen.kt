@@ -10,8 +10,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,14 +23,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
+import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbar
 import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
@@ -102,16 +109,18 @@ private fun SharedTransitionScope.LoginScreen(
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            LogoImage(
-                animatedVisibilityScope = animatedVisibilityScope,
-                modifier = Modifier.weight(1f),
-            )
+        LogoImage(
+            animatedVisibilityScope = animatedVisibilityScope,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(),
+        )
 
-            LoginFooter(isLoading = isLoading, onLogin = onLogin)
-        }
+        LoginFooter(
+            isLoading = isLoading,
+            onLogin = onLogin,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
 
         SnackbarHost(
             hostState = snackbarHostState,
@@ -126,24 +135,29 @@ private fun SharedTransitionScope.LogoImage(
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
 ) {
-    Image(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 95.dp)
-            .sharedElement(
-                sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
-                animatedVisibilityScope = animatedVisibilityScope,
-                boundsTransform = { _, _ ->
-                    tween(
-                        durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
-                        easing = EaseOut,
-                        delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
-                    )
-                },
-            ),
-        painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
-        contentDescription = null,
-    )
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 95.dp)
+                .sharedElement(
+                    sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(
+                            durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
+                            easing = EaseOut,
+                            delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
+                        )
+                    },
+                ),
+            painter = painterResource(DSR.drawable.core_designsystem_logo_prezel),
+            contentDescription = null,
+        )
+    }
 }
 
 @Composable
@@ -169,26 +183,48 @@ private fun LoginFooter(
             ),
         ),
     ) {
-//        PrezelButton(
-//            modifier = Modifier.fillMaxWidth(),
-//            text = "시작하기",
-//            onClick = onLogin,
-//            enabled = true,
-//        )
+        PrezelButtonArea {
+            CustomButton(
+                iconResId = PrezelIcons.Kakao,
+                label = "카카오로 시작하기",
+                enabled = !isLoading,
+                onClick = onLogin,
+                config = PrezelButtonDefaults.getDefault(
+                    isIconOnly = false,
+                    type = ButtonType.FILLED,
+                    size = ButtonSize.REGULAR,
+                    hierarchy = ButtonHierarchy.SECONDARY,
+                    isRounded = false,
+                    backgroundColor = Color(0xFFFEE500),
+                    contentColor = PrezelTheme.colors.textLarge,
+                ),
+            )
+        }
     }
 }
 
 @BasicPreview
 @Composable
 private fun LoginScreenPreview() {
+    LoginScreenPreviewContent(isLoading = false)
+}
+
+@BasicPreview
+@Composable
+private fun LoginScreenLoadingPreview() {
+    LoginScreenPreviewContent(isLoading = true)
+}
+
+@Composable
+private fun LoginScreenPreviewContent(isLoading: Boolean) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     PrezelTheme {
         SharedTransitionLayout {
-            AnimatedVisibility(true) {
+            AnimatedVisibility(visible = true) {
                 LoginScreen(
                     animatedVisibilityScope = this,
-                    isLoading = false,
+                    isLoading = isLoading,
                     onLogin = {},
                     snackbarHostState = snackbarHostState,
                 )

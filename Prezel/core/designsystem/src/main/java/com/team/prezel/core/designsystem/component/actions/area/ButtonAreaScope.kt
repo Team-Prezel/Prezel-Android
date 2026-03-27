@@ -111,6 +111,7 @@ internal class DefaultButtonAreaScope : ButtonAreaScope {
     }
 
     private fun validateButtonCount() {
+        if (_buttons.size == 2) return _buttons.clear()
         require(_buttons.size < 2) { "버튼은 최대 2개까지 선언할 수 있습니다." }
     }
 }
