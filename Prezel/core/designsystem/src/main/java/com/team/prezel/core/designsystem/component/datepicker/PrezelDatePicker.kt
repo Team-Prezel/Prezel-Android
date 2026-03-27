@@ -1,10 +1,12 @@
 package com.team.prezel.core.designsystem.component.datepicker
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +33,9 @@ import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefault
+import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefaults
+import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerMonth
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewDefaults
 import com.team.prezel.core.designsystem.preview.PreviewSurface
@@ -46,43 +51,44 @@ import kotlin.time.Clock
 @Composable
 fun PrezelDatePicker(
     title: String,
-    selectedDate: LocalDate?,
-    onSelect: (LocalDate) -> Unit,
     onClose: () -> Unit,
     onConfirm: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+    initialSelectedDate: LocalDate? = null,
+    config: DatePickerDefault = DatePickerDefaults.default(),
 ) {
-    val initialMonth = remember(today) { YearMonth(today.year, today.month) }
-    val months = remember(initialMonth) {
+    var selectedDate by remember(initialSelectedDate) { mutableStateOf(initialSelectedDate) }
+
+    val months = remember(today) {
         List(12) { offset ->
-            initialMonth.plus(value = offset, unit = DateTimeUnit.MONTH)
+            YearMonth(today.year, today.month).plus(value = offset, unit = DateTimeUnit.MONTH)
         }
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(PrezelTheme.colors.bgRegular),
+            .background(color = config.containerColor),
     ) {
         DatePickerHeader(title = title, onClose = onClose)
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(bottom = PrezelTheme.spacing.V16),
-            overscrollEffect = null,
-        ) {
-            items(items = months, key = { it.toString() }) { month ->
-                MonthSection(
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(items = months, key = { month -> month }) { month ->
+                DatePickerMonth(
                     yearMonth = month,
                     selectedDate = selectedDate,
                     today = today,
-                    onSelect = onSelect,
+                    onSelect = { date -> selectedDate = date },
+                    config = config,
                 )
             }
         }
 
-        DatePickerFooter(selectedDate = selectedDate, onConfirm = onConfirm)
+        DatePickerFooter(
+            enabled = initialSelectedDate != selectedDate,
+            onClick = { selectedDate?.let(onConfirm) },
+        )
     }
 }
 
@@ -111,8 +117,8 @@ private fun DatePickerHeader(
 
 @Composable
 private fun DatePickerFooter(
-    selectedDate: LocalDate?,
-    onConfirm: (LocalDate) -> Unit,
+    enabled: Boolean,
+    onClick: () -> Unit,
 ) {
     val buttonLabel = stringResource(R.string.core_designsystem_date_picker_confirm_btn)
 
@@ -122,8 +128,8 @@ private fun DatePickerFooter(
     ) {
         MainButton(
             label = buttonLabel,
-            enabled = selectedDate != null,
-            onClick = { selectedDate?.let(onConfirm) },
+            enabled = enabled,
+            onClick = onClick,
         )
     }
 }
@@ -135,14 +141,15 @@ private fun WeekdayRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                horizontal = PrezelTheme.spacing.V20,
-                vertical = PrezelTheme.spacing.V12,
-            ),
+            .padding(horizontal = PrezelTheme.spacing.V20),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V2),
     ) {
         labels.forEach { text ->
             Box(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -158,18 +165,13 @@ private fun WeekdayRow() {
 @Preview(showBackground = true)
 @Composable
 private fun PrezelDatePickerPreview() {
-    var selected by remember {
-        mutableStateOf(LocalDate(year = 2026, month = 2, day = 26))
-    }
-
     PreviewSurface(
         defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
     ) {
         PrezelDatePicker(
             title = "발표 날짜",
-            today = LocalDate(year = 2026, month = 2, day = 23),
-            selectedDate = selected,
-            onSelect = { selected = it },
+            today = LocalDate(year = 2026, month = 3, day = 16),
+            initialSelectedDate = LocalDate(year = 2026, month = 3, day = 25),
             onClose = {},
             onConfirm = {},
         )
