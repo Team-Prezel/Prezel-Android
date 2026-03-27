@@ -15,7 +15,7 @@ class KakaoLoginManagerImpl @Inject constructor() : KakaoLoginManager {
             val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
                 when {
                     error != null -> continuation.resume(KakaoLoginResult.Failure(error))
-                    token != null -> continuation.resume(KakaoLoginResult.Success(token.accessToken))
+                    token != null -> continuation.resume(KakaoLoginResult.Success)
                     else -> continuation.resume(
                         KakaoLoginResult.Failure(
                             IllegalStateException("카카오 로그인 결과가 비어있습니다."),
