@@ -7,6 +7,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -43,10 +43,12 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
+import kotlinx.coroutines.delay
 import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
+private const val LOGIN_EXIT_DURATION = 120
 
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
@@ -57,13 +59,17 @@ internal fun SharedTransitionScope.LoginScreen(
 ) {
     val context = LocalContext.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var isNavigatingToHome by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToHome -> navigateToHome()
+                LoginUiEffect.NavigateToHome -> {
+                    isNavigatingToHome = true
+                    delay(LOGIN_EXIT_DURATION.toLong())
+                    navigateToHome()
+                }
 
                 is LoginUiEffect.ShowSnackbar -> {
                     snackbarHostState.showPrezelSnackbar(
@@ -78,7 +84,7 @@ internal fun SharedTransitionScope.LoginScreen(
 
     LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
-        isLoading = uiState.isLoading,
+        showLoginButton = !isNavigatingToHome,
         onLogin = { viewModel.onClickLogin(context, loginFailureMessage) },
         snackbarHostState = snackbarHostState,
         modifier = modifier,
@@ -88,7 +94,7 @@ internal fun SharedTransitionScope.LoginScreen(
 @Composable
 private fun SharedTransitionScope.LoginScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
-    isLoading: Boolean,
+    showLoginButton: Boolean,
     onLogin: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -106,7 +112,7 @@ private fun SharedTransitionScope.LoginScreen(
         )
 
         LoginFooter(
-            isLoading = isLoading,
+            showLoginButton = showLoginButton,
             onLogin = onLogin,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
@@ -146,11 +152,11 @@ private fun SharedTransitionScope.LogoImage(
 
 @Composable
 private fun LoginFooter(
-    isLoading: Boolean,
+    showLoginButton: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isButtonVisible by remember { mutableStateOf(false) }
+    var hasEntered by remember { mutableStateOf(false) }
     val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
         type = ButtonType.FILLED,
@@ -162,11 +168,13 @@ private fun LoginFooter(
     )
 
     LaunchedEffect(Unit) {
-        isButtonVisible = true
+        hasEntered = true
     }
 
+    val isVisible = showLoginButton && hasEntered
+
     AnimatedVisibility(
-        visible = isButtonVisible,
+        visible = isVisible,
         modifier = modifier,
         enter = fadeIn(
             animationSpec = tween(
@@ -175,12 +183,15 @@ private fun LoginFooter(
                 delayMillis = AUTH_SHARED_ELEMENT_TRANSITION_DELAY,
             ),
         ),
+        exit = fadeOut(
+            animationSpec = tween(durationMillis = LOGIN_EXIT_DURATION),
+        ),
     ) {
         PrezelButtonArea {
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
                 label = "카카오로 시작하기",
-                enabled = !isLoading,
+                enabled = true,
                 onClick = onLogin,
                 config = kakaoButtonConfig,
             )
@@ -191,17 +202,6 @@ private fun LoginFooter(
 @BasicPreview
 @Composable
 private fun LoginScreenPreview() {
-    LoginScreenPreviewContent(isLoading = false)
-}
-
-@BasicPreview
-@Composable
-private fun LoginScreenLoadingPreview() {
-    LoginScreenPreviewContent(isLoading = true)
-}
-
-@Composable
-private fun LoginScreenPreviewContent(isLoading: Boolean) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     PrezelTheme {
@@ -209,7 +209,7 @@ private fun LoginScreenPreviewContent(isLoading: Boolean) {
             AnimatedVisibility(visible = true) {
                 LoginScreen(
                     animatedVisibilityScope = this,
-                    isLoading = isLoading,
+                    showLoginButton = true,
                     onLogin = {},
                     snackbarHostState = snackbarHostState,
                 )

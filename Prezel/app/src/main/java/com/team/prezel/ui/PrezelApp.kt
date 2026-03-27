@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
@@ -24,6 +28,9 @@ import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.coroutines.delay
+
+private const val NAV_TRANSITION_DURATION = 100
 
 @Composable
 fun PrezelApp(
@@ -53,6 +60,16 @@ private fun PrezelAppContent(
 ) {
     val navigator = LocalNavigator.current
     val snackbarHostState = LocalSnackbarHostState.current
+    var showNavigationBar by remember { mutableStateOf(appState.shouldShowNavigationBar) }
+
+    LaunchedEffect(appState.shouldShowNavigationBar) {
+        if (appState.shouldShowNavigationBar) {
+            delay(NAV_TRANSITION_DURATION.toLong())
+            showNavigationBar = true
+        } else {
+            showNavigationBar = false
+        }
+    }
 
     SharedTransitionLayout {
         ProvideSharedTransitionScope(this@SharedTransitionLayout) {
@@ -63,7 +80,7 @@ private fun PrezelAppContent(
             }
 
             PrezelNavigationScaffold(
-                showNavigationBar = appState.shouldShowNavigationBar,
+                showNavigationBar = showNavigationBar,
                 snackbarHostState = snackbarHostState,
                 navigationItems = {
                     MAIN_NAV_ITEMS.forEach { (key, item) ->
