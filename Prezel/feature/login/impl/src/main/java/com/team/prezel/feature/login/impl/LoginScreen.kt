@@ -10,13 +10,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,13 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.auth.KakaoLoginManager
-import com.team.prezel.core.auth.KakaoLoginResult
+import com.team.prezel.core.auth.AuthManager
+import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -44,10 +40,11 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
+import com.team.prezel.feature.login.impl.model.LoginUiMessage
 import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
 import com.team.prezel.feature.login.impl.viewModel.LoginUiIntent
+import com.team.prezel.feature.login.impl.viewModel.LoginUiState
 import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
-import kotlinx.coroutines.delay
 import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
@@ -57,110 +54,71 @@ private const val LOGIN_EXIT_DURATION = 120
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
+    authManager: AuthManager,
     navigateToHome: () -> Unit,
-    kakaoLoginManager: KakaoLoginManager,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
-    val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
-    val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
-    val snackbarActionLabel = stringResource(R.string.feature_login_impl_snackbar_confirm)
-    var isNavigatingToHome by remember { mutableStateOf(false) }
 
-    LaunchedEffect(isNavigatingToHome) {
-        if (!isNavigatingToHome) return@LaunchedEffect
-        delay(LOGIN_EXIT_DURATION.toLong())
-        navigateToHome()
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                LoginUiEffect.NavigateToHome -> navigateToHome()
+
+                is LoginUiEffect.ShowMessage -> {
+                    val resId = when (effect.message) {
+                        LoginUiMessage.LoginCancelled -> R.string.feature_login_impl_kakao_failure
+                        LoginUiMessage.LoginFailedRateLimited -> R.string.feature_login_impl_kakao_rate_limited
+                        LoginUiMessage.LoginFailedUnknown -> R.string.feature_login_impl_kakao_failure
+                    }
+                    snackbarHostState.showPrezelSnackbar(
+                        message = resources.getString(resId),
+                        actionLabel = resources.getString(R.string.feature_login_impl_snackbar_confirm),
+                    )
+                }
+
+                is LoginUiEffect.LaunchLogin -> {
+                    authManager.login(context = context, provider = effect.provider).also { result ->
+                        viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
+                    }
+                }
+            }
+        }
     }
 
-    HandleLoginEffects(
-        uiEffect = viewModel.uiEffect,
-        context = context,
-        kakaoLoginManager = kakaoLoginManager,
-        snackbarHostState = snackbarHostState,
-        loginFailureMessage = loginFailureMessage,
-        loginRateLimitMessage = loginRateLimitMessage,
-        snackbarActionLabel = snackbarActionLabel,
-        onIntent = viewModel::onIntent,
-        onNavigateToHome = { isNavigatingToHome = true },
-    )
-
     LoginScreen(
+        uiState = uiState,
         animatedVisibilityScope = animatedVisibilityScope,
-        showLoginButton = !isNavigatingToHome,
-        isLoginEnabled = !uiState.isLoading,
-        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
+        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin(provider = AuthProvider.KAKAO)) },
         modifier = modifier,
     )
 }
 
 @Composable
-private fun HandleLoginEffects(
-    uiEffect: kotlinx.coroutines.flow.Flow<LoginUiEffect>,
-    context: android.content.Context,
-    kakaoLoginManager: KakaoLoginManager,
-    snackbarHostState: SnackbarHostState,
-    loginFailureMessage: String,
-    loginRateLimitMessage: String,
-    snackbarActionLabel: String,
-    onIntent: (LoginUiIntent) -> Unit,
-    onNavigateToHome: () -> Unit,
-) {
-    LaunchedEffect(uiEffect) {
-        uiEffect.collect { effect ->
-            when (effect) {
-                LoginUiEffect.LaunchKakaoLogin -> {
-                    val intent = loginWithKakao(
-                        kakaoLoginManager = kakaoLoginManager,
-                        context = context,
-                        failureMessage = loginFailureMessage,
-                        rateLimitMessage = loginRateLimitMessage,
-                    )
-                    onIntent(intent)
-                }
-
-                LoginUiEffect.NavigateToHome -> onNavigateToHome()
-
-                is LoginUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showPrezelSnackbar(
-                        message = effect.message,
-                        actionLabel = snackbarActionLabel,
-                        onAction = { },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun SharedTransitionScope.LoginScreen(
+    uiState: LoginUiState,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    showLoginButton: Boolean,
-    isLoginEnabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         LogoImage(
             animatedVisibilityScope = animatedVisibilityScope,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(),
+            modifier = Modifier.weight(1f),
         )
 
         LoginFooter(
-            showLoginButton = showLoginButton,
-            isLoginEnabled = isLoginEnabled,
+            enabled = !uiState.isLoading,
             onLogin = onLogin,
-            modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
 }
@@ -172,8 +130,7 @@ private fun SharedTransitionScope.LogoImage(
 ) {
     Image(
         modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 95.dp)
+            .fillMaxWidth(0.4722f)
             .sharedElement(
                 sharedContentState = rememberSharedContentState(key = AUTH_LOGO_SHARED_ELEMENT_KEY),
                 animatedVisibilityScope = animatedVisibilityScope,
@@ -192,12 +149,11 @@ private fun SharedTransitionScope.LogoImage(
 
 @Composable
 private fun LoginFooter(
-    showLoginButton: Boolean,
-    isLoginEnabled: Boolean,
+    enabled: Boolean,
     onLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var hasEntered by remember { mutableStateOf(false) }
+    var isButtonVisible by remember { mutableStateOf(false) }
     val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
         type = ButtonType.FILLED,
@@ -209,14 +165,12 @@ private fun LoginFooter(
     )
 
     LaunchedEffect(Unit) {
-        hasEntered = true
+        isButtonVisible = true
     }
 
-    val isVisible = showLoginButton && hasEntered
-
     AnimatedVisibility(
-        visible = isVisible,
-        modifier = modifier,
+        visible = isButtonVisible,
+        modifier = modifier.fillMaxWidth(),
         enter = fadeIn(
             animationSpec = tween(
                 durationMillis = AUTH_SHARED_ELEMENT_TRANSITION_DURATION,
@@ -230,7 +184,7 @@ private fun LoginFooter(
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
                 label = "카카오로 시작하기",
-                enabled = isLoginEnabled,
+                enabled = enabled,
                 onClick = onLogin,
                 config = kakaoButtonConfig,
             )
@@ -238,51 +192,17 @@ private fun LoginFooter(
     }
 }
 
-private suspend fun loginWithKakao(
-    kakaoLoginManager: KakaoLoginManager,
-    context: android.content.Context,
-    failureMessage: String,
-    rateLimitMessage: String,
-): LoginUiIntent =
-    runCatching { kakaoLoginManager.login(context) }
-        .fold(
-            onSuccess = { result ->
-                result.toLoginIntent(
-                    failureMessage = failureMessage,
-                    rateLimitMessage = rateLimitMessage,
-                )
-            },
-            onFailure = {
-                LoginUiIntent.OnLoginFailure(failureMessage)
-            },
-        )
-
-private fun KakaoLoginResult.toLoginIntent(
-    failureMessage: String,
-    rateLimitMessage: String,
-): LoginUiIntent =
-    when (this) {
-        KakaoLoginResult.Success -> LoginUiIntent.OnLoginSuccess
-        is KakaoLoginResult.RateLimited -> LoginUiIntent.OnLoginFailure(rateLimitMessage)
-        is KakaoLoginResult.Failure -> LoginUiIntent.OnLoginFailure(failureMessage)
-    }
-
 @BasicPreview
 @Composable
 private fun LoginScreenPreview() {
-    val snackbarHostState = remember { SnackbarHostState() }
-
     PrezelTheme {
-        CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-            SharedTransitionLayout {
-                AnimatedVisibility(visible = true) {
-                    LoginScreen(
-                        animatedVisibilityScope = this,
-                        showLoginButton = true,
-                        isLoginEnabled = true,
-                        onLogin = {},
-                    )
-                }
+        SharedTransitionLayout {
+            AnimatedVisibility(true) {
+                LoginScreen(
+                    uiState = LoginUiState(),
+                    animatedVisibilityScope = this,
+                    onLogin = {},
+                )
             }
         }
     }
