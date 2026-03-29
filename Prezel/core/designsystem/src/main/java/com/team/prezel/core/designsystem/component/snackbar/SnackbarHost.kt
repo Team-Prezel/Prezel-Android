@@ -23,13 +23,13 @@ internal data class PrezelSnackbarVisuals(
 
 suspend fun SnackbarHostState.showPrezelSnackbar(
     message: String,
-    actionLabel: String,
-    onAction: () -> Unit,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
     @DrawableRes leadingIconResId: Int? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
     id: String? = null,
-    onDismiss: (() -> Unit)? = null,
     offsetY: Dp = 0.dp,
+    onDismiss: (() -> Unit)? = null,
 ) {
     val result = showSnackbar(
         visuals = PrezelSnackbarVisuals(
