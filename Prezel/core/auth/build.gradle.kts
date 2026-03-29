@@ -6,17 +6,19 @@ plugins {
 }
 
 android {
-    buildFeatures {
-        buildConfig = true
-    }
-
     namespace = "com.team.prezel.core.auth"
 
     defaultConfig {
-        val kakaoNativeAppKey = localProperty("kakao.native.app.key")
+        val kakaoNativeAppKey =
+            localProperty("kakao.native.app.key").orNull
+                ?: error("kakao.native.app.key가 local.properties에 없습니다.")
 
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

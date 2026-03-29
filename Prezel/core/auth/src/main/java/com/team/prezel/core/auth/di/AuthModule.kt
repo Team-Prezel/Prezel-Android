@@ -13,7 +13,5 @@ import javax.inject.Singleton
 abstract class AuthModule {
     @Singleton
     @Binds
-    internal abstract fun bindsKakaoLoginManager(
-        kakaoLoginManager: KakaoLoginManagerImpl,
-    ): KakaoLoginManager
+    internal abstract fun bindsKakaoLoginManager(kakaoLoginManager: KakaoLoginManagerImpl): KakaoLoginManager
 }
