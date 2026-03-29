@@ -1,7 +1,7 @@
 package com.team.prezel
 
 import android.app.Application
-import com.team.prezel.core.auth.KakaoAuthInitializer
+import com.team.prezel.core.auth.AuthInitializer
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -13,6 +13,6 @@ class PrezelApplication : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
-        KakaoAuthInitializer.init(this)
+        AuthInitializer.init(this)
     }
 }
