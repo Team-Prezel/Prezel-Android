@@ -113,23 +113,12 @@ private fun HandleLoginEffects(
         uiEffect.collect { effect ->
             when (effect) {
                 LoginUiEffect.LaunchKakaoLogin -> {
-                    val intent =
-                        runCatching { kakaoLoginManager.login(context) }
-                            .fold(
-                                onSuccess = { result ->
-                                    when (result) {
-                                        KakaoLoginResult.Success -> LoginUiIntent.OnLoginSuccess
-                                        is KakaoLoginResult.RateLimited ->
-                                            LoginUiIntent.OnLoginFailure(loginRateLimitMessage)
-
-                                        is KakaoLoginResult.Failure ->
-                                            LoginUiIntent.OnLoginFailure(loginFailureMessage)
-                                    }
-                                },
-                                onFailure = {
-                                    LoginUiIntent.OnLoginFailure(loginFailureMessage)
-                                },
-                            )
+                    val intent = loginWithKakao(
+                        kakaoLoginManager = kakaoLoginManager,
+                        context = context,
+                        failureMessage = loginFailureMessage,
+                        rateLimitMessage = loginRateLimitMessage,
+                    )
                     onIntent(intent)
                 }
 
@@ -248,6 +237,35 @@ private fun LoginFooter(
         }
     }
 }
+
+private suspend fun loginWithKakao(
+    kakaoLoginManager: KakaoLoginManager,
+    context: android.content.Context,
+    failureMessage: String,
+    rateLimitMessage: String,
+): LoginUiIntent =
+    runCatching { kakaoLoginManager.login(context) }
+        .fold(
+            onSuccess = { result ->
+                result.toLoginIntent(
+                    failureMessage = failureMessage,
+                    rateLimitMessage = rateLimitMessage,
+                )
+            },
+            onFailure = {
+                LoginUiIntent.OnLoginFailure(failureMessage)
+            },
+        )
+
+private fun KakaoLoginResult.toLoginIntent(
+    failureMessage: String,
+    rateLimitMessage: String,
+): LoginUiIntent =
+    when (this) {
+        KakaoLoginResult.Success -> LoginUiIntent.OnLoginSuccess
+        is KakaoLoginResult.RateLimited -> LoginUiIntent.OnLoginFailure(rateLimitMessage)
+        is KakaoLoginResult.Failure -> LoginUiIntent.OnLoginFailure(failureMessage)
+    }
 
 @BasicPreview
 @Composable
