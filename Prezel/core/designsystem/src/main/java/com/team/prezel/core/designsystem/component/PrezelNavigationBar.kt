@@ -1,6 +1,7 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,10 +106,10 @@ fun PrezelNavigationScaffold(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if (!showNavigationBar) return@Scaffold
-
-            PrezelNavigationBar {
-                PrezelNavigationScope(this).navigationItems()
+            AnimatedVisibility(visible = showNavigationBar) {
+                PrezelNavigationBar {
+                    PrezelNavigationScope(this).navigationItems()
+                }
             }
         },
         snackbarHost = {
