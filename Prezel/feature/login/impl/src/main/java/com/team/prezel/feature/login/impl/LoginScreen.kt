@@ -49,7 +49,6 @@ import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
-private const val LOGIN_EXIT_DURATION = 120
 
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
