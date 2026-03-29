@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.VariantDimension
 import com.team.prezel.buildlogic.convention.external.localProperty
 
 plugins {
@@ -8,18 +9,25 @@ plugins {
 android {
     namespace = "com.team.prezel.core.auth"
 
-    defaultConfig {
-        val kakaoNativeAppKey =
-            localProperty("kakao.native.app.key").orNull
-                ?: error("kakao.native.app.key가 local.properties에 없습니다.")
+    buildTypes {
+        debug {
+            setKakaoNativeAppKey("debug")
+        }
 
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
-        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
+        release {
+            setKakaoNativeAppKey("release")
+        }
     }
 
     buildFeatures {
         buildConfig = true
     }
+}
+
+private fun VariantDimension.setKakaoNativeAppKey(buildType: String) {
+    val kakaoNativeAppKey = localProperty("$buildType.kakao.native.app.key").get()
+    buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
+    manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
 }
 
 dependencies {
