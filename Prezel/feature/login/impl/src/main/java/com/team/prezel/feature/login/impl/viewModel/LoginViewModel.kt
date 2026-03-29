@@ -2,8 +2,8 @@ package com.team.prezel.feature.login.impl.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.data.auth.KakaoLoginManager
-import com.team.prezel.core.data.auth.KakaoLoginResult
+import com.team.prezel.core.auth.KakaoLoginManager
+import com.team.prezel.core.auth.KakaoLoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

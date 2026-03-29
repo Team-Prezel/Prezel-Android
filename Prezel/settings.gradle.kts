@@ -39,6 +39,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 includeAuto(
     ":app",
+    "core:auth",
     ":core:data",
     ":core:designsystem",
     ":core:network",

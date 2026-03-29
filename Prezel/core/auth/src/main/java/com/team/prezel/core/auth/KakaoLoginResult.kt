@@ -1,4 +1,4 @@
-package com.team.prezel.core.data.auth
+package com.team.prezel.core.auth
 
 sealed interface KakaoLoginResult {
     data object Success : KakaoLoginResult

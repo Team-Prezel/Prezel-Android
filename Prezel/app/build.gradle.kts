@@ -1,18 +1,8 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
     alias(libs.plugins.kotlinx.serialization)
 }
-
-val localProperties = Properties().apply {
-    load(rootProject.file("local.properties").inputStream())
-}
-
-val kakaoNativeAppKey =
-    localProperties.getProperty("kakao.native.app.key")
-        ?: error("kakao.native.app.key가 local.properties에 없습니다.")
 
 android {
     namespace = "com.team.prezel"
@@ -37,14 +27,10 @@ android {
     buildFeatures {
         buildConfig = true
     }
-
-    defaultConfig {
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
-        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoNativeAppKey
-    }
 }
 
 dependencies {
+    implementation(projects.coreAuth)
     implementation(projects.coreData)
     implementation(projects.coreDesignsystem)
     implementation(projects.coreNavigation)
@@ -66,5 +52,4 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.kakao.user)
 }

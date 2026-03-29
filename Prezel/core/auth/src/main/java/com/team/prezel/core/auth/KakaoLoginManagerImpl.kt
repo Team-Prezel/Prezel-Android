@@ -1,4 +1,4 @@
-package com.team.prezel.core.data.auth
+package com.team.prezel.core.auth
 
 import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken

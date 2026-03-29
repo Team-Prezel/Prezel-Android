@@ -7,7 +7,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.coreData)
+    implementation(projects.coreAuth)
     implementation(projects.featureLoginApi)
     implementation(projects.featureHomeApi)
 }
