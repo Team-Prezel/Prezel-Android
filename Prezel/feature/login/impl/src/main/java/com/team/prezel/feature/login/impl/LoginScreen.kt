@@ -31,6 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.auth.KakaoLoginManager
+import com.team.prezel.core.auth.KakaoLoginResult
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -56,6 +58,7 @@ private const val LOGIN_EXIT_DURATION = 120
 internal fun SharedTransitionScope.LoginScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToHome: () -> Unit,
+    kakaoLoginManager: KakaoLoginManager,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -66,14 +69,37 @@ internal fun SharedTransitionScope.LoginScreen(
     val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
     var isNavigatingToHome by remember { mutableStateOf(false) }
 
+    LaunchedEffect(isNavigatingToHome) {
+        if (!isNavigatingToHome) return@LaunchedEffect
+        delay(LOGIN_EXIT_DURATION.toLong())
+        navigateToHome()
+    }
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToHome -> {
-                    isNavigatingToHome = true
-                    delay(LOGIN_EXIT_DURATION.toLong())
-                    navigateToHome()
+                LoginUiEffect.LaunchKakaoLogin -> {
+                    val intent =
+                        runCatching { kakaoLoginManager.login(context) }
+                            .fold(
+                                onSuccess = { result ->
+                                    when (result) {
+                                        KakaoLoginResult.Success -> LoginUiIntent.OnLoginSuccess
+                                        is KakaoLoginResult.RateLimited ->
+                                            LoginUiIntent.OnLoginFailure(loginRateLimitMessage)
+
+                                        is KakaoLoginResult.Failure ->
+                                            LoginUiIntent.OnLoginFailure(loginFailureMessage)
+                                    }
+                                },
+                                onFailure = {
+                                    LoginUiIntent.OnLoginFailure(loginFailureMessage)
+                                },
+                            )
+                    viewModel.onIntent(intent)
                 }
+
+                LoginUiEffect.NavigateToHome -> isNavigatingToHome = true
 
                 is LoginUiEffect.ShowSnackbar -> {
                     snackbarHostState.showPrezelSnackbar(
@@ -90,15 +116,7 @@ internal fun SharedTransitionScope.LoginScreen(
         animatedVisibilityScope = animatedVisibilityScope,
         showLoginButton = !isNavigatingToHome,
         isLoginEnabled = !uiState.isLoading,
-        onLogin = {
-            viewModel.onIntent(
-                LoginUiIntent.OnClickLogin(
-                    context = context,
-                    failureMessage = loginFailureMessage,
-                    rateLimitMessage = loginRateLimitMessage,
-                ),
-            )
-        },
+        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
         modifier = modifier,
     )
 }

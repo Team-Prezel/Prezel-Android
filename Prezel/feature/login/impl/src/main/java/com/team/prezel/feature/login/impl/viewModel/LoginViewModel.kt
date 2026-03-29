@@ -2,8 +2,6 @@ package com.team.prezel.feature.login.impl.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.auth.KakaoLoginManager
-import com.team.prezel.core.auth.KakaoLoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -17,9 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel
     @Inject
-    constructor(
-        private val kakaoLoginManager: KakaoLoginManager,
-    ) : ViewModel() {
+    constructor() : ViewModel() {
         private val _uiState = MutableStateFlow(LoginUiState())
         val uiState: StateFlow<LoginUiState> = _uiState
 
@@ -28,32 +24,36 @@ class LoginViewModel
 
         fun onIntent(intent: LoginUiIntent) {
             when (intent) {
-                is LoginUiIntent.OnClickLogin -> handleClickLogin(intent)
+                LoginUiIntent.OnClickLogin -> handleClickLogin()
+                LoginUiIntent.OnLoginSuccess -> handleLoginSuccess()
+                is LoginUiIntent.OnLoginFailure -> handleLoginFailure(intent.message)
             }
         }
 
-        private fun handleClickLogin(intent: LoginUiIntent.OnClickLogin) {
+        private fun reduce(reducer: (LoginUiState) -> LoginUiState) {
+            _uiState.update(reducer)
+        }
+
+        private fun handleClickLogin() {
             if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
+                reduce { it.copy(isLoading = true) }
+                _uiEffect.send(LoginUiEffect.LaunchKakaoLogin)
+            }
+        }
 
-                when (kakaoLoginManager.login(intent.context)) {
-                    is KakaoLoginResult.Success -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEffect.send(LoginUiEffect.NavigateToHome)
-                    }
+        private fun handleLoginSuccess() {
+            viewModelScope.launch {
+                reduce { it.copy(isLoading = false) }
+                _uiEffect.send(LoginUiEffect.NavigateToHome)
+            }
+        }
 
-                    is KakaoLoginResult.RateLimited -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEffect.send(LoginUiEffect.ShowSnackbar(intent.rateLimitMessage))
-                    }
-
-                    is KakaoLoginResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEffect.send(LoginUiEffect.ShowSnackbar(intent.failureMessage))
-                    }
-                }
+        private fun handleLoginFailure(message: String) {
+            viewModelScope.launch {
+                reduce { it.copy(isLoading = false) }
+                _uiEffect.send(LoginUiEffect.ShowSnackbar(message))
             }
         }
     }
