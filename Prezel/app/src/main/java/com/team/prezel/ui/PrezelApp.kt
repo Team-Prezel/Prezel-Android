@@ -89,6 +89,10 @@ private fun PrezelAppContent(
                         fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
                             fadeOut(animationSpec = tween(durationMillis = 100))
                     },
+                    predictivePopTransitionSpec = {
+                        fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                            fadeOut(animationSpec = tween(durationMillis = 100))
+                    },
                 )
             }
         }
