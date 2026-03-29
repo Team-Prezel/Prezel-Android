@@ -70,7 +70,7 @@ internal fun SharedTransitionScope.LoginScreen(
 
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
-                        LoginUiMessage.LoginCancelled -> R.string.feature_login_impl_kakao_failure
+                        LoginUiMessage.LoginCancelled -> R.string.feature_login_impl_kakao_cancelled
                         LoginUiMessage.LoginFailedRateLimited -> R.string.feature_login_impl_kakao_rate_limited
                         LoginUiMessage.LoginFailedUnknown -> R.string.feature_login_impl_kakao_failure
                     }
