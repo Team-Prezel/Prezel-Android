@@ -67,6 +67,7 @@ internal fun SharedTransitionScope.LoginScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val loginFailureMessage = stringResource(R.string.feature_login_impl_kakao_failure)
     val loginRateLimitMessage = stringResource(R.string.feature_login_impl_kakao_rate_limited)
+    val snackbarActionLabel = stringResource(R.string.feature_login_impl_snackbar_confirm)
     var isNavigatingToHome by remember { mutableStateOf(false) }
 
     LaunchedEffect(isNavigatingToHome) {
@@ -75,8 +76,41 @@ internal fun SharedTransitionScope.LoginScreen(
         navigateToHome()
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
+    HandleLoginEffects(
+        uiEffect = viewModel.uiEffect,
+        context = context,
+        kakaoLoginManager = kakaoLoginManager,
+        snackbarHostState = snackbarHostState,
+        loginFailureMessage = loginFailureMessage,
+        loginRateLimitMessage = loginRateLimitMessage,
+        snackbarActionLabel = snackbarActionLabel,
+        onIntent = viewModel::onIntent,
+        onNavigateToHome = { isNavigatingToHome = true },
+    )
+
+    LoginScreen(
+        animatedVisibilityScope = animatedVisibilityScope,
+        showLoginButton = !isNavigatingToHome,
+        isLoginEnabled = !uiState.isLoading,
+        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun HandleLoginEffects(
+    uiEffect: kotlinx.coroutines.flow.Flow<LoginUiEffect>,
+    context: android.content.Context,
+    kakaoLoginManager: KakaoLoginManager,
+    snackbarHostState: SnackbarHostState,
+    loginFailureMessage: String,
+    loginRateLimitMessage: String,
+    snackbarActionLabel: String,
+    onIntent: (LoginUiIntent) -> Unit,
+    onNavigateToHome: () -> Unit,
+) {
+    LaunchedEffect(uiEffect) {
+        uiEffect.collect { effect ->
             when (effect) {
                 LoginUiEffect.LaunchKakaoLogin -> {
                     val intent =
@@ -96,29 +130,21 @@ internal fun SharedTransitionScope.LoginScreen(
                                     LoginUiIntent.OnLoginFailure(loginFailureMessage)
                                 },
                             )
-                    viewModel.onIntent(intent)
+                    onIntent(intent)
                 }
 
-                LoginUiEffect.NavigateToHome -> isNavigatingToHome = true
+                LoginUiEffect.NavigateToHome -> onNavigateToHome()
 
                 is LoginUiEffect.ShowSnackbar -> {
                     snackbarHostState.showPrezelSnackbar(
                         message = effect.message,
-                        actionLabel = "확인",
+                        actionLabel = snackbarActionLabel,
                         onAction = { },
                     )
                 }
             }
         }
     }
-
-    LoginScreen(
-        animatedVisibilityScope = animatedVisibilityScope,
-        showLoginButton = !isNavigatingToHome,
-        isLoginEnabled = !uiState.isLoading,
-        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
-        modifier = modifier,
-    )
 }
 
 @Composable
