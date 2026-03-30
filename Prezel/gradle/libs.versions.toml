@@ -19,11 +19,11 @@ ktor = "3.3.3"
 ktorfit = "2.7.2"
 timber = "5.0.1"
 navigation3 = "1.0.0"
-
 kotlinxDatetime = "0.7.1"
 kotlinxCoroutines = "1.10.2"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerialization = "1.9.0"
+kakao = "2.23.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +67,8 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+kakao-user = { module = "com.kakao.sdk:v2-user", version.ref = "kakao" }
 
 # Dependencies of the included build-logic
 android-gradleApiPlugin = { group = "com.android.tools.build", name = "gradle-api", version.ref = "agp" }

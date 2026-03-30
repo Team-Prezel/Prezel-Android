@@ -2,12 +2,15 @@ package com.team.prezel.feature.login.impl.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.auth.model.AuthResult
+import com.team.prezel.feature.login.impl.model.LoginUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,16 +18,59 @@ import javax.inject.Inject
 class LoginViewModel
     @Inject
     constructor() : ViewModel() {
-        private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.Idle)
+        private val _uiState = MutableStateFlow(LoginUiState())
         val uiState: StateFlow<LoginUiState> = _uiState
+        val currentState: LoginUiState
+            get() = uiState.value
 
         private val _uiEffect = Channel<LoginUiEffect>()
         val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
-        fun login() {
+        fun onIntent(intent: LoginUiIntent) {
+            when (intent) {
+                is LoginUiIntent.OnClickLogin -> handleClickLogin()
+                is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
+            }
+        }
+
+        private fun update(reducer: LoginUiState.() -> LoginUiState) {
+            _uiState.update(reducer)
+        }
+
+        private fun handleClickLogin() {
+            if (currentState.isLoading) return
+
             viewModelScope.launch {
-                _uiState.emit(LoginUiState.Loading)
+                update { copy(isLoading = true) }
+
+//                _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
                 _uiEffect.send(LoginUiEffect.NavigateToHome)
             }
         }
+
+        private fun handleLoginResult(result: AuthResult) {
+            viewModelScope.launch {
+                update { copy(isLoading = false) }
+
+                when (result) {
+                    AuthResult.Success -> {
+                        _uiEffect.send(LoginUiEffect.NavigateToHome)
+                    }
+
+                    AuthResult.Cancelled -> {
+                        _uiEffect.send(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
+                    }
+
+                    is AuthResult.Failure -> {
+                        _uiEffect.send(LoginUiEffect.ShowMessage(result.toLoginUiMessage()))
+                    }
+                }
+            }
+        }
+
+        private fun AuthResult.Failure.toLoginUiMessage(): LoginUiMessage =
+            when (this) {
+                AuthResult.Failure.RateLimited -> LoginUiMessage.LoginFailedRateLimited
+                AuthResult.Failure.Unknown -> LoginUiMessage.LoginFailedUnknown
+            }
     }

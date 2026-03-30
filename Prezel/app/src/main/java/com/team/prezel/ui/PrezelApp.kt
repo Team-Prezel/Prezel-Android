@@ -53,6 +53,7 @@ private fun PrezelAppContent(
 ) {
     val navigator = LocalNavigator.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val showNavigationBar = appState.shouldShowNavigationBar
 
     SharedTransitionLayout {
         ProvideSharedTransitionScope(this@SharedTransitionLayout) {
@@ -63,7 +64,7 @@ private fun PrezelAppContent(
             }
 
             PrezelNavigationScaffold(
-                showNavigationBar = appState.shouldShowNavigationBar,
+                showNavigationBar = showNavigationBar,
                 snackbarHostState = snackbarHostState,
                 navigationItems = {
                     MAIN_NAV_ITEMS.forEach { (key, item) ->
@@ -85,6 +86,10 @@ private fun PrezelAppContent(
                             fadeOut(animationSpec = tween(durationMillis = 100))
                     },
                     popTransitionSpec = {
+                        fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                            fadeOut(animationSpec = tween(durationMillis = 100))
+                    },
+                    predictivePopTransitionSpec = {
                         fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
                             fadeOut(animationSpec = tween(durationMillis = 100))
                     },

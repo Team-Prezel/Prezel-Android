@@ -1,6 +1,7 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +26,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.snackbar.PrezelSnackbarHost
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.NoRippleInteractionSource
 
 @Composable
 fun PrezelNavigationBar(
@@ -86,8 +89,9 @@ fun RowScope.PrezelNavigationBarItem(
             unselectedIconColor = PrezelTheme.colors.iconDisabled,
             selectedTextColor = PrezelTheme.colors.textLarge,
             unselectedTextColor = PrezelTheme.colors.textDisabled,
-            indicatorColor = PrezelTheme.colors.bgRegular,
+            indicatorColor = Color.Transparent,
         ),
+        interactionSource = NoRippleInteractionSource,
     )
 }
 
@@ -102,10 +106,10 @@ fun PrezelNavigationScaffold(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if (!showNavigationBar) return@Scaffold
-
-            PrezelNavigationBar {
-                PrezelNavigationScope(this).navigationItems()
+            AnimatedVisibility(visible = showNavigationBar) {
+                PrezelNavigationBar {
+                    PrezelNavigationScope(this).navigationItems()
+                }
             }
         },
         snackbarHost = {
