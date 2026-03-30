@@ -2,7 +2,6 @@ package com.team.prezel.feature.login.impl.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
 import com.team.prezel.feature.login.impl.model.LoginUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,7 @@ class LoginViewModel
 
         fun onIntent(intent: LoginUiIntent) {
             when (intent) {
-                is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
+                is LoginUiIntent.OnClickLogin -> handleClickLogin()
                 is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
             }
         }
@@ -38,13 +37,14 @@ class LoginViewModel
             _uiState.update(reducer)
         }
 
-        private fun handleClickLogin(provider: AuthProvider) {
+        private fun handleClickLogin() {
             if (currentState.isLoading) return
 
             viewModelScope.launch {
                 update { copy(isLoading = true) }
 
-                _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
+//                _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
+                _uiEffect.send(LoginUiEffect.NavigateToHome)
             }
         }
 
