@@ -8,9 +8,7 @@ internal data class TermsUiState(
     val isPrivacyPolicyChecked: Boolean = false,
     val isMarketingConsentChecked: Boolean = false,
 ) {
-    val isRequiredChecked: Boolean
-        get() = isTermsOfServiceChecked && isPrivacyPolicyChecked
+    val isRequiredChecked: Boolean = isTermsOfServiceChecked && isPrivacyPolicyChecked
 
-    val isAllChecked: Boolean
-        get() = isRequiredChecked && isMarketingConsentChecked
+    val isAllChecked: Boolean = isTermsOfServiceChecked && isPrivacyPolicyChecked && isMarketingConsentChecked
 }
