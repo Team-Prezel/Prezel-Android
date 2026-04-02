@@ -72,7 +72,7 @@ internal fun TermsScreen(
         )
     }
 
-    TermsScreen(
+    TermsScreenScreen(
         uiState = uiState,
         onBack = navigateBack,
         onToggleAll = { viewModel.onIntent(TermsUiIntent.OnToggleAll) },
@@ -88,7 +88,7 @@ internal fun TermsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TermsScreen(
+private fun TermsScreenScreen(
     uiState: TermsUiState,
     onBack: () -> Unit,
     onToggleAll: () -> Unit,
@@ -105,7 +105,7 @@ internal fun TermsScreen(
     Column(modifier = modifier.fillMaxSize()) {
         TermsScreenTopAppBar(onBack = onBack)
 
-        AgreementSections(
+        TermsAgreementContent(
             modifier = Modifier.weight(1f),
             uiState = uiState,
             onToggleAll = onToggleAll,
@@ -126,84 +126,9 @@ internal fun TermsScreen(
     }
 }
 
-@Composable
-private fun AgreementSections(
-    uiState: TermsUiState,
-    onToggleAll: () -> Unit,
-    onToggleTermsOfService: () -> Unit,
-    onClickTermsOfServiceDetail: () -> Unit,
-    onTogglePrivacyPolicy: () -> Unit,
-    onClickPrivacyPolicyDetail: () -> Unit,
-    onToggleMarketingConsent: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .padding(
-                horizontal = PrezelTheme.spacing.V20,
-                vertical = PrezelTheme.spacing.V16,
-            ),
-    ) {
-        AgreementAll(isAllChecked = uiState.isAllChecked, onToggleAll = onToggleAll)
-
-        PrezelHorizontalDivider(type = PrezelDividerType.THICK)
-
-        AgreementSection {
-            AgreementRow(
-                checked = uiState.isTermsOfServiceChecked,
-                title = stringResource(R.string.feature_login_impl_terms_of_service),
-                summary = stringResource(R.string.feature_login_impl_terms_of_service_summary),
-                isShowDetailButton = true,
-                onCheckedChange = { onToggleTermsOfService() },
-                onClickDetail = onClickTermsOfServiceDetail,
-            )
-            AgreementRow(
-                checked = uiState.isPrivacyPolicyChecked,
-                title = stringResource(R.string.feature_login_impl_privacy_policy),
-                summary = stringResource(R.string.feature_login_impl_privacy_policy_summary),
-                isShowDetailButton = true,
-                onCheckedChange = { onTogglePrivacyPolicy() },
-                onClickDetail = onClickPrivacyPolicyDetail,
-            )
-            AgreementRow(
-                checked = uiState.isMarketingConsentChecked,
-                title = stringResource(R.string.feature_login_impl_marketing_consent),
-                summary = stringResource(R.string.feature_login_impl_marketing_consent_summary),
-                isShowDetailButton = false,
-                onCheckedChange = { onToggleMarketingConsent() },
-                onClickDetail = {},
-            )
-        }
-    }
-}
-
-@Composable
-private fun AgreementAll(
-    isAllChecked: Boolean,
-    onToggleAll: () -> Unit,
-) {
-    PrezelList(
-        title = stringResource(R.string.feature_login_impl_terms_all),
-        size = PrezelListSize.REGULAR,
-        nested = true,
-        leadingContent = {
-            PrezelCheckbox(
-                checked = isAllChecked,
-                size = CheckboxSize.REGULAR,
-                onCheckedChange = { onToggleAll() },
-                extraTouchPadding = PaddingValues(
-                    start = PrezelTheme.spacing.V8,
-                    top = PrezelTheme.spacing.V8,
-                    bottom = PrezelTheme.spacing.V8,
-                ),
-            )
-        },
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TermsScreenTopAppBar(
+private fun TermsScreenTopAppBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -224,7 +149,87 @@ fun TermsScreenTopAppBar(
 }
 
 @Composable
-private fun AgreementSection(
+private fun TermsAgreementContent(
+    uiState: TermsUiState,
+    onToggleAll: () -> Unit,
+    onToggleTermsOfService: () -> Unit,
+    onClickTermsOfServiceDetail: () -> Unit,
+    onTogglePrivacyPolicy: () -> Unit,
+    onClickPrivacyPolicyDetail: () -> Unit,
+    onToggleMarketingConsent: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .padding(
+                horizontal = PrezelTheme.spacing.V20,
+                vertical = PrezelTheme.spacing.V16,
+            ),
+    ) {
+        TermsSelectAllRow(
+            isAllChecked = uiState.isAllChecked,
+            onToggleAll = onToggleAll,
+        )
+
+        PrezelHorizontalDivider(type = PrezelDividerType.THICK)
+
+        TermsAgreementSection {
+            TermsAgreementRow(
+                checked = uiState.isTermsOfServiceChecked,
+                title = stringResource(R.string.feature_login_impl_terms_of_service),
+                summary = stringResource(R.string.feature_login_impl_terms_of_service_summary),
+                isShowDetailButton = true,
+                onCheckedChange = { onToggleTermsOfService() },
+                onClickDetail = onClickTermsOfServiceDetail,
+            )
+            TermsAgreementRow(
+                checked = uiState.isPrivacyPolicyChecked,
+                title = stringResource(R.string.feature_login_impl_privacy_policy),
+                summary = stringResource(R.string.feature_login_impl_privacy_policy_summary),
+                isShowDetailButton = true,
+                onCheckedChange = { onTogglePrivacyPolicy() },
+                onClickDetail = onClickPrivacyPolicyDetail,
+            )
+            TermsAgreementRow(
+                checked = uiState.isMarketingConsentChecked,
+                title = stringResource(R.string.feature_login_impl_marketing_consent),
+                summary = stringResource(R.string.feature_login_impl_marketing_consent_summary),
+                isShowDetailButton = false,
+                onCheckedChange = { onToggleMarketingConsent() },
+                onClickDetail = {},
+            )
+        }
+    }
+}
+
+@Composable
+private fun TermsSelectAllRow(
+    isAllChecked: Boolean,
+    onToggleAll: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    PrezelList(
+        modifier = modifier,
+        title = stringResource(R.string.feature_login_impl_terms_all),
+        size = PrezelListSize.REGULAR,
+        nested = true,
+        leadingContent = {
+            PrezelCheckbox(
+                checked = isAllChecked,
+                size = CheckboxSize.REGULAR,
+                onCheckedChange = { onToggleAll() },
+                extraTouchPadding = PaddingValues(
+                    start = PrezelTheme.spacing.V8,
+                    top = PrezelTheme.spacing.V8,
+                    bottom = PrezelTheme.spacing.V8,
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+private fun TermsAgreementSection(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -239,7 +244,7 @@ private fun AgreementSection(
 }
 
 @Composable
-private fun AgreementRow(
+private fun TermsAgreementRow(
     checked: Boolean,
     title: String,
     summary: String,
@@ -291,7 +296,7 @@ private fun TermsScreenPreview() {
     var uiState by remember { mutableStateOf(TermsUiState()) }
 
     PrezelTheme {
-        TermsScreen(
+        TermsScreenScreen(
             uiState = uiState,
             onBack = {},
             onToggleAll = {
