@@ -13,6 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
@@ -38,7 +43,10 @@ fun PrezelCheckbox(
     onCheckedChange: (Boolean) -> Unit,
 ) {
     PrezelTouchArea(
-        modifier = modifier,
+        modifier = modifier.semantics {
+            role = Role.Checkbox
+            toggleableState = ToggleableState(checked)
+        },
         onClick = { onCheckedChange(!checked) },
         isUseRipple = false,
         extraTouchPadding = extraTouchPadding,
