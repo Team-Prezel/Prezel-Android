@@ -1,9 +1,9 @@
-package com.team.prezel.feature.login.impl.viewModel
+package com.team.prezel.feature.login.impl.landing.contract
 
 import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
 
-sealed interface LoginUiIntent {
+internal sealed interface LoginUiIntent {
     data class OnClickLogin(
         val provider: AuthProvider,
     ) : LoginUiIntent
