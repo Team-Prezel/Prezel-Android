@@ -21,57 +21,57 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginViewModel
-@Inject
-constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState
-    private val currentState: LoginUiState
-        get() = uiState.value
+    @Inject
+    constructor() : ViewModel() {
+        private val _uiState = MutableStateFlow(LoginUiState())
+        val uiState: StateFlow<LoginUiState> = _uiState
+        private val currentState: LoginUiState
+            get() = uiState.value
 
-    private val _uiEffect = Channel<LoginUiEffect>()
-    val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
+        private val _uiEffect = Channel<LoginUiEffect>()
+        val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
-    fun onIntent(intent: LoginUiIntent) {
-        when (intent) {
-            is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
-            is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
-        }
-    }
-
-    private fun update(reducer: LoginUiState.() -> LoginUiState) {
-        _uiState.update(reducer)
-    }
-
-    private fun handleClickLogin(provider: AuthProvider) {
-        if (currentState.isLoading) return
-
-        viewModelScope.launch {
-            update { copy(isLoading = true) }
-
-            // todo: MVP 개발 완료 후 해당 조건 제거
-            if (BuildConfig.DEBUG) {
-                _uiEffect.send(LoginUiEffect.NavigateToTerms)
-            } else {
-                _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
+        fun onIntent(intent: LoginUiIntent) {
+            when (intent) {
+                is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
+                is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
             }
         }
-    }
 
-    private fun handleLoginResult(result: AuthResult) {
-        viewModelScope.launch {
-            update { copy(isLoading = false) }
+        private fun update(reducer: LoginUiState.() -> LoginUiState) {
+            _uiState.update(reducer)
+        }
 
-            when (result) {
-                AuthResult.Success -> _uiEffect.send(LoginUiEffect.NavigateToTerms)
-                AuthResult.Cancelled -> _uiEffect.send(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
-                is AuthResult.Failure -> _uiEffect.send(LoginUiEffect.ShowMessage(result.toUiMessage()))
+        private fun handleClickLogin(provider: AuthProvider) {
+            if (currentState.isLoading) return
+
+            viewModelScope.launch {
+                update { copy(isLoading = true) }
+
+                // todo: MVP 개발 완료 후 해당 조건 제거
+                if (BuildConfig.DEBUG) {
+                    _uiEffect.send(LoginUiEffect.NavigateToTerms)
+                } else {
+                    _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
+                }
             }
         }
-    }
 
-    private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
-        when (this) {
-            AuthResult.Failure.RateLimited -> LoginUiMessage.LoginFailedRateLimited
-            AuthResult.Failure.Unknown -> LoginUiMessage.LoginFailedUnknown
+        private fun handleLoginResult(result: AuthResult) {
+            viewModelScope.launch {
+                update { copy(isLoading = false) }
+
+                when (result) {
+                    AuthResult.Success -> _uiEffect.send(LoginUiEffect.NavigateToTerms)
+                    AuthResult.Cancelled -> _uiEffect.send(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
+                    is AuthResult.Failure -> _uiEffect.send(LoginUiEffect.ShowMessage(result.toUiMessage()))
+                }
+            }
         }
-}
+
+        private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
+            when (this) {
+                AuthResult.Failure.RateLimited -> LoginUiMessage.LoginFailedRateLimited
+                AuthResult.Failure.Unknown -> LoginUiMessage.LoginFailedUnknown
+            }
+    }
