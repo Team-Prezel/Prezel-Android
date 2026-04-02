@@ -15,6 +15,13 @@ internal object PrezelTextStyles {
         letterSpacing = PrezelFontLetterSpacing.V500,
     )
 
+    val Title1ExtraBold: PrezelTextStyle = PrezelTextStyle(
+        fontWeight = PrezelFontWeight.EXTRA_BOLD,
+        fontSize = PrezelFontSize.V500,
+        lineHeight = PrezelFontLineHeight.V500,
+        letterSpacing = PrezelFontLetterSpacing.V500,
+    )
+
     val Title2Medium: PrezelTextStyle = PrezelTextStyle(
         fontWeight = PrezelFontWeight.MEDIUM,
         fontSize = PrezelFontSize.V400,
@@ -24,6 +31,13 @@ internal object PrezelTextStyles {
 
     val Title2Bold: PrezelTextStyle = PrezelTextStyle(
         fontWeight = PrezelFontWeight.BOLD,
+        fontSize = PrezelFontSize.V400,
+        lineHeight = PrezelFontLineHeight.V400,
+        letterSpacing = PrezelFontLetterSpacing.V400,
+    )
+
+    val Title2ExtraBold: PrezelTextStyle = PrezelTextStyle(
+        fontWeight = PrezelFontWeight.EXTRA_BOLD,
         fontSize = PrezelFontSize.V400,
         lineHeight = PrezelFontLineHeight.V400,
         letterSpacing = PrezelFontLetterSpacing.V400,

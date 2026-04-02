@@ -9,8 +9,10 @@ data class PrezelTypography(
     // 페이지나 섹션의 주요 제목 등 핵심 정보를 강조하는 데 사용하는 스타일입니다.
     val title1Medium: TextStyle,
     val title1Bold: TextStyle,
+    val title1ExtraBold: TextStyle,
     val title2Medium: TextStyle,
     val title2Bold: TextStyle,
+    val title2ExtraBold: TextStyle,
     // Body
     // 일반 본문과 설명, 단일 문장 또는 단락 등의 주된 콘텐츠 전달에 사용하는 스타일입니다.
     val body1Regular: TextStyle,
