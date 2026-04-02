@@ -1,15 +1,9 @@
 package com.team.prezel.core.designsystem.theme
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
 import com.team.prezel.core.designsystem.preview.PreviewSection
@@ -23,8 +17,10 @@ internal object PrezelTypographyScheme {
         PrezelTypography(
             title1Medium = PrezelTextStyles.Title1Medium.toTextStyle(),
             title1Bold = PrezelTextStyles.Title1Bold.toTextStyle(),
+            title1ExtraBold = PrezelTextStyles.Title1ExtraBold.toTextStyle(),
             title2Medium = PrezelTextStyles.Title2Medium.toTextStyle(),
             title2Bold = PrezelTextStyles.Title2Bold.toTextStyle(),
+            title2ExtraBold = PrezelTextStyles.Title2ExtraBold.toTextStyle(),
             body1Regular = PrezelTextStyles.Body1Regular.toTextStyle(),
             body1Medium = PrezelTextStyles.Body1Medium.toTextStyle(),
             body1Bold = PrezelTextStyles.Body1Bold.toTextStyle(),
@@ -43,7 +39,7 @@ internal object PrezelTypographyScheme {
 
 @Preview(
     showBackground = true,
-    device = "spec:width=900dp,height=600dp",
+    device = "spec:width=850dp,height=600dp",
 )
 private annotation class TypographyPreview
 
@@ -57,8 +53,10 @@ private fun PrezelTypographyTitlePreview() {
         items = persistentListOf(
             "Title1 Medium" to typography.title1Medium,
             "Title1 Bold" to typography.title1Bold,
+            "Title1 Extra Bold" to typography.title1ExtraBold,
             "Title2 Medium" to typography.title2Medium,
             "Title2 Bold" to typography.title2Bold,
+            "Title2 Extra Bold" to typography.title2ExtraBold,
         ),
     )
 }
@@ -121,25 +119,11 @@ private fun PrezelTypographyPreviewContent(
 @Composable
 private fun TypographySampleText(
     style: TextStyle,
-    sampleKo: String = "이 문장은 글꼴의 형태와 가독성을 확인하기 위한 예시입니다.",
-    sampleEn: String = "This sentence is an example for checking font shape and readability.",
+    sampleKo: String = "이 문장은 디자인과 레이아웃 테스트를 위한 의미 없는 더미 텍스트입니다.",
 ) {
-    Column(
-        modifier = Modifier
-            .background(
-                color = PrezelTheme.colors.bgLarge,
-                shape = RoundedCornerShape(12.dp),
-            ).padding(8.dp),
-    ) {
-        Text(
-            text = sampleKo,
-            style = style,
-            color = PrezelTheme.colors.textLarge,
-        )
-        Text(
-            text = sampleEn,
-            style = style,
-            color = PrezelTheme.colors.textLarge,
-        )
-    }
+    Text(
+        text = sampleKo,
+        style = style,
+        color = PrezelTheme.colors.textRegular,
+    )
 }

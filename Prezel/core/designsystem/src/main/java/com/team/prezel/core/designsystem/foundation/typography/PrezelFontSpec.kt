@@ -14,6 +14,7 @@ enum class PrezelFontWeight(
     REGULAR(FontWeight.Medium),
     MEDIUM(FontWeight.SemiBold),
     BOLD(FontWeight.Bold),
+    EXTRA_BOLD(FontWeight.ExtraBold),
 }
 
 enum class PrezelFontSize(
