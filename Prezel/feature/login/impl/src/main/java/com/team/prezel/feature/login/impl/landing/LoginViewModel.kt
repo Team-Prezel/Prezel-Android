@@ -50,6 +50,7 @@ internal class LoginViewModel
 
                 // todo: MVP 개발 완료 후 해당 조건 제거
                 if (BuildConfig.DEBUG) {
+                    update { copy(isLoading = false) }
                     _uiEffect.send(LoginUiEffect.NavigateToTerms)
                 } else {
                     _uiEffect.send(LoginUiEffect.LaunchLogin(provider = provider))
