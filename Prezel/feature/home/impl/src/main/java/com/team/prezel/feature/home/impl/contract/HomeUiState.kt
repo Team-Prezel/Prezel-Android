@@ -13,8 +13,11 @@ internal sealed interface HomeUiState : UiState {
         val nickname: String,
     ) : HomeUiState
 
-    data class Content(
-        val nickname: String,
+    data class SingleContent(
+        val presentation: PresentationUiModel,
+    ) : HomeUiState
+
+    data class MultipleContent(
         val presentations: ImmutableList<PresentationUiModel>,
     ) : HomeUiState
 }

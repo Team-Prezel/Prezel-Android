@@ -38,7 +38,6 @@ import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
@@ -53,8 +52,10 @@ internal fun HomeScreen(
 
     HomeScreen(
         uiState = uiState,
-        modifier = modifier,
         onTabSelected = onTabSelected,
+        onClickAddPresentation = { },
+        onClickAnalyzePresentation = { },
+        modifier = modifier,
     )
 }
 
@@ -62,10 +63,10 @@ internal fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    modifier: Modifier,
-    onTabSelected: (String) -> Unit = {},
-    onClickAddPresentation: () -> Unit = {},
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
+    onTabSelected: (String) -> Unit,
+    onClickAddPresentation: () -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(title = { Text(text = "홈") })
@@ -75,15 +76,20 @@ private fun HomeScreen(
             is HomeUiState.Empty -> {
                 HomeEmptyContent(
                     nickname = uiState.nickname,
-                    modifier = Modifier.fillMaxSize(),
                     onClickAddPresentation = onClickAddPresentation,
                 )
             }
 
-            is HomeUiState.Content -> {
+            is HomeUiState.SingleContent -> {
+                HomePresentationPage(
+                    presentation = uiState.presentation,
+                    onClickAnalyzePresentation = onClickAnalyzePresentation,
+                )
+            }
+
+            is HomeUiState.MultipleContent -> {
                 HomePresentationContent(
                     presentations = uiState.presentations,
-                    modifier = Modifier.fillMaxSize(),
                     onTabSelected = onTabSelected,
                     onClickAnalyzePresentation = onClickAnalyzePresentation,
                 )
@@ -98,55 +104,41 @@ private fun HomeEmptyContent(
     modifier: Modifier = Modifier,
     onClickAddPresentation: () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                PrezelTheme.spacing.V20,
-            ),
-    ) {
-        Text(
-            text = "안녕하세요 ${nickname}님!",
-            color = PrezelTheme.colors.textMedium,
-            style = PrezelTheme.typography.title1Medium,
-        )
-        Text(
-            text = "어떤 발표를 앞두고 있나요?",
-            color = PrezelTheme.colors.textLarge,
-            style = PrezelTheme.typography.title1Bold,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        HomeBottomCard(
-            title = "발표 준비를 시작해볼까요?",
-            actionText = "발표 추가하기",
-            titleColor = PrezelTheme.colors.interactiveRegular,
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onClickAddPresentation,
-        )
+    Box {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(PrezelTheme.spacing.V20),
+        ) {
+            Text(
+                text = "안녕하세요 ${nickname}님!",
+                color = PrezelTheme.colors.textMedium,
+                style = PrezelTheme.typography.title1Medium,
+            )
+            Text(
+                text = "어떤 발표를 앞두고 있나요?",
+                color = PrezelTheme.colors.textLarge,
+                style = PrezelTheme.typography.title1Bold,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            HomeBottomCard(
+                title = "발표 준비를 시작해볼까요?",
+                actionText = "발표 추가하기",
+                titleColor = PrezelTheme.colors.interactiveRegular,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onClickAddPresentation,
+            )
+        }
     }
 }
 
 @Composable
 private fun HomePresentationContent(
     presentations: ImmutableList<PresentationUiModel>,
+    onTabSelected: (String) -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
-    onTabSelected: (String) -> Unit = {},
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
 ) {
-    val presentation = presentations.firstOrNull() ?: return
-
-    if (presentations.size < 2) {
-        HomePresentationPage(
-            presentation = presentation,
-            modifier = modifier
-                .fillMaxWidth()
-                .background(PrezelTheme.colors.bgMedium)
-                .padding(all = PrezelTheme.spacing.V20),
-            onClickAnalyzePresentation = onClickAnalyzePresentation,
-        )
-        return
-    }
-
     val tabs = presentations.map(PresentationUiModel::dDayLabel).toPersistentList()
     val pagerState = rememberPagerState { presentations.size }
 
@@ -157,14 +149,11 @@ private fun HomePresentationContent(
     PrezelTabs(
         tabs = tabs,
         pagerState = pagerState,
-        modifier = modifier.background(PrezelTheme.colors.bgMedium),
     ) { pageIndex ->
         HomePresentationPage(
             presentation = presentations[pageIndex],
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = PrezelTheme.spacing.V20),
             onClickAnalyzePresentation = onClickAnalyzePresentation,
+            modifier = modifier,
         )
     }
 }
@@ -172,48 +161,50 @@ private fun HomePresentationContent(
 @Composable
 private fun HomePresentationPage(
     presentation: PresentationUiModel,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        PrezelChip(
-            text = presentation.category.label,
-            customColors = PrezelChipColors(
-                containerColor = PrezelTheme.colors.bgRegular,
-                contentColor = PrezelTheme.colors.interactiveRegular,
-            ),
-        )
+    Box {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(all = PrezelTheme.spacing.V20),
+        ) {
+            PrezelChip(
+                text = presentation.category.label,
+                customColors = PrezelChipColors(
+                    containerColor = PrezelTheme.colors.bgRegular,
+                    contentColor = PrezelTheme.colors.interactiveRegular,
+                ),
+            )
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = presentation.date.toKoreanDate(),
-            color = PrezelTheme.colors.textRegular,
-            style = PrezelTheme.typography.body3Regular,
-        )
+            Text(
+                text = presentation.date.toKoreanDate(),
+                color = PrezelTheme.colors.textRegular,
+                style = PrezelTheme.typography.body3Regular,
+            )
 
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
-        HomePresentationTitleRow(presentation = presentation)
+            HomePresentationTitleRow(presentation = presentation)
 
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
-        HomeBottomCard(
-            title = "충분히 연습했는지 확인해볼까요?",
-            actionText = "발표 분석하기",
-            titleColor = PrezelTheme.colors.textMedium,
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { onClickAnalyzePresentation(presentation) },
-        )
+            HomeBottomCard(
+                title = "충분히 연습했는지 확인해볼까요?",
+                actionText = "발표 분석하기",
+                titleColor = PrezelTheme.colors.textMedium,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onClickAnalyzePresentation(presentation) },
+            )
+        }
     }
 }
 
 @Composable
-private fun HomePresentationTitleRow(
-    presentation: PresentationUiModel,
-) {
+private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -251,8 +242,7 @@ private fun HomeBottomCard(
                     width = PrezelTheme.stroke.V1,
                     shape = PrezelTheme.shapes.V8,
                     color = PrezelTheme.colors.borderSmall,
-                )
-                .background(color = PrezelTheme.colors.bgRegular)
+                ).background(color = PrezelTheme.colors.bgRegular)
                 .padding(horizontal = PrezelTheme.spacing.V16, vertical = PrezelTheme.spacing.V12),
         ) {
             Text(
@@ -287,61 +277,60 @@ private fun LocalDate.toKoreanDate(): String = "${year}년 ${month.number.toStri
 
 private fun PresentationUiModel.dDayLabel(): String = "D-${dDay()}"
 
-private val previewItem = PresentationUiModel(
-    id = "1",
-    category = CategoryUiModel.PERSUASION,
-    title = "공백포함둘에서열글자",
-    date = LocalDate(2026, 4, 10),
-)
-
-private val previewItems = persistentListOf(
-    previewItem,
-    previewItem.copy(id = "2", date = LocalDate(2026, 4, 15)),
-)
-
 @BasicPreview
 @Composable
 private fun HomeEmptyContentPreview() {
+    val uiState = HomeUiState.Empty(nickname = "프레즐")
     PrezelTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(PrezelTheme.colors.bgMedium),
-        ) {
-            HomeEmptyContent(
-                nickname = "Prezel",
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
+        HomeScreen(
+            uiState = uiState,
+            onTabSelected = { },
+            onClickAddPresentation = { },
+            onClickAnalyzePresentation = { },
+        )
     }
 }
 
 @BasicPreview
 @Composable
 private fun PresentationCardSinglePreview() {
+    val uiState = HomeUiState.SingleContent(
+        presentation = PresentationUiModel(
+            id = 1L,
+            category = CategoryUiModel.PERSUASION,
+            title = "공백포함둘에서열글자",
+            date = LocalDate(2026, 4, 10),
+        ),
+    )
     PrezelTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            HomePresentationContent(
-                presentations = persistentListOf(previewItem),
-            )
-        }
+        HomeScreen(
+            uiState = uiState,
+            onTabSelected = { },
+            onClickAddPresentation = { },
+            onClickAnalyzePresentation = { },
+        )
     }
 }
 
 @BasicPreview
 @Composable
 private fun PresentationCardTabsPreview() {
-    PrezelTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            HomePresentationContent(
-                presentations = previewItems,
+    val uiState = HomeUiState.MultipleContent(
+        List(3) { index ->
+            PresentationUiModel(
+                id = index.toLong(),
+                category = CategoryUiModel.PERSUASION,
+                title = "공백포함둘에서열글자",
+                date = LocalDate(2026, 4, 10 + index),
             )
-        }
+        }.toPersistentList(),
+    )
+    PrezelTheme {
+        HomeScreen(
+            uiState = uiState,
+            onTabSelected = { },
+            onClickAddPresentation = { },
+            onClickAnalyzePresentation = { },
+        )
     }
 }

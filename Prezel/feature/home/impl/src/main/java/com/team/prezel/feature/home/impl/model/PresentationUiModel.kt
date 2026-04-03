@@ -8,7 +8,7 @@ import kotlin.time.Clock
 
 @Immutable
 internal data class PresentationUiModel(
-    val id: String,
+    val id: Long,
     val category: CategoryUiModel,
     val title: String,
     val date: LocalDate,
