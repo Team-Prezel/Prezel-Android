@@ -75,13 +75,13 @@ internal fun TermsScreen(
     TermsScreenScreen(
         uiState = uiState,
         onBack = navigateBack,
-        onToggleAll = { viewModel.onIntent(TermsUiIntent.OnToggleAll) },
-        onToggleTermsOfService = { viewModel.onIntent(TermsUiIntent.OnToggleTermsOfService) },
-        onTogglePrivacyPolicy = { viewModel.onIntent(TermsUiIntent.OnTogglePrivacyPolicy) },
-        onToggleMarketingConsent = { viewModel.onIntent(TermsUiIntent.OnToggleMarketingConsent) },
+        onToggleAll = { viewModel.onIntent(TermsUiIntent.ToggleAll) },
+        onToggleTermsOfService = { viewModel.onIntent(TermsUiIntent.ToggleTermsOfService) },
+        onTogglePrivacyPolicy = { viewModel.onIntent(TermsUiIntent.TogglePrivacyPolicy) },
+        onToggleMarketingConsent = { viewModel.onIntent(TermsUiIntent.ToggleMarketingConsent) },
         onClickTermsOfServiceDetail = { activeDetailUrl = BuildConfig.TERMS_OF_SERVICE_URL },
         onClickPrivacyPolicyDetail = { activeDetailUrl = BuildConfig.PRIVACY_POLICY_URL },
-        onContinue = { viewModel.onIntent(TermsUiIntent.OnClickContinue) },
+        onContinue = { viewModel.onIntent(TermsUiIntent.ClickContinue) },
         modifier = modifier,
     )
 }

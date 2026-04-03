@@ -1,13 +1,13 @@
 package com.team.prezel.feature.login.impl.terms.contract
 
 internal sealed interface TermsUiIntent {
-    data object OnToggleAll : TermsUiIntent
+    data object ToggleAll : TermsUiIntent
 
-    data object OnToggleTermsOfService : TermsUiIntent
+    data object ToggleTermsOfService : TermsUiIntent
 
-    data object OnTogglePrivacyPolicy : TermsUiIntent
+    data object TogglePrivacyPolicy : TermsUiIntent
 
-    data object OnToggleMarketingConsent : TermsUiIntent
+    data object ToggleMarketingConsent : TermsUiIntent
 
-    data object OnClickContinue : TermsUiIntent
+    data object ClickContinue : TermsUiIntent
 }
