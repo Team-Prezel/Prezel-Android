@@ -101,7 +101,7 @@ private fun PrezelDialogPreview() {
                 onDismiss = {},
             ) {
                 Action(label = "Action2") {}
-                Action(label = "Action1", type = PrezelDialogScope.ActionType.Good) {}
+                Action(label = "Action1", type = PrezelDialogScope.ActionType.GOOD) {}
             }
         }
     }

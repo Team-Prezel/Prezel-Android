@@ -14,15 +14,15 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 @LayoutScopeMarker
 class PrezelDialogScope {
     enum class ActionType {
-        Default,
-        Good,
-        Bad,
+        DEFAULT,
+        GOOD,
+        BAD,
     }
 
     @Composable
     fun Action(
         label: String,
-        type: ActionType = ActionType.Default,
+        type: ActionType = ActionType.DEFAULT,
         onClick: () -> Unit,
     ) {
         val labelColor = labelColor(type = type)
@@ -43,9 +43,9 @@ class PrezelDialogScope {
     @Composable
     private fun labelColor(type: ActionType) =
         when (type) {
-            ActionType.Default -> PrezelTheme.colors.textRegular
-            ActionType.Good -> PrezelTheme.colors.feedbackGoodRegular
-            ActionType.Bad -> PrezelTheme.colors.feedbackBadRegular
+            ActionType.DEFAULT -> PrezelTheme.colors.textRegular
+            ActionType.GOOD -> PrezelTheme.colors.feedbackGoodRegular
+            ActionType.BAD -> PrezelTheme.colors.feedbackBadRegular
         }
 }
 
@@ -59,13 +59,13 @@ private fun PrezelDialogActionPreview() {
         ) {
             with(PrezelDialogScope()) {
                 PreviewValueRow(name = "Default Action") {
-                    Action(label = "Action", type = PrezelDialogScope.ActionType.Default) {}
+                    Action(label = "Action", type = PrezelDialogScope.ActionType.DEFAULT) {}
                 }
                 PreviewValueRow(name = "Good Action") {
-                    Action(label = "Action", type = PrezelDialogScope.ActionType.Good) {}
+                    Action(label = "Action", type = PrezelDialogScope.ActionType.GOOD) {}
                 }
                 PreviewValueRow(name = "Bad Action") {
-                    Action(label = "Action", type = PrezelDialogScope.ActionType.Bad) {}
+                    Action(label = "Action", type = PrezelDialogScope.ActionType.BAD) {}
                 }
             }
         }
