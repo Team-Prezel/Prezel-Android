@@ -69,7 +69,7 @@ fun PrezelTheme(
         LocalPrezelSpacing provides PrezelSpacing,
         LocalPrezelStroke provides PrezelStroke,
         LocalTextStyle provides typographyScheme.body3Regular,
-        LocalContentColor provides colorScheme.textLarge,
+        LocalContentColor provides colorScheme.textRegular,
         content = content,
     )
 }
