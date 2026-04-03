@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalResources
 import com.team.prezel.R
-import com.team.prezel.core.designsystem.component.snackbar.dismissById
-import com.team.prezel.core.designsystem.component.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.modal.snackbar.dismissById
+import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
 import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.ui.LocalSnackbarHostState
 

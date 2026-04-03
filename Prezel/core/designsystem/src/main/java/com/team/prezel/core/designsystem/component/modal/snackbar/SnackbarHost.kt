@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.snackbar
+package com.team.prezel.core.designsystem.component.modal.snackbar
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
