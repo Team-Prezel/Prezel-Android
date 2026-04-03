@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.PrezelTabs
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
@@ -36,6 +39,7 @@ import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 
@@ -50,6 +54,7 @@ internal fun HomeScreen(
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
+        onTabSelected = onTabSelected,
     )
 }
 
@@ -58,6 +63,7 @@ internal fun HomeScreen(
 private fun HomeScreen(
     uiState: HomeUiState,
     modifier: Modifier,
+    onTabSelected: (String) -> Unit = {},
     onClickAddPresentation: () -> Unit = {},
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
 ) {
@@ -78,6 +84,7 @@ private fun HomeScreen(
                 HomePresentationContent(
                     presentations = uiState.presentations,
                     modifier = Modifier.fillMaxSize(),
+                    onTabSelected = onTabSelected,
                     onClickAnalyzePresentation = onClickAnalyzePresentation,
                 )
             }
@@ -123,15 +130,53 @@ private fun HomeEmptyContent(
 private fun HomePresentationContent(
     presentations: ImmutableList<PresentationUiModel>,
     modifier: Modifier = Modifier,
+    onTabSelected: (String) -> Unit = {},
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
 ) {
     val presentation = presentations.firstOrNull() ?: return
 
+    if (presentations.size < 2) {
+        HomePresentationPage(
+            presentation = presentation,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(PrezelTheme.colors.bgMedium)
+                .padding(all = PrezelTheme.spacing.V20),
+            onClickAnalyzePresentation = onClickAnalyzePresentation,
+        )
+        return
+    }
+
+    val tabs = presentations.map(PresentationUiModel::dDayLabel).toPersistentList()
+    val pagerState = rememberPagerState { presentations.size }
+
+    LaunchedEffect(pagerState.currentPage, tabs) {
+        onTabSelected(tabs[pagerState.currentPage])
+    }
+
+    PrezelTabs(
+        tabs = tabs,
+        pagerState = pagerState,
+        modifier = modifier.background(PrezelTheme.colors.bgMedium),
+    ) { pageIndex ->
+        HomePresentationPage(
+            presentation = presentations[pageIndex],
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(all = PrezelTheme.spacing.V20),
+            onClickAnalyzePresentation = onClickAnalyzePresentation,
+        )
+    }
+}
+
+@Composable
+private fun HomePresentationPage(
+    presentation: PresentationUiModel,
+    modifier: Modifier = Modifier,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit = {},
+) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(PrezelTheme.colors.bgMedium)
-            .padding(all = PrezelTheme.spacing.V20),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -165,7 +210,7 @@ private fun HomePresentationContent(
                 style = PrezelTheme.typography.title1Bold,
             )
             Text(
-                text = "D-${presentation.dDay()}",
+                text = presentation.dDayLabel(),
                 color = PrezelTheme.colors.interactiveRegular,
                 style = PrezelTheme.typography.title1Bold,
             )
@@ -232,6 +277,8 @@ private fun HomeBottomCard(
 
 private fun LocalDate.toKoreanDate(): String = "${year}년 ${month.number.toString().padStart(2, '0')}월 ${day.toString().padStart(2, '0')}일"
 
+private fun PresentationUiModel.dDayLabel(): String = "D-${dDay()}"
+
 private val previewItem = PresentationUiModel(
     id = "1",
     category = CategoryUiModel(
@@ -267,6 +314,21 @@ private fun HomeEmptyContentPreview() {
 @BasicPreview
 @Composable
 private fun PresentationCardSinglePreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            HomePresentationContent(
+                presentations = persistentListOf(previewItem),
+            )
+        }
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PresentationCardTabsPreview() {
     PrezelTheme {
         Column(
             modifier = Modifier
