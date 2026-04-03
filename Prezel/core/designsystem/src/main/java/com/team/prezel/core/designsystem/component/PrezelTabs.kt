@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-enum class PrezelTabSize { Small, Regular }
+enum class PrezelTabSize { Regular, Medium }
 
 @Composable
 fun PrezelTabs(
@@ -109,11 +109,11 @@ private fun PrezelTabContent(
     Tab(
         selected = selected,
         onClick = onClick,
-        modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
+        modifier = Modifier.height(if (size == PrezelTabSize.Regular) 36.dp else 48.dp),
         text = {
             Text(
                 text = label,
-                style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
+                style = if (size == PrezelTabSize.Regular) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
             )
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,
@@ -165,7 +165,7 @@ private fun PrezelMediumTabPreview() {
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Regular,
+            size = PrezelTabSize.Medium,
             modifier = Modifier,
         ) { page ->
             Box(
@@ -190,7 +190,7 @@ private fun PrezelSmallTabPreview() {
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Small,
+            size = PrezelTabSize.Regular,
         ) { page ->
             Box(
                 modifier = Modifier.fillMaxSize(),
