@@ -17,58 +17,58 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class TermsViewModel
-@Inject
-constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(TermsUiState())
-    val uiState: StateFlow<TermsUiState> = _uiState
-    private val currentState: TermsUiState
-        get() = uiState.value
+    @Inject
+    constructor() : ViewModel() {
+        private val _uiState = MutableStateFlow(TermsUiState())
+        val uiState: StateFlow<TermsUiState> = _uiState
+        private val currentState: TermsUiState
+            get() = uiState.value
 
-    private val _uiEffect = Channel<TermsUiEffect>()
-    val uiEffect: Flow<TermsUiEffect> = _uiEffect.receiveAsFlow()
+        private val _uiEffect = Channel<TermsUiEffect>()
+        val uiEffect: Flow<TermsUiEffect> = _uiEffect.receiveAsFlow()
 
-    fun onIntent(intent: TermsUiIntent) {
-        when (intent) {
-            TermsUiIntent.ToggleAll -> toggleAll()
-            TermsUiIntent.ToggleTermsOfService -> toggleTermsOfService()
-            TermsUiIntent.TogglePrivacyPolicy -> togglePrivacyPolicy()
-            TermsUiIntent.ToggleMarketingConsent -> toggleMarketingConsent()
-            TermsUiIntent.ClickContinue -> handleClickContinue()
+        fun onIntent(intent: TermsUiIntent) {
+            when (intent) {
+                TermsUiIntent.ToggleAll -> toggleAll()
+                TermsUiIntent.ToggleTermsOfService -> toggleTermsOfService()
+                TermsUiIntent.TogglePrivacyPolicy -> togglePrivacyPolicy()
+                TermsUiIntent.ToggleMarketingConsent -> toggleMarketingConsent()
+                TermsUiIntent.ClickContinue -> handleClickContinue()
+            }
+        }
+
+        private fun update(reducer: TermsUiState.() -> TermsUiState) {
+            _uiState.update(reducer)
+        }
+
+        private fun toggleAll() {
+            val newChecked = !currentState.isAllChecked
+
+            update {
+                copy(
+                    isTermsOfServiceChecked = newChecked,
+                    isPrivacyPolicyChecked = newChecked,
+                    isMarketingConsentChecked = newChecked,
+                )
+            }
+        }
+
+        private fun toggleTermsOfService() {
+            update { copy(isTermsOfServiceChecked = !isTermsOfServiceChecked) }
+        }
+
+        private fun togglePrivacyPolicy() {
+            update { copy(isPrivacyPolicyChecked = !isPrivacyPolicyChecked) }
+        }
+
+        private fun toggleMarketingConsent() {
+            update { copy(isMarketingConsentChecked = !isMarketingConsentChecked) }
+        }
+
+        private fun handleClickContinue() {
+            if (!currentState.isRequiredChecked) return
+            viewModelScope.launch {
+                _uiEffect.send(TermsUiEffect.NavigateToHome)
+            }
         }
     }
-
-    private fun update(reducer: TermsUiState.() -> TermsUiState) {
-        _uiState.update(reducer)
-    }
-
-    private fun toggleAll() {
-        val newChecked = !currentState.isAllChecked
-
-        update {
-            copy(
-                isTermsOfServiceChecked = newChecked,
-                isPrivacyPolicyChecked = newChecked,
-                isMarketingConsentChecked = newChecked,
-            )
-        }
-    }
-
-    private fun toggleTermsOfService() {
-        update { copy(isTermsOfServiceChecked = !isTermsOfServiceChecked) }
-    }
-
-    private fun togglePrivacyPolicy() {
-        update { copy(isPrivacyPolicyChecked = !isPrivacyPolicyChecked) }
-    }
-
-    private fun toggleMarketingConsent() {
-        update { copy(isMarketingConsentChecked = !isMarketingConsentChecked) }
-    }
-
-    private fun handleClickContinue() {
-        if (!currentState.isRequiredChecked) return
-        viewModelScope.launch {
-            _uiEffect.send(TermsUiEffect.NavigateToHome)
-        }
-    }
-}
