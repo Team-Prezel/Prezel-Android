@@ -1,6 +1,7 @@
 package com.team.prezel.feature.home.impl
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,8 +30,7 @@ import com.team.prezel.core.designsystem.component.PrezelTabs
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.PrezelChipInteraction
-import com.team.prezel.core.designsystem.component.chip.PrezelChipStyle
+import com.team.prezel.core.designsystem.component.chip.PrezelChipColors
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -178,43 +178,25 @@ private fun HomePresentationPage(
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            PrezelChip(
-                text = presentation.category.name,
-                iconResId = PrezelIcons.College,
-                style = PrezelChipStyle().copy(
-                    interaction = PrezelChipInteraction.ACTIVE,
-                ),
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = presentation.date.toKoreanDate(),
-                color = PrezelTheme.colors.textRegular,
-                style = PrezelTheme.typography.body3Regular,
-            )
-        }
+        PrezelChip(
+            text = presentation.category.label,
+            customColors = PrezelChipColors(
+                containerColor = PrezelTheme.colors.bgRegular,
+                contentColor = PrezelTheme.colors.interactiveRegular,
+            ),
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = presentation.title,
-                modifier = Modifier.weight(1f),
-                color = PrezelTheme.colors.textLarge,
-                style = PrezelTheme.typography.title1Bold,
-            )
-            Text(
-                text = presentation.dDayLabel(),
-                color = PrezelTheme.colors.interactiveRegular,
-                style = PrezelTheme.typography.title1Bold,
-            )
-        }
+        Text(
+            text = presentation.date.toKoreanDate(),
+            color = PrezelTheme.colors.textRegular,
+            style = PrezelTheme.typography.body3Regular,
+        )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
+
+        HomePresentationTitleRow(presentation = presentation)
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
@@ -224,6 +206,27 @@ private fun HomePresentationPage(
             titleColor = PrezelTheme.colors.textMedium,
             modifier = Modifier.fillMaxWidth(),
             onClick = { onClickAnalyzePresentation(presentation) },
+        )
+    }
+}
+
+@Composable
+private fun HomePresentationTitleRow(
+    presentation: PresentationUiModel,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = presentation.title,
+            modifier = Modifier.weight(1f),
+            color = PrezelTheme.colors.textLarge,
+            style = PrezelTheme.typography.title1Bold,
+        )
+        Text(
+            text = presentation.dDayLabel(),
+            color = PrezelTheme.colors.interactiveRegular,
+            style = PrezelTheme.typography.title1ExtraBold,
         )
     }
 }
@@ -244,6 +247,11 @@ private fun HomeBottomCard(
             modifier = modifier
                 .fillMaxWidth()
                 .clip(shape = PrezelTheme.shapes.V8)
+                .border(
+                    width = PrezelTheme.stroke.V1,
+                    shape = PrezelTheme.shapes.V8,
+                    color = PrezelTheme.colors.borderSmall,
+                )
                 .background(color = PrezelTheme.colors.bgRegular)
                 .padding(horizontal = PrezelTheme.spacing.V16, vertical = PrezelTheme.spacing.V12),
         ) {
@@ -281,10 +289,7 @@ private fun PresentationUiModel.dDayLabel(): String = "D-${dDay()}"
 
 private val previewItem = PresentationUiModel(
     id = "1",
-    category = CategoryUiModel(
-        iconResId = PrezelIcons.Blank,
-        name = "카테고리",
-    ),
+    category = CategoryUiModel.PERSUASION,
     title = "공백포함둘에서열글자",
     date = LocalDate(2026, 4, 10),
 )
