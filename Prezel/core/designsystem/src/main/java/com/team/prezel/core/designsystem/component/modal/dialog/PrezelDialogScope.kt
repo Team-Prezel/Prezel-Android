@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
@@ -30,6 +33,7 @@ class PrezelDialogScope {
         PrezelTouchArea(
             onClick = onClick,
             shape = PrezelTheme.shapes.V4,
+            modifier = Modifier.semantics { role = Role.Button },
         ) {
             Text(
                 text = label,
