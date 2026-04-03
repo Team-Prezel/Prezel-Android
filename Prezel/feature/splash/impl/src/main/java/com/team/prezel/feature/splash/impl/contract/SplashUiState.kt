@@ -1,4 +1,4 @@
-package com.team.prezel.feature.splash.impl.viewModel
+package com.team.prezel.feature.splash.impl.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.ui.UiState
