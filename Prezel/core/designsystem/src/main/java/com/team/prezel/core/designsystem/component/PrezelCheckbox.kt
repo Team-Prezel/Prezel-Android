@@ -1,22 +1,27 @@
 package com.team.prezel.core.designsystem.component
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
+import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
@@ -34,47 +39,46 @@ fun PrezelCheckbox(
     checked: Boolean,
     modifier: Modifier = Modifier,
     size: CheckboxSize = CheckboxSize.REGULAR,
+    extraTouchPadding: PaddingValues = PaddingValues(all = PrezelTheme.spacing.V8),
     onCheckedChange: (Boolean) -> Unit,
 ) {
-    val checkboxSize = when (size) {
+    PrezelTouchArea(
+        modifier = modifier.semantics {
+            role = Role.Checkbox
+            toggleableState = ToggleableState(checked)
+        },
+        onClick = { onCheckedChange(!checked) },
+        isUseRipple = false,
+        extraTouchPadding = extraTouchPadding,
+    ) {
+        Icon(
+            painter = checkboxIconRes(checked = checked),
+            contentDescription = stringResource(R.string.core_designsystem_checkbox_desc),
+            modifier = Modifier.size(size = checkboxSize(size = size)),
+            tint = checkboxIconTintColor(checked = checked),
+        )
+    }
+}
+
+private fun checkboxSize(size: CheckboxSize): Dp =
+    when (size) {
         CheckboxSize.REGULAR -> 24.dp
         CheckboxSize.LARGE -> 32.dp
     }
 
-    val iconRes =
-        if (checked) {
-            PrezelIcons.CheckCircleFilled
-        } else {
-            PrezelIcons.CheckCircleOutlined
-        }
-
-    val iconColor =
-        if (checked) {
-            PrezelTheme.colors.feedbackGoodRegular
-        } else {
-            PrezelTheme.colors.iconDisabled
-        }
-
-    Box(
-        modifier = modifier
-            .padding(all = PrezelTheme.spacing.V8)
-            .toggleable(
-                value = checked,
-                interactionSource = null,
-                indication = null,
-                role = Role.Checkbox,
-                onValueChange = onCheckedChange,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = stringResource(R.string.core_designsystem_checkbox_desc),
-            modifier = Modifier.size(checkboxSize),
-            tint = iconColor,
-        )
-    }
+@Composable
+private fun checkboxIconRes(checked: Boolean): Painter {
+    val resId = if (checked) PrezelIcons.CheckCircleFilled else PrezelIcons.CheckCircleOutlined
+    return painterResource(id = resId)
 }
+
+@Composable
+private fun checkboxIconTintColor(checked: Boolean): Color =
+    if (checked) {
+        PrezelTheme.colors.feedbackGoodRegular
+    } else {
+        PrezelTheme.colors.iconDisabled
+    }
 
 @BasicPreview
 @Composable

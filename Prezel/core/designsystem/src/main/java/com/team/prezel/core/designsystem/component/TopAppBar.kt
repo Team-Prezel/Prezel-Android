@@ -1,6 +1,7 @@
 package com.team.prezel.core.designsystem.component
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +28,7 @@ fun PrezelTopAppBar(
     leadingIcon: @Composable () -> Unit = {},
     trailingIcons: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    windowInsets: WindowInsets = WindowInsets(),
 ) {
     TopAppBar(
         title = {
@@ -38,6 +40,7 @@ fun PrezelTopAppBar(
         actions = trailingIcons,
         colors = prezelTopAppBarColors(),
         scrollBehavior = scrollBehavior,
+        windowInsets = windowInsets,
         modifier = modifier.testTag("PrezelTopAppBar"),
     )
 }

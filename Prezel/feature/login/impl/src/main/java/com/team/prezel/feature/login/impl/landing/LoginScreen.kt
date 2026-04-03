@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl
+package com.team.prezel.feature.login.impl.landing
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -25,8 +25,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
@@ -40,11 +42,11 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
-import com.team.prezel.feature.login.impl.model.LoginUiMessage
-import com.team.prezel.feature.login.impl.viewModel.LoginUiEffect
-import com.team.prezel.feature.login.impl.viewModel.LoginUiIntent
-import com.team.prezel.feature.login.impl.viewModel.LoginUiState
-import com.team.prezel.feature.login.impl.viewModel.LoginViewModel
+import com.team.prezel.feature.login.impl.R
+import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
+import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
+import com.team.prezel.feature.login.impl.landing.contract.LoginUiState
+import com.team.prezel.feature.login.impl.landing.model.LoginUiMessage
 import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
@@ -52,21 +54,26 @@ private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
 
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
-    animatedVisibilityScope: AnimatedVisibilityScope,
     authManager: AuthManager,
-    navigateToHome: () -> Unit,
+    navigateToTerms: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                LoginUiEffect.NavigateToHome -> navigateToHome()
+                is LoginUiEffect.LaunchLogin -> {
+                    authManager.login(context = context, provider = effect.provider).also { result ->
+                        viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
+                    }
+                }
+
+                LoginUiEffect.NavigateToTerms -> navigateToTerms()
 
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
@@ -74,16 +81,7 @@ internal fun SharedTransitionScope.LoginScreen(
                         LoginUiMessage.LoginFailedRateLimited -> R.string.feature_login_impl_kakao_rate_limited
                         LoginUiMessage.LoginFailedUnknown -> R.string.feature_login_impl_kakao_failure
                     }
-                    snackbarHostState.showPrezelSnackbar(
-                        message = resources.getString(resId),
-                        actionLabel = resources.getString(R.string.feature_login_impl_snackbar_confirm),
-                    )
-                }
-
-                is LoginUiEffect.LaunchLogin -> {
-                    authManager.login(context = context, provider = effect.provider).also { result ->
-                        viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
-                    }
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
             }
         }
@@ -91,7 +89,7 @@ internal fun SharedTransitionScope.LoginScreen(
 
     LoginScreen(
         uiState = uiState,
-        animatedVisibilityScope = animatedVisibilityScope,
+        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
         onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin(provider = AuthProvider.KAKAO)) },
         modifier = modifier,
     )
@@ -153,6 +151,7 @@ private fun LoginFooter(
     modifier: Modifier = Modifier,
 ) {
     var isButtonVisible by remember { mutableStateOf(false) }
+    val startWithKakaoLabel = stringResource(R.string.feature_login_impl_start_with_kakao)
     val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
         isIconOnly = false,
         type = ButtonType.FILLED,
@@ -182,7 +181,7 @@ private fun LoginFooter(
         PrezelButtonArea {
             CustomButton(
                 iconResId = PrezelIcons.Kakao,
-                label = "카카오로 시작하기",
+                label = startWithKakaoLabel,
                 enabled = enabled,
                 onClick = onLogin,
                 config = kakaoButtonConfig,
