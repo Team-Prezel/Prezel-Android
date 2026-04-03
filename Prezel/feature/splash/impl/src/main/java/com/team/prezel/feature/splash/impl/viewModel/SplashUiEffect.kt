@@ -1,6 +1,8 @@
 package com.team.prezel.feature.splash.impl.viewModel
 
-sealed interface SplashUiEffect {
+import com.team.prezel.core.ui.UiEffect
+
+sealed interface SplashUiEffect : UiEffect {
     data object NavigateToHome : SplashUiEffect
 
     data object NavigateToLogin : SplashUiEffect

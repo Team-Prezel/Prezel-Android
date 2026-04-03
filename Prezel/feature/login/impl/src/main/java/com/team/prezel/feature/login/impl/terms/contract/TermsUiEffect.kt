@@ -1,5 +1,7 @@
 package com.team.prezel.feature.login.impl.terms.contract
 
-internal sealed interface TermsUiEffect {
+import com.team.prezel.core.ui.UiEffect
+
+internal sealed interface TermsUiEffect : UiEffect {
     data object NavigateToHome : TermsUiEffect
 }
