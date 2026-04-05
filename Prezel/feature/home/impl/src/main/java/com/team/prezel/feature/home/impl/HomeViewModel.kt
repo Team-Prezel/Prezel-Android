@@ -34,7 +34,6 @@ internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, 
         }
     }
 
-    // TODO: repository 연결 후 실제 홈 데이터를 가져오도록 교체
     private fun getPresentations(): List<PresentationUiModel> =
         listOf(
             PresentationUiModel(
