@@ -21,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,6 +39,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.model.backgroundRes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
@@ -76,6 +79,7 @@ private fun HomeScreen(
             is HomeUiState.Empty -> {
                 HomeEmptyContent(
                     nickname = uiState.nickname,
+                    modifier = Modifier.fillMaxSize(),
                     onClickAddPresentation = onClickAddPresentation,
                 )
             }
@@ -104,9 +108,14 @@ private fun HomeEmptyContent(
     modifier: Modifier = Modifier,
     onClickAddPresentation: () -> Unit = {},
 ) {
-    Box {
+    Box(
+        modifier = modifier.paint(
+            painterResource(id = com.team.prezel.core.designsystem.R.drawable.core_designsystem_section_title_empty),
+            contentScale = ContentScale.FillBounds,
+        ),
+    ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(PrezelTheme.spacing.V20),
         ) {
@@ -121,7 +130,7 @@ private fun HomeEmptyContent(
                 style = PrezelTheme.typography.title1Bold,
             )
             Spacer(modifier = Modifier.weight(1f))
-            HomeBottomCard(
+            PracticeActionButton(
                 title = "발표 준비를 시작해볼까요?",
                 actionText = "발표 추가하기",
                 titleColor = PrezelTheme.colors.interactiveRegular,
@@ -149,11 +158,11 @@ private fun HomePresentationContent(
     PrezelTabs(
         tabs = tabs,
         pagerState = pagerState,
+        modifier = modifier,
     ) { pageIndex ->
         HomePresentationPage(
             presentation = presentations[pageIndex],
             onClickAnalyzePresentation = onClickAnalyzePresentation,
-            modifier = modifier,
         )
     }
 }
@@ -164,10 +173,15 @@ private fun HomePresentationPage(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box {
+    Box(
+        modifier = modifier.paint(
+            painter = painterResource(id = presentation.category.backgroundRes()),
+            contentScale = ContentScale.FillBounds,
+        ),
+    ) {
         Column(
-            modifier = modifier
-                .fillMaxWidth()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(all = PrezelTheme.spacing.V20),
         ) {
             PrezelChip(
@@ -192,7 +206,7 @@ private fun HomePresentationPage(
 
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
-            HomeBottomCard(
+            PracticeActionButton(
                 title = "충분히 연습했는지 확인해볼까요?",
                 actionText = "발표 분석하기",
                 titleColor = PrezelTheme.colors.textMedium,
@@ -223,12 +237,12 @@ private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
 }
 
 @Composable
-private fun HomeBottomCard(
+private fun PracticeActionButton(
     title: String,
     actionText: String,
     titleColor: Color,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit,
 ) {
     PrezelTouchArea(
         onClick = onClick,
@@ -319,7 +333,7 @@ private fun PresentationCardTabsPreview() {
         List(3) { index ->
             PresentationUiModel(
                 id = index.toLong(),
-                category = CategoryUiModel.PERSUASION,
+                category = CategoryUiModel.EDUCATION,
                 title = "공백포함둘에서열글자",
                 date = LocalDate(2026, 4, 10 + index),
             )
