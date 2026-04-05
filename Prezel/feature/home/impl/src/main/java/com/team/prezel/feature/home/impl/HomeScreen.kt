@@ -36,6 +36,7 @@ import com.team.prezel.core.designsystem.component.chip.PrezelChipColors
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
@@ -52,6 +53,10 @@ internal fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(HomeUiIntent.FetchData)
+    }
 
     HomeScreen(
         uiState = uiState,
@@ -71,34 +76,76 @@ private fun HomeScreen(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val bottomSheetHeight = 360.dp
+
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(title = { Text(text = "홈") })
 
-        when (uiState) {
-            HomeUiState.Loading -> {}
-            is HomeUiState.Empty -> {
-                HomeEmptyContent(
-                    nickname = uiState.nickname,
-                    modifier = Modifier.fillMaxSize(),
-                    onClickAddPresentation = onClickAddPresentation,
-                )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        ) {
+            when (uiState) {
+                HomeUiState.Loading -> {}
+                is HomeUiState.Empty -> {
+                    HomeEmptyContent(
+                        nickname = uiState.nickname,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = bottomSheetHeight),
+                        onClickAddPresentation = onClickAddPresentation,
+                    )
+                }
+
+                is HomeUiState.SingleContent -> {
+                    HomePresentationPage(
+                        presentation = uiState.presentation,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = bottomSheetHeight),
+                        onClickAnalyzePresentation = onClickAnalyzePresentation,
+                    )
+                }
+
+                is HomeUiState.MultipleContent -> {
+                    HomePresentationContent(
+                        presentations = uiState.presentations,
+                        onTabSelected = onTabSelected,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = bottomSheetHeight),
+                        onClickAnalyzePresentation = onClickAnalyzePresentation,
+                    )
+                }
             }
 
-            is HomeUiState.SingleContent -> {
-                HomePresentationPage(
-                    presentation = uiState.presentation,
-                    onClickAnalyzePresentation = onClickAnalyzePresentation,
-                )
-            }
-
-            is HomeUiState.MultipleContent -> {
-                HomePresentationContent(
-                    presentations = uiState.presentations,
-                    onTabSelected = onTabSelected,
-                    onClickAnalyzePresentation = onClickAnalyzePresentation,
-                )
-            }
+            HomeBottomSheetShell(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(bottomSheetHeight),
+            )
         }
+    }
+}
+
+@Composable
+private fun HomeBottomSheetShell(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .clip(shape = PrezelTheme.shapes.V16)
+            .background(color = PrezelTheme.colors.bgRegular)
+            .padding(
+                horizontal = PrezelTheme.spacing.V20,
+                vertical = PrezelTheme.spacing.V32,
+            ),
+    ) {
+        Text(
+            text = "지금부터 연습해보세요",
+            color = PrezelTheme.colors.textLarge,
+            style = PrezelTheme.typography.body2Bold,
+        )
     }
 }
 
