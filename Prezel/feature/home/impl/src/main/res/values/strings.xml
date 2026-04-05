@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_home_impl_title">홈</string>
+    <string name="feature_home_impl_bottom_sheet_title">지금부터 연습해보세요</string>
+    <string name="feature_home_impl_empty_greeting">안녕하세요 %1$s님!</string>
+    <string name="feature_home_impl_empty_subtitle">어떤 발표를 앞두고 있나요?</string>
+    <string name="feature_home_impl_add_presentation_title">발표 준비를 시작해볼까요?</string>
+    <string name="feature_home_impl_add_presentation_action">발표 추가하기</string>
+    <string name="feature_home_impl_analyze_presentation_title">충분히 연습했는지 확인해볼까요?</string>
+    <string name="feature_home_impl_analyze_presentation_action">발표 분석하기</string>
+</resources>

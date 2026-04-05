@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,7 +80,7 @@ private fun HomeScreen(
     val bottomSheetHeight = 360.dp
 
     Column(modifier = modifier.fillMaxSize()) {
-        PrezelTopAppBar(title = { Text(text = "홈") })
+        PrezelTopAppBar(title = { Text(text = stringResource(R.string.feature_home_impl_title)) })
 
         Box(
             modifier = Modifier
@@ -142,7 +143,7 @@ private fun HomeBottomSheetShell(modifier: Modifier = Modifier) {
             ),
     ) {
         Text(
-            text = "지금부터 연습해보세요",
+            text = stringResource(R.string.feature_home_impl_bottom_sheet_title),
             color = PrezelTheme.colors.textLarge,
             style = PrezelTheme.typography.body2Bold,
         )
@@ -167,19 +168,19 @@ private fun HomeEmptyContent(
                 .padding(PrezelTheme.spacing.V20),
         ) {
             Text(
-                text = "안녕하세요 ${nickname}님!",
+                text = stringResource(R.string.feature_home_impl_empty_greeting, nickname),
                 color = PrezelTheme.colors.textMedium,
                 style = PrezelTheme.typography.title1Medium,
             )
             Text(
-                text = "어떤 발표를 앞두고 있나요?",
+                text = stringResource(R.string.feature_home_impl_empty_subtitle),
                 color = PrezelTheme.colors.textLarge,
                 style = PrezelTheme.typography.title1Bold,
             )
             Spacer(modifier = Modifier.weight(1f))
             PracticeActionButton(
-                title = "발표 준비를 시작해볼까요?",
-                actionText = "발표 추가하기",
+                title = stringResource(R.string.feature_home_impl_add_presentation_title),
+                actionText = stringResource(R.string.feature_home_impl_add_presentation_action),
                 titleColor = PrezelTheme.colors.interactiveRegular,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onClickAddPresentation,
@@ -254,8 +255,8 @@ private fun HomePresentationPage(
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
             PracticeActionButton(
-                title = "충분히 연습했는지 확인해볼까요?",
-                actionText = "발표 분석하기",
+                title = stringResource(R.string.feature_home_impl_analyze_presentation_title),
+                actionText = stringResource(R.string.feature_home_impl_analyze_presentation_action),
                 titleColor = PrezelTheme.colors.textMedium,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onClickAnalyzePresentation(presentation) },
