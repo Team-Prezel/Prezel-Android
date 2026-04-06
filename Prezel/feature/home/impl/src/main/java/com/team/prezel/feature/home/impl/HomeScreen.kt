@@ -222,6 +222,20 @@ private fun HomePresentationPage(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isPastPresentation = presentation.dDay() < 0
+
+    val titleRes = if (isPastPresentation) {
+        R.string.feature_home_impl_write_feedback_title
+    } else {
+        R.string.feature_home_impl_analyze_presentation_title
+    }
+
+    val actionRes = if (isPastPresentation) {
+        R.string.feature_home_impl_write_feedback_action
+    } else {
+        R.string.feature_home_impl_analyze_presentation_action
+    }
+
     Box(
         modifier = modifier.paint(
             painter = painterResource(id = presentation.category.backgroundRes()),
@@ -256,8 +270,12 @@ private fun HomePresentationPage(
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
             PracticeActionButton(
-                title = stringResource(R.string.feature_home_impl_analyze_presentation_title),
-                actionText = stringResource(R.string.feature_home_impl_analyze_presentation_action),
+                title = if (isPastPresentation) {
+                    stringResource(titleRes, presentation.title)
+                } else {
+                    stringResource(titleRes)
+                },
+                actionText = stringResource(actionRes),
                 titleColor = PrezelTheme.colors.textMedium,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onClickAnalyzePresentation(presentation) },
@@ -366,7 +384,7 @@ private fun PresentationCardSinglePreview() {
         presentation = PresentationUiModel(
             id = 1L,
             category = CategoryUiModel.PERSUASION,
-            title = "공백포함둘에서열글자",
+            title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
         ),
     )
