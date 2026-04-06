@@ -31,14 +31,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-enum class PrezelTabSize { Regular, Medium }
+enum class PrezelTabSize { REGULAR, MEDIUM }
 
 @Composable
 fun PrezelTabs(
     tabs: ImmutableList<String>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
-    size: PrezelTabSize = PrezelTabSize.Regular,
+    size: PrezelTabSize = PrezelTabSize.REGULAR,
     userScrollEnabled: Boolean = true,
     content: @Composable (pageIndex: Int) -> Unit,
 ) {
@@ -109,11 +109,11 @@ private fun PrezelTabContent(
     Tab(
         selected = selected,
         onClick = onClick,
-        modifier = Modifier.height(if (size == PrezelTabSize.Regular) 36.dp else 48.dp),
+        modifier = Modifier.height(if (size == PrezelTabSize.REGULAR) 36.dp else 48.dp),
         text = {
             Text(
                 text = label,
-                style = if (size == PrezelTabSize.Regular) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
+                style = if (size == PrezelTabSize.REGULAR) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
             )
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,
@@ -165,7 +165,7 @@ private fun PrezelMediumTabPreview() {
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Medium,
+            size = PrezelTabSize.MEDIUM,
             modifier = Modifier,
         ) { page ->
             Box(
@@ -180,7 +180,7 @@ private fun PrezelMediumTabPreview() {
 
 @BasicPreview
 @Composable
-private fun PrezelSmallTabPreview() {
+private fun PrezelRegularTabPreview() {
     val tabs = persistentListOf("Label1", "Label2")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
@@ -190,7 +190,7 @@ private fun PrezelSmallTabPreview() {
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Regular,
+            size = PrezelTabSize.REGULAR,
         ) { page ->
             Box(
                 modifier = Modifier.fillMaxSize(),
