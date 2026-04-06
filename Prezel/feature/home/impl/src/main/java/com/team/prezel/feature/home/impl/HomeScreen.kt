@@ -338,7 +338,12 @@ private fun PracticeActionButton(
 
 private fun LocalDate.toKoreanDate(): String = "${year}년 ${month.number.toString().padStart(2, '0')}월 ${day.toString().padStart(2, '0')}일"
 
-private fun PresentationUiModel.dDayLabel(): String = "D-${dDay()}"
+private fun PresentationUiModel.dDayLabel(): String =
+    when (val days = dDay()) {
+        0 -> "D-Day"
+        in Int.MIN_VALUE..-1 -> "D+${-days}"
+        else -> "D-$days"
+    }
 
 @BasicPreview
 @Composable
@@ -362,7 +367,7 @@ private fun PresentationCardSinglePreview() {
             id = 1L,
             category = CategoryUiModel.PERSUASION,
             title = "공백포함둘에서열글자",
-            date = LocalDate(2026, 4, 10),
+            date = LocalDate(2026, 4, 3),
         ),
     )
     PrezelTheme {
