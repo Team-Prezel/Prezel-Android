@@ -42,6 +42,7 @@ import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.model.backgroundRes
+import com.team.prezel.feature.home.impl.model.label
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
@@ -233,7 +234,7 @@ private fun HomePresentationPage(
                 .padding(all = PrezelTheme.spacing.V20),
         ) {
             PrezelChip(
-                text = presentation.category.label,
+                text = presentation.category.label(),
                 customColors = PrezelChipColors(
                     containerColor = PrezelTheme.colors.bgRegular,
                     contentColor = PrezelTheme.colors.interactiveRegular,

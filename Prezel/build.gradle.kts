@@ -32,7 +32,7 @@ subprojects {
     }
 
     tasks.withType<Detekt>().configureEach {
-        jvmTarget = "22"
+        jvmTarget = "21"
 
         reports {
             txt.required.set(true)

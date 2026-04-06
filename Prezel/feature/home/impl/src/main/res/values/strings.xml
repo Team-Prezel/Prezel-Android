@@ -8,4 +8,9 @@
     <string name="feature_home_impl_add_presentation_action">발표 추가하기</string>
     <string name="feature_home_impl_analyze_presentation_title">충분히 연습했는지 확인해볼까요?</string>
     <string name="feature_home_impl_analyze_presentation_action">발표 분석하기</string>
+
+    <string name="feature_home_impl_category_persuasion">설득·제안</string>
+    <string name="feature_home_impl_category_event">설득·제안</string>
+    <string name="feature_home_impl_category_education">설득·제안</string>
+    <string name="feature_home_impl_category_report">설득·제안</string>
 </resources>
