@@ -104,10 +104,10 @@ data class PrezelChipStyle(
             chipColors.containerColor != Color.Unspecified -> chipColors.containerColor
             feedback == PrezelChipFeedback.BAD -> colors.feedbackBadSmall
             interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveXSmall
-            interaction == PrezelChipInteraction.DISABLED -> colors.bgLarge
+            interaction == PrezelChipInteraction.DISABLED -> colors.bgDisabled
             else -> {
                 when (type) {
-                    PrezelChipType.FILLED -> colors.bgMedium
+                    PrezelChipType.FILLED -> colors.bgLarge
                     PrezelChipType.OUTLINED -> colors.bgRegular
                 }
             }
@@ -124,7 +124,12 @@ data class PrezelChipStyle(
             feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
             interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
             interaction == PrezelChipInteraction.DISABLED -> colors.iconDisabled
-            else -> colors.iconRegular
+            else -> {
+                when (type) {
+                    PrezelChipType.FILLED -> colors.iconMedium
+                    PrezelChipType.OUTLINED -> colors.iconRegular
+                }
+            }
         }
 
     @Composable
