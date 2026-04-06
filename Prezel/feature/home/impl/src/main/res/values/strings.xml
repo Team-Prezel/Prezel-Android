@@ -8,7 +8,7 @@
     <string name="feature_home_impl_add_presentation_action">발표 추가하기</string>
     <string name="feature_home_impl_analyze_presentation_title">충분히 연습했는지 확인해볼까요?</string>
     <string name="feature_home_impl_analyze_presentation_action">발표 분석하기</string>
-    <string name="feature_home_impl_write_feedback_title">\'%1$s\'은 어떠셨나요?</string>
+    <string name="feature_home_impl_write_feedback_title">\'%1$s\'는 어떠셨나요?</string>
     <string name="feature_home_impl_write_feedback_action">피드백 작성하기</string>
 
     <string name="feature_home_impl_category_persuasion">설득·제안</string>

@@ -43,6 +43,7 @@ import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.model.backgroundRes
 import com.team.prezel.feature.home.impl.model.label
+import com.team.prezel.feature.home.impl.model.toPracticeActionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
@@ -222,19 +223,7 @@ private fun HomePresentationPage(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isPastPresentation = presentation.dDay() < 0
-
-    val titleRes = if (isPastPresentation) {
-        R.string.feature_home_impl_write_feedback_title
-    } else {
-        R.string.feature_home_impl_analyze_presentation_title
-    }
-
-    val actionRes = if (isPastPresentation) {
-        R.string.feature_home_impl_write_feedback_action
-    } else {
-        R.string.feature_home_impl_analyze_presentation_action
-    }
+    val actionUiModel = presentation.toPracticeActionUiModel()
 
     Box(
         modifier = modifier.paint(
@@ -270,12 +259,8 @@ private fun HomePresentationPage(
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
             PracticeActionButton(
-                title = if (isPastPresentation) {
-                    stringResource(titleRes, presentation.title)
-                } else {
-                    stringResource(titleRes)
-                },
-                actionText = stringResource(actionRes),
+                title = actionUiModel.title,
+                actionText = actionUiModel.actionText,
                 titleColor = PrezelTheme.colors.textMedium,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onClickAnalyzePresentation(presentation) },
