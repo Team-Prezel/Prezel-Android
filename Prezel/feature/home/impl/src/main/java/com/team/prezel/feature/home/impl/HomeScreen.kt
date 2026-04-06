@@ -40,8 +40,11 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
+import com.team.prezel.feature.home.impl.model.PracticeActionType
+import com.team.prezel.feature.home.impl.model.PracticeActionUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.model.backgroundRes
+import com.team.prezel.feature.home.impl.model.emptyPracticeActionUiModel
 import com.team.prezel.feature.home.impl.model.label
 import com.team.prezel.feature.home.impl.model.toPracticeActionUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -52,7 +55,7 @@ import kotlinx.datetime.number
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
-    onTabSelected: (String) -> Unit = {},
+    onTabSelected: (PresentationUiModel) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,6 +69,7 @@ internal fun HomeScreen(
         onTabSelected = onTabSelected,
         onClickAddPresentation = { },
         onClickAnalyzePresentation = { },
+        onClickWriteFeedback = { },
         modifier = modifier,
     )
 }
@@ -74,12 +78,24 @@ internal fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    onTabSelected: (String) -> Unit,
+    onTabSelected: (PresentationUiModel) -> Unit,
     onClickAddPresentation: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val bottomSheetHeight = 360.dp
+    val contentModifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = bottomSheetHeight)
+    val onClickPracticeAction: (PracticeActionUiModel) -> Unit = { actionUiModel ->
+        handlePracticeAction(
+            actionUiModel = actionUiModel,
+            onClickAddPresentation = onClickAddPresentation,
+            onClickAnalyzePresentation = onClickAnalyzePresentation,
+            onClickWriteFeedback = onClickWriteFeedback,
+        )
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(title = { Text(text = stringResource(R.string.feature_home_impl_title)) })
@@ -89,39 +105,12 @@ private fun HomeScreen(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-            when (uiState) {
-                HomeUiState.Loading -> {}
-                is HomeUiState.Empty -> {
-                    HomeEmptyContent(
-                        nickname = uiState.nickname,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = bottomSheetHeight),
-                        onClickAddPresentation = onClickAddPresentation,
-                    )
-                }
-
-                is HomeUiState.SingleContent -> {
-                    HomePresentationPage(
-                        presentation = uiState.presentation,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = bottomSheetHeight),
-                        onClickAnalyzePresentation = onClickAnalyzePresentation,
-                    )
-                }
-
-                is HomeUiState.MultipleContent -> {
-                    HomePresentationContent(
-                        presentations = uiState.presentations,
-                        onTabSelected = onTabSelected,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = bottomSheetHeight),
-                        onClickAnalyzePresentation = onClickAnalyzePresentation,
-                    )
-                }
-            }
+            HomeScreenContent(
+                uiState = uiState,
+                onTabSelected = onTabSelected,
+                onClickPracticeAction = onClickPracticeAction,
+                modifier = contentModifier,
+            )
 
             HomeBottomSheetShell(
                 modifier = Modifier
@@ -130,6 +119,55 @@ private fun HomeScreen(
                     .height(bottomSheetHeight),
             )
         }
+    }
+}
+
+@Composable
+private fun HomeScreenContent(
+    uiState: HomeUiState,
+    onTabSelected: (PresentationUiModel) -> Unit,
+    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (uiState) {
+        HomeUiState.Loading -> Unit
+        is HomeUiState.Empty -> {
+            HomeEmptyContent(
+                nickname = uiState.nickname,
+                modifier = modifier,
+                onClickPracticeAction = onClickPracticeAction,
+            )
+        }
+
+        is HomeUiState.SingleContent -> {
+            HomePresentationPage(
+                presentation = uiState.presentation,
+                modifier = modifier,
+                onClickPracticeAction = onClickPracticeAction,
+            )
+        }
+
+        is HomeUiState.MultipleContent -> {
+            HomePresentationContent(
+                presentations = uiState.presentations,
+                onTabSelected = onTabSelected,
+                modifier = modifier,
+                onClickPracticeAction = onClickPracticeAction,
+            )
+        }
+    }
+}
+
+private fun handlePracticeAction(
+    actionUiModel: PracticeActionUiModel,
+    onClickAddPresentation: () -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
+) {
+    when (actionUiModel.type) {
+        PracticeActionType.ADD_PRESENTATION -> onClickAddPresentation()
+        PracticeActionType.ANALYZE_PRESENTATION -> actionUiModel.presentation?.let(onClickAnalyzePresentation)
+        PracticeActionType.WRITE_FEEDBACK -> actionUiModel.presentation?.let(onClickWriteFeedback)
     }
 }
 
@@ -156,8 +194,10 @@ private fun HomeBottomSheetShell(modifier: Modifier = Modifier) {
 private fun HomeEmptyContent(
     nickname: String,
     modifier: Modifier = Modifier,
-    onClickAddPresentation: () -> Unit = {},
+    onClickPracticeAction: (PracticeActionUiModel) -> Unit = {},
 ) {
+    val actionUiModel = emptyPracticeActionUiModel()
+
     Box(
         modifier = modifier.paint(
             painterResource(id = com.team.prezel.core.designsystem.R.drawable.core_designsystem_section_title_empty),
@@ -181,11 +221,11 @@ private fun HomeEmptyContent(
             )
             Spacer(modifier = Modifier.weight(1f))
             PracticeActionButton(
-                title = stringResource(R.string.feature_home_impl_add_presentation_title),
-                actionText = stringResource(R.string.feature_home_impl_add_presentation_action),
+                title = actionUiModel.title,
+                actionText = actionUiModel.actionText,
                 titleColor = PrezelTheme.colors.interactiveRegular,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onClickAddPresentation,
+                onClick = { onClickPracticeAction(actionUiModel) },
             )
         }
     }
@@ -194,15 +234,15 @@ private fun HomeEmptyContent(
 @Composable
 private fun HomePresentationContent(
     presentations: ImmutableList<PresentationUiModel>,
-    onTabSelected: (String) -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onTabSelected: (PresentationUiModel) -> Unit,
+    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = presentations.map(PresentationUiModel::dDayLabel).toPersistentList()
     val pagerState = rememberPagerState { presentations.size }
 
-    LaunchedEffect(pagerState.currentPage, tabs) {
-        onTabSelected(tabs[pagerState.currentPage])
+    LaunchedEffect(pagerState.currentPage, presentations) {
+        onTabSelected(presentations[pagerState.currentPage])
     }
 
     PrezelTabs(
@@ -212,7 +252,7 @@ private fun HomePresentationContent(
     ) { pageIndex ->
         HomePresentationPage(
             presentation = presentations[pageIndex],
-            onClickAnalyzePresentation = onClickAnalyzePresentation,
+            onClickPracticeAction = onClickPracticeAction,
         )
     }
 }
@@ -220,7 +260,7 @@ private fun HomePresentationContent(
 @Composable
 private fun HomePresentationPage(
     presentation: PresentationUiModel,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val actionUiModel = presentation.toPracticeActionUiModel()
@@ -263,7 +303,7 @@ private fun HomePresentationPage(
                 actionText = actionUiModel.actionText,
                 titleColor = PrezelTheme.colors.textMedium,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onClickAnalyzePresentation(presentation) },
+                onClick = { onClickPracticeAction(actionUiModel) },
             )
         }
     }
@@ -358,6 +398,7 @@ private fun HomeEmptyContentPreview() {
             onTabSelected = { },
             onClickAddPresentation = { },
             onClickAnalyzePresentation = { },
+            onClickWriteFeedback = { },
         )
     }
 }
@@ -379,6 +420,7 @@ private fun PresentationCardSinglePreview() {
             onTabSelected = { },
             onClickAddPresentation = { },
             onClickAnalyzePresentation = { },
+            onClickWriteFeedback = { },
         )
     }
 }
@@ -402,6 +444,7 @@ private fun PresentationCardTabsPreview() {
             onTabSelected = { },
             onClickAddPresentation = { },
             onClickAnalyzePresentation = { },
+            onClickWriteFeedback = { },
         )
     }
 }
