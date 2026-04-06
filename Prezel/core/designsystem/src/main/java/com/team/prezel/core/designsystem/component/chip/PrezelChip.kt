@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,7 +44,8 @@ fun PrezelChip(
     ) {
         CompositionLocalProvider(
             LocalTextStyle provides style.textStyle(),
-            LocalContentColor provides style.contentColor(),
+            LocalPrezelChipIconColor provides style.iconColor(),
+            LocalPrezelChipTextColor provides style.textColor(),
         ) {
             Row(
                 modifier = Modifier.padding(style.contentPadding(iconOnly = iconOnly)),
@@ -60,7 +60,7 @@ fun PrezelChip(
                     if (hasIcon) {
                         Spacer(modifier = Modifier.width(style.iconTextSpacing()))
                     }
-                    Text(text = text)
+                    Text(text = text, color = LocalPrezelChipTextColor.current)
                 }
             }
         }
@@ -97,6 +97,7 @@ private fun PrezelChipIcon(
         painter = painterResource(id = iconResId),
         contentDescription = null,
         modifier = modifier.size(style.iconSize()),
+        tint = LocalPrezelChipIconColor.current,
     )
 }
 
@@ -191,7 +192,8 @@ private fun PrezelChipCustomPreview() {
                 ),
                 customColors = PrezelChipColors(
                     containerColor = PrezelTheme.colors.feedbackWarningSmall,
-                    contentColor = PrezelTheme.colors.feedbackWarningRegular,
+                    iconColor = PrezelTheme.colors.feedbackWarningRegular,
+                    textColor = PrezelTheme.colors.feedbackWarningRegular,
                 ),
             )
 
@@ -206,7 +208,7 @@ private fun PrezelChipCustomPreview() {
                 ),
                 customColors = PrezelChipColors(
                     containerColor = PrezelTheme.colors.feedbackBadSmall,
-                    contentColor = PrezelTheme.colors.feedbackBadRegular,
+                    textColor = PrezelTheme.colors.feedbackBadRegular,
                 ),
             )
 
@@ -221,7 +223,7 @@ private fun PrezelChipCustomPreview() {
                 ),
                 customColors = PrezelChipColors(
                     containerColor = Color(0xFFDBFFF6),
-                    contentColor = Color(0xFF00A37A),
+                    textColor = Color(0xFF00A37A),
                 ),
             )
         }

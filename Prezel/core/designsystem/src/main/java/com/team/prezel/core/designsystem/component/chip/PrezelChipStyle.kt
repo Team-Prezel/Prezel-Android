@@ -19,6 +19,14 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 internal val LocalPrezelChipColors = staticCompositionLocalOf { PrezelChipColors() }
 
+internal val LocalPrezelChipTextColor = staticCompositionLocalOf<Color> {
+    error("No PrezelChipTextColor provided")
+}
+
+internal val LocalPrezelChipIconColor = staticCompositionLocalOf<Color> {
+    error("No PrezelChipIconColor provided")
+}
+
 enum class PrezelChipType {
     FILLED,
     OUTLINED,
@@ -43,7 +51,8 @@ enum class PrezelChipSize {
 @Immutable
 data class PrezelChipColors(
     val containerColor: Color = Color.Unspecified,
-    val contentColor: Color = Color.Unspecified,
+    val iconColor: Color = Color.Unspecified,
+    val textColor: Color = Color.Unspecified,
 )
 
 @Immutable
@@ -70,7 +79,7 @@ data class PrezelChipStyle(
 
         val borderColor =
             when {
-                chipColors.contentColor != Color.Unspecified -> chipColors.contentColor
+                chipColors.iconColor != Color.Unspecified -> chipColors.iconColor
                 feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
                 interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
                 interaction == PrezelChipInteraction.DISABLED -> colors.borderRegular
@@ -115,12 +124,12 @@ data class PrezelChipStyle(
     }
 
     @Composable
-    internal fun contentColor(
+    internal fun iconColor(
         colors: PrezelColors = PrezelTheme.colors,
         chipColors: PrezelChipColors = LocalPrezelChipColors.current,
     ): Color =
         when {
-            chipColors.contentColor != Color.Unspecified -> chipColors.contentColor
+            chipColors.iconColor != Color.Unspecified -> chipColors.iconColor
             feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
             interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
             interaction == PrezelChipInteraction.DISABLED -> colors.iconDisabled
@@ -128,6 +137,24 @@ data class PrezelChipStyle(
                 when (type) {
                     PrezelChipType.FILLED -> colors.iconMedium
                     PrezelChipType.OUTLINED -> colors.iconRegular
+                }
+            }
+        }
+
+    @Composable
+    internal fun textColor(
+        colors: PrezelColors = PrezelTheme.colors,
+        chipColors: PrezelChipColors = LocalPrezelChipColors.current,
+    ): Color =
+        when {
+            chipColors.textColor != Color.Unspecified -> chipColors.textColor
+            feedback == PrezelChipFeedback.BAD -> colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> colors.textDisabled
+            else -> {
+                when (type) {
+                    PrezelChipType.FILLED -> colors.textMedium
+                    PrezelChipType.OUTLINED -> colors.textRegular
                 }
             }
         }
