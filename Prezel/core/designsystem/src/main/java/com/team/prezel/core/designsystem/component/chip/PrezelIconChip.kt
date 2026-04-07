@@ -14,14 +14,16 @@ fun PrezelIconChip(
     size: PrezelChipSize = PrezelChipSize.REGULAR,
     interaction: PrezelChipInteraction = PrezelChipInteraction.DEFAULT,
     feedback: PrezelChipFeedback = PrezelChipFeedback.DEFAULT,
-    config: PrezelChipDefault = PrezelChipDefaults.getDefault(
+    config: PrezelChipDefault? = null,
+) {
+    val resolvedConfig = config ?: PrezelChipDefaults.getDefault(
         iconOnly = true,
         type = type,
         size = size,
         interaction = interaction,
         feedback = feedback,
-    ),
-) {
+    )
+
     PrezelChip(
         modifier = modifier,
         iconResId = iconResId,
@@ -29,7 +31,7 @@ fun PrezelIconChip(
         size = size,
         interaction = interaction,
         feedback = feedback,
-        config = config,
+        config = resolvedConfig,
     )
 }
 

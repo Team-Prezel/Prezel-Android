@@ -95,6 +95,7 @@ internal fun PrezelChipCustomPreviewContent() {
                 feedback = PrezelChipFeedback.DEFAULT,
                 customColors = PrezelChipColors(
                     containerColor = PrezelTheme.colors.feedbackBadSmall,
+                    borderColor = PrezelTheme.colors.feedbackBadRegular,
                     iconColor = PrezelTheme.colors.feedbackBadRegular,
                     textColor = PrezelTheme.colors.feedbackBadRegular,
                 ),

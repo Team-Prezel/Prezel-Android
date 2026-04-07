@@ -25,6 +25,7 @@ internal val LocalPrezelChipIconColor = staticCompositionLocalOf<Color> {
 @Immutable
 data class PrezelChipColors(
     val containerColor: Color = Color.Unspecified,
+    val borderColor: Color = Color.Unspecified,
     val iconColor: Color = Color.Unspecified,
     val textColor: Color = Color.Unspecified,
 )
@@ -111,7 +112,7 @@ object PrezelChipDefaults {
 
         val borderColor =
             when {
-                chipColors.iconColor != Color.Unspecified -> chipColors.iconColor
+                chipColors.borderColor != Color.Unspecified -> chipColors.borderColor
                 feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
                 interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
                 interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.borderRegular
