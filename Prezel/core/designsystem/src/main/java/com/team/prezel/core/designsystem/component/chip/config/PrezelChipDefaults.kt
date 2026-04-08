@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component.chip.config
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -12,21 +11,13 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Immutable
-data class PrezelChipColors(
-    val containerColor: Color = Color.Unspecified,
-    val borderColor: Color = Color.Unspecified,
-    val iconColor: Color = Color.Unspecified,
-    val textColor: Color = Color.Unspecified,
-)
-
-@Immutable
 data class PrezelChipDefault(
     val shape: Shape,
-    val borderStroke: BorderStroke?,
     val textStyle: TextStyle,
     val containerColor: Color,
     val iconColor: Color,
     val textColor: Color,
+    val borderColor: Color?,
     val contentPadding: PaddingValues,
     val iconTextSpacing: Dp,
     val iconSize: Dp,
@@ -41,11 +32,6 @@ object PrezelChipDefaults {
         interaction: PrezelChipInteraction = PrezelChipInteraction.DEFAULT,
         feedback: PrezelChipFeedback = PrezelChipFeedback.DEFAULT,
         shape: Shape = getShape(size = size),
-        borderStroke: BorderStroke? = getBorderStroke(
-            type = type,
-            interaction = interaction,
-            feedback = feedback,
-        ),
         textStyle: TextStyle = getTextStyle(size = size),
         containerColor: Color = getContainerColor(
             iconOnly = iconOnly,
@@ -63,16 +49,21 @@ object PrezelChipDefaults {
             interaction = interaction,
             feedback = feedback,
         ),
+        borderColor: Color? = getBorderColor(
+            type = type,
+            interaction = interaction,
+            feedback = feedback,
+        ),
         contentPadding: PaddingValues = getContentPadding(size = size, iconOnly = iconOnly),
         iconTextSpacing: Dp = getIconTextSpacing(size = size),
         iconSize: Dp = getIconSize(size = size),
     ) = PrezelChipDefault(
         shape = shape,
-        borderStroke = borderStroke,
         textStyle = textStyle,
         containerColor = containerColor,
         iconColor = iconColor,
         textColor = textColor,
+        borderColor = borderColor,
         contentPadding = contentPadding,
         iconTextSpacing = iconTextSpacing,
         iconSize = iconSize,
@@ -86,25 +77,19 @@ object PrezelChipDefaults {
         }
 
     @Composable
-    private fun getBorderStroke(
+    private fun getBorderColor(
         type: PrezelChipType,
         interaction: PrezelChipInteraction,
         feedback: PrezelChipFeedback,
-    ): BorderStroke? {
+    ): Color? {
         if (type == PrezelChipType.FILLED) return null
 
-        val borderColor =
-            when {
-                feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
-                interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
-                interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.borderRegular
-                else -> PrezelTheme.colors.borderMedium
-            }
-
-        return BorderStroke(
-            width = PrezelTheme.stroke.V1,
-            color = borderColor,
-        )
+        return when {
+            feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.borderRegular
+            else -> PrezelTheme.colors.borderMedium
+        }
     }
 
     @Composable
@@ -213,18 +198,3 @@ object PrezelChipDefaults {
             PrezelChipSize.REGULAR -> 16.dp
         }
 }
-
-internal fun PrezelChipDefault.withCustomColors(customColors: PrezelChipColors): PrezelChipDefault =
-    copy(
-        borderStroke = when {
-            borderStroke == null -> null
-            customColors.borderColor == Color.Unspecified -> borderStroke
-            else -> BorderStroke(
-                width = borderStroke.width,
-                color = customColors.borderColor,
-            )
-        },
-        containerColor = if (customColors.containerColor != Color.Unspecified) customColors.containerColor else containerColor,
-        iconColor = if (customColors.iconColor != Color.Unspecified) customColors.iconColor else iconColor,
-        textColor = if (customColors.textColor != Color.Unspecified) customColors.textColor else textColor,
-    )

@@ -10,10 +10,12 @@ import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefault
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipFeedback
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipInteraction
+import com.team.prezel.core.designsystem.component.chip.config.PrezelChipLayout
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewRow
 import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -34,13 +36,10 @@ fun PrezelIconChip(
         feedback = feedback,
     ),
 ) {
-    PrezelChip(
+    PrezelChipLayout(
         modifier = modifier,
+        text = null,
         iconResId = iconResId,
-        type = type,
-        size = size,
-        interaction = interaction,
-        feedback = feedback,
         config = config,
     )
 }
@@ -57,14 +56,14 @@ private fun PrezelChipPreview(
     PreviewSection(title = "Chip - $type") {
         Text(text = "Size", style = PrezelTheme.typography.title2Medium, color = PrezelTheme.colors.textLarge)
         PreviewValueRow(name = "Regular") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 size = PrezelChipSize.REGULAR,
             )
         }
         PreviewValueRow(name = "Small") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 size = PrezelChipSize.SMALL,
@@ -73,21 +72,21 @@ private fun PrezelChipPreview(
 
         Text(text = "Interaction", style = PrezelTheme.typography.title2Medium, color = PrezelTheme.colors.textLarge)
         PreviewValueRow(name = "Default") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 interaction = PrezelChipInteraction.DEFAULT,
             )
         }
         PreviewValueRow(name = "Active") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 interaction = PrezelChipInteraction.ACTIVE,
             )
         }
         PreviewValueRow(name = "Disabled") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 interaction = PrezelChipInteraction.DISABLED,
@@ -96,17 +95,63 @@ private fun PrezelChipPreview(
 
         Text(text = "Feedback", style = PrezelTheme.typography.title2Medium, color = PrezelTheme.colors.textLarge)
         PreviewValueRow(name = "Default") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 feedback = PrezelChipFeedback.DEFAULT,
             )
         }
         PreviewValueRow(name = "Bad") {
-            PrezelChip(
+            PrezelIconChip(
                 iconResId = PrezelIcons.Blank,
                 type = type,
                 feedback = PrezelChipFeedback.BAD,
+            )
+        }
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PrezelChipCustomPreview(
+    @PreviewParameter(PrezelIconChipTypeProvider::class) type: PrezelChipType,
+) {
+    PreviewSection(title = "Custom Chip - $type") {
+        PreviewRow {
+            PrezelIconChip(
+                iconResId = PrezelIcons.Blank,
+                config = PrezelChipDefaults.getDefault(
+                    iconOnly = true,
+                    type = type,
+                    containerColor = PrezelTheme.colors.accentPurpleSmall,
+                    iconColor = PrezelTheme.colors.accentPurpleRegular,
+                    textColor = PrezelTheme.colors.accentPurpleRegular,
+                    borderColor = PrezelTheme.colors.accentPurpleRegular,
+                ),
+            )
+
+            PrezelIconChip(
+                iconResId = PrezelIcons.Blank,
+                config = PrezelChipDefaults.getDefault(
+                    iconOnly = true,
+                    type = type,
+                    containerColor = PrezelTheme.colors.accentTealSmall,
+                    iconColor = PrezelTheme.colors.accentTealRegular,
+                    textColor = PrezelTheme.colors.accentTealRegular,
+                    borderColor = PrezelTheme.colors.accentTealRegular,
+                ),
+            )
+
+            PrezelIconChip(
+                iconResId = PrezelIcons.Blank,
+                config = PrezelChipDefaults.getDefault(
+                    iconOnly = true,
+                    type = type,
+                    containerColor = PrezelTheme.colors.accentMagentaSmall,
+                    iconColor = PrezelTheme.colors.accentMagentaRegular,
+                    textColor = PrezelTheme.colors.accentMagentaRegular,
+                    borderColor = PrezelTheme.colors.accentMagentaRegular,
+                ),
             )
         }
     }
