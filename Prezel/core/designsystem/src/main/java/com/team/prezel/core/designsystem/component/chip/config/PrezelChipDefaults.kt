@@ -1,26 +1,15 @@
-package com.team.prezel.core.designsystem.component.chip
+package com.team.prezel.core.designsystem.component.chip.config
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-
-internal val LocalPrezelChipColors = staticCompositionLocalOf { PrezelChipColors() }
-
-internal val LocalPrezelChipTextColor = staticCompositionLocalOf<Color> {
-    error("No PrezelChipTextColor provided")
-}
-
-internal val LocalPrezelChipIconColor = staticCompositionLocalOf<Color> {
-    error("No PrezelChipIconColor provided")
-}
 
 @Immutable
 data class PrezelChipColors(
@@ -51,13 +40,11 @@ object PrezelChipDefaults {
         size: PrezelChipSize = PrezelChipSize.REGULAR,
         interaction: PrezelChipInteraction = PrezelChipInteraction.DEFAULT,
         feedback: PrezelChipFeedback = PrezelChipFeedback.DEFAULT,
-        chipColors: PrezelChipColors = LocalPrezelChipColors.current,
         shape: Shape = getShape(size = size),
         borderStroke: BorderStroke? = getBorderStroke(
             type = type,
             interaction = interaction,
             feedback = feedback,
-            chipColors = chipColors,
         ),
         textStyle: TextStyle = getTextStyle(size = size),
         containerColor: Color = getContainerColor(
@@ -65,19 +52,16 @@ object PrezelChipDefaults {
             type = type,
             interaction = interaction,
             feedback = feedback,
-            chipColors = chipColors,
         ),
         iconColor: Color = getIconColor(
             type = type,
             interaction = interaction,
             feedback = feedback,
-            chipColors = chipColors,
         ),
         textColor: Color = getTextColor(
             type = type,
             interaction = interaction,
             feedback = feedback,
-            chipColors = chipColors,
         ),
         contentPadding: PaddingValues = getContentPadding(size = size, iconOnly = iconOnly),
         iconTextSpacing: Dp = getIconTextSpacing(size = size),
@@ -106,13 +90,11 @@ object PrezelChipDefaults {
         type: PrezelChipType,
         interaction: PrezelChipInteraction,
         feedback: PrezelChipFeedback,
-        chipColors: PrezelChipColors,
     ): BorderStroke? {
         if (type == PrezelChipType.FILLED) return null
 
         val borderColor =
             when {
-                chipColors.borderColor != Color.Unspecified -> chipColors.borderColor
                 feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
                 interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
                 interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.borderRegular
@@ -138,14 +120,12 @@ object PrezelChipDefaults {
         type: PrezelChipType,
         interaction: PrezelChipInteraction,
         feedback: PrezelChipFeedback,
-        chipColors: PrezelChipColors,
     ): Color {
         if (type == PrezelChipType.OUTLINED && iconOnly) {
             return Color.Transparent
         }
 
         return when {
-            chipColors.containerColor != Color.Unspecified -> chipColors.containerColor
             feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadSmall
             interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveXSmall
             interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.bgDisabled
@@ -163,10 +143,8 @@ object PrezelChipDefaults {
         type: PrezelChipType,
         interaction: PrezelChipInteraction,
         feedback: PrezelChipFeedback,
-        chipColors: PrezelChipColors,
     ): Color =
         when {
-            chipColors.iconColor != Color.Unspecified -> chipColors.iconColor
             feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
             interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
             interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.iconDisabled
@@ -183,10 +161,8 @@ object PrezelChipDefaults {
         type: PrezelChipType,
         interaction: PrezelChipInteraction,
         feedback: PrezelChipFeedback,
-        chipColors: PrezelChipColors,
     ): Color =
         when {
-            chipColors.textColor != Color.Unspecified -> chipColors.textColor
             feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
             interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
             interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.textDisabled
@@ -237,3 +213,18 @@ object PrezelChipDefaults {
             PrezelChipSize.REGULAR -> 16.dp
         }
 }
+
+internal fun PrezelChipDefault.withCustomColors(customColors: PrezelChipColors): PrezelChipDefault =
+    copy(
+        borderStroke = when {
+            borderStroke == null -> null
+            customColors.borderColor == Color.Unspecified -> borderStroke
+            else -> BorderStroke(
+                width = borderStroke.width,
+                color = customColors.borderColor,
+            )
+        },
+        containerColor = if (customColors.containerColor != Color.Unspecified) customColors.containerColor else containerColor,
+        iconColor = if (customColors.iconColor != Color.Unspecified) customColors.iconColor else iconColor,
+        textColor = if (customColors.textColor != Color.Unspecified) customColors.textColor else textColor,
+    )

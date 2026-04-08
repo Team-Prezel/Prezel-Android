@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.chip
+package com.team.prezel.core.designsystem.component.chip.config
 
 import androidx.compose.runtime.Immutable
 
