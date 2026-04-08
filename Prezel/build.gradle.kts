@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -29,7 +31,9 @@ subprojects {
         parallel = true
     }
 
-    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    tasks.withType<Detekt>().configureEach {
+        jvmTarget = "21"
+
         reports {
             txt.required.set(true)
             html.required.set(false)

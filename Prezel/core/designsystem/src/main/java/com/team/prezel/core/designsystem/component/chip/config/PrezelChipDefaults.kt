@@ -1,0 +1,200 @@
+package com.team.prezel.core.designsystem.component.chip.config
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.theme.PrezelTheme
+
+@Immutable
+data class PrezelChipDefault(
+    val shape: Shape,
+    val textStyle: TextStyle,
+    val containerColor: Color,
+    val iconColor: Color,
+    val textColor: Color,
+    val borderColor: Color?,
+    val contentPadding: PaddingValues,
+    val iconTextSpacing: Dp,
+    val iconSize: Dp,
+)
+
+object PrezelChipDefaults {
+    @Composable
+    fun getDefault(
+        iconOnly: Boolean,
+        type: PrezelChipType = PrezelChipType.FILLED,
+        size: PrezelChipSize = PrezelChipSize.REGULAR,
+        interaction: PrezelChipInteraction = PrezelChipInteraction.DEFAULT,
+        feedback: PrezelChipFeedback = PrezelChipFeedback.DEFAULT,
+        shape: Shape = getShape(size = size),
+        textStyle: TextStyle = getTextStyle(size = size),
+        containerColor: Color = getContainerColor(
+            iconOnly = iconOnly,
+            type = type,
+            interaction = interaction,
+            feedback = feedback,
+        ),
+        iconColor: Color = getIconColor(
+            type = type,
+            interaction = interaction,
+            feedback = feedback,
+        ),
+        textColor: Color = getTextColor(
+            type = type,
+            interaction = interaction,
+            feedback = feedback,
+        ),
+        borderColor: Color? = getBorderColor(
+            type = type,
+            interaction = interaction,
+            feedback = feedback,
+        ),
+        contentPadding: PaddingValues = getContentPadding(size = size, iconOnly = iconOnly),
+        iconTextSpacing: Dp = getIconTextSpacing(size = size),
+        iconSize: Dp = getIconSize(size = size),
+    ) = PrezelChipDefault(
+        shape = shape,
+        textStyle = textStyle,
+        containerColor = containerColor,
+        iconColor = iconColor,
+        textColor = textColor,
+        borderColor = if (type == PrezelChipType.OUTLINED) borderColor else null,
+        contentPadding = contentPadding,
+        iconTextSpacing = iconTextSpacing,
+        iconSize = iconSize,
+    )
+
+    @Composable
+    private fun getShape(size: PrezelChipSize): Shape =
+        when (size) {
+            PrezelChipSize.SMALL -> PrezelTheme.shapes.V4
+            PrezelChipSize.REGULAR -> PrezelTheme.shapes.V8
+        }
+
+    @Composable
+    private fun getBorderColor(
+        type: PrezelChipType,
+        interaction: PrezelChipInteraction,
+        feedback: PrezelChipFeedback,
+    ): Color? {
+        if (type == PrezelChipType.FILLED) return null
+
+        return when {
+            feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.borderRegular
+            else -> PrezelTheme.colors.borderMedium
+        }
+    }
+
+    @Composable
+    private fun getTextStyle(size: PrezelChipSize): TextStyle =
+        when (size) {
+            PrezelChipSize.SMALL -> PrezelTheme.typography.caption2Regular
+            PrezelChipSize.REGULAR -> PrezelTheme.typography.caption1Regular
+        }
+
+    @Composable
+    private fun getContainerColor(
+        iconOnly: Boolean,
+        type: PrezelChipType,
+        interaction: PrezelChipInteraction,
+        feedback: PrezelChipFeedback,
+    ): Color {
+        if (type == PrezelChipType.OUTLINED && iconOnly) {
+            return Color.Transparent
+        }
+
+        return when {
+            feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadSmall
+            interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveXSmall
+            interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.bgDisabled
+            else -> {
+                when (type) {
+                    PrezelChipType.FILLED -> PrezelTheme.colors.bgLarge
+                    PrezelChipType.OUTLINED -> PrezelTheme.colors.bgRegular
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun getIconColor(
+        type: PrezelChipType,
+        interaction: PrezelChipInteraction,
+        feedback: PrezelChipFeedback,
+    ): Color =
+        when {
+            feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.iconDisabled
+            else -> {
+                when (type) {
+                    PrezelChipType.FILLED -> PrezelTheme.colors.iconMedium
+                    PrezelChipType.OUTLINED -> PrezelTheme.colors.iconRegular
+                }
+            }
+        }
+
+    @Composable
+    private fun getTextColor(
+        type: PrezelChipType,
+        interaction: PrezelChipInteraction,
+        feedback: PrezelChipFeedback,
+    ): Color =
+        when {
+            feedback == PrezelChipFeedback.BAD -> PrezelTheme.colors.feedbackBadRegular
+            interaction == PrezelChipInteraction.ACTIVE -> PrezelTheme.colors.interactiveRegular
+            interaction == PrezelChipInteraction.DISABLED -> PrezelTheme.colors.textDisabled
+            else -> {
+                when (type) {
+                    PrezelChipType.FILLED -> PrezelTheme.colors.textMedium
+                    PrezelChipType.OUTLINED -> PrezelTheme.colors.textRegular
+                }
+            }
+        }
+
+    @Composable
+    private fun getContentPadding(
+        size: PrezelChipSize,
+        iconOnly: Boolean,
+    ): PaddingValues {
+        if (iconOnly) {
+            val all = when (size) {
+                PrezelChipSize.SMALL -> PrezelTheme.spacing.V6
+                PrezelChipSize.REGULAR -> PrezelTheme.spacing.V8
+            }
+            return PaddingValues(all = all)
+        }
+
+        val horizontal = when (size) {
+            PrezelChipSize.SMALL -> PrezelTheme.spacing.V6
+            PrezelChipSize.REGULAR -> PrezelTheme.spacing.V8
+        }
+
+        val vertical = when (size) {
+            PrezelChipSize.SMALL -> PrezelTheme.spacing.V4
+            PrezelChipSize.REGULAR -> PrezelTheme.spacing.V6
+        }
+
+        return PaddingValues(horizontal = horizontal, vertical = vertical)
+    }
+
+    @Composable
+    private fun getIconTextSpacing(size: PrezelChipSize): Dp =
+        when (size) {
+            PrezelChipSize.REGULAR -> PrezelTheme.spacing.V4
+            PrezelChipSize.SMALL -> PrezelTheme.spacing.V2
+        }
+
+    private fun getIconSize(size: PrezelChipSize): Dp =
+        when (size) {
+            PrezelChipSize.SMALL -> 14.dp
+            PrezelChipSize.REGULAR -> 16.dp
+        }
+}
