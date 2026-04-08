@@ -63,7 +63,7 @@ object PrezelChipDefaults {
         containerColor = containerColor,
         iconColor = iconColor,
         textColor = textColor,
-        borderColor = borderColor,
+        borderColor = if (type == PrezelChipType.OUTLINED) borderColor else null,
         contentPadding = contentPadding,
         iconTextSpacing = iconTextSpacing,
         iconSize = iconSize,
