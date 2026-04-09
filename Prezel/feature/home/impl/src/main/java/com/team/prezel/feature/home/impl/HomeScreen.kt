@@ -2,10 +2,10 @@ package com.team.prezel.feature.home.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,9 +85,6 @@ private fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val bottomSheetHeight = 360.dp
-    val contentModifier = Modifier
-        .fillMaxSize()
-        .padding(bottom = bottomSheetHeight)
     val onClickPracticeAction: (PracticeActionUiModel) -> Unit = { actionUiModel ->
         handlePracticeAction(
             actionUiModel = actionUiModel,
@@ -100,25 +97,17 @@ private fun HomeScreen(
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(title = { Text(text = stringResource(R.string.feature_home_impl_title)) })
 
-        Box(
+        HomeScreenContent(
+            uiState = uiState,
+            onTabSelected = onTabSelected,
+            onClickPracticeAction = onClickPracticeAction,
+        )
+
+        HomeBottomSheetShell(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-        ) {
-            HomeScreenContent(
-                uiState = uiState,
-                onTabSelected = onTabSelected,
-                onClickPracticeAction = onClickPracticeAction,
-                modifier = contentModifier,
-            )
-
-            HomeBottomSheetShell(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(bottomSheetHeight),
-            )
-        }
+                .height(bottomSheetHeight),
+        )
     }
 }
 
@@ -198,36 +187,33 @@ private fun HomeEmptyContent(
 ) {
     val actionUiModel = emptyPracticeActionUiModel()
 
-    Box(
-        modifier = modifier.paint(
-            painterResource(id = com.team.prezel.core.designsystem.R.drawable.core_designsystem_section_title_empty),
-            contentScale = ContentScale.FillBounds,
-        ),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(4f / 3f)
+            .paint(
+                painter = painterResource(id = R.drawable.feature_home_impl_section_title_empty),
+                contentScale = ContentScale.FillWidth,
+            ).padding(all = PrezelTheme.spacing.V20),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(PrezelTheme.spacing.V20),
-        ) {
-            Text(
-                text = stringResource(R.string.feature_home_impl_empty_greeting, nickname),
-                color = PrezelTheme.colors.textMedium,
-                style = PrezelTheme.typography.title1Medium,
-            )
-            Text(
-                text = stringResource(R.string.feature_home_impl_empty_subtitle),
-                color = PrezelTheme.colors.textLarge,
-                style = PrezelTheme.typography.title1Bold,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            PracticeActionButton(
-                title = actionUiModel.title,
-                actionText = actionUiModel.actionText,
-                titleColor = PrezelTheme.colors.interactiveRegular,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onClickPracticeAction(actionUiModel) },
-            )
-        }
+        Text(
+            text = stringResource(R.string.feature_home_impl_empty_greeting, nickname),
+            color = PrezelTheme.colors.textMedium,
+            style = PrezelTheme.typography.title1Medium,
+        )
+        Text(
+            text = stringResource(R.string.feature_home_impl_empty_subtitle),
+            color = PrezelTheme.colors.textLarge,
+            style = PrezelTheme.typography.title1Bold,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        PracticeActionButton(
+            title = actionUiModel.title,
+            actionText = actionUiModel.actionText,
+            titleColor = PrezelTheme.colors.interactiveRegular,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { onClickPracticeAction(actionUiModel) },
+        )
     }
 }
 
@@ -265,48 +251,45 @@ private fun HomePresentationPage(
 ) {
     val actionUiModel = presentation.toPracticeActionUiModel()
 
-    Box(
-        modifier = modifier.paint(
-            painter = painterResource(id = presentation.category.backgroundRes()),
-            contentScale = ContentScale.FillBounds,
-        ),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(4f / 3f)
+            .paint(
+                painter = painterResource(id = presentation.category.backgroundRes()),
+                contentScale = ContentScale.FillWidth,
+            ).padding(all = PrezelTheme.spacing.V20),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = PrezelTheme.spacing.V20),
-        ) {
-            PrezelChip(
-                text = presentation.category.label(),
-                config = PrezelChipDefaults.getDefault(
-                    iconOnly = false,
-                    containerColor = PrezelTheme.colors.bgRegular,
-                    textColor = PrezelTheme.colors.interactiveRegular,
-                ),
-            )
+        PrezelChip(
+            text = presentation.category.label(),
+            config = PrezelChipDefaults.getDefault(
+                iconOnly = false,
+                containerColor = PrezelTheme.colors.bgRegular,
+                textColor = PrezelTheme.colors.interactiveRegular,
+            ),
+        )
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
-            Text(
-                text = presentation.date.toKoreanDate(),
-                color = PrezelTheme.colors.textRegular,
-                style = PrezelTheme.typography.body3Regular,
-            )
+        Text(
+            text = presentation.date.toKoreanDate(),
+            color = PrezelTheme.colors.textRegular,
+            style = PrezelTheme.typography.body3Regular,
+        )
 
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
-            HomePresentationTitleRow(presentation = presentation)
+        HomePresentationTitleRow(presentation = presentation)
 
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
-            PracticeActionButton(
-                title = actionUiModel.title,
-                actionText = actionUiModel.actionText,
-                titleColor = PrezelTheme.colors.textMedium,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onClickPracticeAction(actionUiModel) },
-            )
-        }
+        PracticeActionButton(
+            title = actionUiModel.title,
+            actionText = actionUiModel.actionText,
+            titleColor = PrezelTheme.colors.textMedium,
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { onClickPracticeAction(actionUiModel) },
+        )
     }
 }
 

@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.core.designsystem.R as DSR
 
 enum class CategoryUiModel {
     PERSUASION,
@@ -25,8 +24,8 @@ fun CategoryUiModel.label(): String =
 @DrawableRes
 fun CategoryUiModel.backgroundRes(): Int =
     when (this) {
-        CategoryUiModel.PERSUASION -> DSR.drawable.core_designsystem_section_title_hand
-        CategoryUiModel.EVENT -> DSR.drawable.core_designsystem_section_title_event
-        CategoryUiModel.EDUCATION -> DSR.drawable.core_designsystem_section_title_college
-        CategoryUiModel.REPORT -> DSR.drawable.core_designsystem_section_title_company
+        CategoryUiModel.PERSUASION -> R.drawable.feature_home_impl_section_title_hand
+        CategoryUiModel.EVENT -> R.drawable.feature_home_impl_section_title_event
+        CategoryUiModel.EDUCATION -> R.drawable.feature_home_impl_section_title_college
+        CategoryUiModel.REPORT -> R.drawable.feature_home_impl_section_title_company
     }
