@@ -33,7 +33,7 @@ import com.team.prezel.core.designsystem.component.PrezelTabs
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.PrezelChipColors
+import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -278,9 +278,10 @@ private fun HomePresentationPage(
         ) {
             PrezelChip(
                 text = presentation.category.label(),
-                customColors = PrezelChipColors(
+                config = PrezelChipDefaults.getDefault(
+                    iconOnly = false,
                     containerColor = PrezelTheme.colors.bgRegular,
-                    contentColor = PrezelTheme.colors.interactiveRegular,
+                    textColor = PrezelTheme.colors.interactiveRegular,
                 ),
             )
 
@@ -370,7 +371,7 @@ private fun PracticeActionButton(
 
                 Icon(
                     painter = painterResource(PrezelIcons.ChevronRight),
-                    contentDescription = actionText,
+                    contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = PrezelTheme.colors.iconRegular,
                 )
