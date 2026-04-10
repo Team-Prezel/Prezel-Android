@@ -1,5 +1,6 @@
 package com.team.prezel.feature.home.impl
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -37,13 +38,11 @@ import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefault
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.Category
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
-import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
-import com.team.prezel.feature.home.impl.model.backgroundRes
 import com.team.prezel.feature.home.impl.model.emptyPracticeActionUiModel
-import com.team.prezel.feature.home.impl.model.label
 import com.team.prezel.feature.home.impl.model.toPracticeActionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
@@ -354,6 +353,24 @@ private fun PracticeActionButton(
     }
 }
 
+@Composable
+private fun Category.label(): String =
+    when (this) {
+        Category.PERSUASION -> stringResource(R.string.feature_home_impl_category_persuasion)
+        Category.EVENT -> stringResource(R.string.feature_home_impl_category_event)
+        Category.EDUCATION -> stringResource(R.string.feature_home_impl_category_education)
+        Category.REPORT -> stringResource(R.string.feature_home_impl_category_report)
+    }
+
+@DrawableRes
+private fun Category.backgroundRes(): Int =
+    when (this) {
+        Category.PERSUASION -> R.drawable.feature_home_impl_section_title_hand
+        Category.EVENT -> R.drawable.feature_home_impl_section_title_event
+        Category.EDUCATION -> R.drawable.feature_home_impl_section_title_college
+        Category.REPORT -> R.drawable.feature_home_impl_section_title_company
+    }
+
 private fun LocalDate.toKoreanDate(): String = "${year}년 ${month.number.toString().padStart(2, '0')}월 ${day.toString().padStart(2, '0')}일"
 
 private fun PresentationUiModel.dDayLabel(): String =
@@ -384,7 +401,7 @@ private fun PresentationCardSinglePreview() {
     val uiState = HomeUiState.SingleContent(
         presentation = PresentationUiModel(
             id = 1L,
-            category = CategoryUiModel.PERSUASION,
+            category = Category.PERSUASION,
             title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
         ),
@@ -407,7 +424,7 @@ private fun PresentationCardTabsPreview() {
         List(3) { index ->
             PresentationUiModel(
                 id = index.toLong(),
-                category = CategoryUiModel.EDUCATION,
+                category = Category.EDUCATION,
                 title = "공백포함둘에서열글자",
                 date = LocalDate(2026, 4, 10 + index),
             )

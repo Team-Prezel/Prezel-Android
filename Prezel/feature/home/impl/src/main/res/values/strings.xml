@@ -12,7 +12,7 @@
     <string name="feature_home_impl_write_feedback_action">피드백 작성하기</string>
 
     <string name="feature_home_impl_category_persuasion">설득·제안</string>
-    <string name="feature_home_impl_category_event">설득·제안</string>
-    <string name="feature_home_impl_category_education">설득·제안</string>
-    <string name="feature_home_impl_category_report">설득·제안</string>
+    <string name="feature_home_impl_category_event">행사·공개</string>
+    <string name="feature_home_impl_category_education">학술·교육</string>
+    <string name="feature_home_impl_category_report">업무·보고</string>
 </resources>

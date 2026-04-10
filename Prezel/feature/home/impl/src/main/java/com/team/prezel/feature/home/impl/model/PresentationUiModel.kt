@@ -1,6 +1,7 @@
 package com.team.prezel.feature.home.impl.model
 
 import androidx.compose.runtime.Immutable
+import com.team.prezel.core.model.Category
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -9,7 +10,7 @@ import kotlin.time.Clock
 @Immutable
 internal data class PresentationUiModel(
     val id: Long,
-    val category: CategoryUiModel,
+    val category: Category,
     val title: String,
     val date: LocalDate,
 ) {

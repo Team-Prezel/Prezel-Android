@@ -1,11 +1,11 @@
 package com.team.prezel.feature.home.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.model.Category
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.home.impl.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
-import com.team.prezel.feature.home.impl.model.CategoryUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -38,13 +38,13 @@ internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, 
         listOf(
             PresentationUiModel(
                 id = 1L,
-                category = CategoryUiModel.PERSUASION,
+                category = Category.PERSUASION,
                 title = "신규 서비스 제안 발표",
                 date = LocalDate(2026, 4, 10),
             ),
             PresentationUiModel(
                 id = 2L,
-                category = CategoryUiModel.REPORT,
+                category = Category.REPORT,
                 title = "주간 업무 공유",
                 date = LocalDate(2026, 4, 12),
             ),

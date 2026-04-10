@@ -42,6 +42,7 @@ includeAuto(
     "core:auth",
     ":core:data",
     ":core:designsystem",
+    "core:model",
     ":core:network",
     ":core:navigation",
     ":core:ui",
