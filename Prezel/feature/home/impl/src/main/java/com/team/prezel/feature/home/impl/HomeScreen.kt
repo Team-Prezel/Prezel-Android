@@ -40,8 +40,6 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.CategoryUiModel
-import com.team.prezel.feature.home.impl.model.PracticeActionType
-import com.team.prezel.feature.home.impl.model.PracticeActionUiModel
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.model.backgroundRes
 import com.team.prezel.feature.home.impl.model.emptyPracticeActionUiModel
@@ -85,14 +83,6 @@ private fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val bottomSheetHeight = 360.dp
-    val onClickPracticeAction: (PracticeActionUiModel) -> Unit = { actionUiModel ->
-        handlePracticeAction(
-            actionUiModel = actionUiModel,
-            onClickAddPresentation = onClickAddPresentation,
-            onClickAnalyzePresentation = onClickAnalyzePresentation,
-            onClickWriteFeedback = onClickWriteFeedback,
-        )
-    }
 
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(title = { Text(text = stringResource(R.string.feature_home_impl_title)) })
@@ -100,7 +90,9 @@ private fun HomeScreen(
         HomeScreenContent(
             uiState = uiState,
             onTabSelected = onTabSelected,
-            onClickPracticeAction = onClickPracticeAction,
+            onClickAddPresentation = onClickAddPresentation,
+            onClickAnalyzePresentation = onClickAnalyzePresentation,
+            onClickWriteFeedback = onClickWriteFeedback,
         )
 
         HomeBottomSheetShell(
@@ -115,7 +107,9 @@ private fun HomeScreen(
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onTabSelected: (PresentationUiModel) -> Unit,
-    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
+    onClickAddPresentation: () -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -124,7 +118,7 @@ private fun HomeScreenContent(
             HomeEmptyContent(
                 nickname = uiState.nickname,
                 modifier = modifier,
-                onClickPracticeAction = onClickPracticeAction,
+                onClickAddPresentation = onClickAddPresentation,
             )
         }
 
@@ -132,7 +126,8 @@ private fun HomeScreenContent(
             HomePresentationPage(
                 presentation = uiState.presentation,
                 modifier = modifier,
-                onClickPracticeAction = onClickPracticeAction,
+                onClickAnalyzePresentation = onClickAnalyzePresentation,
+                onClickWriteFeedback = onClickWriteFeedback,
             )
         }
 
@@ -141,22 +136,10 @@ private fun HomeScreenContent(
                 presentations = uiState.presentations,
                 onTabSelected = onTabSelected,
                 modifier = modifier,
-                onClickPracticeAction = onClickPracticeAction,
+                onClickAnalyzePresentation = onClickAnalyzePresentation,
+                onClickWriteFeedback = onClickWriteFeedback,
             )
         }
-    }
-}
-
-private fun handlePracticeAction(
-    actionUiModel: PracticeActionUiModel,
-    onClickAddPresentation: () -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-) {
-    when (actionUiModel.type) {
-        PracticeActionType.ADD_PRESENTATION -> onClickAddPresentation()
-        PracticeActionType.ANALYZE_PRESENTATION -> actionUiModel.presentation?.let(onClickAnalyzePresentation)
-        PracticeActionType.WRITE_FEEDBACK -> actionUiModel.presentation?.let(onClickWriteFeedback)
     }
 }
 
@@ -183,7 +166,7 @@ private fun HomeBottomSheetShell(modifier: Modifier = Modifier) {
 private fun HomeEmptyContent(
     nickname: String,
     modifier: Modifier = Modifier,
-    onClickPracticeAction: (PracticeActionUiModel) -> Unit = {},
+    onClickAddPresentation: () -> Unit = {},
 ) {
     val actionUiModel = emptyPracticeActionUiModel()
 
@@ -212,7 +195,7 @@ private fun HomeEmptyContent(
             actionText = actionUiModel.actionText,
             titleColor = PrezelTheme.colors.interactiveRegular,
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onClickPracticeAction(actionUiModel) },
+            onClick = onClickAddPresentation,
         )
     }
 }
@@ -221,7 +204,8 @@ private fun HomeEmptyContent(
 private fun HomePresentationContent(
     presentations: ImmutableList<PresentationUiModel>,
     onTabSelected: (PresentationUiModel) -> Unit,
-    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = presentations.map(PresentationUiModel::dDayLabel).toPersistentList()
@@ -238,7 +222,8 @@ private fun HomePresentationContent(
     ) { pageIndex ->
         HomePresentationPage(
             presentation = presentations[pageIndex],
-            onClickPracticeAction = onClickPracticeAction,
+            onClickAnalyzePresentation = onClickAnalyzePresentation,
+            onClickWriteFeedback = onClickWriteFeedback,
         )
     }
 }
@@ -246,10 +231,16 @@ private fun HomePresentationContent(
 @Composable
 private fun HomePresentationPage(
     presentation: PresentationUiModel,
-    onClickPracticeAction: (PracticeActionUiModel) -> Unit,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val actionUiModel = presentation.toPracticeActionUiModel()
+    val onClickAction = if (presentation.dDay() < 0) {
+        { onClickWriteFeedback(presentation) }
+    } else {
+        { onClickAnalyzePresentation(presentation) }
+    }
 
     Column(
         modifier = modifier
@@ -288,7 +279,7 @@ private fun HomePresentationPage(
             actionText = actionUiModel.actionText,
             titleColor = PrezelTheme.colors.textMedium,
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onClickPracticeAction(actionUiModel) },
+            onClick = onClickAction,
         )
     }
 }
