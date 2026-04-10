@@ -36,13 +36,13 @@ internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, 
 
     private fun getPresentations(): List<PresentationUiModel> =
         listOf(
-            PresentationUiModel(
+            PresentationUiModel.create(
                 id = 1L,
                 category = Category.PERSUASION,
                 title = "신규 서비스 제안 발표",
                 date = LocalDate(2026, 4, 10),
             ),
-            PresentationUiModel(
+            PresentationUiModel.create(
                 id = 2L,
                 category = Category.REPORT,
                 title = "주간 업무 공유",

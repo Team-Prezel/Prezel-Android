@@ -17,10 +17,8 @@ internal fun emptyPracticeActionUiModel(): PracticeActionUiModel =
     )
 
 @Composable
-internal fun PresentationUiModel.toPracticeActionUiModel(): PracticeActionUiModel {
-    val isPastPresentation = dDay() < 0
-
-    return if (isPastPresentation) {
+internal fun PresentationUiModel.toPracticeActionUiModel(): PracticeActionUiModel =
+    if (isPastPresentation) {
         PracticeActionUiModel(
             title = stringResource(R.string.feature_home_impl_write_feedback_title, title),
             actionText = stringResource(R.string.feature_home_impl_write_feedback_action),
@@ -31,4 +29,3 @@ internal fun PresentationUiModel.toPracticeActionUiModel(): PracticeActionUiMode
             actionText = stringResource(R.string.feature_home_impl_analyze_presentation_action),
         )
     }
-}

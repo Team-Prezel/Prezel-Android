@@ -42,7 +42,6 @@ import com.team.prezel.core.model.Category
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
-import com.team.prezel.feature.home.impl.model.emptyPracticeActionUiModel
 import com.team.prezel.feature.home.impl.model.toPracticeActionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
@@ -167,8 +166,6 @@ private fun HomeEmptyContent(
     modifier: Modifier = Modifier,
     onClickAddPresentation: () -> Unit = {},
 ) {
-    val actionUiModel = emptyPracticeActionUiModel()
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -190,8 +187,8 @@ private fun HomeEmptyContent(
         )
         Spacer(modifier = Modifier.weight(1f))
         PracticeActionButton(
-            title = actionUiModel.title,
-            actionText = actionUiModel.actionText,
+            title = stringResource(R.string.feature_home_impl_add_presentation_title),
+            actionText = stringResource(R.string.feature_home_impl_add_presentation_action),
             titleColor = PrezelTheme.colors.interactiveRegular,
             modifier = Modifier.fillMaxWidth(),
             onClick = onClickAddPresentation,
@@ -235,7 +232,7 @@ private fun HomePresentationPage(
     modifier: Modifier = Modifier,
 ) {
     val actionUiModel = presentation.toPracticeActionUiModel()
-    val onClickAction = if (presentation.dDay() < 0) {
+    val onClickAction = if (presentation.isPastPresentation) {
         { onClickWriteFeedback(presentation) }
     } else {
         { onClickAnalyzePresentation(presentation) }
@@ -261,11 +258,7 @@ private fun HomePresentationPage(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = presentation.date.toKoreanDate(),
-            color = PrezelTheme.colors.textRegular,
-            style = PrezelTheme.typography.body3Regular,
-        )
+        HomePresentationDate(date = presentation.date)
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
@@ -284,6 +277,20 @@ private fun HomePresentationPage(
 }
 
 @Composable
+private fun HomePresentationDate(date: LocalDate) {
+    Text(
+        text = stringResource(
+            R.string.feature_home_impl_presentation_date,
+            date.year,
+            date.month.number,
+            date.day,
+        ),
+        color = PrezelTheme.colors.textRegular,
+        style = PrezelTheme.typography.body3Regular,
+    )
+}
+
+@Composable
 private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -295,7 +302,7 @@ private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
             style = PrezelTheme.typography.title1Bold,
         )
         Text(
-            text = presentation.dDayLabel(),
+            text = presentation.dDayLabel,
             color = PrezelTheme.colors.interactiveRegular,
             style = PrezelTheme.typography.title1ExtraBold,
         )
@@ -371,15 +378,6 @@ private fun Category.backgroundRes(): Int =
         Category.REPORT -> R.drawable.feature_home_impl_section_title_company
     }
 
-private fun LocalDate.toKoreanDate(): String = "${year}년 ${month.number.toString().padStart(2, '0')}월 ${day.toString().padStart(2, '0')}일"
-
-private fun PresentationUiModel.dDayLabel(): String =
-    when (val days = dDay()) {
-        0 -> "D-Day"
-        in Int.MIN_VALUE..-1 -> "D+${-days}"
-        else -> "D-$days"
-    }
-
 @BasicPreview
 @Composable
 private fun HomeEmptyContentPreview() {
@@ -399,7 +397,7 @@ private fun HomeEmptyContentPreview() {
 @Composable
 private fun PresentationCardSinglePreview() {
     val uiState = HomeUiState.SingleContent(
-        presentation = PresentationUiModel(
+        presentation = PresentationUiModel.create(
             id = 1L,
             category = Category.PERSUASION,
             title = "날짜 지난 발표제목",
@@ -422,7 +420,7 @@ private fun PresentationCardSinglePreview() {
 private fun PresentationCardTabsPreview() {
     val uiState = HomeUiState.MultipleContent(
         List(3) { index ->
-            PresentationUiModel(
+            PresentationUiModel.create(
                 id = index.toLong(),
                 category = Category.EDUCATION,
                 title = "공백포함둘에서열글자",

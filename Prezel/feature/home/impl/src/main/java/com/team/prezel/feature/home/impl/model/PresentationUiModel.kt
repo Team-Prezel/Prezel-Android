@@ -13,6 +13,34 @@ internal data class PresentationUiModel(
     val category: Category,
     val title: String,
     val date: LocalDate,
+    val dDayLabel: String,
+    val isPastPresentation: Boolean,
 ) {
-    fun dDay(now: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int = (date.toEpochDays() - now.toEpochDays()).toInt()
+    companion object {
+        fun create(
+            id: Long,
+            category: Category,
+            title: String,
+            date: LocalDate,
+            now: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        ): PresentationUiModel {
+            val dDay = (date.toEpochDays() - now.toEpochDays()).toInt()
+
+            return PresentationUiModel(
+                id = id,
+                category = category,
+                title = title,
+                date = date,
+                dDayLabel = dDay.toDdayLabel(),
+                isPastPresentation = dDay < 0,
+            )
+        }
+    }
 }
+
+private fun Int.toDdayLabel(): String =
+    when (this) {
+        0 -> "D-Day"
+        in Int.MIN_VALUE..-1 -> "D+${-this}"
+        else -> "D-$this"
+    }
