@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 
 @Composable
-internal fun HomtHeroLayout(
+internal fun HomeHeroLayout(
     @DrawableRes backgroundResId: Int,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
@@ -34,11 +34,11 @@ internal fun HomtHeroLayout(
     )
 }
 
-@Preview(showBackground = true)
+@BasicPreview
 @Composable
-private fun HomtHeroLayoutPreview() {
+private fun HomeHeroLayoutPreview() {
     PrezelTheme {
-        HomtHeroLayout(
+        HomeHeroLayout(
             backgroundResId = R.drawable.feature_home_impl_section_title_empty,
         ) {
             Text(

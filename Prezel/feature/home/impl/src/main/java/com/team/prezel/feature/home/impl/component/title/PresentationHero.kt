@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +20,6 @@ import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PresentationHero(
     presentation: PresentationUiModel,
@@ -29,7 +27,7 @@ internal fun PresentationHero(
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    HomtHeroLayout(
+    HomeHeroLayout(
         backgroundResId = presentation.category.backgroundResId(),
         modifier = modifier,
     ) {

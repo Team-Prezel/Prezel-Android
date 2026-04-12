@@ -26,12 +26,14 @@ import com.team.prezel.core.ui.onHeightChanged
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetContent
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetTitle
-import com.team.prezel.feature.home.impl.component.title.HomtHeroLayout
+import com.team.prezel.feature.home.impl.component.title.HomeHeroLayout
 
 private data class HomeBottomSheetLayoutState(
     val sheetPeekHeight: Dp,
     val updateTitleSectionHeight: (Dp) -> Unit,
 )
+
+private val HomeBottomSheetShadowTopInset = 18.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +52,14 @@ internal fun HomePageLayout(
     BottomSheetScaffold(
         modifier = modifier.fillMaxSize(),
         sheetPeekHeight = layoutState.sheetPeekHeight,
-        sheetContent = sheetContent,
+        sheetShape = PrezelTheme.shapes.V16,
+        sheetContent = {
+            Box(modifier = Modifier.padding(top = HomeBottomSheetShadowTopInset)) {
+                with(this@BottomSheetScaffold) {
+                    sheetContent()
+                }
+            }
+        },
         sheetDragHandle = null,
         containerColor = Color.Transparent,
         sheetContainerColor = Color.Transparent,
@@ -76,7 +85,7 @@ private fun rememberHomeBottomSheetLayoutState(
 ): HomeBottomSheetLayoutState {
     var titleSectionHeight by remember { mutableStateOf(0.dp) }
     val sheetPeekHeight = remember(maxHeight, headerHeight, titleSectionHeight) {
-        (maxHeight - headerHeight - titleSectionHeight).coerceAtLeast(0.dp)
+        (maxHeight - headerHeight - titleSectionHeight + HomeBottomSheetShadowTopInset).coerceAtLeast(0.dp)
     }
 
     return remember(titleSectionHeight, sheetPeekHeight) {
@@ -104,7 +113,7 @@ private fun HomeBodySectionPreview() {
                     }
                 },
                 heroContent = {
-                    HomtHeroLayout(
+                    HomeHeroLayout(
                         backgroundResId = R.drawable.feature_home_impl_section_title_empty,
                     ) { }
                 },

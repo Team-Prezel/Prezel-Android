@@ -16,7 +16,7 @@ internal fun EmptyPresentationHero(
     onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    HomtHeroLayout(
+    HomeHeroLayout(
         backgroundResId = R.drawable.feature_home_impl_section_title_empty,
         modifier = modifier,
     ) {
