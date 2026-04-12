@@ -1,7 +1,8 @@
 package com.team.prezel.feature.home.impl.model
 
 import androidx.compose.runtime.Immutable
-import com.team.prezel.core.model.Category
+import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Presentation
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -13,34 +14,25 @@ internal data class PresentationUiModel(
     val category: Category,
     val title: String,
     val date: LocalDate,
-    val dDayLabel: String,
-    val isPastPresentation: Boolean,
+    val dDay: Int,
+    val practiceCount: Int = 0,
 ) {
-    companion object {
-        fun create(
-            id: Long,
-            category: Category,
-            title: String,
-            date: LocalDate,
-            now: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
-        ): PresentationUiModel {
-            val dDay = (date.toEpochDays() - now.toEpochDays()).toInt()
+    val isPastPresentation: Boolean = dDay < 0
 
-            return PresentationUiModel(
+    val dDayLabel: String = when (dDay) {
+        0 -> "D-Day"
+        in Int.MIN_VALUE..-1 -> "D+${-dDay}"
+        else -> "D-$dDay"
+    }
+
+    companion object {
+        fun Presentation.toUiModel(now: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): PresentationUiModel =
+            PresentationUiModel(
                 id = id,
                 category = category,
                 title = title,
                 date = date,
-                dDayLabel = dDay.toDdayLabel(),
-                isPastPresentation = dDay < 0,
+                dDay = dDay(now = now),
             )
-        }
     }
 }
-
-private fun Int.toDdayLabel(): String =
-    when (this) {
-        0 -> "D-Day"
-        in Int.MIN_VALUE..-1 -> "D+${-this}"
-        else -> "D-$this"
-    }
