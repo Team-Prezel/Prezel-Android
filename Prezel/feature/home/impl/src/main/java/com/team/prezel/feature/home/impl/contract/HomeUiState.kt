@@ -20,7 +20,17 @@ internal sealed interface HomeUiState : UiState {
 
     data class MultipleContent(
         val presentations: ImmutableList<PresentationUiModel>,
-    ) : HomeUiState
+    ) : HomeUiState {
+        val dDayLabels: ImmutableList<String> = presentations.map(PresentationUiModel::dDayLabel).toImmutableList()
+    }
+
+    fun presentationCount(): Int =
+        when (this) {
+            Loading -> 0
+            is Empty -> 1
+            is SingleContent -> 1
+            is MultipleContent -> presentations.size
+        }
 
     companion object {
         fun from(
