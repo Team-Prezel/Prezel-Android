@@ -2,13 +2,14 @@ package com.team.prezel.feature.home.impl.component.body
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,16 +27,17 @@ internal fun HomeBottomSheetContent(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     contentPadding: PaddingValues = PaddingValues(vertical = PrezelTheme.spacing.V32),
-    content: LazyListScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    LazyColumn(
+    Column(
         modifier = modifier
-            .fillMaxSize()
-            .prezelDropShadow(style = bottomSheetShadowStyle()),
+            .fillMaxWidth()
+            .prezelDropShadow(style = bottomSheetShadowStyle())
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         content = content,
-        contentPadding = contentPadding,
     )
 }
 
@@ -70,8 +72,8 @@ private fun HomeBottomSheetContentPreview() {
                 ),
                 verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
             ) {
-                item { HomeBottomSheetTitle(title = "지금부터 연습해보세요") }
-                items(3) { index ->
+                HomeBottomSheetTitle(title = "지금부터 연습해보세요")
+                repeat(3) { index ->
                     Text(
                         text = "${index + 1}. 발표 흐름을 다시 점검해보세요",
                         color = PrezelTheme.colors.textRegular,

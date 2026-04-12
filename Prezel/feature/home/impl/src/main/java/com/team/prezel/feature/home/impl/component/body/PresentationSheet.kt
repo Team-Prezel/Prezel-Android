@@ -18,15 +18,14 @@ import kotlinx.datetime.LocalDate
 internal fun PresentationSheet(
     practiceCount: Int,
     modifier: Modifier = Modifier,
-    itemModifier: Modifier = Modifier.padding(horizontal = PrezelTheme.spacing.V20),
 ) {
+    val itemModifier = Modifier.padding(horizontal = PrezelTheme.spacing.V20)
+
     HomeBottomSheetContent(modifier = modifier) {
-        item {
-            HomeBottomSheetTitle(
-                title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, practiceCount),
-                modifier = itemModifier,
-            )
-        }
+        HomeBottomSheetTitle(
+            title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, practiceCount),
+            modifier = itemModifier,
+        )
     }
 }
 

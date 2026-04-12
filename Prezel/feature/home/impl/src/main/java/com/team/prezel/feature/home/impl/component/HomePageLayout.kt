@@ -109,7 +109,7 @@ private fun HomeBodySectionPreview() {
                     HomeBottomSheetContent(
                         contentPadding = PaddingValues(vertical = 32.dp, horizontal = 20.dp),
                     ) {
-                        item { HomeBottomSheetTitle(title = "지금부터 연습해보세요") }
+                        HomeBottomSheetTitle(title = "지금부터 연습해보세요")
                     }
                 },
                 heroContent = {

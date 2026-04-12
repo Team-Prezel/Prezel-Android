@@ -18,7 +18,7 @@ internal fun EmptyPresentationSheet(modifier: Modifier = Modifier) {
         modifier = modifier,
         contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32, horizontal = PrezelTheme.spacing.V20),
     ) {
-        item { HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_empty_title)) }
+        HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_empty_title))
     }
 }
 
