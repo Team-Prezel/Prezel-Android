@@ -60,10 +60,10 @@ internal object HomeBottomSheetScope {
             backgroundColor = PrezelTheme.colors.bgRegular,
             token = PrezelDropShadowDefaults.PrezelShadowToken(
                 offsetX = 0.dp,
-                offsetY = (-8).dp,
-                blurRadius = 24.dp,
+                offsetY = (-6).dp,
+                blurRadius = 12.dp,
                 spreadRadius = 0.dp,
-                color = Color(0x14000000),
+                color = Color(0xFFF5F6F7),
             ),
         )
 }
