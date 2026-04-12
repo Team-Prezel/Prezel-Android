@@ -25,7 +25,7 @@ import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetScaffold
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetScope
 import com.team.prezel.feature.home.impl.component.title.HomeTitleSection
-import com.team.prezel.feature.home.impl.component.title.PracticeActionButton
+import com.team.prezel.feature.home.impl.component.title.PracticeActionCard
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
@@ -104,7 +104,7 @@ private fun HomePresentationPage(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
-        PracticeActionButton(
+        PracticeActionCard(
             title = if (presentation.isPastPresentation) {
                 stringResource(R.string.feature_home_impl_write_feedback_title, presentation.title)
             } else {

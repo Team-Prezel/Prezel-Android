@@ -16,7 +16,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetScaffold
 import com.team.prezel.feature.home.impl.component.title.HomeTitleSection
-import com.team.prezel.feature.home.impl.component.title.PracticeActionButton
+import com.team.prezel.feature.home.impl.component.title.PracticeActionCard
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 
 @Composable
@@ -63,7 +63,7 @@ private fun EmptyTitleSection(
             style = PrezelTheme.typography.title1Bold,
         )
         Spacer(modifier = Modifier.weight(1f))
-        PracticeActionButton(
+        PracticeActionCard(
             title = stringResource(R.string.feature_home_impl_add_presentation_title),
             actionText = stringResource(R.string.feature_home_impl_add_presentation_action),
             titleColor = PrezelTheme.colors.interactiveRegular,

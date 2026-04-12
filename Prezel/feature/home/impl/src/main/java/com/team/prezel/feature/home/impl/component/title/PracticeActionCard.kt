@@ -25,7 +25,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
-internal fun PracticeActionButton(
+internal fun PracticeActionCard(
     title: String,
     actionText: String,
     titleColor: Color,
@@ -75,10 +75,10 @@ internal fun PracticeActionButton(
 
 @BasicPreview
 @Composable
-private fun PracticeActionButtonPreview() {
+private fun PracticeActionCardPreview() {
     PrezelTheme {
         Box(modifier = Modifier.padding(8.dp)) {
-            PracticeActionButton(
+            PracticeActionCard(
                 title = "연습하기",
                 actionText = "지금 바로 시작하기",
                 titleColor = PrezelTheme.colors.interactiveRegular,
