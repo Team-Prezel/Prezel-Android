@@ -307,6 +307,16 @@ object PrezelDropShadowDefaults {
         override fun getShadow(): List<PrezelShadowToken> = shadowList
     }
 
+    data class Custom(
+        override val borderRadius: Dp = 0.dp,
+        override val backgroundColor: Color = Color.Transparent,
+        val token: PrezelShadowToken,
+    ) : PrezelShadowStyle(borderRadius, backgroundColor) {
+        private val shadowList by lazy { listOf(token) }
+
+        override fun getShadow(): List<PrezelShadowToken> = shadowList
+    }
+
     /**
      * 개별 그림자 레이어의 오프셋, blur, spread, 색상을 정의합니다.
      */
