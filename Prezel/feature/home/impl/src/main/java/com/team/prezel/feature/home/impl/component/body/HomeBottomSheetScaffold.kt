@@ -1,6 +1,7 @@
 package com.team.prezel.feature.home.impl.component.body
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,7 +38,7 @@ internal fun HomeBottomSheetScaffold(
     headerHeight: Dp,
     modifier: Modifier = Modifier,
     sheetContent: @Composable HomeBottomSheetScope.() -> Unit,
-    content: @Composable () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val layoutState = rememberHomeBottomSheetLayoutState(
         maxHeight = maxHeight,
@@ -60,10 +61,12 @@ internal fun HomeBottomSheetScaffold(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = headerHeight)
-                .onHeightChanged(layoutState.updateTitleSectionHeight),
+                .padding(top = headerHeight),
         ) {
-            content()
+            Box(
+                modifier = Modifier.onHeightChanged(layoutState.updateTitleSectionHeight),
+                content = content,
+            )
         }
     }
 }
