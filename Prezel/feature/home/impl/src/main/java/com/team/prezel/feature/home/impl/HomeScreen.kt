@@ -25,10 +25,13 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.ui.LocalSnackbarHostState
-import com.team.prezel.feature.home.impl.component.EmptyPresentationContent
-import com.team.prezel.feature.home.impl.component.PresentationContent
-import com.team.prezel.feature.home.impl.component.body.onHeightChanged
+import com.team.prezel.core.ui.onHeightChanged
+import com.team.prezel.feature.home.impl.component.HomePageLayout
+import com.team.prezel.feature.home.impl.component.body.EmptyPresentationSheet
+import com.team.prezel.feature.home.impl.component.body.PresentationSheet
 import com.team.prezel.feature.home.impl.component.head.HomeHeadSection
+import com.team.prezel.feature.home.impl.component.title.EmptyPresentationHero
+import com.team.prezel.feature.home.impl.component.title.PresentationHero
 import com.team.prezel.feature.home.impl.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
@@ -123,35 +126,60 @@ private fun HomeContent(
 ) {
     when (uiState) {
         HomeUiState.Loading -> Unit
-        is HomeUiState.Empty -> EmptyPresentationContent(
-            uiState = uiState,
-            maxHeight = maxHeight,
-            headerHeight = headerHeight,
-            onClickAddPresentation = onClickAddPresentation,
-        )
-
-        is HomeUiState.SingleContent -> PresentationContent(
-            presentation = uiState.presentation,
-            maxHeight = maxHeight,
-            headerHeight = headerHeight,
-            onClickAnalyzePresentation = onClickAnalyzePresentation,
-            onClickWriteFeedback = onClickWriteFeedback,
-        )
-
-        is HomeUiState.MultipleContent -> HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            overscrollEffect = null,
-            userScrollEnabled = false,
-            key = { pageIndex -> uiState.presentations[pageIndex].id },
-        ) { pageIndex ->
-            PresentationContent(
-                presentation = uiState.presentations[pageIndex],
+        is HomeUiState.Empty -> {
+            HomePageLayout(
                 maxHeight = maxHeight,
                 headerHeight = headerHeight,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
+                sheetContent = { EmptyPresentationSheet() },
+                heroContent = {
+                    EmptyPresentationHero(
+                        nickname = uiState.nickname,
+                        onClickAddPresentation = onClickAddPresentation,
+                    )
+                },
             )
+        }
+
+        is HomeUiState.SingleContent -> {
+            val presentation = uiState.presentation
+
+            HomePageLayout(
+                maxHeight = maxHeight,
+                headerHeight = headerHeight,
+                sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+                heroContent = {
+                    PresentationHero(
+                        presentation = presentation,
+                        onClickAnalyzePresentation = onClickAnalyzePresentation,
+                        onClickWriteFeedback = onClickWriteFeedback,
+                    )
+                },
+            )
+        }
+
+        is HomeUiState.MultipleContent -> {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                overscrollEffect = null,
+                userScrollEnabled = false,
+                key = { pageIndex -> uiState.presentations[pageIndex].id },
+            ) { pageIndex ->
+                val presentation = uiState.presentations[pageIndex]
+
+                HomePageLayout(
+                    maxHeight = maxHeight,
+                    headerHeight = headerHeight,
+                    sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+                    heroContent = {
+                        PresentationHero(
+                            presentation = presentation,
+                            onClickAnalyzePresentation = onClickAnalyzePresentation,
+                            onClickWriteFeedback = onClickWriteFeedback,
+                        )
+                    },
+                )
+            }
         }
     }
 }

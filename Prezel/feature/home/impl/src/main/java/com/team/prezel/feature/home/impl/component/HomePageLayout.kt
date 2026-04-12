@@ -1,8 +1,9 @@
-package com.team.prezel.feature.home.impl.component.body
+package com.team.prezel.feature.home.impl.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,15 +17,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.onHeightChanged
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.component.title.HomeTitleSection
+import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetContent
+import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetTitle
+import com.team.prezel.feature.home.impl.component.title.HomtHeroLayout
 
 private data class HomeBottomSheetLayoutState(
     val sheetPeekHeight: Dp,
@@ -33,12 +35,12 @@ private data class HomeBottomSheetLayoutState(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun HomeBottomSheetScaffold(
+internal fun HomePageLayout(
     maxHeight: Dp,
     headerHeight: Dp,
     modifier: Modifier = Modifier,
-    sheetContent: @Composable HomeBottomSheetScope.() -> Unit,
-    content: @Composable BoxScope.() -> Unit,
+    sheetContent: @Composable ColumnScope.() -> Unit,
+    heroContent: @Composable BoxScope.() -> Unit,
 ) {
     val layoutState = rememberHomeBottomSheetLayoutState(
         maxHeight = maxHeight,
@@ -48,11 +50,7 @@ internal fun HomeBottomSheetScaffold(
     BottomSheetScaffold(
         modifier = modifier.fillMaxSize(),
         sheetPeekHeight = layoutState.sheetPeekHeight,
-        sheetContent = {
-            with(HomeBottomSheetScope) {
-                sheetContent()
-            }
-        },
+        sheetContent = sheetContent,
         sheetDragHandle = null,
         containerColor = Color.Transparent,
         sheetContainerColor = Color.Transparent,
@@ -65,7 +63,7 @@ internal fun HomeBottomSheetScaffold(
         ) {
             Box(
                 modifier = Modifier.onHeightChanged(layoutState.updateTitleSectionHeight),
-                content = content,
+                content = heroContent,
             )
         }
     }
@@ -89,34 +87,28 @@ private fun rememberHomeBottomSheetLayoutState(
     }
 }
 
-@Composable
-internal fun Modifier.onHeightChanged(onHeightChanged: (Dp) -> Unit): Modifier {
-    val density = LocalDensity.current
-
-    return onSizeChanged { size ->
-        with(density) { onHeightChanged(size.height.toDp()) }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @BasicPreview
 @Composable
 private fun HomeBodySectionPreview() {
     PrezelTheme {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            HomeBottomSheetScaffold(
+            HomePageLayout(
                 maxHeight = maxHeight,
                 headerHeight = 0.dp,
                 sheetContent = {
-                    Content(contentPadding = PaddingValues(vertical = 32.dp, horizontal = 20.dp)) {
-                        item { Title(title = "지금부터 연습해보세요") }
+                    HomeBottomSheetContent(
+                        contentPadding = PaddingValues(vertical = 32.dp, horizontal = 20.dp),
+                    ) {
+                        item { HomeBottomSheetTitle(title = "지금부터 연습해보세요") }
                     }
                 },
-            ) {
-                HomeTitleSection(
-                    backgroundResId = R.drawable.feature_home_impl_section_title_empty,
-                ) { }
-            }
+                heroContent = {
+                    HomtHeroLayout(
+                        backgroundResId = R.drawable.feature_home_impl_section_title_empty,
+                    ) { }
+                },
+            )
         }
     }
 }

@@ -1,87 +1,35 @@
-package com.team.prezel.feature.home.impl.component
+package com.team.prezel.feature.home.impl.component.title
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetScaffold
-import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetScope
-import com.team.prezel.feature.home.impl.component.title.HomeTitleSection
-import com.team.prezel.feature.home.impl.component.title.PracticeActionCard
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun PresentationContent(
-    presentation: PresentationUiModel,
-    maxHeight: Dp,
-    headerHeight: Dp,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    HomeBottomSheetScaffold(
-        maxHeight = maxHeight,
-        headerHeight = headerHeight,
-        sheetContent = {
-            BottomSheetContent(
-                practiceCount = presentation.practiceCount,
-            )
-        },
-        modifier = modifier,
-    ) {
-        HomePresentationPage(
-            presentation = presentation,
-            onClickAnalyzePresentation = onClickAnalyzePresentation,
-            onClickWriteFeedback = onClickWriteFeedback,
-        )
-    }
-}
-
-@Composable
-private fun HomeBottomSheetScope.BottomSheetContent(
-    practiceCount: Int,
-    modifier: Modifier = Modifier,
-    itemModifier: Modifier = Modifier.padding(horizontal = PrezelTheme.spacing.V20),
-) {
-    Content(modifier = modifier) {
-        item {
-            Title(
-                title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, practiceCount),
-                modifier = itemModifier,
-            )
-        }
-    }
-}
-
-@Composable
-private fun HomePresentationPage(
+internal fun PresentationHero(
     presentation: PresentationUiModel,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    HomeTitleSection(
+    HomtHeroLayout(
         backgroundResId = presentation.category.backgroundResId(),
         modifier = modifier,
     ) {
@@ -176,7 +124,7 @@ private fun Category.backgroundResId(): Int =
 @Composable
 private fun HomePresentationPagePreview() {
     PrezelTheme {
-        HomePresentationPage(
+        PresentationHero(
             presentation = PresentationUiModel(
                 id = 1L,
                 category = Category.PERSUASION,
@@ -194,7 +142,7 @@ private fun HomePresentationPagePreview() {
 @Composable
 private fun HomePresentationPagePastPreview() {
     PrezelTheme {
-        HomePresentationPage(
+        PresentationHero(
             presentation = PresentationUiModel(
                 id = 2L,
                 category = Category.EDUCATION,
@@ -205,28 +153,5 @@ private fun HomePresentationPagePastPreview() {
             onClickAnalyzePresentation = {},
             onClickWriteFeedback = {},
         )
-    }
-}
-
-@BasicPreview
-@Composable
-private fun PresentationContentPreview() {
-    PrezelTheme {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            PresentationContent(
-                presentation = PresentationUiModel(
-                    id = 1L,
-                    category = Category.PERSUASION,
-                    title = "설득하는 발표",
-                    date = LocalDate(2026, 10, 1),
-                    dDay = 3,
-                    practiceCount = 5,
-                ),
-                maxHeight = maxHeight,
-                headerHeight = 0.dp,
-                onClickAnalyzePresentation = {},
-                onClickWriteFeedback = {},
-            )
-        }
     }
 }

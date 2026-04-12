@@ -17,7 +17,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 
 @Composable
-internal fun HomeTitleSection(
+internal fun HomtHeroLayout(
     @DrawableRes backgroundResId: Int,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
@@ -36,9 +36,9 @@ internal fun HomeTitleSection(
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeTitleSectionPreview() {
+private fun HomtHeroLayoutPreview() {
     PrezelTheme {
-        HomeTitleSection(
+        HomtHeroLayout(
             backgroundResId = R.drawable.feature_home_impl_section_title_empty,
         ) {
             Text(
