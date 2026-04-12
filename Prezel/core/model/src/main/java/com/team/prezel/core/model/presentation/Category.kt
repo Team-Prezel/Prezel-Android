@@ -1,4 +1,4 @@
-package com.team.prezel.core.model
+package com.team.prezel.core.model.presentation
 
 enum class Category {
     PERSUASION,
