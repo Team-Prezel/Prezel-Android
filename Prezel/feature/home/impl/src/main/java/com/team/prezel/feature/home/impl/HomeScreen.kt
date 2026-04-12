@@ -126,60 +126,111 @@ private fun HomeContent(
     when (uiState) {
         HomeUiState.Loading -> Unit
         is HomeUiState.Empty -> {
-            HomePageLayout(
+            HomeEmptyContent(
                 maxHeight = maxHeight,
                 headerHeight = headerHeight,
-                sheetContent = { EmptyPresentationSheet() },
-                heroContent = {
-                    EmptyPresentationHero(
-                        nickname = uiState.nickname,
-                        onClickAddPresentation = onClickAddPresentation,
-                    )
-                },
+                uiState = uiState,
+                onClickAddPresentation = onClickAddPresentation,
             )
         }
 
         is HomeUiState.SingleContent -> {
-            val presentation = uiState.presentation
-
-            HomePageLayout(
+            HomeSingleContent(
+                uiState = uiState,
                 maxHeight = maxHeight,
                 headerHeight = headerHeight,
-                sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
-                heroContent = {
-                    PresentationHero(
-                        presentation = presentation,
-                        onClickAnalyzePresentation = onClickAnalyzePresentation,
-                        onClickWriteFeedback = onClickWriteFeedback,
-                    )
-                },
+                onClickAnalyzePresentation = onClickAnalyzePresentation,
+                onClickWriteFeedback = onClickWriteFeedback,
             )
         }
 
         is HomeUiState.MultipleContent -> {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                overscrollEffect = null,
-                userScrollEnabled = false,
-                key = { pageIndex -> uiState.presentations[pageIndex].id },
-            ) { pageIndex ->
-                val presentation = uiState.presentations[pageIndex]
-
-                HomePageLayout(
-                    maxHeight = maxHeight,
-                    headerHeight = headerHeight,
-                    sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
-                    heroContent = {
-                        PresentationHero(
-                            presentation = presentation,
-                            onClickAnalyzePresentation = onClickAnalyzePresentation,
-                            onClickWriteFeedback = onClickWriteFeedback,
-                        )
-                    },
-                )
-            }
+            HomeMultipleContent(
+                uiState = uiState,
+                pagerState = pagerState,
+                maxHeight = maxHeight,
+                headerHeight = headerHeight,
+                onClickAnalyzePresentation = onClickAnalyzePresentation,
+                onClickWriteFeedback = onClickWriteFeedback,
+            )
         }
+    }
+}
+
+@Composable
+private fun HomeEmptyContent(
+    maxHeight: Dp,
+    headerHeight: Dp,
+    uiState: HomeUiState.Empty,
+    onClickAddPresentation: () -> Unit,
+) {
+    HomePageLayout(
+        maxHeight = maxHeight,
+        headerHeight = headerHeight,
+        sheetContent = { EmptyPresentationSheet() },
+        heroContent = {
+            EmptyPresentationHero(
+                nickname = uiState.nickname,
+                onClickAddPresentation = onClickAddPresentation,
+            )
+        },
+    )
+}
+
+@Composable
+private fun HomeSingleContent(
+    uiState: HomeUiState.SingleContent,
+    maxHeight: Dp,
+    headerHeight: Dp,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
+) {
+    val presentation = uiState.presentation
+
+    HomePageLayout(
+        maxHeight = maxHeight,
+        headerHeight = headerHeight,
+        sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+        heroContent = {
+            PresentationHero(
+                presentation = presentation,
+                onClickAnalyzePresentation = onClickAnalyzePresentation,
+                onClickWriteFeedback = onClickWriteFeedback,
+            )
+        },
+    )
+}
+
+@Composable
+private fun HomeMultipleContent(
+    uiState: HomeUiState.MultipleContent,
+    pagerState: PagerState,
+    maxHeight: Dp,
+    headerHeight: Dp,
+    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
+    onClickWriteFeedback: (PresentationUiModel) -> Unit,
+) {
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxSize(),
+        overscrollEffect = null,
+        userScrollEnabled = false,
+        key = { pageIndex -> uiState.presentations[pageIndex].id },
+    ) { pageIndex ->
+        val presentation = uiState.presentations[pageIndex]
+
+        HomePageLayout(
+            maxHeight = maxHeight,
+            headerHeight = headerHeight,
+            sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+            heroContent = {
+                PresentationHero(
+                    presentation = presentation,
+                    onClickAnalyzePresentation = onClickAnalyzePresentation,
+                    onClickWriteFeedback = onClickWriteFeedback,
+                )
+            },
+        )
     }
 }
 
