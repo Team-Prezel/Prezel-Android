@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_home_impl_title">홈</string>
-    <string name="feature_home_impl_bottom_sheet_title">지금부터 연습해보세요</string>
+    <string name="feature_home_impl_bottom_sheet_empty_title">지금부터 연습해보세요</string>
+    <string name="feature_home_impl_bottom_sheet_content_title">지금까지 %1$d번 연습했어요</string>
     <string name="feature_home_impl_empty_greeting">안녕하세요 %1$s님!</string>
     <string name="feature_home_impl_empty_subtitle">어떤 발표를 앞두고 있나요?</string>
     <string name="feature_home_impl_presentation_date">%1$d년 %2$02d월 %3$02d일</string>
@@ -16,4 +17,7 @@
     <string name="feature_home_impl_category_event">행사·공개</string>
     <string name="feature_home_impl_category_education">학술·교육</string>
     <string name="feature_home_impl_category_report">업무·보고</string>
+
+    <!-- Message  -->
+    <string name="feature_home_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>
 </resources>
