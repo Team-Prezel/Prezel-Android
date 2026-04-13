@@ -9,7 +9,6 @@ import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.my.api.MyNavKey
-import com.team.prezel.feature.profile.api.ProfileNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentMapOf
@@ -30,20 +29,14 @@ private val HISTORY = TopLevelNavItem(
     titleTextId = R.string.bottom_nav_history,
 )
 
-private val PROFILE = TopLevelNavItem(
-    iconRes = PrezelIcons.Profile,
-    titleTextId = R.string.bottom_nav_profile,
-)
-
 private val MY = TopLevelNavItem(
     iconRes = PrezelIcons.Profile,
-    titleTextId = R.string.bottom_nav_my,
+    titleTextId = R.string.bottom_nav_profile,
 )
 
 internal val MAIN_NAV_ITEMS = persistentMapOf(
     HomeNavKey to HOME,
     HistoryNavKey to HISTORY,
-    ProfileNavKey to PROFILE,
     MyNavKey to MY,
 )
 
