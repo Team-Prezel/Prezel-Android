@@ -7,6 +7,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreModel)
     implementation(projects.featureHistoryApi)
+
     implementation(libs.kotlinx.collections.immutable)
 }

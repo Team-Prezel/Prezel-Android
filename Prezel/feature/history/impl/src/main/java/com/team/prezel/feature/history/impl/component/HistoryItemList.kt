@@ -23,14 +23,15 @@ import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.feature.history.impl.model.HistoryChipUiModel
-import com.team.prezel.feature.history.impl.model.PresentationItem
+import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 internal fun HistoryItemList(
-    items: ImmutableList<PresentationItem>,
+    items: ImmutableList<HistoryUiModel>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -49,7 +50,7 @@ internal fun HistoryItemList(
 
 @Composable
 private fun HistoryPresentationCard(
-    item: PresentationItem,
+    item: HistoryUiModel,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -110,8 +111,9 @@ private fun HistoryItemListPreview() {
 }
 
 private val previewItems = persistentListOf(
-    PresentationItem(
+    HistoryUiModel(
         id = 1L,
+        category = Category.EDUCATION,
         dDayLabel = "D-5",
         dateLabel = "2025.10.20",
         title = "캡스톤서비스기획 중간고사 발표",
@@ -122,8 +124,9 @@ private val previewItems = persistentListOf(
             HistoryChipUiModel(label = "전문가"),
         ),
     ),
-    PresentationItem(
+    HistoryUiModel(
         id = 2L,
+        category = Category.REPORT,
         dDayLabel = "D-7",
         dateLabel = "2025.10.22",
         title = "IT동아리 대규모 세미나",

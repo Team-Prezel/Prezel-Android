@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryHeadSection
 import com.team.prezel.feature.history.impl.component.HistoryItemList
@@ -27,7 +28,7 @@ import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
 import com.team.prezel.feature.history.impl.model.HistoryChipUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
-import com.team.prezel.feature.history.impl.model.PresentationItem
+import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -71,7 +72,7 @@ internal fun HistoryScreen(
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
-    val pages = remember(uiState) { historyPreviewPages() }
+    val pages = remember(uiState) { uiState.toPages() }
 
     Column(
         modifier = modifier
@@ -100,59 +101,11 @@ internal fun HistoryScreen(
     }
 }
 
-private fun historyPreviewPages(): ImmutableList<ImmutableList<PresentationItem>> =
-    persistentListOf(
-        persistentListOf(
-            PresentationItem(
-                id = 1L,
-                dDayLabel = "D-5",
-                dateLabel = "2026.04.19",
-                title = "캡스톤서비스기획 중간고사 발표",
-                chips = persistentListOf(
-                    HistoryChipUiModel(label = "학술·교육", highlighted = true),
-                    HistoryChipUiModel(label = "내용 전달"),
-                    HistoryChipUiModel(label = "논리적"),
-                    HistoryChipUiModel(label = "전문가"),
-                ),
-            ),
-            PresentationItem(
-                id = 2L,
-                dDayLabel = "D-7",
-                dateLabel = "2026.04.21",
-                title = "IT동아리 대규모 세미나",
-                chips = persistentListOf(
-                    HistoryChipUiModel(label = "업무·보고", highlighted = true),
-                    HistoryChipUiModel(label = "내용 전달"),
-                    HistoryChipUiModel(label = "논리적"),
-                    HistoryChipUiModel(label = "일반 청중"),
-                ),
-            ),
-        ),
-        persistentListOf(
-            PresentationItem(
-                id = 3L,
-                dDayLabel = "D+1",
-                dateLabel = "2026.04.12",
-                title = "서비스 런칭 회고 발표",
-                chips = persistentListOf(
-                    HistoryChipUiModel(label = "업무·보고", highlighted = true),
-                    HistoryChipUiModel(label = "분석형"),
-                    HistoryChipUiModel(label = "팀 회고"),
-                ),
-            ),
-            PresentationItem(
-                id = 4L,
-                dDayLabel = "D+12",
-                dateLabel = "2026.04.02",
-                title = "졸업 프로젝트 최종 발표",
-                chips = persistentListOf(
-                    HistoryChipUiModel(label = "학술·교육", highlighted = true),
-                    HistoryChipUiModel(label = "스토리텔링"),
-                    HistoryChipUiModel(label = "전문가"),
-                ),
-            ),
-        ),
-    )
+private fun HistoryUiState.toPages(): ImmutableList<ImmutableList<HistoryUiModel>> =
+    when (this) {
+        HistoryUiState.Loading -> persistentListOf(persistentListOf(), persistentListOf())
+        is HistoryUiState.Content -> persistentListOf(preparingPresentations, completedPresentations)
+    }
 
 @BasicPreview
 @Composable
@@ -160,6 +113,40 @@ private fun HistoryScreenPreview() {
     val pagerState = rememberPagerState(initialPage = 0) { historyTabs.size }
 
     PrezelTheme {
-        HistoryScreen(uiState = HistoryUiState.Loading, pagerState = pagerState)
+        HistoryScreen(
+            uiState = HistoryUiState.Content(
+                preparingPresentations = persistentListOf(
+                    HistoryUiModel(
+                        id = 1L,
+                        category = Category.EDUCATION,
+                        dDayLabel = "D-5",
+                        dateLabel = "2026.04.19",
+                        title = "캡스톤서비스기획 중간고사 발표",
+                        chips = persistentListOf(
+                            HistoryChipUiModel(label = "학술·교육", highlighted = true),
+                            HistoryChipUiModel(label = "내용 전달"),
+                            HistoryChipUiModel(label = "논리적"),
+                            HistoryChipUiModel(label = "전문가"),
+                        ),
+                    ),
+                ),
+                completedPresentations = persistentListOf(
+                    HistoryUiModel(
+                        id = 2L,
+                        category = Category.PERSUASION,
+                        dDayLabel = "D+1",
+                        dateLabel = "2026.04.12",
+                        title = "서비스 런칭 회고 발표",
+                        chips = persistentListOf(
+                            HistoryChipUiModel(label = "학술·교육", highlighted = true),
+                            HistoryChipUiModel(label = "내용 전달"),
+                            HistoryChipUiModel(label = "논리적"),
+                            HistoryChipUiModel(label = "전문가"),
+                        ),
+                    ),
+                ),
+            ),
+            pagerState = pagerState,
+        )
     }
 }
