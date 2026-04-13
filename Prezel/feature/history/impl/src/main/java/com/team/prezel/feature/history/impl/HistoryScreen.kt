@@ -41,7 +41,8 @@ internal fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(initialPage = 0) { historyTabs.size }
+    val tabs = historyTabs()
+    val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
 
@@ -75,6 +76,7 @@ internal fun HistoryScreen(
 ) {
     val scope = rememberCoroutineScope()
     val pages = remember(uiState) { uiState.toPages() }
+    val tabs = historyTabs()
 
     Column(
         modifier = modifier
@@ -86,7 +88,7 @@ internal fun HistoryScreen(
             onClickTab = { pageIndex ->
                 scope.launch { pagerState.animateScrollToPage(pageIndex) }
             },
-            tabs = historyTabs,
+            tabs = tabs,
         )
 
         HorizontalPager(
@@ -97,6 +99,7 @@ internal fun HistoryScreen(
         ) { pageIndex ->
             HistoryItemList(
                 items = pages[pageIndex],
+                onClickItem = { },
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -112,7 +115,8 @@ private fun HistoryUiState.toPages(): ImmutableList<ImmutableList<HistoryUiModel
 @BasicPreview
 @Composable
 private fun HistoryScreenPreview() {
-    val pagerState = rememberPagerState(initialPage = 0) { historyTabs.size }
+    val tabs = historyTabs()
+    val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
     PrezelTheme {
         HistoryScreen(

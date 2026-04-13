@@ -45,16 +45,23 @@ internal fun HistoryHeadSection(
     }
 }
 
+@Composable
+internal fun historyTabs(): ImmutableList<String> =
+    persistentListOf(
+        stringResource(R.string.feature_history_impl_tab_preparing),
+        stringResource(R.string.feature_history_impl_tab_completed),
+    )
+
 @BasicPreview
 @Composable
 private fun HistoryHeadSectionPreview() {
+    val tabs = historyTabs()
+
     PrezelTheme {
         HistoryHeadSection(
-            pagerState = rememberPagerState(initialPage = 0) { historyTabs.size },
+            pagerState = rememberPagerState(initialPage = 0) { tabs.size },
             onClickTab = { },
-            tabs = historyTabs,
+            tabs = tabs,
         )
     }
 }
-
-internal val historyTabs = persistentListOf("준비 중인 발표", "완료한 발표")

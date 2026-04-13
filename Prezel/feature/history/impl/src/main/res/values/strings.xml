@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_history_impl_title">히스토리</string>
+    <string name="feature_history_impl_tab_preparing">준비 중인 발표</string>
+    <string name="feature_history_impl_tab_completed">완료한 발표</string>
 
     <!-- Presentation Chips -->
     <string name="feature_history_impl_category_persuasion">설득·제안</string>

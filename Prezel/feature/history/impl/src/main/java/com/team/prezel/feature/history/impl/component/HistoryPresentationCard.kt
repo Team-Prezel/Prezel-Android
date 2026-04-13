@@ -2,6 +2,7 @@ package com.team.prezel.feature.history.impl.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
@@ -30,22 +33,28 @@ import com.team.prezel.feature.history.impl.model.HistoryUiModel
 @Composable
 internal fun HistoryPresentationCard(
     item: HistoryUiModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape = PrezelTheme.shapes.V8)
-            .background(PrezelTheme.colors.bgRegular)
-            .padding(all = PrezelTheme.spacing.V14),
-        verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+    PrezelTouchArea(
+        onClick = onClick,
+        shape = PrezelTheme.shapes.V8,
     ) {
-        HistoryPresentationCardHeader(
-            dDayLabel = item.dDayLabel,
-            dateLabel = item.dateLabel,
-        )
-        HistoryPresentationCardTitle(title = item.title)
-        HistoryPresentationCardChips(item = item)
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(shape = PrezelTheme.shapes.V8)
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(all = PrezelTheme.spacing.V14),
+            verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+        ) {
+            HistoryPresentationCardHeader(
+                dDayLabel = item.dDayLabel,
+                dateLabel = item.dateLabel,
+            )
+            HistoryPresentationCardTitle(title = item.title)
+            HistoryPresentationCardChips(item = item)
+        }
     }
 }
 
@@ -142,18 +151,24 @@ private fun HistoryMetaChip(
 @Composable
 private fun HistoryPresentationCardPreview() {
     PrezelTheme {
-        HistoryPresentationCard(
-            item = HistoryUiModel(
-                id = 1L,
-                dDayLabel = "D-5",
-                dateLabel = "2025.10.20",
-                title = "캡스톤서비스기획 중간고사 발표",
-                category = Category.EDUCATION,
-                purpose = Purpose.CONTENT_DELIVERY,
-                style = Style.PROFESSIONAL,
-                audience = Audience.EXPERT,
-            ),
-            modifier = Modifier.background(PrezelTheme.colors.bgMedium),
-        )
+        Box(
+            modifier = Modifier
+                .background(color = PrezelTheme.colors.bgMedium)
+                .padding(8.dp),
+        ) {
+            HistoryPresentationCard(
+                item = HistoryUiModel(
+                    id = 1L,
+                    dDayLabel = "D-5",
+                    dateLabel = "2025.10.20",
+                    title = "캡스톤서비스기획 중간고사 발표",
+                    category = Category.EDUCATION,
+                    purpose = Purpose.CONTENT_DELIVERY,
+                    style = Style.PROFESSIONAL,
+                    audience = Audience.EXPERT,
+                ),
+                onClick = { },
+            )
+        }
     }
 }

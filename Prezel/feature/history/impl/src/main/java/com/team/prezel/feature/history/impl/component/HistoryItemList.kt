@@ -21,6 +21,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 internal fun HistoryItemList(
     items: ImmutableList<HistoryUiModel>,
+    onClickItem: (HistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -32,7 +33,10 @@ internal fun HistoryItemList(
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V14),
     ) {
         items(items = items, key = { item -> item.id }) { item ->
-            HistoryPresentationCard(item = item)
+            HistoryPresentationCard(
+                item = item,
+                onClick = { onClickItem(item) },
+            )
         }
     }
 }
@@ -66,6 +70,7 @@ private fun HistoryItemListPreview() {
     PrezelTheme {
         HistoryItemList(
             items = previewItems,
+            onClickItem = { },
             modifier = Modifier
                 .fillMaxSize()
                 .background(PrezelTheme.colors.bgMedium),
