@@ -3,6 +3,9 @@
     <string name="feature_history_impl_title">히스토리</string>
     <string name="feature_history_impl_tab_preparing">준비 중인 발표</string>
     <string name="feature_history_impl_tab_completed">완료한 발표</string>
+    <string name="feature_history_impl_empty_preparing">아직 준비 중인 발표가 없어요.</string>
+    <string name="feature_history_impl_empty_completed">아직 완료된 발표가 없어요.</string>
+    <string name="feature_history_impl_add_presentation">발표 추가하기</string>
 
     <!-- Presentation Chips -->
     <string name="feature_history_impl_category_persuasion">설득·제안</string>

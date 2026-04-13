@@ -23,6 +23,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
 import com.team.prezel.feature.history.impl.component.HistoryHeadSection
 import com.team.prezel.feature.history.impl.component.HistoryItemList
 import com.team.prezel.feature.history.impl.component.historyTabs
@@ -97,11 +98,21 @@ internal fun HistoryScreen(
             userScrollEnabled = false,
             overscrollEffect = null,
         ) { pageIndex ->
-            HistoryItemList(
-                items = pages[pageIndex],
-                onClickItem = { },
-                modifier = Modifier.fillMaxSize(),
-            )
+            val items = pages[pageIndex]
+
+            if (items.isEmpty()) {
+                HistoryEmptyContent(
+                    isPreparingTab = pageIndex == 0,
+                    onClickAddPresentation = { },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                HistoryItemList(
+                    items = items,
+                    onClickItem = { },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 }
