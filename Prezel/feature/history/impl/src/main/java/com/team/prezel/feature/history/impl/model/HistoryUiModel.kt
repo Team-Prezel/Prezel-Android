@@ -14,4 +14,10 @@ internal data class HistoryUiModel(
     val purpose: Purpose,
     val style: Style,
     val audience: Audience,
+    val status: HistoryPresentationStatus,
 )
+
+internal enum class HistoryPresentationStatus {
+    PREPARING,
+    COMPLETED,
+}

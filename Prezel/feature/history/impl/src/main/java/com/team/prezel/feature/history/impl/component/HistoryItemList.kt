@@ -14,6 +14,7 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -51,6 +52,7 @@ private val previewItems = persistentListOf(
         purpose = Purpose.CONTENT_DELIVERY,
         style = Style.PROFESSIONAL,
         audience = Audience.EXPERT,
+        status = HistoryPresentationStatus.PREPARING,
     ),
     HistoryUiModel(
         id = 2L,
@@ -61,6 +63,7 @@ private val previewItems = persistentListOf(
         purpose = Purpose.CONTENT_DELIVERY,
         style = Style.FRIENDLY,
         audience = Audience.GENERAL_AUDIENCE,
+        status = HistoryPresentationStatus.PREPARING,
     ),
 )
 

@@ -34,7 +34,7 @@ internal fun HistoryEmptyContent(
     ) {
         Image(
             painter = painterResource(R.drawable.feature_history_impl_empty_no_presentation),
-            modifier = modifier.size(120.dp),
+            modifier = Modifier.size(120.dp),
             contentDescription = null,
         )
         Text(

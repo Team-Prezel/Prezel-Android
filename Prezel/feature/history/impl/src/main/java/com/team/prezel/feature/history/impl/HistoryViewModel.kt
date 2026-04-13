@@ -9,6 +9,7 @@ import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
+import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -37,6 +38,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
                             purpose = Purpose.CONTENT_DELIVERY,
                             style = Style.PROFESSIONAL,
                             audience = Audience.EXPERT,
+                            status = HistoryPresentationStatus.PREPARING,
                         ),
                         HistoryUiModel(
                             id = 2L,
@@ -47,6 +49,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
                             purpose = Purpose.CONTENT_DELIVERY,
                             style = Style.FRIENDLY,
                             audience = Audience.GENERAL_AUDIENCE,
+                            status = HistoryPresentationStatus.PREPARING,
                         ),
                     ),
                     completedPresentations = persistentListOf(
@@ -59,6 +62,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
                             purpose = Purpose.IMPROVE_UNDERSTANDING,
                             style = Style.CALM,
                             audience = Audience.TEAMMATES,
+                            status = HistoryPresentationStatus.COMPLETED,
                         ),
                         HistoryUiModel(
                             id = 4L,
@@ -69,6 +73,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
                             purpose = Purpose.BUILD_EMPATHY,
                             style = Style.COMFORTABLE,
                             audience = Audience.EXPERT,
+                            status = HistoryPresentationStatus.COMPLETED,
                         ),
                     ),
                 )

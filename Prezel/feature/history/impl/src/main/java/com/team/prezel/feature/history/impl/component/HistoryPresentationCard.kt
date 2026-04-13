@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.feature.history.impl.mapper.labelResId
+import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 
 @Composable
@@ -98,6 +100,7 @@ private fun HistoryPresentationCardTitle(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun HistoryPresentationCardChips(
     item: HistoryUiModel,
     modifier: Modifier = Modifier,
@@ -166,6 +169,7 @@ private fun HistoryPresentationCardPreview() {
                     purpose = Purpose.CONTENT_DELIVERY,
                     style = Style.PROFESSIONAL,
                     audience = Audience.EXPERT,
+                    status = HistoryPresentationStatus.PREPARING,
                 ),
                 onClick = { },
             )

@@ -9,7 +9,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -30,6 +29,7 @@ import com.team.prezel.feature.history.impl.component.historyTabs
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
+import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -66,6 +66,12 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
+        onClickHistoryItem = { item ->
+            when (item.status) {
+                HistoryPresentationStatus.PREPARING -> Unit
+                HistoryPresentationStatus.COMPLETED -> Unit
+            }
+        },
     )
 }
 
@@ -73,10 +79,10 @@ internal fun HistoryScreen(
 internal fun HistoryScreen(
     uiState: HistoryUiState,
     pagerState: PagerState,
+    onClickHistoryItem: (HistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
-    val pages = remember(uiState) { uiState.toPages() }
     val tabs = historyTabs()
 
     Column(
@@ -92,36 +98,69 @@ internal fun HistoryScreen(
             tabs = tabs,
         )
 
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            userScrollEnabled = false,
-            overscrollEffect = null,
-        ) { pageIndex ->
-            val items = pages[pageIndex]
+        HistoryContent(
+            uiState = uiState,
+            pagerState = pagerState,
+            onClickHistoryItem = onClickHistoryItem,
+        )
+    }
+}
 
-            if (items.isEmpty()) {
-                HistoryEmptyContent(
-                    isPreparingTab = pageIndex == 0,
-                    onClickAddPresentation = { },
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                HistoryItemList(
-                    items = items,
-                    onClickItem = { },
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+@Composable
+private fun HistoryContent(
+    uiState: HistoryUiState,
+    pagerState: PagerState,
+    onClickHistoryItem: (HistoryUiModel) -> Unit,
+) {
+    when (uiState) {
+        HistoryUiState.Loading -> Unit
+
+        is HistoryUiState.Content -> {
+            HistoryPagerContent(
+                pagerState = pagerState,
+                preparingPresentations = uiState.preparingPresentations,
+                completedPresentations = uiState.completedPresentations,
+                onClickHistoryItem = onClickHistoryItem,
+            )
         }
     }
 }
 
-private fun HistoryUiState.toPages(): ImmutableList<ImmutableList<HistoryUiModel>> =
-    when (this) {
-        HistoryUiState.Loading -> persistentListOf(persistentListOf(), persistentListOf())
-        is HistoryUiState.Content -> persistentListOf(preparingPresentations, completedPresentations)
+@Composable
+private fun HistoryPagerContent(
+    pagerState: PagerState,
+    preparingPresentations: ImmutableList<HistoryUiModel>,
+    completedPresentations: ImmutableList<HistoryUiModel>,
+    onClickHistoryItem: (HistoryUiModel) -> Unit,
+) {
+    val pages = persistentListOf(
+        preparingPresentations,
+        completedPresentations,
+    )
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxSize(),
+        userScrollEnabled = false,
+        overscrollEffect = null,
+    ) { pageIndex ->
+        val items = pages[pageIndex]
+
+        if (items.isEmpty()) {
+            HistoryEmptyContent(
+                isPreparingTab = pageIndex == 0,
+                onClickAddPresentation = { },
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            HistoryItemList(
+                items = items,
+                onClickItem = onClickHistoryItem,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
+}
 
 @BasicPreview
 @Composable
@@ -142,6 +181,7 @@ private fun HistoryScreenPreview() {
                         purpose = Purpose.CONTENT_DELIVERY,
                         style = Style.PROFESSIONAL,
                         audience = Audience.EXPERT,
+                        status = HistoryPresentationStatus.PREPARING,
                     ),
                 ),
                 completedPresentations = persistentListOf(
@@ -154,10 +194,12 @@ private fun HistoryScreenPreview() {
                         purpose = Purpose.BUILD_EMPATHY,
                         style = Style.CALM,
                         audience = Audience.GENERAL_AUDIENCE,
+                        status = HistoryPresentationStatus.COMPLETED,
                     ),
                 ),
             ),
             pagerState = pagerState,
+            onClickHistoryItem = { },
         )
     }
 }
