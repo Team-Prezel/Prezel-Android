@@ -50,6 +50,8 @@ includeAuto(
     ":feature:home:impl",
     ":feature:history:api",
     ":feature:history:impl",
+    ":feature:my:api",
+    ":feature:my:impl",
     ":feature:profile:api",
     ":feature:profile:impl",
     ":feature:login:api",

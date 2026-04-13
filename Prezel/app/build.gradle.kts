@@ -44,6 +44,8 @@ dependencies {
     implementation(projects.featureHomeImpl)
     implementation(projects.featureHistoryApi)
     implementation(projects.featureHistoryImpl)
+    implementation(projects.featureMyApi)
+    implementation(projects.featureMyImpl)
     implementation(projects.featureProfileApi)
     implementation(projects.featureProfileImpl)
 
