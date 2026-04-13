@@ -18,7 +18,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryHeadSection
 import com.team.prezel.feature.history.impl.component.HistoryItemList
@@ -26,7 +29,6 @@ import com.team.prezel.feature.history.impl.component.historyTabs
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
-import com.team.prezel.feature.history.impl.model.HistoryChipUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -118,31 +120,25 @@ private fun HistoryScreenPreview() {
                 preparingPresentations = persistentListOf(
                     HistoryUiModel(
                         id = 1L,
-                        category = Category.EDUCATION,
                         dDayLabel = "D-5",
                         dateLabel = "2026.04.19",
                         title = "캡스톤서비스기획 중간고사 발표",
-                        chips = persistentListOf(
-                            HistoryChipUiModel(label = "학술·교육", highlighted = true),
-                            HistoryChipUiModel(label = "내용 전달"),
-                            HistoryChipUiModel(label = "논리적"),
-                            HistoryChipUiModel(label = "전문가"),
-                        ),
+                        category = Category.EDUCATION,
+                        purpose = Purpose.CONTENT_DELIVERY,
+                        style = Style.PROFESSIONAL,
+                        audience = Audience.EXPERT,
                     ),
                 ),
                 completedPresentations = persistentListOf(
                     HistoryUiModel(
                         id = 2L,
-                        category = Category.PERSUASION,
                         dDayLabel = "D+1",
                         dateLabel = "2026.04.12",
                         title = "서비스 런칭 회고 발표",
-                        chips = persistentListOf(
-                            HistoryChipUiModel(label = "학술·교육", highlighted = true),
-                            HistoryChipUiModel(label = "내용 전달"),
-                            HistoryChipUiModel(label = "논리적"),
-                            HistoryChipUiModel(label = "전문가"),
-                        ),
+                        category = Category.PERSUASION,
+                        purpose = Purpose.BUILD_EMPATHY,
+                        style = Style.CALM,
+                        audience = Audience.GENERAL_AUDIENCE,
                     ),
                 ),
             ),
