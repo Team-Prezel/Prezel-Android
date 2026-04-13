@@ -1,44 +1,33 @@
-package com.team.prezel.core.designsystem.component
+package com.team.prezel.core.designsystem.component.navigations
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewDefaults
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
-import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-enum class PrezelTabSize { Small, Regular }
-
 @Composable
-fun PrezelTabs(
+fun PrezelTabsPager(
     tabs: ImmutableList<String>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
-    size: PrezelTabSize = PrezelTabSize.Regular,
+    size: PrezelTabSize = PrezelTabSize.REGULAR,
     userScrollEnabled: Boolean = true,
     content: @Composable (pageIndex: Int) -> Unit,
 ) {
@@ -50,11 +39,11 @@ fun PrezelTabs(
     val scope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxSize()) {
-        PrezelTabsBar(
+        PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
             size = size,
-            onTabClick = { index ->
+            onClickTab = { index ->
                 handleTabClick(scope, pagerState, index)
             },
         )
@@ -64,75 +53,6 @@ fun PrezelTabs(
             userScrollEnabled = userScrollEnabled,
             content = content,
         )
-    }
-}
-
-@Composable
-private fun PrezelTabsBar(
-    tabs: ImmutableList<String>,
-    pagerState: PagerState,
-    size: PrezelTabSize,
-    onTabClick: (index: Int) -> Unit,
-) {
-    SecondaryTabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = Modifier.fillMaxWidth(),
-        containerColor = Color.Transparent,
-        indicator = {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .tabIndicatorOffset(selectedTabIndex = pagerState.currentPage)
-                    .background(PrezelTheme.colors.solidBlack),
-            )
-        },
-    ) {
-        tabs.forEachIndexed { index, label ->
-            PrezelTabContent(
-                label = label,
-                selected = pagerState.currentPage == index,
-                size = size,
-                onClick = { onTabClick(index) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun PrezelTabContent(
-    label: String,
-    selected: Boolean,
-    size: PrezelTabSize,
-    onClick: () -> Unit,
-) {
-    Tab(
-        selected = selected,
-        onClick = onClick,
-        modifier = Modifier.height(if (size == PrezelTabSize.Small) 36.dp else 48.dp),
-        text = {
-            Text(
-                text = label,
-                style = if (size == PrezelTabSize.Small) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
-            )
-        },
-        selectedContentColor = PrezelTheme.colors.solidBlack,
-        unselectedContentColor = PrezelTheme.colors.textDisabled,
-    )
-}
-
-@Composable
-private fun PrezelTabsPager(
-    pagerState: PagerState,
-    userScrollEnabled: Boolean,
-    content: @Composable (pageIndex: Int) -> Unit,
-) {
-    HorizontalPager(
-        state = pagerState,
-        userScrollEnabled = userScrollEnabled,
-        overscrollEffect = null,
-    ) { page ->
-        content(page)
     }
 }
 
@@ -153,6 +73,21 @@ private fun handleTabClick(
     }
 }
 
+@Composable
+private fun PrezelTabsPager(
+    pagerState: PagerState,
+    userScrollEnabled: Boolean,
+    content: @Composable (pageIndex: Int) -> Unit,
+) {
+    HorizontalPager(
+        state = pagerState,
+        userScrollEnabled = userScrollEnabled,
+        overscrollEffect = null,
+    ) { page ->
+        content(page)
+    }
+}
+
 @BasicPreview
 @Composable
 private fun PrezelMediumTabPreview() {
@@ -162,10 +97,10 @@ private fun PrezelMediumTabPreview() {
     PreviewScaffold(
         defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
     ) {
-        PrezelTabs(
+        PrezelTabsPager(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Regular,
+            size = PrezelTabSize.MEDIUM,
             modifier = Modifier,
         ) { page ->
             Box(
@@ -180,17 +115,17 @@ private fun PrezelMediumTabPreview() {
 
 @BasicPreview
 @Composable
-private fun PrezelSmallTabPreview() {
+private fun PrezelRegularTabPreview() {
     val tabs = persistentListOf("Label1", "Label2")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
 
     PreviewScaffold(
         defaults = PreviewDefaults(screenPadding = PaddingValues(0.dp)),
     ) {
-        PrezelTabs(
+        PrezelTabsPager(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.Small,
+            size = PrezelTabSize.REGULAR,
         ) { page ->
             Box(
                 modifier = Modifier.fillMaxSize(),

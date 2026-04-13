@@ -18,8 +18,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
-import com.team.prezel.feature.splash.impl.viewModel.SplashUiEffect
-import com.team.prezel.feature.splash.impl.viewModel.SplashViewModel
+import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
+import com.team.prezel.feature.splash.impl.contract.SplashUiIntent
 import com.team.prezel.core.designsystem.R as DSR
 
 @Composable
@@ -31,6 +31,8 @@ internal fun SharedTransitionScope.SplashScreen(
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(Unit) {
+        viewModel.onIntent(SplashUiIntent.CheckLoginStatus)
+
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 SplashUiEffect.NavigateToHome -> navigateToHome()
