@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(projects.featureHistoryApi)
+    implementation(libs.kotlinx.collections.immutable)
 }
