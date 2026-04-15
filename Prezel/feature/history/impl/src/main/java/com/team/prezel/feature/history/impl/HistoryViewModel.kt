@@ -11,6 +11,8 @@ import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
 import com.team.prezel.feature.history.impl.mapper.toUiModel
+import com.team.prezel.feature.history.impl.model.HistoryPageType
+import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -40,8 +42,16 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
             .map(HistoryPresentation::toUiModel)
             .let { uiModels ->
                 HistoryUiState.Content(
-                    preparingPresentations = uiModels.filter(HistoryUiModel::isPreparing).toImmutableList(),
-                    completedPresentations = uiModels.filterNot(HistoryUiModel::isPreparing).toImmutableList(),
+                    pages = persistentListOf(
+                        HistoryPageUiModel(
+                            type = HistoryPageType.PREPARING,
+                            items = uiModels.filter(HistoryUiModel::isPreparing).toImmutableList(),
+                        ),
+                        HistoryPageUiModel(
+                            type = HistoryPageType.COMPLETED,
+                            items = uiModels.filterNot(HistoryUiModel::isPreparing).toImmutableList(),
+                        ),
+                    ),
                 )
             }
 

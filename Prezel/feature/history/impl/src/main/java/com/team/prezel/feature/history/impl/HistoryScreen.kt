@@ -32,10 +32,13 @@ import com.team.prezel.feature.history.impl.component.HistoryItemList
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
+import com.team.prezel.feature.history.impl.model.HistoryPageType
+import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -44,7 +47,11 @@ internal fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val tabs = historyTabs()
+    val state = uiState
+    val tabs = when (state) {
+        HistoryUiState.Loading -> persistentListOf()
+        is HistoryUiState.Content -> historyTabs(state.pages)
+    }
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
@@ -65,7 +72,8 @@ internal fun HistoryScreen(
     }
 
     HistoryScreen(
-        uiState = uiState,
+        uiState = state,
+        tabs = tabs,
         modifier = modifier,
         pagerState = pagerState,
         onClickHistoryItem = { },
@@ -76,12 +84,11 @@ internal fun HistoryScreen(
 @Composable
 internal fun HistoryScreen(
     uiState: HistoryUiState,
+    tabs: ImmutableList<String>,
     pagerState: PagerState,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val tabs = historyTabs()
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -115,8 +122,7 @@ private fun HistoryContent(
             HistoryPagerContent(
                 pagerState = pagerState,
                 tabs = tabs,
-                preparingPresentations = uiState.preparingPresentations,
-                completedPresentations = uiState.completedPresentations,
+                presentations = uiState.pages,
                 onClickHistoryItem = onClickHistoryItem,
             )
         }
@@ -127,8 +133,7 @@ private fun HistoryContent(
 private fun HistoryPagerContent(
     pagerState: PagerState,
     tabs: ImmutableList<String>,
-    preparingPresentations: ImmutableList<HistoryUiModel>,
-    completedPresentations: ImmutableList<HistoryUiModel>,
+    presentations: ImmutableList<HistoryPageUiModel>,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
 ) {
     PrezelTabsPager(
@@ -140,11 +145,10 @@ private fun HistoryPagerContent(
             .background(PrezelTheme.colors.bgRegular),
         userScrollEnabled = false,
     ) { pageIndex ->
-        val items = when (pageIndex) {
-            0 -> preparingPresentations
-            1 -> completedPresentations
-            else -> error("Invalid page index: $pageIndex")
+        val page = presentations.getOrElse(pageIndex) {
+            error("Invalid page index: $pageIndex")
         }
+        val items = page.items
 
         Box(
             modifier = Modifier
@@ -153,7 +157,7 @@ private fun HistoryPagerContent(
         ) {
             if (items.isEmpty()) {
                 HistoryEmptyContent(
-                    isPreparingTab = pageIndex == 0,
+                    isPreparingTab = page.type == HistoryPageType.PREPARING,
                     onClickAddPresentation = { },
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -169,22 +173,23 @@ private fun HistoryPagerContent(
 }
 
 @Composable
-private fun historyTabs(): ImmutableList<String> =
-    persistentListOf(
-        stringResource(R.string.feature_history_impl_tab_preparing),
-        stringResource(R.string.feature_history_impl_tab_completed),
-    )
+private fun historyTabs(pages: ImmutableList<HistoryPageUiModel>): ImmutableList<String> =
+    pages
+        .map { page ->
+            when (page.type) {
+                HistoryPageType.PREPARING -> stringResource(R.string.feature_history_impl_tab_preparing)
+                HistoryPageType.COMPLETED -> stringResource(R.string.feature_history_impl_tab_completed)
+            }
+        }.toImmutableList()
 
 @BasicPreview
 @Composable
 private fun HistoryScreenPreview() {
-    val tabs = historyTabs()
-    val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
-
-    PrezelTheme {
-        HistoryScreen(
-            uiState = HistoryUiState.Content(
-                preparingPresentations = persistentListOf(
+    val previewState = HistoryUiState.Content(
+        pages = persistentListOf(
+            HistoryPageUiModel(
+                type = HistoryPageType.PREPARING,
+                items = persistentListOf(
                     HistoryUiModel(
                         id = 1L,
                         dDay = 5,
@@ -196,7 +201,10 @@ private fun HistoryScreenPreview() {
                         audience = Audience.EXPERT,
                     ),
                 ),
-                completedPresentations = persistentListOf(
+            ),
+            HistoryPageUiModel(
+                type = HistoryPageType.COMPLETED,
+                items = persistentListOf(
                     HistoryUiModel(
                         id = 2L,
                         dDay = -1,
@@ -209,6 +217,14 @@ private fun HistoryScreenPreview() {
                     ),
                 ),
             ),
+        ),
+    )
+    val pagerState = rememberPagerState(initialPage = 0) { previewState.pages.size }
+
+    PrezelTheme {
+        HistoryScreen(
+            uiState = previewState,
+            tabs = historyTabs(previewState.pages),
             pagerState = pagerState,
             onClickHistoryItem = { },
         )
