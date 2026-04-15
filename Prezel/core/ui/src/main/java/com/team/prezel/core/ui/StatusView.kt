@@ -29,64 +29,11 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
-fun EmptyView(
+fun StatusView(
     title: String,
     modifier: Modifier = Modifier,
     description: String? = null,
-    image: @Composable (() -> Unit)? = null,
-    action: @Composable (() -> Unit)? = null,
-) {
-    StatusView(
-        title = title,
-        description = description,
-        modifier = modifier,
-        image = image,
-        action = action,
-    )
-}
-
-@Composable
-fun ErrorView(
-    title: String,
-    modifier: Modifier = Modifier,
-    description: String? = null,
-    image: @Composable (() -> Unit)? = null,
-    action: @Composable (() -> Unit)? = null,
-) {
-    StatusView(
-        title = title,
-        description = description,
-        modifier = modifier,
-        image = image,
-        action = action,
-    )
-}
-
-@Composable
-fun LoadingView(
-    title: String,
-    @RawRes lottieJsonResId: Int,
-    modifier: Modifier = Modifier,
-    description: String? = null,
-) {
-    StatusView(
-        title = title,
-        description = description,
-        modifier = modifier,
-        image = {
-            LoadingLottie(
-                lottieJsonResId = lottieJsonResId,
-            )
-        },
-    )
-}
-
-@Composable
-private fun StatusView(
-    title: String,
-    description: String?,
-    modifier: Modifier = Modifier,
-    image: @Composable (() -> Unit)? = null,
+    visual: @Composable (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null,
 ) {
     Column(
@@ -94,7 +41,7 @@ private fun StatusView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        image?.invoke()
+        visual?.invoke()
 
         Column(
             modifier = Modifier.padding(top = PrezelTheme.spacing.V16),
@@ -130,7 +77,7 @@ private fun StatusView(
 }
 
 @Composable
-private fun LoadingLottie(
+fun StatusLottie(
     @RawRes lottieJsonResId: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -151,11 +98,11 @@ private fun LoadingLottie(
 
 @BasicPreview
 @Composable
-private fun EmptyViewPreview() {
+private fun StatusViewEmptyPreview() {
     PrezelTheme {
-        EmptyView(
+        StatusView(
             title = "아직 준비중인 발표가 없어요",
-            image = {
+            visual = {
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -178,12 +125,12 @@ private fun EmptyViewPreview() {
 
 @BasicPreview
 @Composable
-private fun ErrorViewPreview() {
+private fun StatusViewErrorPreview() {
     PrezelTheme {
-        ErrorView(
+        StatusView(
             title = "문제가 발생했어요",
             description = "음성이 작거나 주변 소음이 많았을 수 있어요.\n조용한 환경에서 다시 녹음해 주세요.",
-            image = {
+            visual = {
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -207,12 +154,14 @@ private fun ErrorViewPreview() {
 
 @BasicPreview
 @Composable
-private fun LoadingViewPreview() {
+private fun StatusViewLoadingPreview() {
     PrezelTheme {
-        LoadingView(
+        StatusView(
             title = "분석 중이에요",
-            lottieJsonResId = R.raw.asset_loading,
             description = "잠시만 기다려주세요",
+            visual = {
+                StatusLottie(lottieJsonResId = R.raw.asset_loading)
+            },
         )
     }
 }

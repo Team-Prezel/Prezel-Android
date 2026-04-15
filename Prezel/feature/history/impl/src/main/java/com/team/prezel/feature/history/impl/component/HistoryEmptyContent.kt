@@ -12,7 +12,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonS
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.EmptyView
+import com.team.prezel.core.ui.StatusView
 import com.team.prezel.feature.history.impl.R
 
 @Composable
@@ -21,7 +21,7 @@ internal fun HistoryEmptyContent(
     onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    EmptyView(
+    StatusView(
         title = stringResource(
             if (isPreparingTab) {
                 R.string.feature_history_impl_empty_preparing
@@ -30,7 +30,7 @@ internal fun HistoryEmptyContent(
             },
         ),
         modifier = modifier,
-        image = {
+        visual = {
             Image(
                 painter = painterResource(R.drawable.feature_history_impl_empty_no_presentation),
                 modifier = Modifier.size(120.dp),
