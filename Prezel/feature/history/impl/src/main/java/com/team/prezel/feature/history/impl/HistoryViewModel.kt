@@ -3,17 +3,20 @@ package com.team.prezel.feature.history.impl
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.HistoryPresentation
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
-import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
+import com.team.prezel.feature.history.impl.mapper.toUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,58 +36,51 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
     }
 
     private fun createHistoryContentState(): HistoryUiState.Content =
-        HistoryUiState.Content(
-            preparingPresentations = preparingPresentations,
-            completedPresentations = completedPresentations,
-        )
+        historyPresentations
+            .map(HistoryPresentation::toUiModel)
+            .let { uiModels ->
+                HistoryUiState.Content(
+                    preparingPresentations = uiModels.filter(HistoryUiModel::isPreparing).toImmutableList(),
+                    completedPresentations = uiModels.filterNot(HistoryUiModel::isPreparing).toImmutableList(),
+                )
+            }
 
-    private val preparingPresentations = persistentListOf(
-        HistoryUiModel(
+    private val historyPresentations = persistentListOf(
+        HistoryPresentation(
             id = 1L,
-            dDayLabel = "D-5",
-            dateLabel = "2026.04.19",
             title = "캡스톤서비스기획 중간고사 발표",
+            date = LocalDate(2026, 4, 19),
             category = Category.EDUCATION,
             purpose = Purpose.CONTENT_DELIVERY,
             style = Style.PROFESSIONAL,
             audience = Audience.EXPERT,
-            status = HistoryPresentationStatus.PREPARING,
         ),
-        HistoryUiModel(
+        HistoryPresentation(
             id = 2L,
-            dDayLabel = "D-7",
-            dateLabel = "2026.04.21",
             title = "IT동아리 대규모 세미나",
+            date = LocalDate(2026, 4, 21),
             category = Category.REPORT,
             purpose = Purpose.CONTENT_DELIVERY,
             style = Style.FRIENDLY,
             audience = Audience.GENERAL_AUDIENCE,
-            status = HistoryPresentationStatus.PREPARING,
         ),
-    )
-
-    private val completedPresentations = persistentListOf(
-        HistoryUiModel(
+        HistoryPresentation(
             id = 3L,
-            dDayLabel = "D+1",
-            dateLabel = "2026.04.12",
             title = "서비스 런칭 회고 발표",
+            date = LocalDate(2026, 4, 12),
             category = Category.REPORT,
             purpose = Purpose.IMPROVE_UNDERSTANDING,
             style = Style.CALM,
             audience = Audience.TEAMMATES,
-            status = HistoryPresentationStatus.COMPLETED,
         ),
-        HistoryUiModel(
+        HistoryPresentation(
             id = 4L,
-            dDayLabel = "D+12",
-            dateLabel = "2026.04.02",
             title = "졸업 프로젝트 최종 발표",
+            date = LocalDate(2026, 4, 2),
             category = Category.EDUCATION,
             purpose = Purpose.BUILD_EMPATHY,
             style = Style.COMFORTABLE,
             audience = Audience.EXPERT,
-            status = HistoryPresentationStatus.COMPLETED,
         ),
     )
 }

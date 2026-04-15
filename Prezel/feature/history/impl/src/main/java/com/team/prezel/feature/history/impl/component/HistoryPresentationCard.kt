@@ -29,8 +29,8 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.feature.history.impl.mapper.labelResId
-import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
+import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HistoryPresentationCard(
@@ -162,14 +162,13 @@ private fun HistoryPresentationCardPreview() {
             HistoryPresentationCard(
                 item = HistoryUiModel(
                     id = 1L,
-                    dDayLabel = "D-5",
-                    dateLabel = "2025.10.20",
+                    dDay = 5,
+                    date = LocalDate(2025, 10, 20),
                     title = "캡스톤서비스기획 중간고사 발표",
                     category = Category.EDUCATION,
                     purpose = Purpose.CONTENT_DELIVERY,
                     style = Style.PROFESSIONAL,
                     audience = Audience.EXPERT,
-                    status = HistoryPresentationStatus.PREPARING,
                 ),
                 onClick = { },
             )

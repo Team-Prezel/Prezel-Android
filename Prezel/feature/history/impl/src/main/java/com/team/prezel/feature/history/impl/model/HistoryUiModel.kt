@@ -1,23 +1,34 @@
 package com.team.prezel.feature.history.impl.model
 
+import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 
+@Immutable
 internal data class HistoryUiModel(
     val id: Long,
-    val dDayLabel: String,
-    val dateLabel: String,
+    val dDay: Int,
+    val date: LocalDate,
     val title: String,
     val category: Category,
     val purpose: Purpose,
     val style: Style,
     val audience: Audience,
-    val status: HistoryPresentationStatus,
-)
+) {
+    val isPreparing: Boolean
+        get() = dDay >= 0
 
-internal enum class HistoryPresentationStatus {
-    PREPARING,
-    COMPLETED,
+    val dDayLabel: String
+        get() = when {
+            dDay > 0 -> "D-$dDay"
+            dDay == 0 -> "D-Day"
+            else -> "D+${-dDay}"
+        }
+
+    val dateLabel: String
+        get() = "%04d.%02d.%02d".format(date.year, date.month.number, date.day)
 }

@@ -11,4 +11,5 @@ dependencies {
     implementation(projects.featureHistoryApi)
 
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.kotlinx.datetime)
 }

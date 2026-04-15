@@ -29,12 +29,12 @@ import com.team.prezel.feature.history.impl.component.historyTabs
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
-import com.team.prezel.feature.history.impl.model.HistoryPresentationStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HistoryScreen(
@@ -66,12 +66,7 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
-        onClickHistoryItem = { item ->
-            when (item.status) {
-                HistoryPresentationStatus.PREPARING -> Unit
-                HistoryPresentationStatus.COMPLETED -> Unit
-            }
-        },
+        onClickHistoryItem = { },
     )
 }
 
@@ -93,7 +88,7 @@ internal fun HistoryScreen(
         HistoryHeadSection(
             pagerState = pagerState,
             onClickTab = { pageIndex ->
-                scope.launch { pagerState.animateScrollToPage(pageIndex) }
+                scope.launch { pagerState.scrollToPage(pageIndex) }
             },
             tabs = tabs,
         )
@@ -133,18 +128,17 @@ private fun HistoryPagerContent(
     completedPresentations: ImmutableList<HistoryUiModel>,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
 ) {
-    val pages = persistentListOf(
-        preparingPresentations,
-        completedPresentations,
-    )
-
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
         userScrollEnabled = false,
         overscrollEffect = null,
     ) { pageIndex ->
-        val items = pages[pageIndex]
+        val items = when (pageIndex) {
+            0 -> preparingPresentations
+            1 -> completedPresentations
+            else -> error("Invalid page index: $pageIndex")
+        }
 
         if (items.isEmpty()) {
             HistoryEmptyContent(
@@ -174,27 +168,25 @@ private fun HistoryScreenPreview() {
                 preparingPresentations = persistentListOf(
                     HistoryUiModel(
                         id = 1L,
-                        dDayLabel = "D-5",
-                        dateLabel = "2026.04.19",
+                        dDay = 5,
+                        date = LocalDate(2026, 4, 19),
                         title = "캡스톤서비스기획 중간고사 발표",
                         category = Category.EDUCATION,
                         purpose = Purpose.CONTENT_DELIVERY,
                         style = Style.PROFESSIONAL,
                         audience = Audience.EXPERT,
-                        status = HistoryPresentationStatus.PREPARING,
                     ),
                 ),
                 completedPresentations = persistentListOf(
                     HistoryUiModel(
                         id = 2L,
-                        dDayLabel = "D+1",
-                        dateLabel = "2026.04.12",
+                        dDay = -1,
+                        date = LocalDate(2026, 4, 12),
                         title = "서비스 런칭 회고 발표",
                         category = Category.PERSUASION,
                         purpose = Purpose.BUILD_EMPATHY,
                         style = Style.CALM,
                         audience = Audience.GENERAL_AUDIENCE,
-                        status = HistoryPresentationStatus.COMPLETED,
                     ),
                 ),
             ),
