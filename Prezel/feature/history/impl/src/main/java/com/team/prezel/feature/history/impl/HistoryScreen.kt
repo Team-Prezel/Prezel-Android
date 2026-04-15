@@ -1,20 +1,25 @@
 package com.team.prezel.feature.history.impl
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
+import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Audience
@@ -23,9 +28,7 @@ import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
-import com.team.prezel.feature.history.impl.component.HistoryHeadSection
 import com.team.prezel.feature.history.impl.component.HistoryItemList
-import com.team.prezel.feature.history.impl.component.historyTabs
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
@@ -33,7 +36,6 @@ import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -70,6 +72,7 @@ internal fun HistoryScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HistoryScreen(
     uiState: HistoryUiState,
@@ -77,7 +80,6 @@ internal fun HistoryScreen(
     onClickHistoryItem: (HistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
     val tabs = historyTabs()
 
     Column(
@@ -85,17 +87,15 @@ internal fun HistoryScreen(
             .fillMaxSize()
             .background(PrezelTheme.colors.bgMedium),
     ) {
-        HistoryHeadSection(
-            pagerState = pagerState,
-            onClickTab = { pageIndex ->
-                scope.launch { pagerState.scrollToPage(pageIndex) }
-            },
-            tabs = tabs,
+        PrezelTopAppBar(
+            modifier = Modifier.background(PrezelTheme.colors.bgRegular),
+            title = { Text(text = stringResource(R.string.feature_history_impl_title)) },
         )
 
         HistoryContent(
             uiState = uiState,
             pagerState = pagerState,
+            tabs = tabs,
             onClickHistoryItem = onClickHistoryItem,
         )
     }
@@ -105,6 +105,7 @@ internal fun HistoryScreen(
 private fun HistoryContent(
     uiState: HistoryUiState,
     pagerState: PagerState,
+    tabs: ImmutableList<String>,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
 ) {
     when (uiState) {
@@ -113,6 +114,7 @@ private fun HistoryContent(
         is HistoryUiState.Content -> {
             HistoryPagerContent(
                 pagerState = pagerState,
+                tabs = tabs,
                 preparingPresentations = uiState.preparingPresentations,
                 completedPresentations = uiState.completedPresentations,
                 onClickHistoryItem = onClickHistoryItem,
@@ -124,15 +126,19 @@ private fun HistoryContent(
 @Composable
 private fun HistoryPagerContent(
     pagerState: PagerState,
+    tabs: ImmutableList<String>,
     preparingPresentations: ImmutableList<HistoryUiModel>,
     completedPresentations: ImmutableList<HistoryUiModel>,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
 ) {
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize(),
+    PrezelTabsPager(
+        tabs = tabs,
+        pagerState = pagerState,
+        size = PrezelTabSize.MEDIUM,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PrezelTheme.colors.bgRegular),
         userScrollEnabled = false,
-        overscrollEffect = null,
     ) { pageIndex ->
         val items = when (pageIndex) {
             0 -> preparingPresentations
@@ -140,21 +146,34 @@ private fun HistoryPagerContent(
             else -> error("Invalid page index: $pageIndex")
         }
 
-        if (items.isEmpty()) {
-            HistoryEmptyContent(
-                isPreparingTab = pageIndex == 0,
-                onClickAddPresentation = { },
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else {
-            HistoryItemList(
-                items = items,
-                onClickItem = onClickHistoryItem,
-                modifier = Modifier.fillMaxSize(),
-            )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(PrezelTheme.colors.bgMedium),
+        ) {
+            if (items.isEmpty()) {
+                HistoryEmptyContent(
+                    isPreparingTab = pageIndex == 0,
+                    onClickAddPresentation = { },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                HistoryItemList(
+                    items = items,
+                    onClickItem = onClickHistoryItem,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun historyTabs(): ImmutableList<String> =
+    persistentListOf(
+        stringResource(R.string.feature_history_impl_tab_preparing),
+        stringResource(R.string.feature_history_impl_tab_completed),
+    )
 
 @BasicPreview
 @Composable
