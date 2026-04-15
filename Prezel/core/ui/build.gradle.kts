@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(projects.coreDesignsystem)
+    implementation(libs.lottie.compose)
 }
