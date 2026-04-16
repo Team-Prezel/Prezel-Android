@@ -6,15 +6,11 @@ import com.team.prezel.core.ui.UiState
 
 @Immutable
 internal sealed interface ProfileUiState : UiState {
-    fun canPhotoPickerLaunch(): Boolean =
-        when (this) {
-            Loading -> false
-            is Fetched -> true
-        }
+    fun canPhotoPickerLaunch(): Boolean = (this as? Fetched)?.profileImage?.isDefault == true
 
     data object Loading : ProfileUiState
 
-    interface Fetched : ProfileUiState {
+    interface Fetched {
         val nickname: String
         val nicknameValidation: NicknameValidationState
         val profileImage: User.ProfileImage
@@ -32,7 +28,8 @@ internal sealed interface ProfileUiState : UiState {
         override val nickname: String = "",
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Unchecked,
         override val profileImage: User.ProfileImage = User.ProfileImage(url = "", isDefault = true),
-    ) : Fetched {
+    ) : Fetched,
+        ProfileUiState {
         override val submitButtonEnabled: Boolean = nicknameValidation == NicknameValidationState.Available
 
         override fun updateProfile(
@@ -53,7 +50,8 @@ internal sealed interface ProfileUiState : UiState {
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Available,
         val originalProfileImage: User.ProfileImage,
         override val profileImage: User.ProfileImage,
-    ) : Fetched {
+    ) : Fetched,
+        ProfileUiState {
         override val submitButtonEnabled: Boolean =
             (nicknameValidation == NicknameValidationState.Available && nickname != originalNickname) ||
                 profileImage != originalProfileImage
