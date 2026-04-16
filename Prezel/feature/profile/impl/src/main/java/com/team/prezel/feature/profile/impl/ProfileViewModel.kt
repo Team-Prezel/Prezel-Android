@@ -3,6 +3,7 @@ package com.team.prezel.feature.profile.impl
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.profile.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
+import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
@@ -45,6 +46,7 @@ internal class ProfileViewModel @AssistedInject constructor(
     override fun onIntent(intent: ProfileUiIntent) {
         when (intent) {
             is ProfileUiIntent.OnNicknameChanged -> handleNicknameChanged(intent.nickname)
+            is ProfileUiIntent.OnProfileImageChanged -> handleProfileImageChanged(intent.profileUrl)
 
             ProfileUiIntent.OnClickSubmit -> submitProfile()
         }
@@ -64,6 +66,19 @@ internal class ProfileViewModel @AssistedInject constructor(
         }
 
         nicknameInput.value = sanitizedNickname
+    }
+
+    private fun handleProfileImageChanged(profileUrl: String) {
+        if (profileUrl == currentState.profileImage.url) return
+
+        updateState {
+            updateProfile(
+                profileImage = User.ProfileImage(
+                    url = profileUrl,
+                    isDefault = profileUrl.isBlank(),
+                ),
+            )
+        }
     }
 
     private suspend fun validateNickname(nickname: String) {

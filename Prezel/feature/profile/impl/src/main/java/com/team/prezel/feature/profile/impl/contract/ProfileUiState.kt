@@ -1,32 +1,39 @@
 package com.team.prezel.feature.profile.impl.contract
 
 import androidx.compose.runtime.Immutable
+import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.UiState
 
 @Immutable
 internal sealed interface ProfileUiState : UiState {
     val nickname: String
     val nicknameValidation: NicknameValidationState
-    val isPrimaryActionEnabled: Boolean
+    val profileImage: User.ProfileImage
+
+    val submitButtonEnabled: Boolean
 
     fun updateProfile(
         nickname: String = this.nickname,
         nicknameValidation: NicknameValidationState = this.nicknameValidation,
+        profileImage: User.ProfileImage = this.profileImage,
     ): ProfileUiState
 
     data class Create(
         override val nickname: String = "",
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Unchecked,
+        override val profileImage: User.ProfileImage = User.ProfileImage(url = "", isDefault = true),
     ) : ProfileUiState {
-        override val isPrimaryActionEnabled: Boolean = nicknameValidation == NicknameValidationState.Available
+        override val submitButtonEnabled: Boolean = nicknameValidation == NicknameValidationState.Available
 
         override fun updateProfile(
             nickname: String,
             nicknameValidation: NicknameValidationState,
+            profileImage: User.ProfileImage,
         ): ProfileUiState =
             copy(
                 nickname = nickname,
                 nicknameValidation = nicknameValidation,
+                profileImage = profileImage,
             )
     }
 
@@ -34,17 +41,20 @@ internal sealed interface ProfileUiState : UiState {
         val originalNickname: String,
         override val nickname: String = originalNickname,
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Available,
+        override val profileImage: User.ProfileImage,
     ) : ProfileUiState {
-        override val isPrimaryActionEnabled: Boolean =
+        override val submitButtonEnabled: Boolean =
             nicknameValidation == NicknameValidationState.Available && nickname != originalNickname
 
         override fun updateProfile(
             nickname: String,
             nicknameValidation: NicknameValidationState,
+            profileImage: User.ProfileImage,
         ): ProfileUiState =
             copy(
                 nickname = nickname,
                 nicknameValidation = nicknameValidation,
+                profileImage = profileImage,
             )
     }
 }

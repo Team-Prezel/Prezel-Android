@@ -3,7 +3,9 @@
     <string name="feature_profile_impl_topbar_edit_title">프로필 편집</string>
     <string name="feature_profile_impl_nickname_text_field_label">닉네임</string>
     <string name="feature_profile_impl_submit_button_text">완료</string>
+
     <string name="feature_profile_impl_topbar_leading_icon_content_description">뒤로가기</string>
+    <string name="feature_profile_impl_profile_image_content_description">프로필</string>
 
     <!--  Helper Message  -->
     <string name="feature_profile_impl_nickname_text_field_placeholder">닉네임을 입력해 주세요</string>

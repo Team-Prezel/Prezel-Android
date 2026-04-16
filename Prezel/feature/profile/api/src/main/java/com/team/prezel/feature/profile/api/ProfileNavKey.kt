@@ -12,5 +12,6 @@ sealed interface ProfileNavKey : NavKey {
     data class Edit(
         val nickname: String,
         val profileUrl: String,
+        val isDefault: Boolean,
     ) : ProfileNavKey
 }

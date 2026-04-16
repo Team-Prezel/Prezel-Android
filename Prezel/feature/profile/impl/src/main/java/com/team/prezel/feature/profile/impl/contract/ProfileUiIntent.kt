@@ -7,5 +7,9 @@ internal sealed interface ProfileUiIntent : UiIntent {
         val nickname: String,
     ) : ProfileUiIntent
 
+    data class OnProfileImageChanged(
+        val profileUrl: String,
+    ) : ProfileUiIntent
+
     data object OnClickSubmit : ProfileUiIntent
 }
