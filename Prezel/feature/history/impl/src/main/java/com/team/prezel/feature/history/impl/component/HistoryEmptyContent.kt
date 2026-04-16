@@ -14,19 +14,19 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.StatusView
 import com.team.prezel.feature.history.impl.R
+import com.team.prezel.feature.history.impl.model.HistoryPageType
 
 @Composable
 internal fun HistoryEmptyContent(
-    isPreparingTab: Boolean,
+    type: HistoryPageType,
     onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     StatusView(
         title = stringResource(
-            if (isPreparingTab) {
-                R.string.feature_history_impl_empty_preparing
-            } else {
-                R.string.feature_history_impl_empty_completed
+            when (type) {
+                HistoryPageType.PREPARING -> R.string.feature_history_impl_empty_preparing
+                HistoryPageType.COMPLETED -> R.string.feature_history_impl_empty_completed
             },
         ),
         modifier = modifier,
@@ -37,18 +37,20 @@ internal fun HistoryEmptyContent(
                 contentDescription = null,
             )
         },
-        action = if (isPreparingTab) {
-            {
-                PrezelButton(
-                    text = stringResource(R.string.feature_history_impl_add_presentation),
-                    type = ButtonType.OUTLINED,
-                    size = ButtonSize.SMALL,
-                    isRounded = true,
-                    onClick = onClickAddPresentation,
-                )
+        action = when (type) {
+            HistoryPageType.PREPARING -> {
+                {
+                    PrezelButton(
+                        text = stringResource(R.string.feature_history_impl_add_presentation),
+                        type = ButtonType.OUTLINED,
+                        size = ButtonSize.SMALL,
+                        isRounded = true,
+                        onClick = onClickAddPresentation,
+                    )
+                }
             }
-        } else {
-            null
+
+            HistoryPageType.COMPLETED -> null
         },
     )
 }
@@ -58,7 +60,7 @@ internal fun HistoryEmptyContent(
 private fun HistoryPreparingEmptyContentPreview() {
     PrezelTheme {
         HistoryEmptyContent(
-            isPreparingTab = true,
+            type = HistoryPageType.PREPARING,
             onClickAddPresentation = { },
         )
     }
@@ -69,7 +71,7 @@ private fun HistoryPreparingEmptyContentPreview() {
 private fun HistoryCompletedEmptyContentPreview() {
     PrezelTheme {
         HistoryEmptyContent(
-            isPreparingTab = false,
+            type = HistoryPageType.COMPLETED,
             onClickAddPresentation = { },
         )
     }

@@ -10,7 +10,6 @@ import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryUiState
-import com.team.prezel.feature.history.impl.mapper.toUiModel
 import com.team.prezel.feature.history.impl.model.HistoryPageType
 import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
@@ -39,7 +38,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
 
     private fun createHistoryContentState(): HistoryUiState.Content =
         historyPresentations
-            .map(HistoryPresentation::toUiModel)
+            .map(HistoryUiModel::toUiModel)
             .let { uiModels ->
                 HistoryUiState.Content(
                     pages = persistentListOf(
