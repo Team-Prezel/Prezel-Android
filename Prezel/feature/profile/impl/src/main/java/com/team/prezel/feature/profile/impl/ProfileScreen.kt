@@ -67,6 +67,7 @@ internal fun ProfileScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
+                ProfileUiEffect.OnBack -> onBack()
                 is ProfileUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
                         ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message

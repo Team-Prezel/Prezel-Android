@@ -126,11 +126,22 @@ internal class ProfileViewModel @Inject constructor(
         }
 
     private fun submitProfile() {
-        val state = currentState as? ProfileUiState.Fetched ?: return
-        if (state.nicknameValidation != NicknameValidationState.Available) return
+        val fetchedState = currentState as? ProfileUiState.Fetched ?: return
+        if (!fetchedState.submitButtonEnabled) return
 
         viewModelScope.launch {
-            // todo: 닉네임 생성 API 호출
+            // todo: 프로필 수정 API 호출 필요
+//            patchUserProfileUseCase(fetchedState.profileImage, fetchedState.nickname)
+//                .onSuccess {
+//                    when(fetchedState) {
+//                        is ProfileUiState.Create -> ProfileUiEffect.NavigateToHome
+//                        is ProfileUiState.Edit -> ProfileUiEffect.OnBack
+//                    }.let(sendEffect)
+//                }
+//                .onFailure { throwable ->
+//                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.PATCH_USER_PROFILE_FAILED))
+//                    Timber.e(throwable)
+//                }
             sendEffect(ProfileUiEffect.NavigateToHome)
         }
     }
