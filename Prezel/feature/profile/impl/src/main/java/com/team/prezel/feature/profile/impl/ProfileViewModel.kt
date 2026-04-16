@@ -119,6 +119,7 @@ internal class ProfileViewModel @Inject constructor(
 
         updateState {
             val fetchedState = currentState as? ProfileUiState.Fetched ?: return@updateState currentState
+            if (fetchedState.nickname != nickname) return@updateState currentState
             fetchedState.updateProfile(nicknameValidation = validationState)
         }
     }
