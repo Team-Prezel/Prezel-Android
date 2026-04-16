@@ -3,7 +3,7 @@ package com.team.prezel.feature.history.impl
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.HistoryPresentation
+import com.team.prezel.core.model.presentation.Presentation
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.BaseViewModel
@@ -55,7 +55,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
             }
 
     private val historyPresentations = persistentListOf(
-        HistoryPresentation(
+        Presentation(
             id = 1L,
             title = "캡스톤서비스기획 중간고사 발표",
             date = LocalDate(2026, 4, 19),
@@ -64,7 +64,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
             style = Style.PROFESSIONAL,
             audience = Audience.EXPERT,
         ),
-        HistoryPresentation(
+        Presentation(
             id = 2L,
             title = "IT동아리 대규모 세미나",
             date = LocalDate(2026, 4, 21),
@@ -73,7 +73,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
             style = Style.FRIENDLY,
             audience = Audience.GENERAL_AUDIENCE,
         ),
-        HistoryPresentation(
+        Presentation(
             id = 3L,
             title = "서비스 런칭 회고 발표",
             date = LocalDate(2026, 4, 12),
@@ -82,7 +82,7 @@ internal class HistoryViewModel @Inject constructor() : BaseViewModel<HistoryUiS
             style = Style.CALM,
             audience = Audience.TEAMMATES,
         ),
-        HistoryPresentation(
+        Presentation(
             id = 4L,
             title = "졸업 프로젝트 최종 발표",
             date = LocalDate(2026, 4, 2),

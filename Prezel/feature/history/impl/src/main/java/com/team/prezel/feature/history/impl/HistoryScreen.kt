@@ -53,7 +53,9 @@ internal fun HistoryScreen(
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HistoryUiIntent.FetchData)
+    }
 
+    LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is HistoryUiEffect.ShowMessage -> {
