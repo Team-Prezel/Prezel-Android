@@ -46,6 +46,7 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
     implementation(projects.featureMyImpl)
+    implementation(projects.featureProfileImpl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

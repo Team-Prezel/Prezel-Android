@@ -50,7 +50,7 @@ import com.team.prezel.feature.login.impl.terms.contract.TermsUiState
 @Composable
 internal fun TermsScreen(
     navigateBack: () -> Unit,
-    navigateToHome: () -> Unit,
+    navigateToProfile: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TermsViewModel = hiltViewModel(),
 ) {
@@ -60,7 +60,7 @@ internal fun TermsScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                TermsUiEffect.NavigateToHome -> navigateToHome()
+                TermsUiEffect.NavigateToProfile -> navigateToProfile()
             }
         }
     }

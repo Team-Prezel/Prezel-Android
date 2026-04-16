@@ -48,7 +48,7 @@ internal class TermsViewModel @Inject constructor() : BaseViewModel<TermsUiState
     private fun handleClickContinue() {
         if (!currentState.isRequiredChecked) return
         viewModelScope.launch {
-            sendEffect(TermsUiEffect.NavigateToHome)
+            sendEffect(TermsUiEffect.NavigateToProfile)
         }
     }
 }

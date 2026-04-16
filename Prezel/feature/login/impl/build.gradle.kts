@@ -20,5 +20,6 @@ android {
 dependencies {
     implementation(projects.coreAuth)
     implementation(projects.featureLoginApi)
+    implementation(projects.featureProfileApi)
     implementation(projects.featureHomeApi)
 }

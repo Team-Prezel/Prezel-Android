@@ -56,6 +56,7 @@ private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
 internal fun SharedTransitionScope.LoginScreen(
     authManager: AuthManager,
     navigateToTerms: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -74,6 +75,8 @@ internal fun SharedTransitionScope.LoginScreen(
                 }
 
                 LoginUiEffect.NavigateToTerms -> navigateToTerms()
+
+                LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {

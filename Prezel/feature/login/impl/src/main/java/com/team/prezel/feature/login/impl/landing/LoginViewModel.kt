@@ -40,14 +40,27 @@ internal class LoginViewModel @Inject constructor() : BaseViewModel<LoginUiState
 
     private fun handleLoginResult(result: AuthResult) {
         viewModelScope.launch {
-            updateState { copy(isLoading = false) }
-
             when (result) {
-                AuthResult.Success -> sendEffect(LoginUiEffect.NavigateToTerms)
-                AuthResult.Cancelled -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
-                is AuthResult.Failure -> sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
+                AuthResult.Success -> fetchMyInfo()
+                AuthResult.Cancelled -> {
+                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
+                    updateState { copy(isLoading = false) }
+                }
+
+                is AuthResult.Failure -> {
+                    sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
+                    updateState { copy(isLoading = false) }
+                }
             }
         }
+    }
+
+    private fun fetchMyInfo() {
+        viewModelScope
+            .launch {
+                val isProfileCreateComplete = true
+                if (isProfileCreateComplete) sendEffect(LoginUiEffect.NavigateToHome) else sendEffect(LoginUiEffect.NavigateToTerms)
+            }.invokeOnCompletion { updateState { copy(isLoading = false) } }
     }
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
