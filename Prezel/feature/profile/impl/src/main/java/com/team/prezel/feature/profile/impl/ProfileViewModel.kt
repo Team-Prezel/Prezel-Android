@@ -6,11 +6,11 @@ import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.BaseViewModel
-import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
-import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Companion.toUiState
+import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Content.Companion.toUiState
+import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -62,21 +62,21 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     private fun handleNicknameChanged(nickname: String) {
-        val fetchedState = currentState as? ProfileUiState.Fetched ?: return
+        val uiState = currentState as? ProfileUiState.Content ?: return
 
         val sanitizedNickname = nickname
             .filterNot(Char::isWhitespace)
             .take(Nickname.MAX_LENGTH)
-        if (sanitizedNickname == fetchedState.nickname) return
+        if (sanitizedNickname == uiState.nickname) return
 
         updateState {
             val validationState = when {
-                sanitizedNickname.isBlank() && fetchedState.nickname.isNotBlank() -> NicknameValidationState.TooShort
+                sanitizedNickname.isBlank() && uiState.nickname.isNotBlank() -> NicknameValidationState.TooShort
                 sanitizedNickname.isBlank() -> NicknameValidationState.Unchecked
                 else -> NicknameValidationState.Checking
             }
 
-            fetchedState.updateProfile(
+            uiState.copy(
                 nickname = sanitizedNickname,
                 nicknameValidation = validationState,
             )
@@ -86,11 +86,11 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     private fun handleProfileImageChanged(profileUrl: String) {
-        val state = currentState as? ProfileUiState.Fetched ?: return
-        if (profileUrl == state.profileImage.url) return
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (profileUrl == uiState.profileImage.url) return
 
         updateState {
-            state.updateProfile(
+            uiState.copy(
                 profileImage = User.ProfileImage(
                     url = profileUrl,
                     isDefault = profileUrl.isBlank(),
@@ -118,9 +118,9 @@ internal class ProfileViewModel @Inject constructor(
         }
 
         updateState {
-            val fetchedState = currentState as? ProfileUiState.Fetched ?: return@updateState currentState
-            if (fetchedState.nickname != nickname) return@updateState currentState
-            fetchedState.updateProfile(nicknameValidation = validationState)
+            val uiState = currentState as? ProfileUiState.Content ?: return@updateState currentState
+            if (uiState.nickname != nickname) return@updateState currentState
+            uiState.copy(nicknameValidation = validationState)
         }
     }
 
@@ -132,8 +132,8 @@ internal class ProfileViewModel @Inject constructor(
         }
 
     private fun submitProfile() {
-        val fetchedState = currentState as? ProfileUiState.Fetched ?: return
-        if (!fetchedState.submitButtonEnabled) return
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (!uiState.submitButtonEnabled) return
 
         viewModelScope.launch {
             // todo: 프로필 수정 API 호출 필요

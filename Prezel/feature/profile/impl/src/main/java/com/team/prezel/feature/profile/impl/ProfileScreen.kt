@@ -27,14 +27,15 @@ import com.team.prezel.core.ui.advancedImePadding
 import com.team.prezel.feature.profile.impl.component.NicknameTextField
 import com.team.prezel.feature.profile.impl.component.ProfileImageEditor
 import com.team.prezel.feature.profile.impl.component.ProfileScreenTopAppBar
-import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
+import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
 
 @Composable
 internal fun ProfileScreen(
+    isNewProfile: Boolean,
     navigateToHome: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,9 +71,10 @@ internal fun ProfileScreen(
 
     ProfileScreen(
         uiState = uiState,
+        isNewProfile = isNewProfile,
         onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.OnNicknameChanged(nickname)) },
         onClickProfileImage = {
-            if (uiState.canPhotoPickerLaunch()) {
+            if (uiState.shouldLaunchPhotoPicker) {
                 photoPickerLauncher.launch(
                     PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly),
                 )
@@ -90,27 +92,28 @@ internal fun ProfileScreen(
 @Composable
 private fun ProfileScreen(
     uiState: ProfileUiState,
+    isNewProfile: Boolean,
     onNicknameChanged: (String) -> Unit,
     onClickProfileImage: () -> Unit,
     onClickSubmit: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val fetchedState = uiState as? ProfileUiState.Fetched
+    val contentState = uiState as? ProfileUiState.Content
     val submitButtonText = stringResource(R.string.feature_profile_impl_submit_button_text)
 
     Column(modifier = modifier.fillMaxSize()) {
         ProfileScreenTopAppBar(
-            isCreate = uiState is ProfileUiState.Create,
+            isCreate = isNewProfile,
             onBack = onBack,
         )
 
         ProfileScreenContent(
-            profileUrl = fetchedState?.profileImage?.url.orEmpty(),
-            isDefaultProfileImage = fetchedState?.profileImage?.isDefault ?: true,
-            nickname = fetchedState?.nickname.orEmpty(),
+            profileUrl = contentState?.profileImage?.url.orEmpty(),
+            isDefaultProfileImage = contentState?.profileImage?.isDefault ?: true,
+            nickname = contentState?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
-            nicknameValidationState = fetchedState?.nicknameValidation ?: NicknameValidationState.Unchecked,
+            nicknameValidationState = contentState?.nicknameValidation ?: NicknameValidationState.Unchecked,
             onClickProfileImage = onClickProfileImage,
             modifier = Modifier.weight(1f),
         )
@@ -121,7 +124,7 @@ private fun ProfileScreen(
         ) {
             MainButton(
                 label = submitButtonText,
-                enabled = fetchedState?.submitButtonEnabled ?: false,
+                enabled = contentState?.submitButtonEnabled ?: false,
                 onClick = onClickSubmit,
             )
         }
@@ -165,26 +168,14 @@ private fun ProfileScreenContent(
 private fun CreateProfileScreenPreview() {
     PrezelTheme {
         ProfileScreen(
-            uiState = ProfileUiState.Create(),
-            onNicknameChanged = {},
-            onClickProfileImage = {},
-            onClickSubmit = {},
-            onBack = {},
-        )
-    }
-}
-
-@BasicPreview
-@Composable
-private fun EditProfileScreenPreview() {
-    PrezelTheme {
-        ProfileScreen(
-            uiState = ProfileUiState.Edit(
+            uiState = ProfileUiState.Content(
                 originalNickname = "",
-                nickname = "",
                 originalProfileImage = User.ProfileImage(url = "", isDefault = true),
+                nickname = "",
+                nicknameValidation = NicknameValidationState.Unchecked,
                 profileImage = User.ProfileImage(url = "", isDefault = true),
             ),
+            isNewProfile = true,
             onNicknameChanged = {},
             onClickProfileImage = {},
             onClickSubmit = {},

@@ -17,6 +17,7 @@ internal fun EntryProviderScope<NavKey>.featureProfileEntryBuilder() {
         val navigator = LocalNavigator.current
 
         ProfileScreen(
+            isNewProfile = true,
             navigateToHome = { navigator.replaceRoot(HomeNavKey) },
             onBack = { navigator.goBack() },
         )
@@ -26,6 +27,7 @@ internal fun EntryProviderScope<NavKey>.featureProfileEntryBuilder() {
         val navigator = LocalNavigator.current
 
         ProfileScreen(
+            isNewProfile = false,
             navigateToHome = { navigator.replaceRoot(HomeNavKey) },
             onBack = { navigator.goBack() },
         )
