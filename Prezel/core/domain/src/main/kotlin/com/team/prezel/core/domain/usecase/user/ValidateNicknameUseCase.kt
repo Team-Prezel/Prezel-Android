@@ -17,7 +17,7 @@ class ValidateNicknameUseCase @Inject constructor(
     private val userRepository: UserRepository,
 ) {
     suspend operator fun invoke(nickname: String): Result =
-        when (val creationResult = Nickname.Companion.create(nickname)) {
+        when (val creationResult = Nickname.create(nickname)) {
             is Nickname.CreationResult.Success -> {
                 userRepository.checkNicknameDuplication(creationResult.nickname).fold(
                     onSuccess = { isDuplicated ->
