@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.2"
 kotlin = "2.3.0"
+javaxInject = "1"
 coil = "2.7.0"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -50,6 +51,7 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+javax-inject = { module = "javax.inject:javax.inject", version.ref = "javaxInject" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

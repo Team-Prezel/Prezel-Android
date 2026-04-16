@@ -10,5 +10,8 @@ android {
 
 dependencies {
     implementation(projects.coreNetwork)
+    implementation(projects.coreModel)
+    implementation(projects.coreDomain)
+
     implementation(libs.kotlinx.coroutines.core)
 }
