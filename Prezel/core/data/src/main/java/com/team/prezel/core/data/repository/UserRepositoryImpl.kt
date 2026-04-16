@@ -16,8 +16,8 @@ internal class UserRepositoryImpl @Inject constructor() : UserRepository {
             User(
                 id = 1,
                 email = "test@gmail.com",
-                nickname = "moon",
-                profileImage = User.ProfileImage(url = "https://picsum.photos/200", isDefault = false),
+                nickname = "",
+                profileImage = User.ProfileImage(url = "https://picsum.photos/200", isDefault = true),
                 isRegistered = false,
             )
         }.onSuccess { user ->
