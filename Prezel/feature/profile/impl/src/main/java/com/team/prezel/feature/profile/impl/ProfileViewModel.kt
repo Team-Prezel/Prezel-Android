@@ -70,7 +70,11 @@ internal class ProfileViewModel @Inject constructor(
         if (sanitizedNickname == fetchedState.nickname) return
 
         updateState {
-            val validationState = if (sanitizedNickname.isBlank()) NicknameValidationState.Unchecked else NicknameValidationState.Checking
+            val validationState = when {
+                sanitizedNickname.isBlank() && fetchedState.nickname.isNotBlank() -> NicknameValidationState.TooShort
+                sanitizedNickname.isBlank() -> NicknameValidationState.Unchecked
+                else -> NicknameValidationState.Checking
+            }
 
             fetchedState.updateProfile(
                 nickname = sanitizedNickname,
@@ -96,11 +100,7 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     private suspend fun validateNickname(nickname: String) {
-        val state = currentState as? ProfileUiState.Fetched ?: return
-        if (nickname.isBlank()) {
-            updateState { state.updateProfile(nicknameValidation = NicknameValidationState.Unchecked) }
-            return
-        }
+        if (nickname.isBlank()) return
 
         val validationState = when (val result = validateNicknameUseCase(nickname)) {
             is ValidateNicknameUseCase.Result.Available -> NicknameValidationState.Available
