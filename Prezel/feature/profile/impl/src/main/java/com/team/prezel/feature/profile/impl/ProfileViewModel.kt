@@ -1,7 +1,8 @@
 package com.team.prezel.feature.profile.impl
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.domain.usecase.profile.ValidateNicknameUseCase
+import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
+import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.BaseViewModel
@@ -9,34 +10,31 @@ import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
+import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Companion.toUiState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
-@HiltViewModel(assistedFactory = ProfileViewModel.Factory::class)
-internal class ProfileViewModel @AssistedInject constructor(
-    @Assisted initialState: ProfileUiState,
+@HiltViewModel
+internal class ProfileViewModel @Inject constructor(
+    private val fetchUserInfoUseCase: FetchUserInfoUseCase,
     private val validateNicknameUseCase: ValidateNicknameUseCase,
-) : BaseViewModel<ProfileUiState, ProfileUiIntent, ProfileUiEffect>(initialState) {
-    private val nicknameInput = MutableStateFlow(currentState.nickname)
-
-    @AssistedFactory
-    interface Factory {
-        fun create(initialState: ProfileUiState): ProfileViewModel
-    }
+) : BaseViewModel<ProfileUiState, ProfileUiIntent, ProfileUiEffect>(ProfileUiState.Loading) {
+    private val nicknameChanges = MutableStateFlow<String?>(null)
 
     init {
         viewModelScope.launch {
-            nicknameInput
+            nicknameChanges
+                .filterNotNull()
                 .debounce(NICKNAME_VALIDATION_DEBOUNCE_MILLIS)
                 .distinctUntilChanged()
                 .collectLatest(::validateNickname)
@@ -45,34 +43,48 @@ internal class ProfileViewModel @AssistedInject constructor(
 
     override fun onIntent(intent: ProfileUiIntent) {
         when (intent) {
+            ProfileUiIntent.FetchData -> fetchUserInfo()
             is ProfileUiIntent.OnNicknameChanged -> handleNicknameChanged(intent.nickname)
             is ProfileUiIntent.OnProfileImageChanged -> handleProfileImageChanged(intent.profileUrl)
-
             ProfileUiIntent.OnClickSubmit -> submitProfile()
         }
     }
 
+    private fun fetchUserInfo() {
+        viewModelScope.launch {
+            fetchUserInfoUseCase()
+                .onSuccess { user -> updateState { user.toUiState() } }
+                .onFailure { throwable ->
+                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.FETCH_USER_INFO_FAILED))
+                    Timber.e(throwable)
+                }
+        }
+    }
+
     private fun handleNicknameChanged(nickname: String) {
+        val state = currentState as? ProfileUiState.Fetched ?: return
+
         val sanitizedNickname = nickname.take(Nickname.MAX_LENGTH)
-        if (sanitizedNickname == currentState.nickname) return
+        if (sanitizedNickname == state.nickname) return
 
         updateState {
             val validationState = if (sanitizedNickname.isBlank()) NicknameValidationState.Unchecked else NicknameValidationState.Checking
 
-            updateProfile(
+            state.updateProfile(
                 nickname = sanitizedNickname,
                 nicknameValidation = validationState,
             )
         }
 
-        nicknameInput.value = sanitizedNickname
+        nicknameChanges.value = sanitizedNickname
     }
 
     private fun handleProfileImageChanged(profileUrl: String) {
-        if (profileUrl == currentState.profileImage.url) return
+        val state = currentState as? ProfileUiState.Fetched ?: return
+        if (profileUrl == state.profileImage.url) return
 
         updateState {
-            updateProfile(
+            state.updateProfile(
                 profileImage = User.ProfileImage(
                     url = profileUrl,
                     isDefault = profileUrl.isBlank(),
@@ -82,8 +94,9 @@ internal class ProfileViewModel @AssistedInject constructor(
     }
 
     private suspend fun validateNickname(nickname: String) {
+        val state = currentState as? ProfileUiState.Fetched ?: return
         if (nickname.isBlank()) {
-            updateState { updateProfile(nicknameValidation = NicknameValidationState.Unchecked) }
+            updateState { state.updateProfile(nicknameValidation = NicknameValidationState.Unchecked) }
             return
         }
 
@@ -102,7 +115,7 @@ internal class ProfileViewModel @AssistedInject constructor(
             }
         }
 
-        updateState { updateProfile(nicknameValidation = validationState) }
+        updateState { state.updateProfile(nicknameValidation = validationState) }
     }
 
     private fun Nickname.InvalidReason.toValidationState(): NicknameValidationState =
@@ -113,7 +126,8 @@ internal class ProfileViewModel @AssistedInject constructor(
         }
 
     private fun submitProfile() {
-        if (currentState.nicknameValidation != NicknameValidationState.Available) return
+        val state = currentState as? ProfileUiState.Fetched ?: return
+        if (state.nicknameValidation != NicknameValidationState.Available) return
 
         viewModelScope.launch {
             // todo: 닉네임 생성 API 호출

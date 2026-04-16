@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.PrezelAvatar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
@@ -48,7 +49,7 @@ internal fun ProfileScreen(
     navigateToHome: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel,
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -61,12 +62,15 @@ internal fun ProfileScreen(
     }
 
     LaunchedEffect(Unit) {
+        viewModel.onIntent(ProfileUiIntent.FetchData)
+
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
                 is ProfileUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
-                        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed
+                        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
+                        ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
@@ -80,7 +84,7 @@ internal fun ProfileScreen(
             viewModel.onIntent(ProfileUiIntent.OnNicknameChanged(nickname.filterNot(Char::isWhitespace)))
         },
         onClickProfileImage = {
-            if (uiState.profileImage.isDefault) {
+            if (uiState.canPhotoPickerLaunch()) {
                 photoPickerLauncher.launch(
                     PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly),
                 )
@@ -103,6 +107,7 @@ private fun ProfileScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val fetchedState = uiState as? ProfileUiState.Fetched
     val submitButtonText = stringResource(R.string.feature_profile_impl_submit_button_text)
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -112,11 +117,11 @@ private fun ProfileScreen(
         )
 
         ProfileScreenContent(
-            profileUrl = uiState.profileImage.url,
-            isDefaultProfileImage = uiState.profileImage.isDefault,
-            nickname = uiState.nickname,
+            profileUrl = fetchedState?.profileImage?.url.orEmpty(),
+            isDefaultProfileImage = fetchedState?.profileImage?.isDefault ?: true,
+            nickname = fetchedState?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
-            nicknameFeedback = uiState.nicknameValidation.toNicknameFeedback(),
+            nicknameFeedback = fetchedState?.nicknameValidation?.toNicknameFeedback() ?: PrezelTextFieldFeedback.NO_MESSAGE,
             onClickProfileImage = onClickProfileImage,
             modifier = Modifier.weight(1f),
         )
@@ -127,7 +132,7 @@ private fun ProfileScreen(
         ) {
             MainButton(
                 label = submitButtonText,
-                enabled = uiState.submitButtonEnabled,
+                enabled = fetchedState?.submitButtonEnabled ?: false,
                 onClick = onClickSubmit,
             )
         }
@@ -247,6 +252,8 @@ private fun EditProfileScreenPreview() {
         ProfileScreen(
             uiState = ProfileUiState.Edit(
                 originalNickname = "",
+                nickname = "",
+                originalProfileImage = User.ProfileImage(url = "", isDefault = true),
                 profileImage = User.ProfileImage(url = "", isDefault = true),
             ),
             onNicknameChanged = {},

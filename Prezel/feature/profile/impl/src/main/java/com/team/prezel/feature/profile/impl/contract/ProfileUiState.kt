@@ -6,23 +6,33 @@ import com.team.prezel.core.ui.UiState
 
 @Immutable
 internal sealed interface ProfileUiState : UiState {
-    val nickname: String
-    val nicknameValidation: NicknameValidationState
-    val profileImage: User.ProfileImage
+    fun canPhotoPickerLaunch(): Boolean =
+        when (this) {
+            Loading -> false
+            is Fetched -> true
+        }
 
-    val submitButtonEnabled: Boolean
+    data object Loading : ProfileUiState
 
-    fun updateProfile(
-        nickname: String = this.nickname,
-        nicknameValidation: NicknameValidationState = this.nicknameValidation,
-        profileImage: User.ProfileImage = this.profileImage,
-    ): ProfileUiState
+    interface Fetched : ProfileUiState {
+        val nickname: String
+        val nicknameValidation: NicknameValidationState
+        val profileImage: User.ProfileImage
+
+        val submitButtonEnabled: Boolean
+
+        fun updateProfile(
+            nickname: String = this.nickname,
+            nicknameValidation: NicknameValidationState = this.nicknameValidation,
+            profileImage: User.ProfileImage = this.profileImage,
+        ): ProfileUiState
+    }
 
     data class Create(
         override val nickname: String = "",
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Unchecked,
         override val profileImage: User.ProfileImage = User.ProfileImage(url = "", isDefault = true),
-    ) : ProfileUiState {
+    ) : Fetched {
         override val submitButtonEnabled: Boolean = nicknameValidation == NicknameValidationState.Available
 
         override fun updateProfile(
@@ -41,10 +51,12 @@ internal sealed interface ProfileUiState : UiState {
         val originalNickname: String,
         override val nickname: String = originalNickname,
         override val nicknameValidation: NicknameValidationState = NicknameValidationState.Available,
+        val originalProfileImage: User.ProfileImage,
         override val profileImage: User.ProfileImage,
-    ) : ProfileUiState {
+    ) : Fetched {
         override val submitButtonEnabled: Boolean =
-            nicknameValidation == NicknameValidationState.Available && nickname != originalNickname
+            (nicknameValidation == NicknameValidationState.Available && nickname != originalNickname) ||
+                profileImage != originalProfileImage
 
         override fun updateProfile(
             nickname: String,
@@ -56,6 +68,23 @@ internal sealed interface ProfileUiState : UiState {
                 nicknameValidation = nicknameValidation,
                 profileImage = profileImage,
             )
+    }
+
+    companion object {
+        fun User.toUiState(): ProfileUiState =
+            if (profileImage.isDefault) {
+                Create(
+                    nickname = nickname,
+                    profileImage = profileImage,
+                )
+            } else {
+                Edit(
+                    originalNickname = nickname,
+                    nickname = nickname,
+                    originalProfileImage = profileImage,
+                    profileImage = profileImage,
+                )
+            }
     }
 }
 

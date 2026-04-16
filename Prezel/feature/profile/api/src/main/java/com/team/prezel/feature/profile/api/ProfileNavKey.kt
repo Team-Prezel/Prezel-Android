@@ -9,9 +9,5 @@ sealed interface ProfileNavKey : NavKey {
     data object Create : ProfileNavKey
 
     @Serializable
-    data class Edit(
-        val nickname: String,
-        val profileUrl: String,
-        val isDefault: Boolean,
-    ) : ProfileNavKey
+    data object Edit : ProfileNavKey
 }
