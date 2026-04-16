@@ -30,7 +30,7 @@ fun PrezelAvatar(
     imageUrl: String?,
     contentDescription: String,
     modifier: Modifier = Modifier,
-    size: PrezelAvatarSize = PrezelAvatarSize.SMALL,
+    size: PrezelAvatarSize = PrezelAvatarSize.REGULAR,
 ) {
     var isError by remember(imageUrl) { mutableStateOf(false) }
     val shape = PrezelTheme.shapes.V1000
@@ -47,8 +47,7 @@ fun PrezelAvatar(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        val shouldShowDefault =
-            imageUrl.isNullOrBlank() || isError
+        val shouldShowDefault = imageUrl.isNullOrBlank() || isError
 
         if (shouldShowDefault) {
             DefaultAvatarIcon(
@@ -103,7 +102,7 @@ private fun DefaultAvatarIcon(
         painter = painterResource(R.drawable.core_designsystem_ic_person),
         contentDescription = contentDescription,
         modifier = Modifier.size(prezelAvatarIconSize(size)),
-        tint = PrezelTheme.colors.iconDisabled,
+        tint = PrezelTheme.colors.iconRegular,
     )
 }
 
