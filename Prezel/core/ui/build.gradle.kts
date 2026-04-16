@@ -5,3 +5,8 @@ plugins {
 android {
     namespace = "com.team.prezel.core.ui"
 }
+
+dependencies {
+    implementation(projects.coreDesignsystem)
+    implementation(libs.lottie.compose)
+}

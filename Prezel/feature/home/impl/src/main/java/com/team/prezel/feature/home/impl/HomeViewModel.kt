@@ -1,8 +1,11 @@
 package com.team.prezel.feature.home.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Presentation
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.home.impl.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
@@ -40,15 +43,21 @@ internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, 
         listOf(
             Presentation(
                 id = 1L,
-                category = Category.PERSUASION,
                 title = "신규 서비스 제안 발표",
                 date = LocalDate(2026, 4, 10),
+                category = Category.PERSUASION,
+                purpose = Purpose.CONTENT_DELIVERY,
+                style = Style.PROFESSIONAL,
+                audience = Audience.GENERAL_AUDIENCE,
             ),
             Presentation(
                 id = 2L,
-                category = Category.REPORT,
                 title = "주간 업무 공유",
                 date = LocalDate(2026, 4, 12),
+                category = Category.REPORT,
+                purpose = Purpose.CONTENT_DELIVERY,
+                style = Style.PROFESSIONAL,
+                audience = Audience.GENERAL_AUDIENCE,
             ),
         ).map { presentation -> presentation.toUiModel() }
 }
