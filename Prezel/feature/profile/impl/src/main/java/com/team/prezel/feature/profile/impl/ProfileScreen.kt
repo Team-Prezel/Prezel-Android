@@ -3,40 +3,29 @@ package com.team.prezel.feature.profile.impl
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.designsystem.component.PrezelAvatar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
-import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
-import com.team.prezel.core.designsystem.component.textfield.PrezelTextField
-import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldFeedback
-import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.core.ui.advancedImePadding
+import com.team.prezel.feature.profile.impl.component.NicknameTextField
+import com.team.prezel.feature.profile.impl.component.ProfileImageEditor
 import com.team.prezel.feature.profile.impl.component.ProfileScreenTopAppBar
 import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
@@ -89,9 +78,10 @@ internal fun ProfileScreen(
                 photoPickerLauncher.launch(
                     PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly),
                 )
-            } else {
-                viewModel.onIntent(ProfileUiIntent.OnProfileImageChanged(profileUrl = ""))
+                return@ProfileScreen
             }
+
+            viewModel.onIntent(ProfileUiIntent.OnProfileImageChanged(profileUrl = ""))
         },
         onClickSubmit = { viewModel.onIntent(ProfileUiIntent.OnClickSubmit) },
         onBack = onBack,
@@ -122,7 +112,7 @@ private fun ProfileScreen(
             isDefaultProfileImage = fetchedState?.profileImage?.isDefault ?: true,
             nickname = fetchedState?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
-            nicknameFeedback = fetchedState?.nicknameValidation?.toNicknameFeedback() ?: PrezelTextFieldFeedback.NO_MESSAGE,
+            nicknameValidationState = fetchedState?.nicknameValidation ?: NicknameValidationState.Unchecked,
             onClickProfileImage = onClickProfileImage,
             modifier = Modifier.weight(1f),
         )
@@ -145,7 +135,7 @@ private fun ProfileScreenContent(
     profileUrl: String,
     isDefaultProfileImage: Boolean,
     nickname: String,
-    nicknameFeedback: PrezelTextFieldFeedback,
+    nicknameValidationState: NicknameValidationState,
     onNicknameChanged: (String) -> Unit,
     onClickProfileImage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -155,7 +145,7 @@ private fun ProfileScreenContent(
             .padding(horizontal = PrezelTheme.spacing.V20)
             .padding(top = PrezelTheme.spacing.V16),
     ) {
-        Avatar(
+        ProfileImageEditor(
             profileUrl = profileUrl,
             isDefaultProfileImage = isDefaultProfileImage,
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -164,73 +154,13 @@ private fun ProfileScreenContent(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        PrezelTextField(
-            value = nickname,
-            onValueChange = onNicknameChanged,
-            label = stringResource(R.string.feature_profile_impl_nickname_text_field_label),
-            placeholder = stringResource(R.string.feature_profile_impl_nickname_text_field_placeholder),
-            modifier = Modifier.fillMaxWidth(),
-            feedback = nicknameFeedback,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-            ),
-        )
-
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-    }
-}
-
-@Composable
-private fun Avatar(
-    profileUrl: String,
-    isDefaultProfileImage: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Box(modifier = modifier) {
-        PrezelAvatar(
-            imageUrl = profileUrl,
-            contentDescription = stringResource(R.string.feature_profile_impl_profile_image_content_description),
-        )
-
-        PrezelIconButton(
-            iconResId = PrezelIcons.Plus,
-            type = ButtonType.FILLED,
-            size = ButtonSize.SMALL,
-            hierarchy = ButtonHierarchy.PRIMARY,
-            isRounded = true,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .rotate(if (isDefaultProfileImage) 0f else 45f),
-            onClick = onClick,
+        NicknameTextField(
+            nickname = nickname,
+            onNicknameChanged = onNicknameChanged,
+            nicknameValidationState = nicknameValidationState,
         )
     }
 }
-
-@Composable
-private fun NicknameValidationState.toNicknameFeedback(): PrezelTextFieldFeedback =
-    when (this) {
-        NicknameValidationState.Unchecked,
-        NicknameValidationState.Checking,
-        NicknameValidationState.TooLong,
-        -> PrezelTextFieldFeedback.NO_MESSAGE
-
-        NicknameValidationState.Available -> PrezelTextFieldFeedback.Good(
-            message = stringResource(R.string.feature_profile_impl_nickname_helper_available),
-        )
-
-        NicknameValidationState.TooShort -> PrezelTextFieldFeedback.Bad(
-            message = stringResource(R.string.feature_profile_impl_nickname_helper_too_short),
-        )
-
-        NicknameValidationState.Duplicated -> PrezelTextFieldFeedback.Bad(
-            message = stringResource(R.string.feature_profile_impl_nickname_helper_duplicated),
-        )
-
-        NicknameValidationState.InvalidCharacter -> PrezelTextFieldFeedback.Bad(
-            message = stringResource(R.string.feature_profile_impl_nickname_helper_unavailable),
-        )
-    }
 
 @BasicPreview
 @Composable
