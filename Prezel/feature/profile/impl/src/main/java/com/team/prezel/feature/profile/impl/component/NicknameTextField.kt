@@ -14,7 +14,7 @@ import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldFeed
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.profile.impl.R
-import com.team.prezel.feature.profile.impl.contract.NicknameValidationState
+import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 
 @Composable
 internal fun NicknameTextField(
