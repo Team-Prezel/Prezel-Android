@@ -53,8 +53,8 @@ internal sealed interface ProfileUiState : UiState {
     ) : Fetched,
         ProfileUiState {
         override val submitButtonEnabled: Boolean =
-            (nicknameValidation == NicknameValidationState.Available && nickname != originalNickname) ||
-                profileImage != originalProfileImage
+            nicknameValidation == NicknameValidationState.Available &&
+                (nickname != originalNickname || profileImage != originalProfileImage)
 
         override fun updateProfile(
             nickname: String,
