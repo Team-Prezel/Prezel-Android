@@ -7,8 +7,8 @@
     <string name="feature_profile_impl_topbar_leading_icon_content_description">뒤로가기</string>
     <string name="feature_profile_impl_profile_image_content_description">프로필</string>
 
-    <!--  Helper Message  -->
-    <string name="feature_profile_impl_nickname_text_field_placeholder">닉네임을 입력해 주세요</string>
+    <!--  Nickname TextField  -->
+    <string name="feature_profile_impl_nickname_text_field_placeholder">최대 10자까지 입력이 가능해요</string>
     <string name="feature_profile_impl_nickname_helper_available">사용 가능한 닉네임이에요.</string>
     <string name="feature_profile_impl_nickname_helper_too_short">2자 이상 입력해 주세요.</string>
     <string name="feature_profile_impl_nickname_helper_duplicated">이미 사용하고 있는 닉네임이에요.</string>
