@@ -70,9 +70,7 @@ internal fun ProfileScreen(
 
     ProfileScreen(
         uiState = uiState,
-        onNicknameChanged = { nickname ->
-            viewModel.onIntent(ProfileUiIntent.OnNicknameChanged(nickname.filterNot(Char::isWhitespace)))
-        },
+        onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.OnNicknameChanged(nickname)) },
         onClickProfileImage = {
             if (uiState.canPhotoPickerLaunch()) {
                 photoPickerLauncher.launch(

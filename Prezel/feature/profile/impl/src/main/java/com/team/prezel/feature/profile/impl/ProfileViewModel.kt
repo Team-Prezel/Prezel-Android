@@ -62,15 +62,17 @@ internal class ProfileViewModel @Inject constructor(
     }
 
     private fun handleNicknameChanged(nickname: String) {
-        val state = currentState as? ProfileUiState.Fetched ?: return
+        val fetchedState = currentState as? ProfileUiState.Fetched ?: return
 
-        val sanitizedNickname = nickname.take(Nickname.MAX_LENGTH)
-        if (sanitizedNickname == state.nickname) return
+        val sanitizedNickname = nickname
+            .filterNot(Char::isWhitespace)
+            .take(Nickname.MAX_LENGTH)
+        if (sanitizedNickname == fetchedState.nickname) return
 
         updateState {
             val validationState = if (sanitizedNickname.isBlank()) NicknameValidationState.Unchecked else NicknameValidationState.Checking
 
-            state.updateProfile(
+            fetchedState.updateProfile(
                 nickname = sanitizedNickname,
                 nicknameValidation = validationState,
             )
@@ -115,7 +117,10 @@ internal class ProfileViewModel @Inject constructor(
             }
         }
 
-        updateState { state.updateProfile(nicknameValidation = validationState) }
+        updateState {
+            val fetchedState = currentState as? ProfileUiState.Fetched ?: return@updateState currentState
+            fetchedState.updateProfile(nicknameValidation = validationState)
+        }
     }
 
     private fun Nickname.InvalidReason.toValidationState(): NicknameValidationState =
