@@ -3,7 +3,6 @@ package com.team.prezel.core.domain
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 
-
 interface AuthRepository {
     suspend fun reissueToken(refreshToken: String): Result<AuthToken>
 

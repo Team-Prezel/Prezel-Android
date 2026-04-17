@@ -2,12 +2,15 @@ package com.team.prezel.core.network.di
 
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
+import com.team.prezel.core.network.auth.AuthTokenStore
+import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -15,10 +18,13 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -36,25 +42,40 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(json: Json): HttpClient =
+    @Named("refresh")
+    fun provideRefreshHttpClient(json: Json): HttpClient =
         HttpClient(OkHttp) {
-            expectSuccess = true
-
-            install(ContentNegotiation) {
-                json(json)
-            }
-
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        Timber.tag("KtorClient").d(message)
-                    }
-                }
-                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
-            }
+            configureBaseClient(json)
 
             defaultRequest {
                 contentType(ContentType.Application.Json)
+            }
+        }
+
+    @Provides
+    @Singleton
+    fun provideHttpClient(
+        json: Json,
+        authTokenStore: AuthTokenStore,
+        tokenRefreshAuthenticator: TokenRefreshAuthenticator,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            engine {
+                config {
+                    authenticator(tokenRefreshAuthenticator)
+                }
+            }
+
+            configureBaseClient(json)
+
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+
+                if (headers[HttpHeaders.Authorization] == null && url.encodedPath.requiresAuthorization()) {
+                    authTokenStore.getAccessToken()?.let { accessToken ->
+                        headers.append(HttpHeaders.Authorization, "Bearer $accessToken")
+                    }
+                }
             }
         }
 
@@ -67,4 +88,23 @@ object NetworkModule {
             .httpClient(httpClient)
             .converterFactories(ApiResponseConverterFactory())
             .build()
+
+    private fun HttpClientConfig<*>.configureBaseClient(json: Json) {
+        expectSuccess = true
+
+        install(ContentNegotiation) {
+            json(json)
+        }
+
+        install(Logging) {
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Timber.tag("KtorClient").d(message)
+                }
+            }
+            level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+        }
+    }
+
+    private fun String.requiresAuthorization(): Boolean = this != "/auth/login" && this != "/auth/reissue"
 }

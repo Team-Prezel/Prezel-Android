@@ -20,10 +20,7 @@ internal class LoginViewModel @Inject constructor(
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
             is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
-            is LoginUiIntent.OnLoginResult -> handleLoginResult(
-                provider = intent.provider,
-                result = intent.result,
-            )
+            is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
         }
     }
 
@@ -41,10 +38,7 @@ internal class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun handleLoginResult(
-        provider: AuthProvider,
-        result: AuthResult,
-    ) {
+    private fun handleLoginResult(result: AuthResult) {
         viewModelScope.launch {
             when (result) {
                 is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
@@ -52,6 +46,7 @@ internal class LoginViewModel @Inject constructor(
                     updateState { copy(isLoading = false, pendingProvider = null) }
                     sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
                 }
+
                 is AuthResult.Failure -> {
                     updateState { copy(isLoading = false, pendingProvider = null) }
                     sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
@@ -61,18 +56,19 @@ internal class LoginViewModel @Inject constructor(
     }
 
     private suspend fun handleServerLogin(idToken: String) {
-        authRepository.login(
-            idToken = idToken,
-        ).fold(
-            onSuccess = {
-                updateState { copy(isLoading = false, pendingProvider = null) }
-                sendEffect(LoginUiEffect.NavigateToTerms)
-            },
-            onFailure = {
-                updateState { copy(isLoading = false, pendingProvider = null) }
-                sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginFailedUnknown))
-            },
-        )
+        authRepository
+            .login(
+                idToken = idToken,
+            ).fold(
+                onSuccess = {
+                    updateState { copy(isLoading = false, pendingProvider = null) }
+                    sendEffect(LoginUiEffect.NavigateToTerms)
+                },
+                onFailure = {
+                    updateState { copy(isLoading = false, pendingProvider = null) }
+                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginFailedUnknown))
+                },
+            )
     }
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
