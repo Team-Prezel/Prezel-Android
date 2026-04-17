@@ -13,11 +13,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.IOException
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,27 +38,16 @@ internal class DataStoreAuthTokenStore @Inject constructor(
     private var refreshToken: String? = null
 
     private val mutex = Mutex()
-    private val isCacheInitializationStarted = AtomicBoolean(false)
 
     init {
-        initializeCache()
+        val preferences = runBlocking { readPreferences() }
+        accessToken = preferences[KEY_ACCESS_TOKEN]
+        refreshToken = preferences[KEY_REFRESH_TOKEN]
     }
 
     override fun getAccessToken(): String? = accessToken
 
     override fun getRefreshToken(): String? = refreshToken
-
-    override fun initializeCache() {
-        if (!isCacheInitializationStarted.compareAndSet(false, true)) return
-
-        applicationScope.launch {
-            mutex.withLock {
-                val preferences = readPreferences()
-                accessToken = preferences[KEY_ACCESS_TOKEN]
-                refreshToken = preferences[KEY_REFRESH_TOKEN]
-            }
-        }
-    }
 
     override suspend fun saveTokens(
         accessToken: String,

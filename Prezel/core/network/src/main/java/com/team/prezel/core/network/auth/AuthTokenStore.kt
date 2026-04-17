@@ -5,8 +5,6 @@ interface AuthTokenStore {
 
     fun getRefreshToken(): String?
 
-    fun initializeCache()
-
     suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,

@@ -102,7 +102,8 @@ object NetworkModule {
                     Timber.tag("KtorClient").d(message)
                 }
             }
-            level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+            sanitizeHeader { header -> header == HttpHeaders.Authorization }
+            level = if (BuildConfig.DEBUG) LogLevel.HEADERS else LogLevel.NONE
         }
     }
 
