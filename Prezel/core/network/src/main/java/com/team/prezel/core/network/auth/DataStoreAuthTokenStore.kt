@@ -14,8 +14,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,47 +38,59 @@ internal class DataStoreAuthTokenStore @Inject constructor(
     @Volatile
     private var refreshToken: String? = null
 
+    private val mutex = Mutex()
+    private val isCacheInitializationStarted = AtomicBoolean(false)
+
     init {
-        val preferences = runBlocking {
-            dataStore.data
-                .catch { exception ->
-                    if (exception is IOException) emit(emptyPreferences()) else throw exception
-                }.first()
-        }
-        accessToken = preferences[KEY_ACCESS_TOKEN]
-        refreshToken = preferences[KEY_REFRESH_TOKEN]
+        initializeCache()
     }
 
     override fun getAccessToken(): String? = accessToken
 
     override fun getRefreshToken(): String? = refreshToken
 
-    override fun saveTokens(
+    override fun initializeCache() {
+        if (!isCacheInitializationStarted.compareAndSet(false, true)) return
+
+        applicationScope.launch {
+            mutex.withLock {
+                val preferences = readPreferences()
+                accessToken = preferences[KEY_ACCESS_TOKEN]
+                refreshToken = preferences[KEY_REFRESH_TOKEN]
+            }
+        }
+    }
+
+    override suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,
     ) {
-        this.accessToken = accessToken
-        this.refreshToken = refreshToken
-
-        applicationScope.launch {
+        mutex.withLock {
             dataStore.edit { preferences ->
                 preferences[KEY_ACCESS_TOKEN] = accessToken
                 preferences[KEY_REFRESH_TOKEN] = refreshToken
             }
+            this.accessToken = accessToken
+            this.refreshToken = refreshToken
         }
     }
 
-    override fun clear() {
-        accessToken = null
-        refreshToken = null
-
-        applicationScope.launch {
+    override suspend fun clear() {
+        mutex.withLock {
             dataStore.edit { preferences ->
                 preferences.remove(KEY_ACCESS_TOKEN)
                 preferences.remove(KEY_REFRESH_TOKEN)
             }
+            accessToken = null
+            refreshToken = null
         }
     }
+
+    private suspend fun readPreferences(): Preferences =
+        dataStore.data
+            .catch { exception ->
+                if (exception is IOException) emit(emptyPreferences()) else throw exception
+            }.first()
 
     private companion object {
         const val PREFERENCES_NAME = "auth_token_preferences"

@@ -47,10 +47,7 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
         if (!BuildConfig.DEBUG) return
 
         when (response) {
-            is ApiResponse.Success -> {
-                Timber.tag("AuthToken").d("Server accessToken=%s", response.data.accessToken)
-                Timber.tag("AuthToken").d("Server refreshToken=%s", response.data.refreshToken)
-            }
+            is ApiResponse.Success -> Timber.tag("AuthToken").d("서버 인증 응답에 성공했습니다.")
 
             is ApiResponse.Failure.HttpError -> {
                 Timber.tag("AuthToken").e(response.throwable, "Server login failed: http error")

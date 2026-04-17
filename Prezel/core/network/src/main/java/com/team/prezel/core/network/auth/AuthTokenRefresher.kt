@@ -30,28 +30,29 @@ class AuthTokenRefresher @Inject constructor(
         mutex.withLock {
             val refreshToken = authTokenStore.getRefreshToken() ?: return@withLock null
 
-            runCatching {
-                refreshHttpClient
-                    .post("${BuildConfig.BASE_URL}auth/reissue") {
-                        contentType(ContentType.Application.Json)
-                        setBody(ReissueTokenRequest(refreshToken = refreshToken))
-                    }.body<LoginResponse>()
-            }.onSuccess { response ->
+            try {
+                val response =
+                    refreshHttpClient
+                        .post("${BuildConfig.BASE_URL}auth/reissue") {
+                            contentType(ContentType.Application.Json)
+                            setBody(ReissueTokenRequest(refreshToken = refreshToken))
+                        }.body<LoginResponse>()
+
                 authTokenStore.saveTokens(
                     accessToken = response.accessToken,
                     refreshToken = response.refreshToken,
                 )
                 if (BuildConfig.DEBUG) {
-                    Timber.tag("AuthToken").d("Refreshed accessToken=%s", response.accessToken)
-                    Timber.tag("AuthToken").d("Refreshed refreshToken=%s", response.refreshToken)
+                    Timber.tag("AuthToken").d("토큰 재발급에 성공했습니다.")
                 }
-            }.onFailure { throwable ->
+                response.accessToken
+            } catch (throwable: Throwable) {
                 if (throwable.isInvalidRefreshToken()) {
                     authTokenStore.clear()
                 }
                 Timber.e(throwable, "토큰 재발급에 실패했습니다.")
-            }.getOrNull()
-                ?.accessToken
+                null
+            }
         }
 
     private fun Throwable.isInvalidRefreshToken(): Boolean = this is ResponseException && response.status == HttpStatusCode.Unauthorized

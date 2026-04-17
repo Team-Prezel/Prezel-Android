@@ -5,10 +5,12 @@ interface AuthTokenStore {
 
     fun getRefreshToken(): String?
 
-    fun saveTokens(
+    fun initializeCache()
+
+    suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,
     )
 
-    fun clear()
+    suspend fun clear()
 }

@@ -36,7 +36,7 @@ internal class AuthRepositoryImpl @Inject constructor(
                 authTokenStore.clear()
             }
 
-    private fun saveTokens(response: LoginResponse): AuthToken =
+    private suspend fun saveTokens(response: LoginResponse): AuthToken =
         response
             .toAuthToken()
             .also { token ->
