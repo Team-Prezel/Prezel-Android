@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,37 +30,43 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigator = LocalNavigator.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToLogin -> navigator.replaceRoot(LoginNavKey)
+                is ProfileUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
             }
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.Center,
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) {
-        Text("Profile")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = viewModel::logout,
-            enabled = !uiState.isLoading,
-            modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text("로그아웃")
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Button(
-            onClick = viewModel::withdraw,
-            enabled = !uiState.isLoading,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("회원탈퇴")
+            Button(
+                onClick = viewModel::logout,
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("로그아웃")
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = viewModel::withdraw,
+                enabled = !uiState.isLoading,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("회원탈퇴")
+            }
         }
     }
 }

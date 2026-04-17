@@ -2,7 +2,6 @@ package com.team.prezel.feature.profile.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.domain.AuthRepository
 import com.team.prezel.core.domain.usecase.LogoutUseCase
 import com.team.prezel.core.domain.usecase.WithdrawUseCase
 import com.team.prezel.core.model.auth.WithdrawReason
@@ -20,7 +19,6 @@ import javax.inject.Inject
 class ProfileViewModel
     @Inject
     constructor(
-        private val authRepository: AuthRepository,
         private val logoutUseCase: LogoutUseCase,
         private val withdrawUseCase: WithdrawUseCase,
     ) : ViewModel() {
@@ -31,31 +29,29 @@ class ProfileViewModel
         val uiEffect = _uiEffect.asSharedFlow()
 
         fun logout() {
-            val accessToken = authRepository.getAccessToken() ?: return
             if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                val result = logoutUseCase(accessToken)
+                val result = logoutUseCase()
                 _uiState.update { it.copy(isLoading = false) }
                 if (result.isSuccess) {
                     Timber.tag("ProfileTest").d("로그아웃에 성공했습니다.")
                     _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
                 } else {
                     Timber.tag("ProfileTest").e(result.exceptionOrNull(), "로그아웃에 실패했습니다.")
+                    _uiEffect.emit(ProfileUiEffect.ShowSnackbar("로그아웃에 실패했습니다."))
                 }
             }
         }
 
         fun withdraw() {
-            val accessToken = authRepository.getAccessToken() ?: return
             if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
                 val result =
                     withdrawUseCase(
-                        accessToken = accessToken,
                         reason = WithdrawReason.Other("임시 테스트 탈퇴"),
                     )
                 _uiState.update { it.copy(isLoading = false) }
@@ -64,6 +60,7 @@ class ProfileViewModel
                     _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
                 } else {
                     Timber.tag("ProfileTest").e(result.exceptionOrNull(), "회원탈퇴에 실패했습니다.")
+                    _uiEffect.emit(ProfileUiEffect.ShowSnackbar("회원탈퇴에 실패했습니다."))
                 }
             }
         }
