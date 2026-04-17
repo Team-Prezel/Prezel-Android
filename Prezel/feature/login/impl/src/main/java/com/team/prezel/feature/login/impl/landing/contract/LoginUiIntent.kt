@@ -10,6 +10,7 @@ internal sealed interface LoginUiIntent : UiIntent {
     ) : LoginUiIntent
 
     data class OnLoginResult(
+        val provider: AuthProvider,
         val result: AuthResult,
     ) : LoginUiIntent
 }

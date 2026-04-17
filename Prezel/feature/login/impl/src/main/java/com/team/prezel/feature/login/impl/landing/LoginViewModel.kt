@@ -3,8 +3,8 @@ package com.team.prezel.feature.login.impl.landing
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
+import com.team.prezel.core.domain.AuthRepository
 import com.team.prezel.core.ui.BaseViewModel
-import com.team.prezel.feature.login.impl.BuildConfig
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiState
@@ -14,11 +14,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class LoginViewModel @Inject constructor() : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>(LoginUiState()) {
+internal class LoginViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+) : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>(LoginUiState()) {
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
             is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
-            is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
+            is LoginUiIntent.OnLoginResult -> handleLoginResult(
+                provider = intent.provider,
+                result = intent.result,
+            )
         }
     }
 
@@ -26,28 +31,55 @@ internal class LoginViewModel @Inject constructor() : BaseViewModel<LoginUiState
         if (currentState.isLoading) return
 
         viewModelScope.launch {
-            updateState { copy(isLoading = true) }
+            updateState {
+                copy(
+                    isLoading = true,
+                    pendingProvider = provider,
+                )
+            }
+            sendEffect(LoginUiEffect.LaunchLogin(provider = provider))
+        }
+    }
 
-            // todo: MVP 개발 완료 후 해당 조건 제거
-            if (BuildConfig.DEBUG) {
-                updateState { copy(isLoading = false) }
-                sendEffect(LoginUiEffect.NavigateToTerms)
-            } else {
-                sendEffect(LoginUiEffect.LaunchLogin(provider = provider))
+    private fun handleLoginResult(
+        provider: AuthProvider,
+        result: AuthResult,
+    ) {
+        viewModelScope.launch {
+            when (result) {
+                is AuthResult.Success -> handleServerLogin(
+                    provider = provider,
+                    idToken = result.idToken,
+                )
+                AuthResult.Cancelled -> {
+                    updateState { copy(isLoading = false, pendingProvider = null) }
+                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
+                }
+                is AuthResult.Failure -> {
+                    updateState { copy(isLoading = false, pendingProvider = null) }
+                    sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
+                }
             }
         }
     }
 
-    private fun handleLoginResult(result: AuthResult) {
-        viewModelScope.launch {
-            updateState { copy(isLoading = false) }
-
-            when (result) {
-                AuthResult.Success -> sendEffect(LoginUiEffect.NavigateToTerms)
-                AuthResult.Cancelled -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
-                is AuthResult.Failure -> sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
-            }
-        }
+    private suspend fun handleServerLogin(
+        provider: AuthProvider,
+        idToken: String,
+    ) {
+        authRepository.login(
+            provider = provider.name,
+            idToken = idToken,
+        ).fold(
+            onSuccess = {
+                updateState { copy(isLoading = false, pendingProvider = null) }
+                sendEffect(LoginUiEffect.NavigateToTerms)
+            },
+            onFailure = {
+                updateState { copy(isLoading = false, pendingProvider = null) }
+                sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginFailedUnknown))
+            },
+        )
     }
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =

@@ -79,7 +79,7 @@ fun StatusView(
 @Composable
 fun StatusLottie(
     @RawRes lottieJsonResId: Int,
-    modifier: Modifier = Modifier.size(80.dp),
+    modifier: Modifier = Modifier,
 ) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(lottieJsonResId),
@@ -92,7 +92,7 @@ fun StatusLottie(
     LottieAnimation(
         composition = composition,
         progress = { progress },
-        modifier = modifier,
+        modifier = modifier.size(80.dp),
     )
 }
 

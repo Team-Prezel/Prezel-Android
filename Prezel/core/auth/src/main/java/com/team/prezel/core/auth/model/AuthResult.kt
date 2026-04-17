@@ -1,7 +1,9 @@
 package com.team.prezel.core.auth.model
 
 sealed interface AuthResult {
-    data object Success : AuthResult
+    data class Success(
+        val idToken: String,
+    ) : AuthResult
 
     data object Cancelled : AuthResult
 

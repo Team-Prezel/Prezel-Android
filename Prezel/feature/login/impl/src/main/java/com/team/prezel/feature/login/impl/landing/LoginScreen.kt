@@ -69,7 +69,12 @@ internal fun SharedTransitionScope.LoginScreen(
             when (effect) {
                 is LoginUiEffect.LaunchLogin -> {
                     authManager.login(context = context, provider = effect.provider).also { result ->
-                        viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
+                        viewModel.onIntent(
+                            LoginUiIntent.OnLoginResult(
+                                provider = effect.provider,
+                                result = result,
+                            ),
+                        )
                     }
                 }
 

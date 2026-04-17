@@ -7,6 +7,7 @@ import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.team.prezel.core.auth.BuildConfig
 import com.team.prezel.core.auth.model.AuthResult
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -75,8 +76,22 @@ class KakaoAuthClient
                     }
 
                     token != null -> {
-                        Timber.d("$loginType 로그인에 성공했습니다.")
-                        resume(AuthResult.Success)
+                        if (BuildConfig.DEBUG) {
+                            Timber.tag("AuthToken").d(
+                                "Kakao SDK token access=%s refresh=%s id=%s",
+                                token.accessToken,
+                                token.refreshToken,
+                                token.idToken,
+                            )
+                        }
+                        val idToken = token.idToken
+                        if (idToken.isNullOrBlank()) {
+                            Timber.e("$loginType 로그인에 성공했지만 idToken이 비어있습니다.")
+                            resume(AuthResult.Failure.Unknown)
+                        } else {
+                            Timber.d("$loginType 로그인에 성공했습니다.")
+                            resume(AuthResult.Success(idToken = idToken))
+                        }
                     }
 
                     else -> {
