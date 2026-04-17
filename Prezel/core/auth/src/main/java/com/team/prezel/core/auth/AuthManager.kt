@@ -30,9 +30,10 @@ class AuthManager
         }
 
         suspend fun logout(): Result<Unit> {
-            val provider = currentProvider ?: return Result.failure(
-                IllegalStateException("로그인된 AuthProvider가 없습니다."),
-            )
+            val provider =
+                currentProvider ?: authClients.keys.singleOrNull() ?: return Result.failure(
+                    IllegalStateException("로그인된 AuthProvider가 없습니다."),
+                )
 
             val authClient = authClients[provider] ?: return Result.failure(
                 IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),

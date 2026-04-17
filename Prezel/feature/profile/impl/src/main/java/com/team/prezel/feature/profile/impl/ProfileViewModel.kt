@@ -2,6 +2,7 @@ package com.team.prezel.feature.profile.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.domain.usecase.LogoutUseCase
 import com.team.prezel.core.domain.usecase.WithdrawUseCase
 import com.team.prezel.core.model.auth.WithdrawReason
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class ProfileViewModel
     @Inject
     constructor(
+        private val authManager: AuthManager,
         private val logoutUseCase: LogoutUseCase,
         private val withdrawUseCase: WithdrawUseCase,
     ) : ViewModel() {
@@ -33,7 +35,11 @@ class ProfileViewModel
 
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                val result = logoutUseCase()
+                val result =
+                    logoutUseCase().fold(
+                        onSuccess = { authManager.logout() },
+                        onFailure = { Result.failure(it) },
+                    )
                 _uiState.update { it.copy(isLoading = false) }
                 if (result.isSuccess) {
                     Timber.tag("ProfileTest").d("로그아웃에 성공했습니다.")
@@ -53,6 +59,9 @@ class ProfileViewModel
                 val result =
                     withdrawUseCase(
                         reason = WithdrawReason.Other("임시 테스트 탈퇴"),
+                    ).fold(
+                        onSuccess = { authManager.logout() },
+                        onFailure = { Result.failure(it) },
                     )
                 _uiState.update { it.copy(isLoading = false) }
                 if (result.isSuccess) {
