@@ -13,6 +13,10 @@ internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authTokenStore: AuthTokenStore,
 ) : AuthRepository {
+    override fun getAccessToken(): String? = authTokenStore.getAccessToken()
+
+    override fun getRefreshToken(): String? = authTokenStore.getRefreshToken()
+
     override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 

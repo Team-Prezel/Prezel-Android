@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreDomain)
     implementation(projects.featureSplashApi)
     implementation(projects.featureLoginApi)
     implementation(projects.featureHomeApi)
