@@ -47,10 +47,7 @@ internal class LoginViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             when (result) {
-                is AuthResult.Success -> handleServerLogin(
-                    provider = provider,
-                    idToken = result.idToken,
-                )
+                is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
                 AuthResult.Cancelled -> {
                     updateState { copy(isLoading = false, pendingProvider = null) }
                     sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
@@ -63,12 +60,8 @@ internal class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleServerLogin(
-        provider: AuthProvider,
-        idToken: String,
-    ) {
+    private suspend fun handleServerLogin(idToken: String) {
         authRepository.login(
-            provider = provider.name,
             idToken = idToken,
         ).fold(
             onSuccess = {
