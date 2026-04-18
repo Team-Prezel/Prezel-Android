@@ -1,6 +1,7 @@
 package com.team.prezel.core.domain.usecase.auth
 
 import com.team.prezel.core.domain.repository.auth.AuthRepository
+import com.team.prezel.core.domain.result.auth.AuthActionResult
 import javax.inject.Inject
 
 /**

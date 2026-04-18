@@ -1,4 +1,4 @@
-package com.team.prezel.core.domain.usecase.auth
+package com.team.prezel.core.domain.result.auth
 
 sealed interface AuthActionResult {
     data object Success : AuthActionResult

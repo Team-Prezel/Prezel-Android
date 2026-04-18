@@ -3,7 +3,7 @@ package com.team.prezel.core.data.repository
 import com.team.prezel.core.data.toResult
 import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.domain.repository.auth.AuthRepository
-import com.team.prezel.core.domain.usecase.auth.AuthActionResult
+import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource

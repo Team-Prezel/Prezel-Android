@@ -3,7 +3,7 @@ package com.team.prezel.feature.profile.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.AuthManager
-import com.team.prezel.core.domain.usecase.auth.AuthActionResult
+import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.domain.usecase.auth.LogoutUseCase
 import com.team.prezel.core.domain.usecase.auth.WithdrawUseCase
 import com.team.prezel.core.model.auth.WithdrawReason

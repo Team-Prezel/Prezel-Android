@@ -1,6 +1,6 @@
 package com.team.prezel.core.domain.repository.auth
 
-import com.team.prezel.core.domain.usecase.auth.AuthActionResult
+import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 
