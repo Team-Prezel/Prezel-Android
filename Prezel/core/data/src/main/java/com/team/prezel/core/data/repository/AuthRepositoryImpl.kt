@@ -6,7 +6,6 @@ import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
-import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import javax.inject.Inject
 
@@ -27,11 +26,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         }
 
     override suspend fun login(idToken: String): Result<AuthToken> =
-        when (val response = authRemoteDataSource.login(idToken = idToken)) {
-            is ApiResponse.Success -> Result.success(saveTokens(response))
-            is ApiResponse.Failure.HttpError -> Result.failure(response.throwable)
-            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
-        }
+        authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
     override suspend fun withdraw(
         accessToken: String,
@@ -40,20 +35,10 @@ internal class AuthRepositoryImpl @Inject constructor(
         authRemoteDataSource
             .withdraw(
                 accessToken = accessToken,
-                reasonCategory = reason.category,
-                reasonText = reason.reasonText,
+                reasonCategory = reason.toCategory(),
+                reasonText = reason.toReasonText(),
             ).toResult {
                 authTokenStore.clear()
-            }
-
-    private suspend fun saveTokens(response: ApiResponse.Success<LoginResponse>): AuthToken =
-        response
-            .toAuthToken()
-            .also { token ->
-                authTokenStore.saveTokens(
-                    accessToken = token.accessToken,
-                    refreshToken = token.refreshToken,
-                )
             }
 
     private suspend fun saveTokens(response: LoginResponse): AuthToken =
@@ -66,20 +51,14 @@ internal class AuthRepositoryImpl @Inject constructor(
                 )
             }
 
-    private fun ApiResponse.Success<LoginResponse>.toAuthToken(): AuthToken =
-        AuthToken(
-            accessToken = data.accessToken,
-            refreshToken = data.refreshToken,
-        )
-
     private fun LoginResponse.toAuthToken(): AuthToken =
         AuthToken(
             accessToken = accessToken,
             refreshToken = refreshToken,
         )
 
-    private val WithdrawReason.category: String
-        get() = when (this) {
+    private fun WithdrawReason.toCategory(): String =
+        when (this) {
             WithdrawReason.NotUsedOften -> "NOT_USED_OFTEN"
             WithdrawReason.NoLongerNeeded -> "NO_LONGER_NEEDED"
             WithdrawReason.TooDifficultOrComplex -> "TOO_DIFFICULT_OR_COMPLEX"
@@ -88,8 +67,8 @@ internal class AuthRepositoryImpl @Inject constructor(
             is WithdrawReason.Other -> "OTHER"
         }
 
-    private val WithdrawReason.reasonText: String
-        get() = when (this) {
+    private fun WithdrawReason.toReasonText(): String =
+        when (this) {
             is WithdrawReason.Other -> text
             else -> ""
         }

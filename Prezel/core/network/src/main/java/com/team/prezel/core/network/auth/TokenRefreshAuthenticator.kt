@@ -17,9 +17,7 @@ class TokenRefreshAuthenticator @Inject constructor(
         route: Route?,
         response: Response,
     ): Request? {
-        if (!response.request.url.encodedPath
-                .requiresAuthorization()
-        ) {
+        if (!AuthPathPolicy.requiresAuthorization(response.request.url.encodedPath)) {
             return null
         }
         if (responseCount(response) >= MAX_AUTH_RETRY_COUNT) return null
@@ -34,8 +32,6 @@ class TokenRefreshAuthenticator @Inject constructor(
             .build()
     }
 
-    private fun String.requiresAuthorization(): Boolean = this != LOGIN_PATH && this != REISSUE_PATH
-
     private fun responseCount(response: Response): Int {
         var count = 1
         var current = response.priorResponse
@@ -45,10 +41,7 @@ class TokenRefreshAuthenticator @Inject constructor(
         }
         return count
     }
-
     private companion object {
-        const val LOGIN_PATH = "/auth/login"
-        const val REISSUE_PATH = "/auth/reissue"
         const val MAX_AUTH_RETRY_COUNT = 2
     }
 }

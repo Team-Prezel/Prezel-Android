@@ -2,6 +2,7 @@ package com.team.prezel.core.network.di
 
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
+import com.team.prezel.core.network.auth.AuthPathPolicy
 import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
 import com.team.prezel.core.network.service.AuthService
@@ -72,7 +73,7 @@ object NetworkModule {
             defaultRequest {
                 contentType(ContentType.Application.Json)
 
-                if (headers[HttpHeaders.Authorization] == null && url.encodedPath.requiresAuthorization()) {
+                if (headers[HttpHeaders.Authorization] == null && AuthPathPolicy.requiresAuthorization(url.encodedPath)) {
                     authTokenStore.getAccessToken()?.let { accessToken ->
                         headers.append(HttpHeaders.Authorization, "Bearer $accessToken")
                     }
@@ -111,6 +112,4 @@ object NetworkModule {
             level = if (BuildConfig.DEBUG) LogLevel.HEADERS else LogLevel.NONE
         }
     }
-
-    private fun String.requiresAuthorization(): Boolean = this != "/auth/login" && this != "/auth/reissue"
 }
