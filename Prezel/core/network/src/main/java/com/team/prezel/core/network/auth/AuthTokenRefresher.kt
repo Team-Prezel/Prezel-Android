@@ -11,6 +11,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
@@ -46,11 +47,13 @@ class AuthTokenRefresher @Inject constructor(
                     Timber.tag("AuthToken").d("토큰 재발급에 성공했습니다.")
                 }
                 response.accessToken
-            } catch (throwable: Throwable) {
-                if (throwable.isInvalidRefreshToken()) {
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                if (exception.isInvalidRefreshToken()) {
                     authTokenStore.clear()
                 }
-                Timber.e(throwable, "토큰 재발급에 실패했습니다.")
+                Timber.e(exception, "토큰 재발급에 실패했습니다.")
                 null
             }
         }

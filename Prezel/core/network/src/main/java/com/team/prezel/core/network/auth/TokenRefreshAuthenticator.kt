@@ -41,6 +41,7 @@ class TokenRefreshAuthenticator @Inject constructor(
         }
         return count
     }
+
     private companion object {
         const val MAX_AUTH_RETRY_COUNT = 2
     }

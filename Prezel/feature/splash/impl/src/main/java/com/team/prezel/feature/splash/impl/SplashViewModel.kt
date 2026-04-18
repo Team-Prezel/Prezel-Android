@@ -1,7 +1,7 @@
 package com.team.prezel.feature.splash.impl
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.domain.usecase.CheckLoginStatusUseCase
+import com.team.prezel.core.domain.usecase.auth.CheckLoginStatusUseCase
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
 import com.team.prezel.feature.splash.impl.contract.SplashUiIntent

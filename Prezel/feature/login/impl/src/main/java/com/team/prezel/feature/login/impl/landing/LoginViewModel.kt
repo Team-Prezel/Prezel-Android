@@ -3,7 +3,7 @@ package com.team.prezel.feature.login.impl.landing
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
-import com.team.prezel.core.domain.AuthRepository
+import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent

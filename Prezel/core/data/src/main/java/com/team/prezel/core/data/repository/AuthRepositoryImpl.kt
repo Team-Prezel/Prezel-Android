@@ -1,7 +1,7 @@
 package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.toResult
-import com.team.prezel.core.domain.AuthRepository
+import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.auth.AuthTokenStore
@@ -25,8 +25,7 @@ internal class AuthRepositoryImpl @Inject constructor(
             authTokenStore.clear()
         }
 
-    override suspend fun login(idToken: String): Result<AuthToken> =
-        authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
+    override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
     override suspend fun withdraw(
         accessToken: String,

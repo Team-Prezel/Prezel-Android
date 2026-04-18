@@ -1,7 +1,7 @@
 package com.team.prezel.core.data.di
 
 import com.team.prezel.core.data.repository.AuthRepositoryImpl
-import com.team.prezel.core.domain.AuthRepository
+import com.team.prezel.core.domain.repository.auth.AuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

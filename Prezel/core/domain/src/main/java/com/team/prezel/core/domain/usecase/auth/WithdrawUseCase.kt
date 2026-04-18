@@ -1,6 +1,6 @@
-package com.team.prezel.core.domain.usecase
+package com.team.prezel.core.domain.usecase.auth
 
-import com.team.prezel.core.domain.AuthRepository
+import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.model.auth.WithdrawReason
 import javax.inject.Inject
 

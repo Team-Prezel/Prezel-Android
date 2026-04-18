@@ -1,4 +1,4 @@
-package com.team.prezel.core.domain
+package com.team.prezel.core.domain.repository.auth
 
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
