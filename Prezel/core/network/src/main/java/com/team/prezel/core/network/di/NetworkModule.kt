@@ -4,6 +4,8 @@ import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
+import com.team.prezel.core.network.service.AuthService
+import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -87,6 +89,10 @@ object NetworkModule {
             .httpClient(httpClient)
             .converterFactories(ApiResponseConverterFactory())
             .build()
+
+    @Provides
+    @Singleton
+    internal fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
 
     private fun HttpClientConfig<*>.configureBaseClient(json: Json) {
         expectSuccess = true

@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class AuthTokenModule {
+internal abstract class TokenStoreModule {
     @Binds
     @Singleton
     abstract fun bindAuthTokenStore(impl: DataStoreAuthTokenStore): AuthTokenStore
