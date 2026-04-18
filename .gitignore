@@ -19,7 +19,6 @@ output-metadata.json
 # IntelliJ
 *.iml
 .idea/
-.kotlin/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
@@ -33,6 +32,3 @@ google-services.json
 
 # Android Profiling
 *.hprof
-
-# macOS Finder
-.DS_Store
