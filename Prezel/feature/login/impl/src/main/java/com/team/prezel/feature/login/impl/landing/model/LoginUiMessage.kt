@@ -1,7 +1,7 @@
 package com.team.prezel.feature.login.impl.landing.model
 
 internal enum class LoginUiMessage {
-    LoginCancelled,
-    LoginFailedRateLimited,
-    LoginFailedUnknown,
+    LOGIN_CANCELLED,
+    LOGIN_FAILED_RATE_LIMITED,
+    LOGIN_FAILED_UNKNOWN,
 }

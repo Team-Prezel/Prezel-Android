@@ -85,9 +85,9 @@ internal fun SharedTransitionScope.LoginScreen(
 
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
-                        LoginUiMessage.LoginCancelled -> R.string.feature_login_impl_kakao_cancelled
-                        LoginUiMessage.LoginFailedRateLimited -> R.string.feature_login_impl_kakao_rate_limited
-                        LoginUiMessage.LoginFailedUnknown -> R.string.feature_login_impl_kakao_failure
+                        LoginUiMessage.LOGIN_CANCELLED -> R.string.feature_login_impl_kakao_cancelled
+                        LoginUiMessage.LOGIN_FAILED_RATE_LIMITED -> R.string.feature_login_impl_kakao_rate_limited
+                        LoginUiMessage.LOGIN_FAILED_UNKNOWN -> R.string.feature_login_impl_kakao_failure
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }

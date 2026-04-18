@@ -44,7 +44,7 @@ internal class LoginViewModel @Inject constructor(
                 is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
                 AuthResult.Cancelled -> {
                     updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginCancelled))
+                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_CANCELLED))
                 }
 
                 is AuthResult.Failure -> {
@@ -66,14 +66,14 @@ internal class LoginViewModel @Inject constructor(
                 },
                 onFailure = {
                     updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LoginFailedUnknown))
+                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
                 },
             )
     }
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
         when (this) {
-            AuthResult.Failure.RateLimited -> LoginUiMessage.LoginFailedRateLimited
-            AuthResult.Failure.Unknown -> LoginUiMessage.LoginFailedUnknown
+            AuthResult.Failure.RateLimited -> LoginUiMessage.LOGIN_FAILED_RATE_LIMITED
+            AuthResult.Failure.Unknown -> LoginUiMessage.LOGIN_FAILED_UNKNOWN
         }
 }

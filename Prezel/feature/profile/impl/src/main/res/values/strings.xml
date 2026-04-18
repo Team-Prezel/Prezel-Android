@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_profile_impl_logout_failed">로그아웃에 실패했습니다.</string>
+    <string name="feature_profile_impl_withdraw_failed">회원탈퇴에 실패했습니다.</string>
+    <string name="feature_profile_impl_authentication_expired">인증이 만료되었어요. 다시 로그인해 주세요.</string>
+</resources>

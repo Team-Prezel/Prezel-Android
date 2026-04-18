@@ -43,4 +43,8 @@ class AuthManager
                 currentProvider = null
             }
         }
+
+        fun clearCurrentProvider() {
+            currentProvider = null
+        }
     }

@@ -7,6 +7,7 @@ sealed interface ApiResponse<out T> {
 
     sealed interface Failure : ApiResponse<Nothing> {
         data class HttpError(
+            val error: ApiErrorResponse?,
             val throwable: Throwable,
         ) : Failure
 

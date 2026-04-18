@@ -1,5 +1,6 @@
 package com.team.prezel.core.network
 
+import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.ApiResponse
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.converter.Converter
@@ -8,12 +9,21 @@ import de.jensklingenberg.ktorfit.converter.TypeData
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.util.reflect.TypeInfo
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
 class ApiResponseConverterFactory : Converter.Factory {
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            prettyPrint = false
+        }
+
     override fun suspendResponseConverter(
         typeData: TypeData,
         ktorfit: Ktorfit,
@@ -45,7 +55,7 @@ class ApiResponseConverterFactory : Converter.Factory {
             ApiResponse.Failure.NetworkError(t)
         }
 
-    private fun mapFailure(t: Throwable): ApiResponse<Any> {
+    private suspend fun mapFailure(t: Throwable): ApiResponse<Any> {
         t.rethrowIfCancellation()
 
         return when (t) {
@@ -56,7 +66,10 @@ class ApiResponseConverterFactory : Converter.Factory {
 
             is ResponseException -> {
                 Timber.e(t, "HTTP error ${t.response.status.value}")
-                ApiResponse.Failure.HttpError(t)
+                ApiResponse.Failure.HttpError(
+                    error = parseErrorResponse(t),
+                    throwable = t,
+                )
             }
 
             else -> {
@@ -65,6 +78,11 @@ class ApiResponseConverterFactory : Converter.Factory {
             }
         }
     }
+
+    private suspend fun parseErrorResponse(exception: ResponseException): ApiErrorResponse? =
+        runCatching {
+            json.decodeFromString<ApiErrorResponse>(exception.response.bodyAsText())
+        }.getOrNull()
 
     private fun Throwable.rethrowIfCancellation() {
         if (this is CancellationException) throw this
