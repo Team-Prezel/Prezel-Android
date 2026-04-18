@@ -17,7 +17,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.datastore.preferences)
+    implementation(projects.coreDatastore)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.content.negotiation)

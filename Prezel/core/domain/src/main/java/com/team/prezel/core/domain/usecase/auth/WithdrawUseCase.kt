@@ -16,15 +16,5 @@ import javax.inject.Inject
 class WithdrawUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    suspend operator fun invoke(reason: WithdrawReason): Result<Unit> {
-        val accessToken =
-            authRepository.getAccessToken() ?: return Result.failure(
-                IllegalStateException("저장된 access token이 없습니다."),
-            )
-
-        return authRepository.withdraw(
-            accessToken = accessToken,
-            reason = reason,
-        )
-    }
+    suspend operator fun invoke(reason: WithdrawReason): Result<Unit> = authRepository.withdraw(reason = reason)
 }

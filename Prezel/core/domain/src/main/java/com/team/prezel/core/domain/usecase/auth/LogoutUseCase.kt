@@ -15,12 +15,5 @@ import javax.inject.Inject
 class LogoutUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    suspend operator fun invoke(): Result<Unit> {
-        val accessToken =
-            authRepository.getAccessToken() ?: return Result.failure(
-                IllegalStateException("저장된 access token이 없습니다."),
-            )
-
-        return authRepository.logout(accessToken = accessToken)
-    }
+    suspend operator fun invoke(): Result<Unit> = authRepository.logout()
 }

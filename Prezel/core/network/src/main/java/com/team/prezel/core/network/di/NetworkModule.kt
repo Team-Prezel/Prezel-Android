@@ -2,8 +2,8 @@ package com.team.prezel.core.network.di
 
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
+import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.auth.AuthPathPolicy
-import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.createAuthService
@@ -27,7 +27,6 @@ import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -40,18 +39,6 @@ object NetworkModule {
             ignoreUnknownKeys = true
             encodeDefaults = true
             prettyPrint = false
-        }
-
-    @Provides
-    @Singleton
-    @Named("refresh")
-    fun provideRefreshHttpClient(json: Json): HttpClient =
-        HttpClient(OkHttp) {
-            configureBaseClient(json)
-
-            defaultRequest {
-                contentType(ContentType.Application.Json)
-            }
         }
 
     @Provides

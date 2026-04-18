@@ -10,12 +10,9 @@ interface AuthRepository {
 
     suspend fun reissueToken(refreshToken: String): Result<AuthToken>
 
-    suspend fun logout(accessToken: String): Result<Unit>
+    suspend fun logout(): Result<Unit>
 
     suspend fun login(idToken: String): Result<AuthToken>
 
-    suspend fun withdraw(
-        accessToken: String,
-        reason: WithdrawReason,
-    ): Result<Unit>
+    suspend fun withdraw(reason: WithdrawReason): Result<Unit>
 }

@@ -1,4 +1,4 @@
-package com.team.prezel.core.network.auth
+package com.team.prezel.core.datastore.auth
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -8,17 +8,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.team.prezel.core.network.di.ApplicationScope
+import com.team.prezel.core.datastore.di.ApplicationScope
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.io.IOException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 internal class DataStoreAuthTokenStore @Inject constructor(

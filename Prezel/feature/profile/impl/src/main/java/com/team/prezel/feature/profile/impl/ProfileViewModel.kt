@@ -3,7 +3,7 @@ package com.team.prezel.feature.profile.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.AuthManager
-import com.team.prezel.core.domain.error.ApiHttpException
+import com.team.prezel.core.domain.error.AuthenticationRequiredException
 import com.team.prezel.core.domain.usecase.auth.LogoutUseCase
 import com.team.prezel.core.domain.usecase.auth.WithdrawUseCase
 import com.team.prezel.core.model.auth.WithdrawReason
@@ -90,9 +90,5 @@ class ProfileViewModel
             _uiEffect.emit(ProfileUiEffect.ShowMessage(failureMessage))
         }
 
-        private fun Throwable?.isAuthenticationRequired(): Boolean = (this as? ApiHttpException)?.code == AUTHENTICATION_REQUIRED_CODE
-
-        private companion object {
-            const val AUTHENTICATION_REQUIRED_CODE = "U001"
-        }
+        private fun Throwable?.isAuthenticationRequired(): Boolean = this is AuthenticationRequiredException
     }

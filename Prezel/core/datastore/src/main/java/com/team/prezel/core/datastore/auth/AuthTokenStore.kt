@@ -1,4 +1,4 @@
-package com.team.prezel.core.network.auth
+package com.team.prezel.core.datastore.auth
 
 /**
  * 인증 토큰의 현재 값을 동기 조회하고, 영속 저장소와의 동기화를 비동기로 처리하는 저장소 계약입니다.

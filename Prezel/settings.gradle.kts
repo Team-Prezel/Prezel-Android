@@ -41,6 +41,7 @@ includeAuto(
     ":app",
     "core:auth",
     ":core:data",
+    ":core:datastore",
     ":core:designsystem",
     ":core:domain",
     ":core:model",

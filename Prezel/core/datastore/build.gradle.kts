@@ -4,15 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.team.prezel.core.data"
+    namespace = "com.team.prezel.core.datastore"
     testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
-    implementation(projects.coreDatastore)
-    implementation(projects.coreDomain)
-    implementation(projects.coreModel)
-    implementation(projects.coreNetwork)
-
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.core)
 }

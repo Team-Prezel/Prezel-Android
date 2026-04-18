@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.auth
 
+import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.model.ApiErrorResponse

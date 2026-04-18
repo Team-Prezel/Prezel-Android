@@ -1,11 +1,13 @@
 package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.toResult
+import com.team.prezel.core.datastore.auth.AuthTokenStore
+import com.team.prezel.core.domain.error.AuthenticationRequiredException
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
-import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
+import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import javax.inject.Inject
 
@@ -20,25 +22,34 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 
-    override suspend fun logout(accessToken: String): Result<Unit> =
-        authRemoteDataSource.logout(accessToken = accessToken).toResult {
-            authTokenStore.clear()
+    override suspend fun logout(): Result<Unit> {
+        val accessToken = authTokenStore.getAccessToken() ?: return authenticationRequired()
+
+        return when (val response = authRemoteDataSource.logout(accessToken = accessToken)) {
+            is ApiResponse.Success -> Result.success(authTokenStore.clear())
+            is ApiResponse.Failure.HttpError -> response.toLogoutResult()
+            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
         }
+    }
 
     override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
-    override suspend fun withdraw(
-        accessToken: String,
-        reason: WithdrawReason,
-    ): Result<Unit> =
-        authRemoteDataSource
-            .withdraw(
-                accessToken = accessToken,
-                reasonCategory = reason.toCategory(),
-                reasonText = reason.toReasonText(),
-            ).toResult {
-                authTokenStore.clear()
-            }
+    override suspend fun withdraw(reason: WithdrawReason): Result<Unit> {
+        val accessToken = authTokenStore.getAccessToken() ?: return authenticationRequired()
+
+        return when (
+            val response =
+                authRemoteDataSource.withdraw(
+                    accessToken = accessToken,
+                    reasonCategory = reason.toCategory(),
+                    reasonText = reason.toReasonText(),
+                )
+        ) {
+            is ApiResponse.Success -> Result.success(authTokenStore.clear())
+            is ApiResponse.Failure.HttpError -> response.toLogoutResult()
+            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+        }
+    }
 
     private suspend fun saveTokens(response: LoginResponse): AuthToken =
         response
@@ -56,6 +67,17 @@ internal class AuthRepositoryImpl @Inject constructor(
             refreshToken = refreshToken,
         )
 
+    private suspend fun ApiResponse.Failure.HttpError.toLogoutResult(): Result<Unit> =
+        if (error?.code == AUTHENTICATION_REQUIRED_CODE) {
+            authTokenStore.clear()
+            authenticationRequired(message = error?.message)
+        } else {
+            Result.failure(throwable)
+        }
+
+    private fun authenticationRequired(message: String? = null): Result<Unit> =
+        Result.failure(AuthenticationRequiredException(message ?: "인증이 필요합니다."))
+
     private fun WithdrawReason.toCategory(): String =
         when (this) {
             WithdrawReason.NotUsedOften -> "NOT_USED_OFTEN"
@@ -71,4 +93,8 @@ internal class AuthRepositoryImpl @Inject constructor(
             is WithdrawReason.Other -> text
             else -> ""
         }
+
+    private companion object {
+        const val AUTHENTICATION_REQUIRED_CODE = "U001"
+    }
 }
