@@ -27,6 +27,7 @@ import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -70,6 +71,18 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("refresh")
+    fun provideRefreshHttpClient(json: Json): HttpClient =
+        HttpClient(OkHttp) {
+            configureBaseClient(json)
+
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+            }
+        }
+
+    @Provides
+    @Singleton
     fun provideKtorfit(httpClient: HttpClient): Ktorfit =
         Ktorfit
             .Builder()
@@ -80,7 +93,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("refresh")
+    fun provideRefreshKtorfit(
+        @Named("refresh") httpClient: HttpClient,
+    ): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .httpClient(httpClient)
+            .converterFactories(ApiResponseConverterFactory())
+            .build()
+
+    @Provides
+    @Singleton
     internal fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
+
+    @Provides
+    @Singleton
+    @Named("refresh")
+    internal fun provideRefreshAuthService(
+        @Named("refresh") ktorfit: Ktorfit,
+    ): AuthService = ktorfit.createAuthService()
 
     private fun HttpClientConfig<*>.configureBaseClient(json: Json) {
         expectSuccess = true

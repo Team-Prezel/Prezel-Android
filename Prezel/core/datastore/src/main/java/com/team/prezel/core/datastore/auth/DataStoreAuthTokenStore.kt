@@ -41,9 +41,11 @@ internal class DataStoreAuthTokenStore @Inject constructor(
 
     init {
         applicationScope.launch {
-            val preferences = readPreferences()
-            accessToken = preferences[KEY_ACCESS_TOKEN]
-            refreshToken = preferences[KEY_REFRESH_TOKEN]
+            mutex.withLock {
+                val preferences = readPreferences()
+                accessToken = preferences[KEY_ACCESS_TOKEN]
+                refreshToken = preferences[KEY_REFRESH_TOKEN]
+            }
         }
     }
 

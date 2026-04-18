@@ -80,9 +80,12 @@ class ApiResponseConverterFactory : Converter.Factory {
     }
 
     private suspend fun parseErrorResponse(exception: ResponseException): ApiErrorResponse? =
-        runCatching {
+        try {
             json.decodeFromString<ApiErrorResponse>(exception.response.bodyAsText())
-        }.getOrNull()
+        } catch (t: Throwable) {
+            t.rethrowIfCancellation()
+            null
+        }
 
     private fun Throwable.rethrowIfCancellation() {
         if (this is CancellationException) throw this

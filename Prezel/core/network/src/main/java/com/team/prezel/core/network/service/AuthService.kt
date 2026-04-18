@@ -7,7 +7,6 @@ import com.team.prezel.core.network.model.auth.ReissueTokenRequest
 import com.team.prezel.core.network.model.auth.WithdrawRequest
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
-import de.jensklingenberg.ktorfit.http.Header
 import de.jensklingenberg.ktorfit.http.POST
 
 internal interface AuthService {
@@ -17,9 +16,7 @@ internal interface AuthService {
     ): ApiResponse<LoginResponse>
 
     @POST("auth/logout")
-    suspend fun logout(
-        @Header("Authorization") authorization: String,
-    ): ApiResponse<String>
+    suspend fun logout(): ApiResponse<String>
 
     @POST("auth/login")
     suspend fun login(
@@ -28,7 +25,6 @@ internal interface AuthService {
 
     @DELETE("auth/withdraw")
     suspend fun withdraw(
-        @Header("Authorization") authorization: String,
         @Body request: WithdrawRequest,
     ): ApiResponse<String>
 }

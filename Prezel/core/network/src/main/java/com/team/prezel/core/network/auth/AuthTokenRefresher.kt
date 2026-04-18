@@ -2,18 +2,20 @@ package com.team.prezel.core.network.auth
 
 import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.BuildConfig
-import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.ApiResponse
+import com.team.prezel.core.network.model.auth.ReissueTokenRequest
+import com.team.prezel.core.network.service.AuthService
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class AuthTokenRefresher @Inject constructor(
-    private val authRemoteDataSource: AuthRemoteDataSource,
+    @Named("refresh") private val authService: AuthService,
     private val authTokenStore: AuthTokenStore,
 ) {
     private val mutex = Mutex()
@@ -22,7 +24,12 @@ class AuthTokenRefresher @Inject constructor(
         mutex.withLock {
             val refreshToken = authTokenStore.getRefreshToken() ?: return@withLock null
 
-            when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
+            when (
+                val response =
+                    authService.reissueToken(
+                        request = ReissueTokenRequest(refreshToken = refreshToken),
+                    )
+            ) {
                 is ApiResponse.Success -> {
                     authTokenStore.saveTokens(
                         accessToken = response.data.accessToken,

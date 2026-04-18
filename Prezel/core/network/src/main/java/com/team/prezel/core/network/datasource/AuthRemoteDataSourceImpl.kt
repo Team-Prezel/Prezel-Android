@@ -19,10 +19,7 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
                 request = ReissueTokenRequest(refreshToken = refreshToken),
             ).also(::logTokenResponse)
 
-    override suspend fun logout(accessToken: String): ApiResponse<String> =
-        authService.logout(
-            authorization = "Bearer $accessToken",
-        )
+    override suspend fun logout(): ApiResponse<String> = authService.logout()
 
     override suspend fun login(idToken: String): ApiResponse<LoginResponse> =
         LoginRequest(idToken = idToken)
@@ -31,12 +28,10 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
             }.also(::logTokenResponse)
 
     override suspend fun withdraw(
-        accessToken: String,
         reasonCategory: String,
         reasonText: String,
     ): ApiResponse<String> =
         authService.withdraw(
-            authorization = "Bearer $accessToken",
             request = WithdrawRequest(
                 reasonCategory = reasonCategory,
                 reasonText = reasonText,

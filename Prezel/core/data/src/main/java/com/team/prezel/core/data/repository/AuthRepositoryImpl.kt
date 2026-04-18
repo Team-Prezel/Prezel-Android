@@ -23,9 +23,9 @@ internal class AuthRepositoryImpl @Inject constructor(
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 
     override suspend fun logout(): AuthActionResult {
-        val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
+        if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
 
-        return when (val response = authRemoteDataSource.logout(accessToken = accessToken)) {
+        return when (val response = authRemoteDataSource.logout()) {
             is ApiResponse.Success -> {
                 authTokenStore.clear()
                 AuthActionResult.Success
@@ -38,12 +38,11 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
     override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {
-        val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
+        if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
 
         return when (
             val response =
                 authRemoteDataSource.withdraw(
-                    accessToken = accessToken,
                     reasonCategory = reason.toCategory(),
                     reasonText = reason.toReasonText(),
                 )
@@ -90,10 +89,10 @@ internal class AuthRepositoryImpl @Inject constructor(
         when (this) {
             WithdrawReason.NotUsedOften -> "NOT_USED_OFTEN"
             WithdrawReason.NoLongerNeeded -> "NO_LONGER_NEEDED"
-            WithdrawReason.TooDifficultOrComplex -> "TOO_DIFFICULT_OR_COMPLEX"
-            WithdrawReason.AnalysisResultInaccurate -> "ANALYSIS_RESULT_INACCURATE"
-            WithdrawReason.TooManyErrors -> "TOO_MANY_ERRORS"
-            is WithdrawReason.Other -> "OTHER"
+            WithdrawReason.TooDifficultOrComplex -> "TOO_COMPLEX"
+            WithdrawReason.AnalysisResultInaccurate -> "INACCURATE_ANALYSIS"
+            WithdrawReason.TooManyErrors -> "MANY_ERRORS"
+            is WithdrawReason.Other -> "ETC"
         }
 
     private fun WithdrawReason.toReasonText(): String =
