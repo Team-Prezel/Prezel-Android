@@ -44,7 +44,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(
+    internal fun provideHttpClient(
         json: Json,
         authTokenStore: AuthTokenStore,
         tokenRefreshAuthenticator: TokenRefreshAuthenticator,

@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TokenRefreshAuthenticator @Inject constructor(
+internal class TokenRefreshAuthenticator @Inject constructor(
     private val authTokenRefresher: AuthTokenRefresher,
 ) : Authenticator {
     override fun authenticate(

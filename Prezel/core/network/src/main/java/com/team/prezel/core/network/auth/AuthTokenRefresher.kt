@@ -14,8 +14,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-class AuthTokenRefresher @Inject constructor(
-    @Named("refresh") private val authService: AuthService,
+internal class AuthTokenRefresher @Inject constructor(
+    @param:Named("refresh") private val authService: AuthService,
     private val authTokenStore: AuthTokenStore,
 ) {
     private val mutex = Mutex()
