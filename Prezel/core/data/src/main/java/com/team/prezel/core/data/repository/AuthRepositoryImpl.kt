@@ -23,7 +23,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 
     override suspend fun logout(): Result<Unit> {
-        val accessToken = authTokenStore.getAccessToken() ?: return authenticationRequired()
+        val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
 
         return when (val response = authRemoteDataSource.logout(accessToken = accessToken)) {
             is ApiResponse.Success -> Result.success(authTokenStore.clear())
@@ -32,10 +32,11 @@ internal class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
+    override suspend fun login(idToken: String): Result<AuthToken> =
+        authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
     override suspend fun withdraw(reason: WithdrawReason): Result<Unit> {
-        val accessToken = authTokenStore.getAccessToken() ?: return authenticationRequired()
+        val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
 
         return when (
             val response =
@@ -77,6 +78,11 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     private fun authenticationRequired(message: String? = null): Result<Unit> =
         Result.failure(AuthenticationRequiredException(message ?: "인증이 필요합니다."))
+
+    private suspend fun clearTokensAndAuthenticationRequired(): Result<Unit> {
+        authTokenStore.clear()
+        return authenticationRequired()
+    }
 
     private fun WithdrawReason.toCategory(): String =
         when (this) {

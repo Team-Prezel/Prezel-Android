@@ -16,7 +16,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -40,9 +40,11 @@ internal class DataStoreAuthTokenStore @Inject constructor(
     private val mutex = Mutex()
 
     init {
-        val preferences = runBlocking { readPreferences() }
-        accessToken = preferences[KEY_ACCESS_TOKEN]
-        refreshToken = preferences[KEY_REFRESH_TOKEN]
+        applicationScope.launch {
+            val preferences = readPreferences()
+            accessToken = preferences[KEY_ACCESS_TOKEN]
+            refreshToken = preferences[KEY_REFRESH_TOKEN]
+        }
     }
 
     override fun getAccessToken(): String? = accessToken

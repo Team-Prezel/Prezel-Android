@@ -38,14 +38,17 @@ class ProfileViewModel
             if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
-                val result = logoutUseCase().fold(onSuccess = { authManager.logout() }, onFailure = { Result.failure(it) })
-                _uiState.update { it.copy(isLoading = false) }
-                handleAuthActionResult(
-                    result = result,
-                    failureLog = "로그아웃에 실패했습니다.",
-                    failureMessage = ProfileUiMessage.LOGOUT_FAILED,
-                )
+                try {
+                    _uiState.update { it.copy(isLoading = true) }
+                    val result = logoutUseCase().fold(onSuccess = { authManager.logout() }, onFailure = { Result.failure(it) })
+                    handleAuthActionResult(
+                        result = result,
+                        failureLog = "로그아웃에 실패했습니다.",
+                        failureMessage = ProfileUiMessage.LOGOUT_FAILED,
+                    )
+                } finally {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         }
 
@@ -53,17 +56,20 @@ class ProfileViewModel
             if (_uiState.value.isLoading) return
 
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
-                val result =
-                    withdrawUseCase(
-                        reason = WithdrawReason.Other("임시 테스트 탈퇴"),
-                    ).fold(onSuccess = { authManager.logout() }, onFailure = { Result.failure(it) })
-                _uiState.update { it.copy(isLoading = false) }
-                handleAuthActionResult(
-                    result = result,
-                    failureLog = "회원탈퇴에 실패했습니다.",
-                    failureMessage = ProfileUiMessage.WITHDRAW_FAILED,
-                )
+                try {
+                    _uiState.update { it.copy(isLoading = true) }
+                    val result =
+                        withdrawUseCase(
+                            reason = WithdrawReason.Other("임시 테스트 탈퇴"),
+                        ).fold(onSuccess = { authManager.logout() }, onFailure = { Result.failure(it) })
+                    handleAuthActionResult(
+                        result = result,
+                        failureLog = "회원탈퇴에 실패했습니다.",
+                        failureMessage = ProfileUiMessage.WITHDRAW_FAILED,
+                    )
+                } finally {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         }
 
