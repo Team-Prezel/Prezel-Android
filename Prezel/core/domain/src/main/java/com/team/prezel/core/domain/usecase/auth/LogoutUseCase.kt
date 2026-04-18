@@ -7,13 +7,12 @@ import javax.inject.Inject
  * 현재 로그인 세션의 로그아웃을 요청하는 UseCase.
  *
  * ### 동작 흐름
- * 1. 저장된 현재 액세스 토큰을 조회합니다.
- * 2. [com.team.prezel.core.domain.repository.auth.AuthRepository.logout]을 호출하여 서버에 로그아웃을 요청합니다.
- * 3. 요청 결과에 따라 성공 여부를 [Result]로 반환합니다.
- *
+ * 1. [com.team.prezel.core.domain.repository.auth.AuthRepository.logout]을 호출합니다.
+ * 2. repository가 저장된 토큰 조회와 서버 로그아웃 요청을 처리합니다.
+ * 3. 결과를 [AuthActionResult]로 반환합니다.
  */
 class LogoutUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    suspend operator fun invoke(): Result<Unit> = authRepository.logout()
+    suspend operator fun invoke(): AuthActionResult = authRepository.logout()
 }

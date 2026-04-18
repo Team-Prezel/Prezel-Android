@@ -2,8 +2,8 @@ package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.toResult
 import com.team.prezel.core.datastore.auth.AuthTokenStore
-import com.team.prezel.core.domain.error.AuthenticationRequiredException
 import com.team.prezel.core.domain.repository.auth.AuthRepository
+import com.team.prezel.core.domain.usecase.auth.AuthActionResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
@@ -22,20 +22,22 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 
-    override suspend fun logout(): Result<Unit> {
+    override suspend fun logout(): AuthActionResult {
         val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
 
         return when (val response = authRemoteDataSource.logout(accessToken = accessToken)) {
-            is ApiResponse.Success -> Result.success(authTokenStore.clear())
-            is ApiResponse.Failure.HttpError -> response.toLogoutResult()
-            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+            is ApiResponse.Success -> {
+                authTokenStore.clear()
+                AuthActionResult.Success
+            }
+            is ApiResponse.Failure.HttpError -> response.toAuthActionResult()
+            is ApiResponse.Failure.NetworkError -> AuthActionResult.Failure(response.throwable)
         }
     }
 
-    override suspend fun login(idToken: String): Result<AuthToken> =
-        authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
+    override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
 
-    override suspend fun withdraw(reason: WithdrawReason): Result<Unit> {
+    override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {
         val accessToken = authTokenStore.getAccessToken() ?: return clearTokensAndAuthenticationRequired()
 
         return when (
@@ -46,9 +48,12 @@ internal class AuthRepositoryImpl @Inject constructor(
                     reasonText = reason.toReasonText(),
                 )
         ) {
-            is ApiResponse.Success -> Result.success(authTokenStore.clear())
-            is ApiResponse.Failure.HttpError -> response.toLogoutResult()
-            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+            is ApiResponse.Success -> {
+                authTokenStore.clear()
+                AuthActionResult.Success
+            }
+            is ApiResponse.Failure.HttpError -> response.toAuthActionResult()
+            is ApiResponse.Failure.NetworkError -> AuthActionResult.Failure(response.throwable)
         }
     }
 
@@ -68,20 +73,17 @@ internal class AuthRepositoryImpl @Inject constructor(
             refreshToken = refreshToken,
         )
 
-    private suspend fun ApiResponse.Failure.HttpError.toLogoutResult(): Result<Unit> =
+    private suspend fun ApiResponse.Failure.HttpError.toAuthActionResult(): AuthActionResult =
         if (error?.code == AUTHENTICATION_REQUIRED_CODE) {
             authTokenStore.clear()
-            authenticationRequired(message = error?.message)
+            AuthActionResult.AuthenticationRequired
         } else {
-            Result.failure(throwable)
+            AuthActionResult.Failure(throwable)
         }
 
-    private fun authenticationRequired(message: String? = null): Result<Unit> =
-        Result.failure(AuthenticationRequiredException(message ?: "인증이 필요합니다."))
-
-    private suspend fun clearTokensAndAuthenticationRequired(): Result<Unit> {
+    private suspend fun clearTokensAndAuthenticationRequired(): AuthActionResult {
         authTokenStore.clear()
-        return authenticationRequired()
+        return AuthActionResult.AuthenticationRequired
     }
 
     private fun WithdrawReason.toCategory(): String =

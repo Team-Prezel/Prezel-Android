@@ -1,8 +1,8 @@
 package com.team.prezel.core.network.di
 
+import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
-import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.auth.AuthPathPolicy
 import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
 import com.team.prezel.core.network.service.AuthService
