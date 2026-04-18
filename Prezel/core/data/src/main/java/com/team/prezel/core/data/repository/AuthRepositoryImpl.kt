@@ -6,6 +6,7 @@ import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
+import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import javax.inject.Inject
 
@@ -25,7 +26,12 @@ internal class AuthRepositoryImpl @Inject constructor(
             authTokenStore.clear()
         }
 
-    override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
+    override suspend fun login(idToken: String): Result<AuthToken> =
+        when (val response = authRemoteDataSource.login(idToken = idToken)) {
+            is ApiResponse.Success -> Result.success(saveTokens(response))
+            is ApiResponse.Failure.HttpError -> Result.failure(response.throwable)
+            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+        }
 
     override suspend fun withdraw(
         accessToken: String,
@@ -40,6 +46,16 @@ internal class AuthRepositoryImpl @Inject constructor(
                 authTokenStore.clear()
             }
 
+    private suspend fun saveTokens(response: ApiResponse.Success<LoginResponse>): AuthToken =
+        response
+            .toAuthToken()
+            .also { token ->
+                authTokenStore.saveTokens(
+                    accessToken = token.accessToken,
+                    refreshToken = token.refreshToken,
+                )
+            }
+
     private suspend fun saveTokens(response: LoginResponse): AuthToken =
         response
             .toAuthToken()
@@ -49,6 +65,12 @@ internal class AuthRepositoryImpl @Inject constructor(
                     refreshToken = token.refreshToken,
                 )
             }
+
+    private fun ApiResponse.Success<LoginResponse>.toAuthToken(): AuthToken =
+        AuthToken(
+            accessToken = data.accessToken,
+            refreshToken = data.refreshToken,
+        )
 
     private fun LoginResponse.toAuthToken(): AuthToken =
         AuthToken(

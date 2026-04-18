@@ -36,7 +36,9 @@ class ApiResponseConverterFactory : Converter.Factory {
     ): ApiResponse<Any> =
         try {
             val body = response.body<Any>(bodyTypeInfo)
-            ApiResponse.Success(body)
+            ApiResponse.Success(
+                data = body,
+            )
         } catch (t: Throwable) {
             t.rethrowIfCancellation()
             Timber.e(t, "Response parsing failed")

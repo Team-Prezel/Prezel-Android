@@ -22,6 +22,9 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
         with(LocalSharedTransitionScope.current) {
             LoginScreen(
                 authManager = authManager,
+                navigateToHome = {
+                    navigator.replaceRoot(HomeNavKey)
+                },
                 navigateToTerms = {
                     navigator.navigate(LoginTermsNavKey)
                 },

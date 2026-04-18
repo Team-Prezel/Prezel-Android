@@ -55,6 +55,7 @@ private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
     authManager: AuthManager,
+    navigateToHome: () -> Unit,
     navigateToTerms: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
@@ -77,6 +78,8 @@ internal fun SharedTransitionScope.LoginScreen(
                         )
                     }
                 }
+
+                LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 LoginUiEffect.NavigateToTerms -> navigateToTerms()
 
