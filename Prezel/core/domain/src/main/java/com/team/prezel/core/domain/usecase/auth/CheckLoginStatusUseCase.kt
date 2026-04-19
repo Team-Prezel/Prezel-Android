@@ -17,6 +17,8 @@ class CheckLoginStatusUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(): Boolean {
+        authRepository.awaitTokenStoreInitialized()
+
         val accessToken = authRepository.getAccessToken()
         if (!accessToken.isNullOrBlank()) return true
 

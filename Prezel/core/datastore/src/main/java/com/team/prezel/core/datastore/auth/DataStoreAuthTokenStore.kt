@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Job
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,8 +39,7 @@ internal class DataStoreAuthTokenStore @Inject constructor(
     private var refreshToken: String? = null
 
     private val mutex = Mutex()
-
-    init {
+    private val initializationJob: Job =
         applicationScope.launch {
             mutex.withLock {
                 val preferences = readPreferences()
@@ -47,16 +47,20 @@ internal class DataStoreAuthTokenStore @Inject constructor(
                 refreshToken = preferences[KEY_REFRESH_TOKEN]
             }
         }
-    }
 
     override fun getAccessToken(): String? = accessToken
 
     override fun getRefreshToken(): String? = refreshToken
 
+    override suspend fun awaitInitialized() {
+        initializationJob.join()
+    }
+
     override suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,
     ) {
+        awaitInitialized()
         mutex.withLock {
             dataStore.edit { preferences ->
                 preferences[KEY_ACCESS_TOKEN] = accessToken
@@ -68,6 +72,7 @@ internal class DataStoreAuthTokenStore @Inject constructor(
     }
 
     override suspend fun clear() {
+        awaitInitialized()
         mutex.withLock {
             dataStore.edit { preferences ->
                 preferences.remove(KEY_ACCESS_TOKEN)

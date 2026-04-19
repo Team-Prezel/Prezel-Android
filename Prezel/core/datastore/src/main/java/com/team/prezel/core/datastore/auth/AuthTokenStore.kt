@@ -18,6 +18,8 @@ interface AuthTokenStore {
 
     fun getRefreshToken(): String?
 
+    suspend fun awaitInitialized()
+
     suspend fun saveTokens(
         accessToken: String,
         refreshToken: String,

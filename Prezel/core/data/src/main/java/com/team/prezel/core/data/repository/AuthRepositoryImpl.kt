@@ -19,6 +19,10 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     override fun getRefreshToken(): String? = authTokenStore.getRefreshToken()
 
+    override suspend fun awaitTokenStoreInitialized() {
+        authTokenStore.awaitInitialized()
+    }
+
     override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
         authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
 

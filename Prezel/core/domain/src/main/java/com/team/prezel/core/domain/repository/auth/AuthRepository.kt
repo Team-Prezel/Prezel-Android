@@ -9,6 +9,8 @@ interface AuthRepository {
 
     fun getRefreshToken(): String?
 
+    suspend fun awaitTokenStoreInitialized()
+
     suspend fun reissueToken(refreshToken: String): Result<AuthToken>
 
     suspend fun logout(): AuthActionResult
