@@ -1,6 +1,7 @@
 package com.team.prezel.feature.splash.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.domain.result.auth.LoginStatusResult
 import com.team.prezel.core.domain.usecase.auth.CheckLoginStatusUseCase
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
@@ -27,10 +28,10 @@ internal class SplashViewModel @Inject constructor(
 
         viewModelScope
             .launch {
-                if (checkLoginStatusUseCase()) {
-                    sendEffect(SplashUiEffect.NavigateToHome)
-                } else {
-                    sendEffect(SplashUiEffect.NavigateToLogin)
+                when (checkLoginStatusUseCase()) {
+                    LoginStatusResult.Authenticated -> sendEffect(SplashUiEffect.NavigateToHome)
+                    LoginStatusResult.Unauthenticated -> sendEffect(SplashUiEffect.NavigateToLogin)
+                    is LoginStatusResult.RetryableFailure -> sendEffect(SplashUiEffect.ShowRetryableFailureMessage)
                 }
             }.invokeOnCompletion { updateState { copy(isLoading = false) } }
     }

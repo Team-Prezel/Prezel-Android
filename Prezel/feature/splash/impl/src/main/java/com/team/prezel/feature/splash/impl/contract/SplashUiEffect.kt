@@ -6,4 +6,6 @@ sealed interface SplashUiEffect : UiEffect {
     data object NavigateToHome : SplashUiEffect
 
     data object NavigateToLogin : SplashUiEffect
+
+    data object ShowRetryableFailureMessage : SplashUiEffect
 }
