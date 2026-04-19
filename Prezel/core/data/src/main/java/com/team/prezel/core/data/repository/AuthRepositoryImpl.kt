@@ -2,12 +2,12 @@ package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.toResult
 import com.team.prezel.core.datastore.auth.AuthTokenStore
+import com.team.prezel.core.domain.error.ApiHttpException
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
-import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import javax.inject.Inject
@@ -28,13 +28,18 @@ internal class AuthRepositoryImpl @Inject constructor(
         when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
             is ApiResponse.Success -> Result.success(saveTokens(response.data))
             is ApiResponse.Failure.HttpError -> {
-                if (response.error.isRefreshUnrecoverable()) {
-                    authTokenStore.clear()
-                }
-                response.toResult { error("Unreachable") }
+                authTokenStore.clear()
+                Result.failure(
+                    ApiHttpException(
+                        status = response.error?.status,
+                        code = response.error?.code,
+                        message = response.error?.message,
+                        cause = response.throwable,
+                    ),
+                )
             }
 
-            is ApiResponse.Failure.NetworkError -> response.toResult { error("Unreachable") }
+            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
         }
 
     override suspend fun logout(): AuthActionResult {
@@ -97,9 +102,6 @@ internal class AuthRepositoryImpl @Inject constructor(
             AuthActionResult.Failure(throwable)
         }
 
-    private fun ApiErrorResponse?.isRefreshUnrecoverable(): Boolean =
-        this?.code == AUTHENTICATION_REQUIRED_CODE || this?.code == TOKEN_INVALID_CODE || this?.code == USER_NOT_FOUND_CODE
-
     private suspend fun clearTokensAndAuthenticationRequired(): AuthActionResult {
         authTokenStore.clear()
         return AuthActionResult.AuthenticationRequired
@@ -123,7 +125,5 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     private companion object {
         const val AUTHENTICATION_REQUIRED_CODE = "U001"
-        const val TOKEN_INVALID_CODE = "T001"
-        const val USER_NOT_FOUND_CODE = "U003"
     }
 }
