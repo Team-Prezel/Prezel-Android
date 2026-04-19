@@ -7,6 +7,7 @@ import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
+import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import javax.inject.Inject
@@ -24,7 +25,17 @@ internal class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
-        authRemoteDataSource.reissueToken(refreshToken = refreshToken).toResult(::saveTokens)
+        when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
+            is ApiResponse.Success -> Result.success(saveTokens(response.data))
+            is ApiResponse.Failure.HttpError -> {
+                if (response.error.isRefreshUnrecoverable()) {
+                    authTokenStore.clear()
+                }
+                response.toResult { error("Unreachable") }
+            }
+
+            is ApiResponse.Failure.NetworkError -> response.toResult { error("Unreachable") }
+        }
 
     override suspend fun logout(): AuthActionResult {
         if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
@@ -34,6 +45,7 @@ internal class AuthRepositoryImpl @Inject constructor(
                 authTokenStore.clear()
                 AuthActionResult.Success
             }
+
             is ApiResponse.Failure.HttpError -> response.toAuthActionResult()
             is ApiResponse.Failure.NetworkError -> AuthActionResult.Failure(response.throwable)
         }
@@ -55,6 +67,7 @@ internal class AuthRepositoryImpl @Inject constructor(
                 authTokenStore.clear()
                 AuthActionResult.Success
             }
+
             is ApiResponse.Failure.HttpError -> response.toAuthActionResult()
             is ApiResponse.Failure.NetworkError -> AuthActionResult.Failure(response.throwable)
         }
@@ -84,6 +97,9 @@ internal class AuthRepositoryImpl @Inject constructor(
             AuthActionResult.Failure(throwable)
         }
 
+    private fun ApiErrorResponse?.isRefreshUnrecoverable(): Boolean =
+        this?.code == AUTHENTICATION_REQUIRED_CODE || this?.code == TOKEN_INVALID_CODE || this?.code == USER_NOT_FOUND_CODE
+
     private suspend fun clearTokensAndAuthenticationRequired(): AuthActionResult {
         authTokenStore.clear()
         return AuthActionResult.AuthenticationRequired
@@ -107,5 +123,7 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     private companion object {
         const val AUTHENTICATION_REQUIRED_CODE = "U001"
+        const val TOKEN_INVALID_CODE = "T001"
+        const val USER_NOT_FOUND_CODE = "U003"
     }
 }

@@ -90,8 +90,8 @@ class ProfileViewModel
 
                 AuthActionResult.AuthenticationRequired -> {
                     authManager.clearCurrentProvider()
-                    _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
                     _uiEffect.emit(ProfileUiEffect.ShowMessage(ProfileUiMessage.AUTHENTICATION_EXPIRED))
+                    _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
                 }
 
                 is AuthActionResult.Failure -> {
