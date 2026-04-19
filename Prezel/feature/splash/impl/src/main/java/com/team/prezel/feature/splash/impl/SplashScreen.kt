@@ -41,7 +41,9 @@ internal fun SharedTransitionScope.SplashScreen(
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(SplashUiIntent.CheckLoginStatus)
+    }
 
+    LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 SplashUiEffect.NavigateToHome -> navigateToHome()

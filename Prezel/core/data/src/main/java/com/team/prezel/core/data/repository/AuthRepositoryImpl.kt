@@ -2,9 +2,9 @@ package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.toResult
 import com.team.prezel.core.datastore.auth.AuthTokenStore
-import com.team.prezel.core.domain.error.ApiHttpException
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.result.auth.AuthActionResult
+import com.team.prezel.core.domain.result.auth.LoginStatusResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
@@ -24,22 +24,18 @@ internal class AuthRepositoryImpl @Inject constructor(
         authTokenStore.awaitInitialized()
     }
 
-    override suspend fun reissueToken(refreshToken: String): Result<AuthToken> =
+    override suspend fun reissueToken(refreshToken: String): LoginStatusResult =
         when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
-            is ApiResponse.Success -> Result.success(saveTokens(response.data))
+            is ApiResponse.Success -> {
+                saveTokens(response.data)
+                LoginStatusResult.Authenticated
+            }
             is ApiResponse.Failure.HttpError -> {
                 authTokenStore.clear()
-                Result.failure(
-                    ApiHttpException(
-                        status = response.error?.status,
-                        code = response.error?.code,
-                        message = response.error?.message,
-                        cause = response.throwable,
-                    ),
-                )
+                LoginStatusResult.Unauthenticated
             }
 
-            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+            is ApiResponse.Failure.NetworkError -> LoginStatusResult.RetryableFailure(response.throwable)
         }
 
     override suspend fun logout(): AuthActionResult {

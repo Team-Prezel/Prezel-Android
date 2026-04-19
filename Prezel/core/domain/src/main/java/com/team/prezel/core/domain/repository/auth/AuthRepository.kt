@@ -1,6 +1,7 @@
 package com.team.prezel.core.domain.repository.auth
 
 import com.team.prezel.core.domain.result.auth.AuthActionResult
+import com.team.prezel.core.domain.result.auth.LoginStatusResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
 
@@ -11,7 +12,7 @@ interface AuthRepository {
 
     suspend fun awaitTokenStoreInitialized()
 
-    suspend fun reissueToken(refreshToken: String): Result<AuthToken>
+    suspend fun reissueToken(refreshToken: String): LoginStatusResult
 
     suspend fun logout(): AuthActionResult
 
