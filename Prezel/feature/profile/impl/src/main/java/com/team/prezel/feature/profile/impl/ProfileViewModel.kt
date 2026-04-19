@@ -83,7 +83,7 @@ class ProfileViewModel
                     authManager
                         .logout()
                         .onFailure { throwable ->
-                            Timber.tag("ProfileTest").w(throwable, "로컬 인증 세션 정리에 실패했습니다.")
+                            Timber.w(throwable, "로컬 인증 세션 정리에 실패했습니다.")
                         }
                     _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
                 }
@@ -95,7 +95,7 @@ class ProfileViewModel
                 }
 
                 is AuthActionResult.Failure -> {
-                    Timber.tag("ProfileTest").e(result.throwable, failureLog)
+                    Timber.e(result.throwable, failureLog)
                     _uiEffect.emit(ProfileUiEffect.ShowMessage(failureMessage))
                 }
             }

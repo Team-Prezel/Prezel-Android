@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
@@ -23,11 +22,11 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.ui.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
+import com.team.prezel.feature.profile.impl.contract.ProfileUiState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
-import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(
+internal fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -35,27 +34,32 @@ fun ProfileScreen(
     val navigator = LocalNavigator.current
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToLogin -> navigator.replaceRoot(LoginNavKey)
-                is ProfileUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        ProfileUiMessage.AUTHENTICATION_EXPIRED -> R.string.feature_profile_impl_authentication_expired
-                        ProfileUiMessage.LOGOUT_FAILED -> R.string.feature_profile_impl_logout_failed
-                        ProfileUiMessage.WITHDRAW_FAILED -> R.string.feature_profile_impl_withdraw_failed
-                    }
-
-                    coroutineScope.launch {
-                        snackbarHostState.showPrezelSnackbar(resources.getString(resId))
-                    }
-                }
+                is ProfileUiEffect.ShowMessage ->
+                    snackbarHostState.showPrezelSnackbar(resources.getString(effect.message.toTextRes()))
             }
         }
     }
 
+    ProfileScreenContent(
+        uiState = uiState,
+        onLogout = viewModel::logout,
+        onWithdraw = viewModel::withdraw,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ProfileScreenContent(
+    uiState: ProfileUiState,
+    onLogout: () -> Unit,
+    onWithdraw: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -66,7 +70,7 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Button(
-                onClick = viewModel::logout,
+                onClick = onLogout,
                 enabled = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -74,7 +78,7 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.height(12.dp))
             Button(
-                onClick = viewModel::withdraw,
+                onClick = onWithdraw,
                 enabled = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -83,3 +87,10 @@ fun ProfileScreen(
         }
     }
 }
+
+private fun ProfileUiMessage.toTextRes(): Int =
+    when (this) {
+        ProfileUiMessage.AUTHENTICATION_EXPIRED -> R.string.feature_profile_impl_authentication_expired
+        ProfileUiMessage.LOGOUT_FAILED -> R.string.feature_profile_impl_logout_failed
+        ProfileUiMessage.WITHDRAW_FAILED -> R.string.feature_profile_impl_withdraw_failed
+    }

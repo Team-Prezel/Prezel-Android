@@ -30,9 +30,14 @@ internal class AuthRepositoryImpl @Inject constructor(
                 saveTokens(response.data)
                 LoginStatusResult.Authenticated
             }
+
             is ApiResponse.Failure.HttpError -> {
-                authTokenStore.clear()
-                LoginStatusResult.Unauthenticated
+                if (response.error?.code == AUTHENTICATION_REQUIRED_CODE) {
+                    authTokenStore.clear()
+                    LoginStatusResult.Unauthenticated
+                } else {
+                    LoginStatusResult.RetryableFailure(response.throwable)
+                }
             }
 
             is ApiResponse.Failure.NetworkError -> LoginStatusResult.RetryableFailure(response.throwable)
