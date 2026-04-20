@@ -48,7 +48,7 @@ internal fun ProfileScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
-        viewModel.onIntent(ProfileUiIntent.OnProfileImageChanged(profileUrl = uri.toString()))
+        viewModel.onIntent(ProfileUiIntent.UpdateProfileImage(profileUrl = uri.toString()))
     }
 
     LaunchedEffect(Unit) {
@@ -72,7 +72,7 @@ internal fun ProfileScreen(
     ProfileScreen(
         uiState = uiState,
         isNewProfile = isNewProfile,
-        onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.OnNicknameChanged(nickname)) },
+        onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.UpdateNickname(nickname)) },
         onClickProfileImage = {
             if (uiState.shouldLaunchPhotoPicker) {
                 photoPickerLauncher.launch(
@@ -81,9 +81,9 @@ internal fun ProfileScreen(
                 return@ProfileScreen
             }
 
-            viewModel.onIntent(ProfileUiIntent.OnProfileImageChanged(profileUrl = ""))
+            viewModel.onIntent(ProfileUiIntent.UpdateProfileImage(profileUrl = ""))
         },
-        onClickSubmit = { viewModel.onIntent(ProfileUiIntent.OnClickSubmit) },
+        onClickSubmit = { viewModel.onIntent(ProfileUiIntent.SubmitProfile) },
         onBack = onBack,
         modifier = modifier,
     )

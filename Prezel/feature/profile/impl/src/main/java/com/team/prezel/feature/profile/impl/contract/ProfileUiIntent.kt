@@ -5,13 +5,13 @@ import com.team.prezel.core.ui.UiIntent
 internal sealed interface ProfileUiIntent : UiIntent {
     data object FetchData : ProfileUiIntent
 
-    data class OnNicknameChanged(
+    data class UpdateNickname(
         val nickname: String,
     ) : ProfileUiIntent
 
-    data class OnProfileImageChanged(
+    data class UpdateProfileImage(
         val profileUrl: String,
     ) : ProfileUiIntent
 
-    data object OnClickSubmit : ProfileUiIntent
+    data object SubmitProfile : ProfileUiIntent
 }

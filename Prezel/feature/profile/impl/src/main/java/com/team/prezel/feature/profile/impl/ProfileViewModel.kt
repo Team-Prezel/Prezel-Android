@@ -44,9 +44,9 @@ internal class ProfileViewModel @Inject constructor(
     override fun onIntent(intent: ProfileUiIntent) {
         when (intent) {
             ProfileUiIntent.FetchData -> fetchUserInfo()
-            is ProfileUiIntent.OnNicknameChanged -> handleNicknameChanged(intent.nickname)
-            is ProfileUiIntent.OnProfileImageChanged -> handleProfileImageChanged(intent.profileUrl)
-            ProfileUiIntent.OnClickSubmit -> submitProfile()
+            is ProfileUiIntent.UpdateNickname -> handleNicknameChanged(intent.nickname)
+            is ProfileUiIntent.UpdateProfileImage -> handleProfileImageChanged(intent.profileUrl)
+            ProfileUiIntent.SubmitProfile -> submitProfile()
         }
     }
 
