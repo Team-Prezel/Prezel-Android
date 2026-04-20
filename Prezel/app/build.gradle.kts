@@ -44,7 +44,8 @@ dependencies {
     implementation(projects.featureHomeImpl)
     implementation(projects.featureHistoryApi)
     implementation(projects.featureHistoryImpl)
-    implementation(projects.featureProfileApi)
+    implementation(projects.featureMyApi)
+    implementation(projects.featureMyImpl)
     implementation(projects.featureProfileImpl)
 
     implementation(libs.androidx.core.ktx)

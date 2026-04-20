@@ -7,5 +7,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreDomain)
+    implementation(projects.coreModel)
+
     implementation(projects.featureProfileApi)
+    implementation(projects.featureHomeApi)
 }

@@ -212,7 +212,7 @@ internal fun rememberPrezelTextFieldInteraction(
     value: String,
     enabled: Boolean,
     focused: Boolean,
-    idleMillis: Long = 800L,
+    idleMillis: Long = 500L,
 ): PrezelTextFieldInteraction {
     var isIdle by remember { mutableStateOf(false) }
     val latestValue by rememberUpdatedState(value)
