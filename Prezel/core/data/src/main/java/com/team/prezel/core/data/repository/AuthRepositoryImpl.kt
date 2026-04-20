@@ -16,16 +16,16 @@ internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authTokenStore: AuthTokenStore,
 ) : AuthRepository {
-    override fun getAccessToken(): String? = authTokenStore.getAccessToken()
-
-    override fun getRefreshToken(): String? = authTokenStore.getRefreshToken()
-
-    override suspend fun awaitTokenStoreInitialized() {
+    override suspend fun checkLoginStatus(): LoginStatusResult {
         authTokenStore.awaitInitialized()
-    }
 
-    override suspend fun reissueToken(refreshToken: String): LoginStatusResult =
-        when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
+        val accessToken = authTokenStore.getAccessToken()
+        if (!accessToken.isNullOrBlank()) return LoginStatusResult.Authenticated
+
+        val refreshToken = authTokenStore.getRefreshToken()
+        if (refreshToken.isNullOrBlank()) return LoginStatusResult.Unauthenticated
+
+        return when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
             is ApiResponse.Success -> {
                 saveTokens(response.data)
                 LoginStatusResult.Authenticated
@@ -42,6 +42,7 @@ internal class AuthRepositoryImpl @Inject constructor(
 
             is ApiResponse.Failure.NetworkError -> LoginStatusResult.RetryableFailure(response.throwable)
         }
+    }
 
     override suspend fun logout(): AuthActionResult {
         if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
@@ -57,7 +58,13 @@ internal class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(idToken: String): Result<AuthToken> = authRemoteDataSource.login(idToken = idToken).toResult(::saveTokens)
+    override suspend fun login(idToken: String): Result<Unit> =
+        authRemoteDataSource
+            .login(idToken = idToken)
+            .toResult { response ->
+                saveTokens(response)
+                Unit
+            }
 
     override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {
         if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()

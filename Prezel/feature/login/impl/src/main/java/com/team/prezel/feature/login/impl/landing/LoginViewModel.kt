@@ -3,7 +3,7 @@ package com.team.prezel.feature.login.impl.landing
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
-import com.team.prezel.core.domain.repository.auth.AuthRepository
+import com.team.prezel.core.domain.usecase.auth.LoginUseCase
 import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val loginUseCase: LoginUseCase,
 ) : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>(LoginUiState()) {
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
@@ -56,19 +56,16 @@ internal class LoginViewModel @Inject constructor(
     }
 
     private suspend fun handleServerLogin(idToken: String) {
-        authRepository
-            .login(
-                idToken = idToken,
-            ).fold(
-                onSuccess = {
-                    updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.NavigateToTerms)
-                },
-                onFailure = {
-                    updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
-                },
-            )
+        loginUseCase(idToken = idToken).fold(
+            onSuccess = {
+                updateState { copy(isLoading = false, pendingProvider = null) }
+                sendEffect(LoginUiEffect.NavigateToTerms)
+            },
+            onFailure = {
+                updateState { copy(isLoading = false, pendingProvider = null) }
+                sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
+            },
+        )
     }
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
