@@ -47,7 +47,7 @@ fun PrezelTextArea(
 ) {
     var focused by remember { mutableStateOf(false) }
 
-    val state = rememberPrezelTextFieldState(
+    val style = rememberPrezelTextFieldState(
         value = value,
         enabled = enabled,
         focused = focused,
@@ -60,7 +60,7 @@ fun PrezelTextArea(
             if (applied != value) onValueChange(applied)
         },
         placeholder = placeholder,
-        state = state,
+        style = style,
         maxLength = maxLength,
         focused = focused,
         onFocusChange = { isFocused -> focused = isFocused },
@@ -79,7 +79,7 @@ private fun PrezelTextArea(
     onValueChange: (String) -> Unit,
     placeholder: String,
     maxLength: Int,
-    state: PrezelTextFieldStyle,
+    style: PrezelTextFieldStyle,
     focused: Boolean,
     onFocusChange: (Boolean) -> Unit,
     label: String?,
@@ -103,7 +103,7 @@ private fun PrezelTextArea(
                 .fillMaxWidth()
                 .heightIn(min = 72.dp)
                 .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
-            textStyle = PrezelTheme.typography.body2Regular.copy(color = state.textColor()),
+            textStyle = PrezelTheme.typography.body2Regular.copy(color = style.textColor()),
             cursorBrush = SolidColor(PrezelTheme.colors.interactiveRegular),
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -112,11 +112,11 @@ private fun PrezelTextArea(
                     innerTextField = innerTextField,
                     showPlaceholder = !focused && value.isEmpty(),
                     placeholder = placeholder,
-                    state = state,
+                    state = style,
                     counter = {
                         if (showCount) {
                             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-                            Counter(currentLength = value.length, maxLength = maxLength, state = state)
+                            Counter(currentLength = value.length, maxLength = maxLength, state = style)
                         }
                     },
                     modifier = Modifier.heightIn(min = 72.dp),
@@ -124,9 +124,9 @@ private fun PrezelTextArea(
             },
         )
 
-        if (state.supportingText.isNotEmpty()) {
+        if (style.supportingText.isNotEmpty()) {
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
-            PrezelTextFieldSupportingText(state = state)
+            PrezelTextFieldSupportingText(text = style.supportingText, textColor = style.supportingTextColor())
         }
     }
 }
@@ -308,7 +308,7 @@ private fun PrezelTextAreaPreviewItem(
         onValueChange = {},
         placeholder = "Placeholder",
         label = label,
-        state = state,
+        style = state,
         maxLength = 100,
         focused = focused,
         modifier = modifier,

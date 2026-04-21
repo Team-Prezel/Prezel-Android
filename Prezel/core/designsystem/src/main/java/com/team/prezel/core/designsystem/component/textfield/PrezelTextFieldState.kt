@@ -103,11 +103,11 @@ data class PrezelTextFieldStyle(
         when (state) {
             PrezelTextFieldState.DEFAULT,
             PrezelTextFieldState.DISABLED,
-                -> Color.Transparent
+            -> Color.Transparent
 
             PrezelTextFieldState.TYPING,
             PrezelTextFieldState.TYPED,
-                -> when (status) {
+            -> when (status) {
                 is PrezelTextFieldStatus.Default -> Color.Transparent
                 is PrezelTextFieldStatus.Good -> colors.feedbackGoodSmall
                 is PrezelTextFieldStatus.Bad -> colors.feedbackBadSmall
@@ -161,11 +161,11 @@ data class PrezelTextFieldStyle(
         when (state) {
             PrezelTextFieldState.DISABLED,
             PrezelTextFieldState.DEFAULT,
-                -> colors.iconDisabled
+            -> colors.iconDisabled
 
             PrezelTextFieldState.TYPING,
             PrezelTextFieldState.TYPED,
-                -> when (status) {
+            -> when (status) {
                 is PrezelTextFieldStatus.Default -> colors.iconRegular
                 is PrezelTextFieldStatus.Good -> colors.interactiveRegular
                 is PrezelTextFieldStatus.Bad -> colors.feedbackBadRegular
@@ -183,11 +183,11 @@ data class PrezelTextFieldStyle(
         val borderWidth = when (state) {
             PrezelTextFieldState.DEFAULT,
             PrezelTextFieldState.DISABLED,
-                -> 1.dp
+            -> 1.dp
 
             PrezelTextFieldState.TYPING,
             PrezelTextFieldState.TYPED,
-                -> 2.dp
+            -> 2.dp
         }
 
         val borderColor = when (state) {
@@ -215,11 +215,12 @@ internal fun rememberPrezelTextFieldState(
     value: String,
     enabled: Boolean,
     focused: Boolean,
-): PrezelTextFieldState = PrezelTextFieldState.calculate(
-    enabled = enabled,
-    focused = focused,
-    hasValue = value.isNotEmpty(),
-)
+): PrezelTextFieldState =
+    PrezelTextFieldState.calculate(
+        enabled = enabled,
+        focused = focused,
+        hasValue = value.isNotEmpty(),
+    )
 
 internal fun applyPrezelTextInputPolicy(
     value: String,

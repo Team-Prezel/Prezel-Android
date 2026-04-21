@@ -66,7 +66,7 @@ fun PrezelTextField(
             if (applied != value) onValueChange(applied)
         },
         placeholder = placeholder,
-        state = state,
+        style = state,
         focused = focused,
         onFocusChange = { isFocused -> focused = isFocused },
         modifier = modifier,
@@ -83,7 +83,7 @@ private fun PrezelTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    state: PrezelTextFieldStyle,
+    style: PrezelTextFieldStyle,
     focused: Boolean,
     onFocusChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -108,7 +108,7 @@ private fun PrezelTextField(
                 .height(48.dp)
                 .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
             singleLine = true,
-            textStyle = PrezelTheme.typography.body2Regular.copy(color = state.textColor()),
+            textStyle = PrezelTheme.typography.body2Regular.copy(color = style.textColor()),
             cursorBrush = SolidColor(PrezelTheme.colors.interactiveRegular),
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -118,14 +118,14 @@ private fun PrezelTextField(
                     showPlaceholder = !focused && value.isEmpty(),
                     placeholder = placeholder,
                     trailingIcon = trailingIcon,
-                    state = state,
+                    state = style,
                 )
             },
         )
 
-        if (state.supportingText.isNotEmpty()) {
+        if (style.supportingText.isNotEmpty()) {
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
-            PrezelTextFieldSupportingText(state = state)
+            PrezelTextFieldSupportingText(text = style.supportingText, textColor = style.supportingTextColor())
         }
     }
 }
@@ -300,7 +300,7 @@ private fun PreviewTextFieldItem(
         onValueChange = {},
         placeholder = "Placeholder",
         label = label,
-        state = state,
+        style = state,
         focused = focused,
         modifier = modifier,
         onFocusChange = {},
