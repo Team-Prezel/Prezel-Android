@@ -1,7 +1,7 @@
 package com.team.prezel.core.data.repository
 
+import com.team.prezel.core.data.datasource.AuthLocalDataSource
 import com.team.prezel.core.data.toResult
-import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.domain.result.auth.LoginStatusResult
@@ -14,15 +14,15 @@ import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
-    private val authTokenStore: AuthTokenStore,
+    private val authLocalDataSource: AuthLocalDataSource,
 ) : AuthRepository {
     override suspend fun checkLoginStatus(): LoginStatusResult {
-        authTokenStore.awaitInitialized()
+        authLocalDataSource.awaitInitialized()
 
-        val accessToken = authTokenStore.getAccessToken()
+        val accessToken = authLocalDataSource.getAccessToken()
         if (!accessToken.isNullOrBlank()) return LoginStatusResult.Authenticated
 
-        val refreshToken = authTokenStore.getRefreshToken()
+        val refreshToken = authLocalDataSource.getRefreshToken()
         if (refreshToken.isNullOrBlank()) return LoginStatusResult.Unauthenticated
 
         return when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
@@ -33,7 +33,7 @@ internal class AuthRepositoryImpl @Inject constructor(
 
             is ApiResponse.Failure.HttpError -> {
                 if (response.error?.code == AUTHENTICATION_REQUIRED_CODE) {
-                    authTokenStore.clear()
+                    authLocalDataSource.clear()
                     LoginStatusResult.Unauthenticated
                 } else {
                     LoginStatusResult.RetryableFailure(response.throwable)
@@ -45,11 +45,11 @@ internal class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): AuthActionResult {
-        if (authTokenStore.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
+        if (authLocalDataSource.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
 
         return when (val response = authRemoteDataSource.logout()) {
             is ApiResponse.Success -> {
-                authTokenStore.clear()
+                authLocalDataSource.clear()
                 AuthActionResult.Success
             }
 
@@ -67,7 +67,7 @@ internal class AuthRepositoryImpl @Inject constructor(
             }
 
     override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {
-        if (authTokenStore.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
+        if (authLocalDataSource.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
 
         return when (
             val response =
@@ -77,7 +77,7 @@ internal class AuthRepositoryImpl @Inject constructor(
                 )
         ) {
             is ApiResponse.Success -> {
-                authTokenStore.clear()
+                authLocalDataSource.clear()
                 AuthActionResult.Success
             }
 
@@ -90,7 +90,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         response
             .toAuthToken()
             .also { token ->
-                authTokenStore.saveTokens(
+                authLocalDataSource.saveTokens(
                     accessToken = token.accessToken,
                     refreshToken = token.refreshToken,
                 )
@@ -104,14 +104,14 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     private suspend fun ApiResponse.Failure.HttpError.toAuthActionResult(): AuthActionResult =
         if (error?.code == AUTHENTICATION_REQUIRED_CODE) {
-            authTokenStore.clear()
+            authLocalDataSource.clear()
             AuthActionResult.AuthenticationRequired
         } else {
             AuthActionResult.Failure(throwable)
         }
 
     private suspend fun clearTokensAndAuthenticationRequired(): AuthActionResult {
-        authTokenStore.clear()
+        authLocalDataSource.clear()
         return AuthActionResult.AuthenticationRequired
     }
 
