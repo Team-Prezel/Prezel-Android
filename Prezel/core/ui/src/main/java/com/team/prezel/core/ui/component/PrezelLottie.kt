@@ -2,6 +2,7 @@ package com.team.prezel.core.ui.component
 
 import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -37,8 +38,7 @@ fun PrezelLottie(
     )
 
     val updatedCallback by rememberUpdatedState(onAnimationFrame)
-
-    if (updatedCallback != null) {
+    LaunchedEffect(progress) {
         updatedCallback?.invoke(progress)
     }
 
