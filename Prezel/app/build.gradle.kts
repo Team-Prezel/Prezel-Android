@@ -32,6 +32,7 @@ android {
 dependencies {
     implementation(projects.coreAuth)
     implementation(projects.coreData)
+    implementation(projects.coreDatastore)
     implementation(projects.coreDesignsystem)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)

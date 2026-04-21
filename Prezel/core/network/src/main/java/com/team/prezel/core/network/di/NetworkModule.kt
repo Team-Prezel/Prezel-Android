@@ -62,18 +62,22 @@ object NetworkModule {
                 bearer {
                     loadTokens {
                         val accessToken = authTokenStore.getAccessToken()
-                        val refreshToken = authTokenStore.getRefreshToken()
-                        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+                        if (accessToken.isNullOrBlank()) {
                             null
                         } else {
-                            BearerTokens(accessToken = accessToken, refreshToken = refreshToken)
+                            BearerTokens(
+                                accessToken = accessToken,
+                                refreshToken = authTokenStore.getRefreshToken().orEmpty(),
+                            )
                         }
                     }
 
                     refreshTokens {
                         val refreshedAccessToken = authTokenRefresher.refreshAccessToken() ?: return@refreshTokens null
-                        val refreshedRefreshToken = authTokenStore.getRefreshToken() ?: return@refreshTokens null
-                        BearerTokens(accessToken = refreshedAccessToken, refreshToken = refreshedRefreshToken)
+                        BearerTokens(
+                            accessToken = refreshedAccessToken,
+                            refreshToken = authTokenStore.getRefreshToken().orEmpty(),
+                        )
                     }
 
                     sendWithoutRequest { request ->
