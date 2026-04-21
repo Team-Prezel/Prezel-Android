@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.modal.snackbar
+package com.team.prezel.core.designsystem.component.feedback.snackbar
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
