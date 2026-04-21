@@ -33,7 +33,6 @@ import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -54,77 +53,23 @@ object NetworkModule {
         json: Json,
         authTokenStore: AuthTokenStore,
         authTokenRefresher: AuthTokenRefresher,
-    ): HttpClient =
-        HttpClient(OkHttp) {
-            configureBaseClient(json)
-
-            install(Auth) {
-                bearer {
-                    loadTokens {
-                        val accessToken = authTokenStore.getAccessToken()
-                        if (accessToken.isNullOrBlank()) {
-                            null
-                        } else {
-                            BearerTokens(
-                                accessToken = accessToken,
-                                refreshToken = authTokenStore.getRefreshToken().orEmpty(),
-                            )
-                        }
-                    }
-
-                    refreshTokens {
-                        val refreshedAccessToken = authTokenRefresher.refreshAccessToken() ?: return@refreshTokens null
-                        BearerTokens(
-                            accessToken = refreshedAccessToken,
-                            refreshToken = authTokenStore.getRefreshToken().orEmpty(),
-                        )
-                    }
-
-                    sendWithoutRequest { request ->
-                        AuthPathPolicy.requiresAuthorization(request.url.encodedPath)
-                    }
-                }
-            }
-
-            defaultRequest {
-                contentType(ContentType.Application.Json)
-            }
-        }
+    ): HttpClient = createHttpClient(json) { configureAuthenticatedClient(authTokenStore, authTokenRefresher) }
 
     @Provides
     @Singleton
-    @Named("refresh")
-    fun provideRefreshHttpClient(json: Json): HttpClient =
-        HttpClient(OkHttp) {
-            configureBaseClient(json)
-
-            defaultRequest {
-                contentType(ContentType.Application.Json)
-            }
-        }
+    @RefreshNetwork
+    fun provideRefreshHttpClient(json: Json): HttpClient = createHttpClient(json)
 
     @Provides
     @Singleton
-    fun provideKtorfit(httpClient: HttpClient): Ktorfit =
-        Ktorfit
-            .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
-            .httpClient(httpClient)
-            .converterFactories(ApiResponseConverterFactory())
-            .build()
+    fun provideKtorfit(httpClient: HttpClient): Ktorfit = createKtorfit(httpClient)
 
     @Provides
     @Singleton
-    @Named("refresh")
+    @RefreshNetwork
     fun provideRefreshKtorfit(
-        @Named("refresh") httpClient: HttpClient,
-    ): Ktorfit =
-        Ktorfit
-            .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
-            .httpClient(httpClient)
-            .converterFactories(ApiResponseConverterFactory())
-            .build()
+        @RefreshNetwork httpClient: HttpClient,
+    ): Ktorfit = createKtorfit(httpClient)
 
     @Provides
     @Singleton
@@ -132,10 +77,65 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("refresh")
+    @RefreshNetwork
     internal fun provideRefreshAuthService(
-        @Named("refresh") ktorfit: Ktorfit,
+        @RefreshNetwork ktorfit: Ktorfit,
     ): AuthService = ktorfit.createAuthService()
+
+    private fun createHttpClient(
+        json: Json,
+        configure: HttpClientConfig<*>.() -> Unit = {},
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            configureBaseClient(json)
+            configure()
+            defaultRequest {
+                contentType(ContentType.Application.Json)
+            }
+        }
+
+    private fun HttpClientConfig<*>.configureAuthenticatedClient(
+        authTokenStore: AuthTokenStore,
+        authTokenRefresher: AuthTokenRefresher,
+    ) {
+        install(Auth) {
+            bearer {
+                loadTokens {
+                    authTokenStore.toBearerTokens()
+                }
+
+                refreshTokens {
+                    val refreshedAccessToken = authTokenRefresher.refreshAccessToken() ?: return@refreshTokens null
+                    BearerTokens(
+                        accessToken = refreshedAccessToken,
+                        refreshToken = authTokenStore.getRefreshToken().orEmpty(),
+                    )
+                }
+
+                sendWithoutRequest { request ->
+                    AuthPathPolicy.requiresAuthorization(request.url.encodedPath)
+                }
+            }
+        }
+    }
+
+    private fun createKtorfit(httpClient: HttpClient): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .httpClient(httpClient)
+            .converterFactories(ApiResponseConverterFactory())
+            .build()
+
+    private fun AuthTokenStore.toBearerTokens(): BearerTokens? {
+        val accessToken = getAccessToken()
+        if (accessToken.isNullOrBlank()) return null
+
+        return BearerTokens(
+            accessToken = accessToken,
+            refreshToken = getRefreshToken().orEmpty(),
+        )
+    }
 
     private fun HttpClientConfig<*>.configureBaseClient(json: Json) {
         expectSuccess = true
@@ -170,5 +170,10 @@ object NetworkModule {
     private const val SOCKET_TIMEOUT_MILLIS = 15_000L
 
     private fun buildUserAgent(): String =
-        "Prezel-Android/${BuildConfig.BUILD_TYPE} (Android ${Build.VERSION.RELEASE}; SDK ${Build.VERSION.SDK_INT}; ${Build.MANUFACTURER} ${Build.MODEL})"
+        buildString {
+            append("Prezel-Android/${BuildConfig.BUILD_TYPE} ")
+            append("(Android ${Build.VERSION.RELEASE}; ")
+            append("SDK ${Build.VERSION.SDK_INT}; ")
+            append("${Build.MANUFACTURER} ${Build.MODEL})")
+        }
 }

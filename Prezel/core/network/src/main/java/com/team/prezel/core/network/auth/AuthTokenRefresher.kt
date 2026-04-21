@@ -2,6 +2,7 @@ package com.team.prezel.core.network.auth
 
 import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.BuildConfig
+import com.team.prezel.core.network.di.RefreshNetwork
 import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.ReissueTokenRequest
@@ -10,12 +11,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 internal class AuthTokenRefresher @Inject constructor(
-    @param:Named("refresh") private val authService: AuthService,
+    @param:RefreshNetwork private val authService: AuthService,
     private val authTokenStore: AuthTokenStore,
 ) {
     private val mutex = Mutex()

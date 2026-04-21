@@ -55,14 +55,6 @@ internal class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun fetchMyInfo() {
-        viewModelScope
-            .launch {
-                val isProfileCreateComplete = true
-                if (isProfileCreateComplete) sendEffect(LoginUiEffect.NavigateToHome) else sendEffect(LoginUiEffect.NavigateToTerms)
-            }.invokeOnCompletion { updateState { copy(isLoading = false) } }
-    }
-
     private suspend fun handleServerLogin(idToken: String) {
         loginUseCase(idToken = idToken).fold(
             onSuccess = {
