@@ -1,10 +1,11 @@
 package com.team.prezel.core.network.di
 
+import android.os.Build
 import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.auth.AuthPathPolicy
-import com.team.prezel.core.network.auth.TokenRefreshAuthenticator
+import com.team.prezel.core.network.auth.AuthTokenRefresher
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
@@ -15,6 +16,11 @@ import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.UserAgent
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -47,25 +53,37 @@ object NetworkModule {
     internal fun provideHttpClient(
         json: Json,
         authTokenStore: AuthTokenStore,
-        tokenRefreshAuthenticator: TokenRefreshAuthenticator,
+        authTokenRefresher: AuthTokenRefresher,
     ): HttpClient =
         HttpClient(OkHttp) {
-            engine {
-                config {
-                    authenticator(tokenRefreshAuthenticator)
+            configureBaseClient(json)
+
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val accessToken = authTokenStore.getAccessToken()
+                        val refreshToken = authTokenStore.getRefreshToken()
+                        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+                            null
+                        } else {
+                            BearerTokens(accessToken = accessToken, refreshToken = refreshToken)
+                        }
+                    }
+
+                    refreshTokens {
+                        val refreshedAccessToken = authTokenRefresher.refreshAccessToken() ?: return@refreshTokens null
+                        val refreshedRefreshToken = authTokenStore.getRefreshToken() ?: return@refreshTokens null
+                        BearerTokens(accessToken = refreshedAccessToken, refreshToken = refreshedRefreshToken)
+                    }
+
+                    sendWithoutRequest { request ->
+                        AuthPathPolicy.requiresAuthorization(request.url.encodedPath)
+                    }
                 }
             }
 
-            configureBaseClient(json)
-
             defaultRequest {
                 contentType(ContentType.Application.Json)
-
-                if (headers[HttpHeaders.Authorization] == null && AuthPathPolicy.requiresAuthorization(url.encodedPath)) {
-                    authTokenStore.getAccessToken()?.let { accessToken ->
-                        headers.append(HttpHeaders.Authorization, "Bearer $accessToken")
-                    }
-                }
             }
         }
 
@@ -122,6 +140,16 @@ object NetworkModule {
             json(json)
         }
 
+        install(HttpTimeout) {
+            requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
+            connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+            socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
+        }
+
+        install(UserAgent) {
+            agent = buildUserAgent()
+        }
+
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
@@ -132,4 +160,11 @@ object NetworkModule {
             level = if (BuildConfig.DEBUG) LogLevel.HEADERS else LogLevel.NONE
         }
     }
+
+    private const val REQUEST_TIMEOUT_MILLIS = 15_000L
+    private const val CONNECT_TIMEOUT_MILLIS = 10_000L
+    private const val SOCKET_TIMEOUT_MILLIS = 15_000L
+
+    private fun buildUserAgent(): String =
+        "Prezel-Android/${BuildConfig.BUILD_TYPE} (Android ${Build.VERSION.RELEASE}; SDK ${Build.VERSION.SDK_INT}; ${Build.MANUFACTURER} ${Build.MODEL})"
 }

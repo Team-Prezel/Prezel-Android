@@ -45,7 +45,7 @@ internal class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): AuthActionResult {
-        if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
+        if (authTokenStore.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
 
         return when (val response = authRemoteDataSource.logout()) {
             is ApiResponse.Success -> {
@@ -67,7 +67,7 @@ internal class AuthRepositoryImpl @Inject constructor(
             }
 
     override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {
-        if (authTokenStore.getAccessToken() == null) return clearTokensAndAuthenticationRequired()
+        if (authTokenStore.getAccessToken().isNullOrBlank()) return clearTokensAndAuthenticationRequired()
 
         return when (
             val response =
