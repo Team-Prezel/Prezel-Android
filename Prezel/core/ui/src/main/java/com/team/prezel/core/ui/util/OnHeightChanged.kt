@@ -1,4 +1,4 @@
-package com.team.prezel.core.ui
+package com.team.prezel.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

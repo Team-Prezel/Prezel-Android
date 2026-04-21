@@ -22,8 +22,8 @@ import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnac
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.profile.User
-import com.team.prezel.core.ui.LocalSnackbarHostState
-import com.team.prezel.core.ui.advancedImePadding
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.profile.impl.component.NicknameTextField
 import com.team.prezel.feature.profile.impl.component.ProfileImageEditor
 import com.team.prezel.feature.profile.impl.component.ProfileScreenTopAppBar

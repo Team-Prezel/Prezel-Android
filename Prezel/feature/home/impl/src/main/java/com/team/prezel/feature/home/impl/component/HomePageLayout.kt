@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.onHeightChanged
+import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetContent
 import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetTitle
