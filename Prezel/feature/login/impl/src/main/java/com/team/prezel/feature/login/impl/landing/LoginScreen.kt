@@ -57,6 +57,7 @@ internal fun SharedTransitionScope.LoginScreen(
     authManager: AuthManager,
     navigateToHome: () -> Unit,
     navigateToTerms: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -82,6 +83,8 @@ internal fun SharedTransitionScope.LoginScreen(
                 LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 LoginUiEffect.NavigateToTerms -> navigateToTerms()
+
+                LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {

@@ -164,7 +164,10 @@ private fun PrezelTextFieldDecorationBox(
                 .padding(PrezelTheme.spacing.V12),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart,
+            ) {
                 innerTextField()
                 if (showPlaceholder) PrezelTextFieldPlaceholder(placeholder = placeholder)
             }

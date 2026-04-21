@@ -1,0 +1,28 @@
+package com.team.prezel.feature.my.impl.navigation
+
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.team.prezel.feature.my.api.MyNavKey
+import com.team.prezel.feature.my.impl.MyScreen
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.multibindings.IntoSet
+
+internal fun EntryProviderScope<NavKey>.featureMyEntryBuilder() {
+    entry<MyNavKey> {
+        MyScreen()
+    }
+}
+
+@Module
+@InstallIn(ActivityRetainedComponent::class)
+object FeatureMyModule {
+    @IntoSet
+    @Provides
+    fun provideFeatureMyEntryBuilder(): EntryProviderScope<NavKey>.() -> Unit =
+        {
+            featureMyEntryBuilder()
+        }
+}

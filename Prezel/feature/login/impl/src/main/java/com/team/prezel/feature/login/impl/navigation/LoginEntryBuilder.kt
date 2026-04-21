@@ -9,6 +9,7 @@ import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.login.impl.landing.LoginScreen
 import com.team.prezel.feature.login.impl.terms.TermsScreen
+import com.team.prezel.feature.profile.api.ProfileNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,9 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
                 navigateToTerms = {
                     navigator.navigate(LoginTermsNavKey)
                 },
+                navigateToHome = {
+                    navigator.replaceRoot(HomeNavKey)
+                },
             )
         }
     }
@@ -39,8 +43,8 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
             navigateBack = {
                 navigator.goBack()
             },
-            navigateToHome = {
-                navigator.replaceRoot(HomeNavKey)
+            navigateToProfile = {
+                navigator.navigate(ProfileNavKey.Create)
             },
         )
     }

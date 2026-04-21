@@ -2,6 +2,7 @@ import com.team.prezel.buildlogic.convention.external.localProperty
 
 plugins {
     alias(libs.plugins.prezel.android.feature.impl)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -23,5 +24,6 @@ dependencies {
     implementation(projects.coreModel)
 
     implementation(projects.featureLoginApi)
+    implementation(projects.featureProfileApi)
     implementation(projects.featureHomeApi)
 }

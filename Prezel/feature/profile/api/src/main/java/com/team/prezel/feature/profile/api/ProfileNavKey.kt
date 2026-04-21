@@ -4,4 +4,10 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ProfileNavKey : NavKey
+sealed interface ProfileNavKey : NavKey {
+    @Serializable
+    data object Create : ProfileNavKey
+
+    @Serializable
+    data object Edit : ProfileNavKey
+}

@@ -1,5 +1,7 @@
 package com.team.prezel.core.data.di
 
+import com.team.prezel.core.data.repository.UserRepositoryImpl
+import com.team.prezel.core.domain.repository.profile.UserRepository
 import com.team.prezel.core.data.repository.AuthRepositoryImpl
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import dagger.Binds
@@ -14,4 +16,5 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 }

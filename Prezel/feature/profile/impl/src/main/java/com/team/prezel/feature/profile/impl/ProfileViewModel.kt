@@ -1,103 +1,158 @@
 package com.team.prezel.feature.profile.impl
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.auth.AuthManager
-import com.team.prezel.core.domain.result.auth.AuthActionResult
-import com.team.prezel.core.domain.usecase.auth.LogoutUseCase
-import com.team.prezel.core.domain.usecase.auth.WithdrawUseCase
-import com.team.prezel.core.model.auth.WithdrawReason
+import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
+import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
+import com.team.prezel.core.model.profile.Nickname
+import com.team.prezel.core.model.profile.User
+import com.team.prezel.core.ui.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
+import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
+import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Content.Companion.toUiState
+import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
-class ProfileViewModel
-    @Inject
-    constructor(
-        private val authManager: AuthManager,
-        private val logoutUseCase: LogoutUseCase,
-        private val withdrawUseCase: WithdrawUseCase,
-    ) : ViewModel() {
-        private val _uiState = MutableStateFlow(ProfileUiState())
-        val uiState = _uiState.asStateFlow()
+internal class ProfileViewModel @Inject constructor(
+    private val fetchUserInfoUseCase: FetchUserInfoUseCase,
+    private val validateNicknameUseCase: ValidateNicknameUseCase,
+) : BaseViewModel<ProfileUiState, ProfileUiIntent, ProfileUiEffect>(ProfileUiState.Loading) {
+    private val nicknameChanges = MutableStateFlow<String?>(null)
 
-        private val _uiEffect = MutableSharedFlow<ProfileUiEffect>()
-        val uiEffect = _uiEffect.asSharedFlow()
-
-        fun logout() {
-            if (_uiState.value.isLoading) return
-
-            viewModelScope.launch {
-                try {
-                    _uiState.update { it.copy(isLoading = true) }
-                    val result = logoutUseCase()
-                    handleAuthActionResult(
-                        result = result,
-                        failureLog = "로그아웃에 실패했습니다.",
-                        failureMessage = ProfileUiMessage.LOGOUT_FAILED,
-                    )
-                } finally {
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            }
-        }
-
-        fun withdraw() {
-            if (_uiState.value.isLoading) return
-
-            viewModelScope.launch {
-                try {
-                    _uiState.update { it.copy(isLoading = true) }
-                    val result =
-                        withdrawUseCase(
-                            reason = WithdrawReason.Other("임시 테스트 탈퇴"),
-                        )
-                    handleAuthActionResult(
-                        result = result,
-                        failureLog = "회원탈퇴에 실패했습니다.",
-                        failureMessage = ProfileUiMessage.WITHDRAW_FAILED,
-                    )
-                } finally {
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            }
-        }
-
-        private suspend fun handleAuthActionResult(
-            result: AuthActionResult,
-            failureLog: String,
-            failureMessage: ProfileUiMessage,
-        ) {
-            when (result) {
-                AuthActionResult.Success -> {
-                    authManager
-                        .logout()
-                        .onFailure { throwable ->
-                            Timber.w(throwable, "로컬 인증 세션 정리에 실패했습니다.")
-                        }
-                    _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
-                }
-
-                AuthActionResult.AuthenticationRequired -> {
-                    authManager.clearCurrentProvider()
-                    _uiEffect.emit(ProfileUiEffect.ShowMessage(ProfileUiMessage.AUTHENTICATION_EXPIRED))
-                    _uiEffect.emit(ProfileUiEffect.NavigateToLogin)
-                }
-
-                is AuthActionResult.Failure -> {
-                    Timber.e(result.throwable, failureLog)
-                    _uiEffect.emit(ProfileUiEffect.ShowMessage(failureMessage))
-                }
-            }
+    init {
+        viewModelScope.launch {
+            nicknameChanges
+                .filterNotNull()
+                .debounce(NICKNAME_VALIDATION_DEBOUNCE_MILLIS)
+                .distinctUntilChanged()
+                .collectLatest(::validateNickname)
         }
     }
+
+    override fun onIntent(intent: ProfileUiIntent) {
+        when (intent) {
+            ProfileUiIntent.FetchData -> fetchUserInfo()
+            is ProfileUiIntent.UpdateNickname -> handleNicknameChanged(intent.nickname)
+            is ProfileUiIntent.UpdateProfileImage -> handleProfileImageChanged(intent.profileUrl)
+            ProfileUiIntent.SubmitProfile -> submitProfile()
+        }
+    }
+
+    private fun fetchUserInfo() {
+        viewModelScope.launch {
+            fetchUserInfoUseCase()
+                .onSuccess { user -> updateState { user.toUiState() } }
+                .onFailure { throwable ->
+                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.FETCH_USER_INFO_FAILED))
+                    Timber.e(throwable)
+                }
+        }
+    }
+
+    private fun handleNicknameChanged(nickname: String) {
+        val uiState = currentState as? ProfileUiState.Content ?: return
+
+        val sanitizedNickname = nickname
+            .filterNot(Char::isWhitespace)
+            .take(Nickname.MAX_LENGTH)
+        if (sanitizedNickname == uiState.nickname) return
+
+        updateState {
+            val validationState = when {
+                sanitizedNickname.isBlank() && uiState.nickname.isNotBlank() -> NicknameValidationState.TooShort
+                sanitizedNickname.isBlank() -> NicknameValidationState.Unchecked
+                else -> NicknameValidationState.Checking
+            }
+
+            uiState.copy(
+                nickname = sanitizedNickname,
+                nicknameValidation = validationState,
+            )
+        }
+
+        nicknameChanges.value = sanitizedNickname
+    }
+
+    private fun handleProfileImageChanged(profileUrl: String) {
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (profileUrl == uiState.profileImage.url) return
+
+        updateState {
+            uiState.copy(
+                profileImage = User.ProfileImage(
+                    url = profileUrl,
+                    isDefault = profileUrl.isBlank(),
+                ),
+            )
+        }
+    }
+
+    private suspend fun validateNickname(nickname: String) {
+        if (nickname.isBlank()) return
+
+        val validationState = when (val result = validateNicknameUseCase(nickname)) {
+            is ValidateNicknameUseCase.Result.Available -> NicknameValidationState.Available
+            is ValidateNicknameUseCase.Result.Invalid -> {
+                when (result) {
+                    is ValidateNicknameUseCase.Result.Invalid.Format -> result.reason.toValidationState()
+                    is ValidateNicknameUseCase.Result.Invalid.Duplicated -> NicknameValidationState.Duplicated
+                }
+            }
+
+            is ValidateNicknameUseCase.Result.Error -> {
+                sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.CHECK_NICKNAME_FAILED))
+                NicknameValidationState.Unchecked
+            }
+        }
+
+        updateState {
+            val uiState = currentState as? ProfileUiState.Content ?: return@updateState currentState
+            if (uiState.nickname != nickname) return@updateState currentState
+            uiState.copy(nicknameValidation = validationState)
+        }
+    }
+
+    private fun Nickname.InvalidReason.toValidationState(): NicknameValidationState =
+        when (this) {
+            Nickname.InvalidReason.TOO_SHORT -> NicknameValidationState.TooShort
+            Nickname.InvalidReason.TOO_LONG -> NicknameValidationState.TooLong
+            Nickname.InvalidReason.INVALID_CHARACTER -> NicknameValidationState.InvalidCharacter
+        }
+
+    private fun submitProfile() {
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (!uiState.submitButtonEnabled) return
+
+        viewModelScope.launch {
+            // todo: 프로필 수정 API 호출 필요
+//            patchUserProfileUseCase(fetchedState.profileImage, fetchedState.nickname)
+//                .onSuccess {
+//                    when(fetchedState) {
+//                        is ProfileUiState.Create -> ProfileUiEffect.NavigateToHome
+//                        is ProfileUiState.Edit -> ProfileUiEffect.OnBack
+//                    }.let(sendEffect)
+//                }
+//                .onFailure { throwable ->
+//                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.PATCH_USER_PROFILE_FAILED))
+//                    Timber.e(throwable)
+//                }
+            sendEffect(ProfileUiEffect.NavigateToHome)
+        }
+    }
+
+    private companion object {
+        const val NICKNAME_VALIDATION_DEBOUNCE_MILLIS = 300L
+    }
+}

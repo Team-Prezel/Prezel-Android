@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import timber.log.Timber
 
 @Composable
 fun PrezelAsyncImage(
@@ -22,7 +23,10 @@ fun PrezelAsyncImage(
         modifier = modifier,
         placeholder = ColorPainter(Color.Transparent),
         onSuccess = { onSuccess() },
-        onError = { onError(it.result.throwable) },
+        onError = { error ->
+            onError(error.result.throwable)
+            Timber.e(t = error.result.throwable)
+        },
         contentScale = contentScale,
     )
 }
