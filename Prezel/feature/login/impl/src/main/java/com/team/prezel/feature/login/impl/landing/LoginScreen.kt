@@ -57,7 +57,6 @@ internal fun SharedTransitionScope.LoginScreen(
     authManager: AuthManager,
     navigateToHome: () -> Unit,
     navigateToTerms: () -> Unit,
-    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {

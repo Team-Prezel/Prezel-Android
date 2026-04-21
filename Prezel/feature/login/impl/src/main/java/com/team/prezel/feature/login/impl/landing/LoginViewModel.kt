@@ -78,7 +78,7 @@ internal class LoginViewModel @Inject constructor(
 
     private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
         when (this) {
-            AuthResult.Failure.RateLimited -> LoginUiMessage.LoginFailedRateLimited
-            AuthResult.Failure.Unknown -> LoginUiMessage.LoginFailedUnknown
+            AuthResult.Failure.RateLimited -> LoginUiMessage.LOGIN_FAILED_RATE_LIMITED
+            AuthResult.Failure.Unknown -> LoginUiMessage.LOGIN_FAILED_UNKNOWN
         }
 }
