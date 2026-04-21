@@ -1,7 +1,7 @@
 package com.team.prezel.feature.splash.impl
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.ui.BaseViewModel
+import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
 import com.team.prezel.feature.splash.impl.contract.SplashUiIntent
 import com.team.prezel.feature.splash.impl.contract.SplashUiState

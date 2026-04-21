@@ -2,7 +2,7 @@ package com.team.prezel.feature.profile.impl.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.profile.User
-import com.team.prezel.core.ui.UiState
+import com.team.prezel.core.ui.base.UiState
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 
 @Immutable

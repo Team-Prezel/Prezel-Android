@@ -5,7 +5,7 @@ import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
 import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
-import com.team.prezel.core.ui.BaseViewModel
+import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState

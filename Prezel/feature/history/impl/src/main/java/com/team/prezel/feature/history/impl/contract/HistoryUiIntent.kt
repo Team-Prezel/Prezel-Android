@@ -1,6 +1,6 @@
 package com.team.prezel.feature.history.impl.contract
 
-import com.team.prezel.core.ui.UiIntent
+import com.team.prezel.core.ui.base.UiIntent
 
 internal sealed interface HistoryUiIntent : UiIntent {
     data object FetchData : HistoryUiIntent

@@ -1,7 +1,7 @@
 package com.team.prezel.feature.home.impl.contract
 
 import androidx.compose.runtime.Immutable
-import com.team.prezel.core.ui.UiState
+import com.team.prezel.core.ui.base.UiState
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
