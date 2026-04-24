@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
-import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview

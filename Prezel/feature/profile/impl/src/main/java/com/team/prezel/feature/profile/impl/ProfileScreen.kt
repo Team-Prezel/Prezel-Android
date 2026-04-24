@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
-import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.profile.User
