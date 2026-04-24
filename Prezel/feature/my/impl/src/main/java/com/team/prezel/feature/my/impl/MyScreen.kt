@@ -83,7 +83,11 @@ private fun MyScreen(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 
-        ProfileSection(uiState = uiState, onClickEditProfile = onClickEditProfile)
+        ProfileSection(
+            nickname = uiState.nickname,
+            profileImageUrl = uiState.profileImageUrl,
+            onClickEditProfile = onClickEditProfile,
+        )
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 

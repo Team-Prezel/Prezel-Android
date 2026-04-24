@@ -18,11 +18,11 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.my.impl.contract.MyUiState
 
 @Composable
 internal fun ProfileSection(
-    uiState: MyUiState,
+    nickname: String,
+    profileImageUrl: String?,
     onClickEditProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -31,7 +31,7 @@ internal fun ProfileSection(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PrezelAvatar(
-            imageUrl = uiState.profileImageUrl,
+            imageUrl = profileImageUrl,
             contentDescription = "프로필 이미지",
             size = PrezelAvatarSize.REGULAR,
         )
@@ -39,7 +39,7 @@ internal fun ProfileSection(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
         Text(
-            text = uiState.nickname,
+            text = nickname,
             style = PrezelTheme.typography.body1Bold,
             color = PrezelTheme.colors.textLarge,
         )
@@ -66,10 +66,8 @@ private fun ProfileSectionPreview() {
             contentAlignment = Alignment.Center,
         ) {
             ProfileSection(
-                uiState = MyUiState(
-                    nickname = "프레즐러",
-                    profileImageUrl = null,
-                ),
+                nickname = "닉네임",
+                profileImageUrl = null,
                 onClickEditProfile = {},
             )
         }
