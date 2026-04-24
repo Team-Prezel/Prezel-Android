@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.modal.dialog
+package com.team.prezel.core.designsystem.component.feedback.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
