@@ -66,6 +66,7 @@ private fun BadgeListTitle(modifier: Modifier = Modifier) {
             Icon(
                 painter = painterResource(PrezelIcons.ChevronRight),
                 contentDescription = "뱃지",
+                tint = PrezelTheme.colors.iconRegular,
             )
         },
     )
