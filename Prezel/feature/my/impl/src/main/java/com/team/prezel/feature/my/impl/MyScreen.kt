@@ -81,6 +81,8 @@ private fun MyScreen(
     ) {
         MyTopAppBar(onClickSetting = onClickSetting)
 
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
         ProfileSection(uiState = uiState, onClickEditProfile = onClickEditProfile)
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
