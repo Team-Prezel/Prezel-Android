@@ -28,7 +28,7 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
-import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
 import com.team.prezel.feature.history.impl.component.HistoryItemList
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect

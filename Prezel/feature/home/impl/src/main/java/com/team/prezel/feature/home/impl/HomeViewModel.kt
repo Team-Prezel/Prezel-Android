@@ -6,7 +6,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Presentation
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
-import com.team.prezel.core.ui.BaseViewModel
+import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.home.impl.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState

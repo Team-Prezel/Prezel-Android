@@ -1,6 +1,6 @@
 package com.team.prezel.feature.profile.impl.contract
 
-import com.team.prezel.core.ui.UiEffect
+import com.team.prezel.core.ui.base.UiEffect
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
 
 internal sealed interface ProfileUiEffect : UiEffect {

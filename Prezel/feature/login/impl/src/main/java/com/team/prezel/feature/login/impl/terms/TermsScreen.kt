@@ -1,6 +1,7 @@
 package com.team.prezel.feature.login.impl.terms
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -209,7 +210,11 @@ private fun TermsSelectAllRow(
     modifier: Modifier = Modifier,
 ) {
     PrezelList(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            onClick = onToggleAll,
+            indication = null,
+            interactionSource = null,
+        ),
         title = stringResource(R.string.feature_login_impl_terms_all),
         size = PrezelListSize.REGULAR,
         nested = true,

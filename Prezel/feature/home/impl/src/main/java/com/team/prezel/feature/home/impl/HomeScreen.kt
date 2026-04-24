@@ -24,8 +24,8 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.ui.LocalSnackbarHostState
-import com.team.prezel.core.ui.onHeightChanged
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.component.HomePageLayout
 import com.team.prezel.feature.home.impl.component.body.EmptyPresentationSheet
 import com.team.prezel.feature.home.impl.component.body.PresentationSheet

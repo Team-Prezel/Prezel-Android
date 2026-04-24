@@ -1,6 +1,5 @@
-package com.team.prezel.core.ui
+package com.team.prezel.core.ui.component
 
-import androidx.annotation.RawRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,16 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -76,26 +69,6 @@ fun StatusView(
     }
 }
 
-@Composable
-fun StatusLottie(
-    @RawRes lottieJsonResId: Int,
-    modifier: Modifier = Modifier.size(80.dp),
-) {
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(lottieJsonResId),
-    )
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-    )
-
-    LottieAnimation(
-        composition = composition,
-        progress = { progress },
-        modifier = modifier,
-    )
-}
-
 @BasicPreview
 @Composable
 private fun StatusViewEmptyPreview() {
@@ -147,20 +120,6 @@ private fun StatusViewErrorPreview() {
                     isRounded = true,
                     onClick = { },
                 )
-            },
-        )
-    }
-}
-
-@BasicPreview
-@Composable
-private fun StatusViewLoadingPreview() {
-    PrezelTheme {
-        StatusView(
-            title = "분석 중이에요",
-            description = "잠시만 기다려주세요",
-            visual = {
-                StatusLottie(lottieJsonResId = R.raw.asset_loading)
             },
         )
     }

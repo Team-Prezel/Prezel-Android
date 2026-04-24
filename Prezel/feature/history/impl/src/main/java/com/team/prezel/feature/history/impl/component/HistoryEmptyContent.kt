@@ -12,7 +12,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonS
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.StatusView
+import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.history.impl.R
 import com.team.prezel.feature.history.impl.model.HistoryPageType
 

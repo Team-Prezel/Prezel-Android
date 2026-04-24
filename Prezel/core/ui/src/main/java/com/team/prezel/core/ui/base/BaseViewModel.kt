@@ -1,4 +1,4 @@
-package com.team.prezel.core.ui
+package com.team.prezel.core.ui.base
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel

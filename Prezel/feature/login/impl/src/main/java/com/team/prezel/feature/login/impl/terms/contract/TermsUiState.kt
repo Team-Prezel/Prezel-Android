@@ -1,7 +1,7 @@
 package com.team.prezel.feature.login.impl.terms.contract
 
 import androidx.compose.runtime.Immutable
-import com.team.prezel.core.ui.UiState
+import com.team.prezel.core.ui.base.UiState
 
 @Immutable
 internal data class TermsUiState(

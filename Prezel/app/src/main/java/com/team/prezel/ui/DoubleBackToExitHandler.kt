@@ -13,7 +13,7 @@ import com.team.prezel.R
 import com.team.prezel.core.designsystem.component.feedback.snackbar.dismissById
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.navigation.NavigationState
-import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 
 private const val SNACKBAR_IDENTIFIER = "DoubleBackToExitHandler"
 

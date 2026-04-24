@@ -21,7 +21,7 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
-import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
 

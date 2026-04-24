@@ -1,4 +1,4 @@
-package com.team.prezel.core.ui
+package com.team.prezel.core.ui.state
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.staticCompositionLocalOf
