@@ -1,4 +1,4 @@
-package com.team.prezel.core.ui
+package com.team.prezel.core.ui.util
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets

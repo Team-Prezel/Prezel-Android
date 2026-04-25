@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextField
-import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldFeedback
+import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldStatus
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.profile.impl.R
@@ -28,7 +28,7 @@ internal fun NicknameTextField(
         onValueChange = onNicknameChanged,
         label = stringResource(R.string.feature_profile_impl_nickname_text_field_label),
         placeholder = stringResource(R.string.feature_profile_impl_nickname_text_field_placeholder),
-        feedback = nicknameValidationState.toNicknameFeedback(),
+        status = nicknameValidationState.toNicknameStatus(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
         ),
@@ -37,26 +37,26 @@ internal fun NicknameTextField(
 }
 
 @Composable
-private fun NicknameValidationState.toNicknameFeedback(): PrezelTextFieldFeedback =
+private fun NicknameValidationState.toNicknameStatus(): PrezelTextFieldStatus =
     when (this) {
         NicknameValidationState.Unchecked,
         NicknameValidationState.Checking,
         NicknameValidationState.TooLong,
-        -> PrezelTextFieldFeedback.NO_MESSAGE
+        -> PrezelTextFieldStatus.DEFAULT
 
-        NicknameValidationState.Available -> PrezelTextFieldFeedback.Good(
+        NicknameValidationState.Available -> PrezelTextFieldStatus.Default(
             message = stringResource(R.string.feature_profile_impl_nickname_helper_available),
         )
 
-        NicknameValidationState.TooShort -> PrezelTextFieldFeedback.Bad(
+        NicknameValidationState.TooShort -> PrezelTextFieldStatus.Bad(
             message = stringResource(R.string.feature_profile_impl_nickname_helper_too_short),
         )
 
-        NicknameValidationState.Duplicated -> PrezelTextFieldFeedback.Bad(
+        NicknameValidationState.Duplicated -> PrezelTextFieldStatus.Bad(
             message = stringResource(R.string.feature_profile_impl_nickname_helper_duplicated),
         )
 
-        NicknameValidationState.InvalidCharacter -> PrezelTextFieldFeedback.Bad(
+        NicknameValidationState.InvalidCharacter -> PrezelTextFieldStatus.Bad(
             message = stringResource(R.string.feature_profile_impl_nickname_helper_unavailable),
         )
     }

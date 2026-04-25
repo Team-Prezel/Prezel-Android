@@ -1,6 +1,6 @@
 package com.team.prezel.feature.history.impl.contract
 
-import com.team.prezel.core.ui.UiEffect
+import com.team.prezel.core.ui.base.UiEffect
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 
 internal sealed interface HistoryUiEffect : UiEffect {

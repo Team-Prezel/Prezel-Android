@@ -1,6 +1,6 @@
 package com.team.prezel.feature.login.impl.terms.contract
 
-import com.team.prezel.core.ui.UiIntent
+import com.team.prezel.core.ui.base.UiIntent
 
 internal sealed interface TermsUiIntent : UiIntent {
     data object ToggleAll : TermsUiIntent

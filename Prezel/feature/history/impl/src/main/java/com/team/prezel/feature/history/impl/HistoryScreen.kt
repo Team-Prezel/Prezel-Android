@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
-import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview
@@ -28,7 +28,7 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
-import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
 import com.team.prezel.feature.history.impl.component.HistoryItemList
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect

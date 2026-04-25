@@ -1,6 +1,6 @@
 package com.team.prezel.feature.home.impl.contract
 
-import com.team.prezel.core.ui.UiEffect
+import com.team.prezel.core.ui.base.UiEffect
 import com.team.prezel.feature.home.impl.model.HomeUiMessage
 
 internal sealed interface HomeUiEffect : UiEffect {

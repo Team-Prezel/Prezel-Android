@@ -1,7 +1,7 @@
 package com.team.prezel.feature.login.impl.terms
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.ui.BaseViewModel
+import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.login.impl.terms.contract.TermsUiEffect
 import com.team.prezel.feature.login.impl.terms.contract.TermsUiIntent
 import com.team.prezel.feature.login.impl.terms.contract.TermsUiState

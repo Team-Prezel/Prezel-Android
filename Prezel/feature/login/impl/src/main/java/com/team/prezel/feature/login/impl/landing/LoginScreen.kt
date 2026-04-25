@@ -36,11 +36,11 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonH
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
-import com.team.prezel.core.designsystem.component.modal.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.R
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
