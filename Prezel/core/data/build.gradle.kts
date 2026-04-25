@@ -15,4 +15,5 @@ dependencies {
     implementation(projects.coreNetwork)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.ktor.client.auth)
 }

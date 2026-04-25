@@ -1,11 +1,11 @@
 package com.team.prezel.core.network.di
 
 import android.os.Build
-import com.team.prezel.core.datastore.auth.AuthTokenStore
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.auth.AuthPathPolicy
 import com.team.prezel.core.network.auth.AuthTokenRefresher
+import com.team.prezel.core.network.datasource.AuthLocalDataSource
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
@@ -51,9 +51,9 @@ object NetworkModule {
     @Singleton
     internal fun provideHttpClient(
         json: Json,
-        authTokenStore: AuthTokenStore,
+        authLocalDataSource: AuthLocalDataSource,
         authTokenRefresher: AuthTokenRefresher,
-    ): HttpClient = createHttpClient(json) { configureAuthenticatedClient(authTokenStore, authTokenRefresher) }
+    ): HttpClient = createHttpClient(json) { configureAuthenticatedClient(authLocalDataSource, authTokenRefresher) }
 
     @Provides
     @Singleton
@@ -95,21 +95,18 @@ object NetworkModule {
         }
 
     private fun HttpClientConfig<*>.configureAuthenticatedClient(
-        authTokenStore: AuthTokenStore,
+        authLocalDataSource: AuthLocalDataSource,
         authTokenRefresher: AuthTokenRefresher,
     ) {
         install(Auth) {
             bearer {
+                cacheTokens = true
                 loadTokens {
-                    authTokenStore.toBearerTokens()
+                    authLocalDataSource.toBearerTokens()
                 }
 
                 refreshTokens {
-                    val refreshedAccessToken = authTokenRefresher.refreshAccessToken() ?: return@refreshTokens null
-                    BearerTokens(
-                        accessToken = refreshedAccessToken,
-                        refreshToken = authTokenStore.getRefreshToken().orEmpty(),
-                    )
+                    authTokenRefresher.refreshTokens() ?: return@refreshTokens null
                 }
 
                 sendWithoutRequest { request ->
@@ -119,6 +116,15 @@ object NetworkModule {
         }
     }
 
+    private suspend fun AuthLocalDataSource.toBearerTokens(): BearerTokens? {
+        val token = getToken() ?: return null
+
+        return BearerTokens(
+            accessToken = token.accessToken,
+            refreshToken = token.refreshToken,
+        )
+    }
+
     private fun createKtorfit(httpClient: HttpClient): Ktorfit =
         Ktorfit
             .Builder()
@@ -126,16 +132,6 @@ object NetworkModule {
             .httpClient(httpClient)
             .converterFactories(ApiResponseConverterFactory())
             .build()
-
-    private fun AuthTokenStore.toBearerTokens(): BearerTokens? {
-        val accessToken = getAccessToken()
-        if (accessToken.isNullOrBlank()) return null
-
-        return BearerTokens(
-            accessToken = accessToken,
-            refreshToken = getRefreshToken().orEmpty(),
-        )
-    }
 
     private fun HttpClientConfig<*>.configureBaseClient(json: Json) {
         expectSuccess = true

@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(projects.coreDatastore)
+    implementation(projects.coreModel)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.auth)
