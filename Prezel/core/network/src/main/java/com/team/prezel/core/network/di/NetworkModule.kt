@@ -57,30 +57,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @RefreshNetwork
-    fun provideRefreshHttpClient(json: Json): HttpClient = createHttpClient(json)
-
-    @Provides
-    @Singleton
     fun provideKtorfit(httpClient: HttpClient): Ktorfit = createKtorfit(httpClient)
 
     @Provides
     @Singleton
-    @RefreshNetwork
-    fun provideRefreshKtorfit(
-        @RefreshNetwork httpClient: HttpClient,
-    ): Ktorfit = createKtorfit(httpClient)
-
-    @Provides
-    @Singleton
     internal fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
-
-    @Provides
-    @Singleton
-    @RefreshNetwork
-    internal fun provideRefreshAuthService(
-        @RefreshNetwork ktorfit: Ktorfit,
-    ): AuthService = ktorfit.createAuthService()
 
     private fun createHttpClient(
         json: Json,
@@ -106,7 +87,7 @@ object NetworkModule {
                 }
 
                 refreshTokens {
-                    authTokenRefresher.refreshTokens() ?: return@refreshTokens null
+                    authTokenRefresher.refreshTokens(this) ?: return@refreshTokens null
                 }
 
                 sendWithoutRequest { request ->
@@ -140,11 +121,7 @@ object NetworkModule {
             json(json)
         }
 
-        install(HttpTimeout) {
-            requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
-            connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
-            socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
-        }
+        install(HttpTimeout)
 
         install(UserAgent) {
             agent = buildUserAgent()
@@ -160,10 +137,6 @@ object NetworkModule {
             level = if (BuildConfig.DEBUG) LogLevel.HEADERS else LogLevel.NONE
         }
     }
-
-    private const val REQUEST_TIMEOUT_MILLIS = 15_000L
-    private const val CONNECT_TIMEOUT_MILLIS = 10_000L
-    private const val SOCKET_TIMEOUT_MILLIS = 15_000L
 
     private fun buildUserAgent(): String =
         buildString {
