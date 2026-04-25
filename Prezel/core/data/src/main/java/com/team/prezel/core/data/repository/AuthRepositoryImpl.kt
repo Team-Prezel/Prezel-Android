@@ -6,6 +6,8 @@ import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.domain.result.auth.LoginStatusResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
+import com.team.prezel.core.network.auth.AuthTokenRefreshResult
+import com.team.prezel.core.network.auth.AuthTokenRefresher
 import com.team.prezel.core.network.datasource.AuthLocalDataSource
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.model.ApiResponse
@@ -17,6 +19,7 @@ import javax.inject.Inject
 internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authLocalDataSource: AuthLocalDataSource,
+    private val authTokenRefresher: AuthTokenRefresher,
     private val httpClient: HttpClient,
 ) : AuthRepository {
     override suspend fun checkLoginStatus(): LoginStatusResult {
@@ -26,22 +29,18 @@ internal class AuthRepositoryImpl @Inject constructor(
         val refreshToken = token?.refreshToken
         if (refreshToken.isNullOrBlank()) return LoginStatusResult.Unauthenticated
 
-        return when (val response = authRemoteDataSource.reissueToken(refreshToken = refreshToken)) {
-            is ApiResponse.Success -> {
-                saveTokens(response.data)
+        return when (val result = authTokenRefresher.refreshToken(httpClient, refreshToken)) {
+            is AuthTokenRefreshResult.Success -> {
+                httpClient.clearAuthTokens()
                 LoginStatusResult.Authenticated
             }
 
-            is ApiResponse.Failure.HttpError -> {
-                if (response.error?.code == AUTHENTICATION_REQUIRED_CODE) {
-                    clearTokens()
-                    LoginStatusResult.Unauthenticated
-                } else {
-                    LoginStatusResult.RetryableFailure(response.throwable)
-                }
+            is AuthTokenRefreshResult.Failure.Unrecoverable -> {
+                httpClient.clearAuthTokens()
+                LoginStatusResult.Unauthenticated
             }
 
-            is ApiResponse.Failure.NetworkError -> LoginStatusResult.RetryableFailure(response.throwable)
+            is AuthTokenRefreshResult.Failure.Retryable -> LoginStatusResult.RetryableFailure(result.throwable)
         }
     }
 

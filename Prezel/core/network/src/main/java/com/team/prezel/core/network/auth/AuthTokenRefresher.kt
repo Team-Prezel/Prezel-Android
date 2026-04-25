@@ -6,10 +6,13 @@ import com.team.prezel.core.network.datasource.AuthLocalDataSource
 import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import com.team.prezel.core.network.model.auth.ReissueTokenRequest
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.auth.AuthCircuitBreaker
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -22,7 +25,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
-internal class AuthTokenRefresher @Inject constructor(
+class AuthTokenRefresher @Inject constructor(
     private val json: Json,
     private val authLocalDataSource: AuthLocalDataSource,
 ) {
@@ -34,34 +37,72 @@ internal class AuthTokenRefresher @Inject constructor(
                 ?: authLocalDataSource.getToken()?.refreshToken
                 ?: return@withLock null
 
-            try {
-                val response = params.client
-                    .post("${BuildConfig.BASE_URL}auth/reissue") {
-                        with(params) {
-                            markAsRefreshTokenRequest()
-                        }
-                        setBody(ReissueTokenRequest(refreshToken = refreshToken))
-                    }.body<LoginResponse>()
+            when (
+                val result =
+                    refreshToken(
+                        client = params.client,
+                        refreshToken = refreshToken,
+                        markAsRefreshTokenRequest = {
+                            with(params) {
+                                markAsRefreshTokenRequest()
+                            }
+                        },
+                    )
+            ) {
+                is AuthTokenRefreshResult.Success ->
+                    BearerTokens(
+                        accessToken = result.token.accessToken,
+                        refreshToken = result.token.refreshToken,
+                    )
 
-                val token = AuthToken(
-                    accessToken = response.accessToken,
-                    refreshToken = response.refreshToken,
-                )
-                authLocalDataSource.saveToken(token)
-                if (BuildConfig.DEBUG) {
-                    Timber.tag("AuthToken").d("토큰 재발급에 성공했습니다.")
-                }
-                BearerTokens(
-                    accessToken = token.accessToken,
-                    refreshToken = token.refreshToken,
-                )
-            } catch (t: Throwable) {
-                t.rethrowIfCancellation()
-                if (t.isSessionRecoveryUnrecoverable()) {
-                    authLocalDataSource.clear()
-                }
+                is AuthTokenRefreshResult.Failure -> null
+            }
+        }
+
+    suspend fun refreshToken(
+        client: HttpClient,
+        refreshToken: String,
+    ): AuthTokenRefreshResult =
+        mutex.withLock {
+            refreshToken(
+                client = client,
+                refreshToken = refreshToken,
+                markAsRefreshTokenRequest = {
+                    attributes.put(AuthCircuitBreaker, Unit)
+                },
+            )
+        }
+
+    private suspend fun refreshToken(
+        client: HttpClient,
+        refreshToken: String,
+        markAsRefreshTokenRequest: HttpRequestBuilder.() -> Unit,
+    ): AuthTokenRefreshResult =
+        try {
+            val response = client
+                .post("${BuildConfig.BASE_URL}auth/reissue") {
+                    markAsRefreshTokenRequest()
+                    setBody(ReissueTokenRequest(refreshToken = refreshToken))
+                }.body<LoginResponse>()
+
+            val token = AuthToken(
+                accessToken = response.accessToken,
+                refreshToken = response.refreshToken,
+            )
+            authLocalDataSource.saveToken(token)
+            if (BuildConfig.DEBUG) {
+                Timber.tag("AuthToken").d("토큰 재발급에 성공했습니다.")
+            }
+            AuthTokenRefreshResult.Success(token)
+        } catch (t: Throwable) {
+            t.rethrowIfCancellation()
+            if (t.isSessionRecoveryUnrecoverable()) {
+                authLocalDataSource.clear()
                 Timber.e(t, "토큰 재발급에 실패했습니다.")
-                null
+                AuthTokenRefreshResult.Failure.Unrecoverable(t)
+            } else {
+                Timber.e(t, "토큰 재발급에 실패했습니다.")
+                AuthTokenRefreshResult.Failure.Retryable(t)
             }
         }
 
@@ -69,7 +110,9 @@ internal class AuthTokenRefresher @Inject constructor(
         if (this !is ResponseException) return false
 
         val error = parseErrorResponse()
-        return error?.code == TOKEN_INVALID_CODE || error?.code == USER_NOT_FOUND_CODE
+        return error?.code == TOKEN_INVALID_CODE ||
+            error?.code == AUTHENTICATION_REQUIRED_CODE ||
+            error?.code == USER_NOT_FOUND_CODE
     }
 
     private suspend fun ResponseException.parseErrorResponse(): ApiErrorResponse? =
@@ -86,6 +129,7 @@ internal class AuthTokenRefresher @Inject constructor(
 
     private companion object {
         const val TOKEN_INVALID_CODE = "T001"
+        const val AUTHENTICATION_REQUIRED_CODE = "U001"
         const val USER_NOT_FOUND_CODE = "U003"
     }
 }
