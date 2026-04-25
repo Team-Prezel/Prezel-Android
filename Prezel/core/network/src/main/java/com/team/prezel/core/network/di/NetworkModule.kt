@@ -16,7 +16,6 @@ import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -87,7 +86,7 @@ object NetworkModule {
                 }
 
                 refreshTokens {
-                    authTokenRefresher.refreshTokens(this) ?: return@refreshTokens null
+                    authTokenRefresher.refreshBearerTokens(this) ?: return@refreshTokens null
                 }
 
                 sendWithoutRequest { request ->
@@ -120,8 +119,6 @@ object NetworkModule {
         install(ContentNegotiation) {
             json(json)
         }
-
-        install(HttpTimeout)
 
         install(UserAgent) {
             agent = buildUserAgent()

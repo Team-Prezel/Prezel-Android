@@ -31,7 +31,7 @@ class AuthTokenRefresher @Inject constructor(
 ) {
     private val mutex = Mutex()
 
-    suspend fun refreshTokens(params: RefreshTokensParams): BearerTokens? =
+    suspend fun refreshBearerTokens(params: RefreshTokensParams): BearerTokens? =
         mutex.withLock {
             val refreshToken = params.oldTokens?.refreshToken
                 ?: authLocalDataSource.getToken()?.refreshToken
@@ -39,7 +39,7 @@ class AuthTokenRefresher @Inject constructor(
 
             when (
                 val result =
-                    refreshToken(
+                    requestTokenReissue(
                         client = params.client,
                         refreshToken = refreshToken,
                         markAsRefreshTokenRequest = {
@@ -59,12 +59,12 @@ class AuthTokenRefresher @Inject constructor(
             }
         }
 
-    suspend fun refreshToken(
+    suspend fun reissueToken(
         client: HttpClient,
         refreshToken: String,
     ): AuthTokenRefreshResult =
         mutex.withLock {
-            refreshToken(
+            requestTokenReissue(
                 client = client,
                 refreshToken = refreshToken,
                 markAsRefreshTokenRequest = {
@@ -73,7 +73,7 @@ class AuthTokenRefresher @Inject constructor(
             )
         }
 
-    private suspend fun refreshToken(
+    private suspend fun requestTokenReissue(
         client: HttpClient,
         refreshToken: String,
         markAsRefreshTokenRequest: HttpRequestBuilder.() -> Unit,

@@ -29,7 +29,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         val refreshToken = token?.refreshToken
         if (refreshToken.isNullOrBlank()) return LoginStatusResult.Unauthenticated
 
-        return when (val result = authTokenRefresher.refreshToken(httpClient, refreshToken)) {
+        return when (val result = authTokenRefresher.reissueToken(httpClient, refreshToken)) {
             is AuthTokenRefreshResult.Success -> {
                 httpClient.clearAuthTokens()
                 LoginStatusResult.Authenticated

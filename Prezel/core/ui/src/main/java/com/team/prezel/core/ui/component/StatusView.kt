@@ -69,26 +69,6 @@ fun StatusView(
     }
 }
 
-@Composable
-fun StatusLottie(
-    @RawRes lottieJsonResId: Int,
-    modifier: Modifier = Modifier,
-) {
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(lottieJsonResId),
-    )
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-    )
-
-    LottieAnimation(
-        composition = composition,
-        progress = { progress },
-        modifier = modifier.size(80.dp),
-    )
-}
-
 @BasicPreview
 @Composable
 private fun StatusViewEmptyPreview() {
