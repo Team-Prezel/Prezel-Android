@@ -52,9 +52,17 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun login(idToken: String): Result<Unit> =
         when (val response = authRemoteDataSource.login(idToken = idToken)) {
-            is ApiResponse.Success -> saveTokens(response.data)
-            is ApiResponse.Failure.HttpError -> Result.failure(response.throwable)
-            is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
+            is ApiResponse.Success -> {
+                saveTokens(response.data).onFailure { clearTokens() }
+            }
+
+            is ApiResponse.Failure.HttpError -> {
+                Result.failure(response.throwable)
+            }
+
+            is ApiResponse.Failure.NetworkError -> {
+                Result.failure(response.throwable)
+            }
         }
 
     override suspend fun withdraw(reason: WithdrawReason): AuthActionResult {

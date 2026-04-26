@@ -33,8 +33,19 @@ class AuthTokenRefresher @Inject constructor(
 
     suspend fun refreshBearerTokens(params: RefreshTokensParams): BearerTokens? =
         mutex.withLock {
-            val refreshToken = params.oldTokens?.refreshToken
-                ?: authTokenStore.getToken().first()?.refreshToken
+            val storedToken = authTokenStore.getToken().first()
+            val oldRefreshToken = params.oldTokens?.refreshToken
+
+            if (
+                oldRefreshToken != null &&
+                storedToken != null &&
+                storedToken.refreshToken != oldRefreshToken
+            ) {
+                return@withLock storedToken.toBearerTokens()
+            }
+
+            val refreshToken = oldRefreshToken
+                ?: storedToken?.refreshToken
                 ?: return@withLock null
 
             when (
@@ -58,6 +69,12 @@ class AuthTokenRefresher @Inject constructor(
                 is AuthTokenRefreshResult.Failure -> null
             }
         }
+
+    private fun AuthToken.toBearerTokens(): BearerTokens =
+        BearerTokens(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+        )
 
     private suspend fun requestTokenReissue(
         client: HttpClient,

@@ -25,6 +25,7 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class AuthTokenRefresherTest {
     private val json = Json {
@@ -98,14 +99,48 @@ class AuthTokenRefresherTest {
             assertEquals(0, notifier.notifyCount)
         }
 
+    @Test
+    fun `저장소 토큰이 이미 갱신됐으면 재발급 요청 없이 최신 BearerTokens를 반환한다`() =
+        runTest {
+            val updatedToken = AuthToken(
+                accessToken = "updated-access-token",
+                refreshToken = "updated-refresh-token",
+            )
+            val tokenStore = FakeAuthTokenStore(token = updatedToken)
+            val notifier = FakeAuthSessionExpiredNotifier()
+            val refresher = AuthTokenRefresher(
+                json = json,
+                authTokenStore = tokenStore,
+                authSessionExpiredNotifier = notifier,
+            )
+            val client = createClient(
+                content = "",
+                status = HttpStatusCode.OK,
+                failOnReissue = true,
+            )
+
+            val result = refresher.refreshBearerTokens(
+                params = client.refreshTokensParams(),
+            )
+
+            assertEquals("updated-access-token", result?.accessToken)
+            assertEquals("updated-refresh-token", result?.refreshToken)
+            assertEquals(0, tokenStore.saveCount)
+            assertEquals(0, tokenStore.clearCount)
+            assertEquals(0, notifier.notifyCount)
+        }
+
     private fun createClient(
         content: String,
         status: HttpStatusCode,
+        failOnReissue: Boolean = false,
     ): HttpClient =
         HttpClient(
             MockEngine { request ->
                 if (request.url.encodedPath == "/protected") {
                     respond(content = "{}", status = HttpStatusCode.OK, headers = jsonHeaders)
+                } else if (failOnReissue) {
+                    fail("재발급 요청이 호출되지 않아야 합니다.")
                 } else {
                     respond(content = content, status = status, headers = jsonHeaders)
                 }
