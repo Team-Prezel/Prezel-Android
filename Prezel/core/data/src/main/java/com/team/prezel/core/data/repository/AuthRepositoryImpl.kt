@@ -22,20 +22,31 @@ internal class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): AuthActionResult {
-        if (authLocalDataSource
-                .getToken()
-                .first()
-                ?.accessToken
-                .isNullOrBlank()
-        ) {
+        val accessToken = authLocalDataSource
+            .getToken()
+            .first()
+            ?.accessToken
+
+        if (accessToken.isNullOrBlank()) {
             return clearTokensAndAuthenticationRequired()
         }
 
         return when (val response = authRemoteDataSource.logout()) {
-            is ApiResponse.Success -> clearTokens().toAuthActionSuccessResult()
+            is ApiResponse.Success -> {
+                clearTokens().toAuthActionSuccessResult()
+            }
 
-            is ApiResponse.Failure.HttpError -> response.toAuthActionResult()
-            is ApiResponse.Failure.NetworkError -> AuthActionResult.Failure(response.throwable)
+            is ApiResponse.Failure.HttpError -> {
+                clearTokens()
+
+                response.toAuthActionResult()
+            }
+
+            is ApiResponse.Failure.NetworkError -> {
+                clearTokens()
+
+                AuthActionResult.Failure(response.throwable)
+            }
         }
     }
 

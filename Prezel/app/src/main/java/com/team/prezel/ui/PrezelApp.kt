@@ -27,12 +27,13 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
+import timber.log.Timber
 
 @Composable
 fun PrezelApp(
     appState: PrezelAppState,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
-    onSessionExpired: () -> Unit,
+    onSessionExpired: suspend () -> Unit,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -46,9 +47,13 @@ fun PrezelApp(
             authSessionMonitor.sessionEvents.collect { event ->
                 when (event) {
                     AuthSessionEvent.Expired -> {
-                        onSessionExpired()
-                        navigator.replaceRoot(LoginNavKey)
                         authSessionMonitor.acknowledgeSessionEvent()
+                        runCatching {
+                            onSessionExpired()
+                        }.onFailure { throwable ->
+                            Timber.w(throwable, "세션 만료 후 인증 세션 정리에 실패했습니다.")
+                        }
+                        navigator.replaceRoot(LoginNavKey)
                     }
                 }
             }

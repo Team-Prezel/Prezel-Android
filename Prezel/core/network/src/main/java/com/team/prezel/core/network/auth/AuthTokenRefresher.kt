@@ -68,6 +68,7 @@ class AuthTokenRefresher @Inject constructor(
             val response = client
                 .post("${BuildConfig.BASE_URL}auth/reissue") {
                     markAsRefreshTokenRequest()
+                    attributes.put(AuthRequestAttributes.SkipAuthKey, true)
                     setBody(ReissueTokenRequest(refreshToken = refreshToken))
                 }.body<LoginResponse>()
 
@@ -107,21 +108,19 @@ class AuthTokenRefresher @Inject constructor(
     private suspend fun Throwable.isSessionRecoveryUnrecoverable(): Boolean {
         if (this !is ResponseException) return false
 
-        val error = parseErrorResponse()
-        return error?.code == TOKEN_INVALID_CODE ||
-            error?.code == AUTHENTICATION_REQUIRED_CODE ||
-            error?.code == USER_NOT_FOUND_CODE
-    }
-
-    private suspend fun ResponseException.parseErrorResponse(): ApiErrorResponse? =
-        try {
+        val error = try {
             json.decodeFromString<ApiErrorResponse>(response.bodyAsText())
         } catch (t: Throwable) {
             t.rethrowIfCancellation()
             null
         }
 
-    private fun Throwable.rethrowIfCancellation() {
+        return error?.code == TOKEN_INVALID_CODE ||
+            error?.code == AUTHENTICATION_REQUIRED_CODE ||
+            error?.code == USER_NOT_FOUND_CODE
+    }
+
+    fun Throwable.rethrowIfCancellation() {
         if (this is CancellationException) throw this
     }
 

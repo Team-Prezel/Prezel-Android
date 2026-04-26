@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 PrezelApp(
                     appState = appState,
                     entryBuilders = entryBuilders.toImmutableSet(),
-                    onSessionExpired = authManager::clearCurrentProvider,
+                    onSessionExpired = authManager::clearAuthSession,
                 )
             }
         }

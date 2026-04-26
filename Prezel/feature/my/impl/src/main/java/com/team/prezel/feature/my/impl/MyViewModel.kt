@@ -41,6 +41,13 @@ internal class MyViewModel @Inject constructor(
                 val result = logoutUseCase()
                 handleAuthActionResult(
                     result = result,
+                    onSuccess = {
+                        authManager
+                            .logout()
+                            .onFailure { throwable ->
+                                Timber.w(throwable, "로컬 인증 세션 정리에 실패했습니다.")
+                            }
+                    },
                     failureLog = "로그아웃에 실패했습니다.",
                     failureMessage = MyUiMessage.LOGOUT_FAILED,
                 )
@@ -56,12 +63,10 @@ internal class MyViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
-                val result =
-                    withdrawUseCase(
-                        reason = WithdrawReason.Other("임시 테스트 탈퇴"),
-                    )
+                val result = withdrawUseCase(reason = WithdrawReason.Other("임시 테스트 탈퇴"))
                 handleAuthActionResult(
                     result = result,
+                    onSuccess = { authManager.clearCurrentProvider() },
                     failureLog = "회원탈퇴에 실패했습니다.",
                     failureMessage = MyUiMessage.WITHDRAW_FAILED,
                 )
@@ -73,16 +78,13 @@ internal class MyViewModel @Inject constructor(
 
     private suspend fun handleAuthActionResult(
         result: AuthActionResult,
+        onSuccess: suspend () -> Unit,
         failureLog: String,
         failureMessage: MyUiMessage,
     ) {
         when (result) {
             AuthActionResult.Success -> {
-                authManager
-                    .logout()
-                    .onFailure { throwable ->
-                        Timber.w(throwable, "로컬 인증 세션 정리에 실패했습니다.")
-                    }
+                onSuccess()
                 _uiEffect.emit(MyUiEffect.NavigateToLogin)
             }
 

@@ -7,44 +7,60 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthManager
-    @Inject
-    constructor(
-        private val authClients: Map<AuthProvider, @JvmSuppressWildcards AuthClient>,
-    ) {
-        var currentProvider: AuthProvider? = null
-            private set
+class AuthManager @Inject constructor(
+    private val authClients: Map<AuthProvider, @JvmSuppressWildcards AuthClient>,
+) {
+    var currentProvider: AuthProvider? = null
+        private set
 
-        suspend fun login(
-            context: Context,
-            provider: AuthProvider,
-        ): AuthResult {
-            val authClient = authClients[provider] ?: return AuthResult.Failure.Unknown
-            val result = authClient.login(context = context)
+    suspend fun login(
+        context: Context,
+        provider: AuthProvider,
+    ): AuthResult {
+        val authClient = authClients[provider] ?: return AuthResult.Failure.Unknown
+        val result = authClient.login(context = context)
 
-            if (result is AuthResult.Success) {
-                currentProvider = provider
-            }
-
-            return result
+        if (result is AuthResult.Success) {
+            currentProvider = provider
         }
 
-        suspend fun logout(): Result<Unit> {
-            val provider =
-                currentProvider ?: authClients.keys.singleOrNull() ?: return Result.failure(
-                    IllegalStateException("로그인된 AuthProvider가 없습니다."),
-                )
+        return result
+    }
 
-            val authClient = authClients[provider] ?: return Result.failure(
-                IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),
+    suspend fun logout(): Result<Unit> {
+        val provider =
+            currentProvider ?: authClients.keys.singleOrNull() ?: return Result.failure(
+                IllegalStateException("로그인된 AuthProvider가 없습니다."),
             )
 
-            return authClient.logout().onSuccess {
-                currentProvider = null
-            }
-        }
+        val authClient = authClients[provider] ?: return Result.failure(
+            IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),
+        )
 
-        fun clearCurrentProvider() {
+        return authClient.logout().onSuccess {
             currentProvider = null
         }
     }
+
+    fun clearCurrentProvider() {
+        currentProvider = null
+    }
+
+    suspend fun clearAuthSession(): Result<Unit> {
+        val provider = currentProvider ?: return Result.success(Unit)
+        val authClient = authClients[provider]
+
+        if (authClient == null) {
+            currentProvider = null
+            return Result.failure(
+                IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),
+            )
+        }
+
+        return authClient
+            .logout()
+            .also {
+                currentProvider = null
+            }
+    }
+}

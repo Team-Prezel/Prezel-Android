@@ -15,10 +15,9 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
     override suspend fun logout(): ApiResponse<String> = authService.logout()
 
     override suspend fun login(idToken: String): ApiResponse<LoginResponse> =
-        LoginRequest(idToken = idToken)
-            .let { request ->
-                authService.login(request = request)
-            }.also(::logTokenResponse)
+        authService
+            .login(request = LoginRequest(idToken = idToken))
+            .also(::logTokenResponse)
 
     override suspend fun withdraw(
         reasonCategory: String,
@@ -38,11 +37,11 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
             is ApiResponse.Success -> Timber.tag("AuthToken").d("서버 인증 응답에 성공했습니다.")
 
             is ApiResponse.Failure.HttpError -> {
-                Timber.tag("AuthToken").e(response.throwable, "Server login failed: http error")
+                Timber.tag("AuthToken").e(response.throwable, "서버 로그인에 실패했습니다: http error")
             }
 
             is ApiResponse.Failure.NetworkError -> {
-                Timber.tag("AuthToken").e(response.throwable, "Server login failed: network error")
+                Timber.tag("AuthToken").e(response.throwable, "서버 로그인에 실패했습니다: network error")
             }
         }
     }

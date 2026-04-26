@@ -3,7 +3,7 @@ package com.team.prezel.core.network.di
 import android.os.Build
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
-import com.team.prezel.core.network.auth.AuthPathPolicy
+import com.team.prezel.core.network.auth.AuthRequestAttributes
 import com.team.prezel.core.network.auth.AuthTokenRefresher
 import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.service.AuthService
@@ -28,7 +28,6 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
@@ -86,11 +85,11 @@ object NetworkModule {
                 }
 
                 refreshTokens {
-                    authTokenRefresher.refreshBearerTokens(this) ?: return@refreshTokens null
+                    authTokenRefresher.refreshBearerTokens(this)
                 }
 
                 sendWithoutRequest { request ->
-                    AuthPathPolicy.requiresAuthorization(request.url.encodedPath)
+                    request.attributes.getOrNull(AuthRequestAttributes.SkipAuthKey) != true
                 }
             }
         }
