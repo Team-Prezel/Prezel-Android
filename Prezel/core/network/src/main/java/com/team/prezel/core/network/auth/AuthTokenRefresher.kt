@@ -1,8 +1,8 @@
 package com.team.prezel.core.network.auth
 
+import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.network.BuildConfig
-import com.team.prezel.core.network.datasource.AuthLocalDataSource
 import com.team.prezel.core.network.model.ApiErrorResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 import com.team.prezel.core.network.model.auth.ReissueTokenRequest
@@ -16,6 +16,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -34,7 +35,7 @@ class AuthTokenRefresher @Inject constructor(
     suspend fun refreshBearerTokens(params: RefreshTokensParams): BearerTokens? =
         mutex.withLock {
             val refreshToken = params.oldTokens?.refreshToken
-                ?: authLocalDataSource.getToken()?.refreshToken
+                ?: authLocalDataSource.getToken().first()?.refreshToken
                 ?: return@withLock null
 
             when (
@@ -89,7 +90,12 @@ class AuthTokenRefresher @Inject constructor(
                 accessToken = response.accessToken,
                 refreshToken = response.refreshToken,
             )
-            authLocalDataSource.saveToken(token)
+            authLocalDataSource
+                .saveToken(token)
+                .onFailure { throwable ->
+                    Timber.e(throwable, "재발급된 토큰 저장에 실패했습니다.")
+                    return AuthTokenRefreshResult.Failure.Retryable(throwable)
+                }
             if (BuildConfig.DEBUG) {
                 Timber.tag("AuthToken").d("토큰 재발급에 성공했습니다.")
             }
@@ -97,7 +103,11 @@ class AuthTokenRefresher @Inject constructor(
         } catch (t: Throwable) {
             t.rethrowIfCancellation()
             if (t.isSessionRecoveryUnrecoverable()) {
-                authLocalDataSource.clear()
+                authLocalDataSource
+                    .clear()
+                    .onFailure { throwable ->
+                        Timber.e(throwable, "인증 토큰 삭제에 실패했습니다.")
+                    }
                 Timber.e(t, "토큰 재발급에 실패했습니다.")
                 AuthTokenRefreshResult.Failure.Unrecoverable(t)
             } else {

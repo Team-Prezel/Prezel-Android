@@ -1,7 +1,7 @@
 package com.team.prezel.core.datastore.di
 
-import com.team.prezel.core.datastore.auth.AuthTokenStore
-import com.team.prezel.core.datastore.auth.DataStoreAuthTokenStore
+import com.team.prezel.core.datastore.auth.AuthLocalDataSource
+import com.team.prezel.core.datastore.auth.AuthLocalDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,8 +10,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class TokenStoreModule {
+internal abstract class DataSourceModule {
     @Binds
     @Singleton
-    abstract fun bindAuthTokenStore(impl: DataStoreAuthTokenStore): AuthTokenStore
+    abstract fun bindAuthLocalDataSource(impl: AuthLocalDataSourceImpl): AuthLocalDataSource
 }

@@ -1,11 +1,11 @@
 package com.team.prezel.core.network.di
 
 import android.os.Build
+import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.auth.AuthPathPolicy
 import com.team.prezel.core.network.auth.AuthTokenRefresher
-import com.team.prezel.core.network.datasource.AuthLocalDataSource
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
@@ -30,6 +30,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Singleton
@@ -97,7 +98,7 @@ object NetworkModule {
     }
 
     private suspend fun AuthLocalDataSource.toBearerTokens(): BearerTokens? {
-        val token = getToken() ?: return null
+        val token = getToken().first() ?: return null
 
         return BearerTokens(
             accessToken = token.accessToken,
