@@ -1,9 +1,11 @@
 package com.team.prezel.core.domain.session
 
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 interface AuthSessionEventStream {
-    val events: SharedFlow<AuthSessionEvent>
+    val events: Flow<AuthSessionEvent>
+
+    fun clearSessionExpiredEvent()
 }
 
 interface AuthSessionEventPublisher {

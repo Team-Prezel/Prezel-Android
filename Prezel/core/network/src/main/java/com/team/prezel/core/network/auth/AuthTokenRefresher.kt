@@ -88,12 +88,14 @@ class AuthTokenRefresher @Inject constructor(
         } catch (t: Throwable) {
             t.rethrowIfCancellation()
             if (t.isSessionRecoveryUnrecoverable()) {
-                authTokenStore
-                    .clear()
-                    .onFailure { throwable ->
+                authTokenStore.clear().fold(
+                    onSuccess = {
+                        authSessionExpiredNotifier.notifySessionExpired()
+                    },
+                    onFailure = { throwable ->
                         Timber.e(throwable, "인증 토큰 삭제에 실패했습니다.")
-                    }
-                authSessionExpiredNotifier.notifySessionExpired()
+                    },
+                )
                 Timber.e(t, "토큰 재발급에 실패했습니다.")
                 AuthTokenRefreshResult.Failure.Unrecoverable(t)
             } else {

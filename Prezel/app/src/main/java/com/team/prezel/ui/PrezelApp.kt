@@ -49,6 +49,7 @@ fun PrezelApp(
                     AuthSessionEvent.Expired -> {
                         onSessionExpired()
                         navigator.replaceRoot(LoginNavKey)
+                        authSessionEventStream.clearSessionExpiredEvent()
                     }
                 }
             }
