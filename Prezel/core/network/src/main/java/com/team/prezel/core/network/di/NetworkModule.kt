@@ -44,7 +44,6 @@ object NetworkModule {
         Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
-            prettyPrint = false
         }
 
     @Provides

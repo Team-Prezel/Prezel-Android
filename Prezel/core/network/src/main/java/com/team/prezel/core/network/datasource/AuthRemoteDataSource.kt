@@ -4,8 +4,6 @@ import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 
 interface AuthRemoteDataSource {
-    suspend fun reissueToken(refreshToken: String): ApiResponse<LoginResponse>
-
     suspend fun logout(): ApiResponse<String>
 
     suspend fun login(idToken: String): ApiResponse<LoginResponse>

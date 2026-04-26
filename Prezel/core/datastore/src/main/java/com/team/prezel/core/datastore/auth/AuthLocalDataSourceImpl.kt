@@ -26,6 +26,7 @@ import kotlin.coroutines.cancellation.CancellationException
 internal class AuthLocalDataSourceImpl @Inject constructor(
     @ApplicationContext context: Context,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
+    private val authTokenCacheInvalidator: AuthTokenCacheInvalidator,
 ) : AuthLocalDataSource {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -51,6 +52,7 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
             dataStore.edit { preferences ->
                 preferences[KEY_AUTH_TOKEN] = json.encodeToString(token)
             }
+            invalidateAuthTokenCaches()
         }
 
     override suspend fun clear(): Result<Unit> =
@@ -58,6 +60,7 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
             dataStore.edit { preferences ->
                 preferences.remove(KEY_AUTH_TOKEN)
             }
+            invalidateAuthTokenCaches()
         }
 
     private suspend inline fun runSuspendCatching(crossinline block: suspend () -> Unit): Result<Unit> =
@@ -74,6 +77,10 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
             ?.let { tokenJson ->
                 runCatching { json.decodeFromString<AuthToken>(tokenJson) }.getOrNull()
             }?.takeIf { token -> token.accessToken.isNotBlank() && token.refreshToken.isNotBlank() }
+
+    private fun invalidateAuthTokenCaches() {
+        authTokenCacheInvalidator.invalidate()
+    }
 
     private companion object {
         const val PREFERENCES_NAME = "auth_token_preferences"

@@ -4,7 +4,6 @@ import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginRequest
 import com.team.prezel.core.network.model.auth.LoginResponse
-import com.team.prezel.core.network.model.auth.ReissueTokenRequest
 import com.team.prezel.core.network.model.auth.WithdrawRequest
 import com.team.prezel.core.network.service.AuthService
 import timber.log.Timber
@@ -13,12 +12,6 @@ import javax.inject.Inject
 internal class AuthRemoteDataSourceImpl @Inject constructor(
     private val authService: AuthService,
 ) : AuthRemoteDataSource {
-    override suspend fun reissueToken(refreshToken: String): ApiResponse<LoginResponse> =
-        authService
-            .reissueToken(
-                request = ReissueTokenRequest(refreshToken = refreshToken),
-            ).also(::logTokenResponse)
-
     override suspend fun logout(): ApiResponse<String> = authService.logout()
 
     override suspend fun login(idToken: String): ApiResponse<LoginResponse> =

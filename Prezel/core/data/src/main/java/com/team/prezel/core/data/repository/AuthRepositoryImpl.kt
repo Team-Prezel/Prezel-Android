@@ -6,42 +6,19 @@ import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.domain.result.auth.LoginStatusResult
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.model.auth.WithdrawReason
-import com.team.prezel.core.network.auth.AuthTokenRefreshResult
-import com.team.prezel.core.network.auth.AuthTokenRefresher
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.auth.clearAuthTokens
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authLocalDataSource: AuthLocalDataSource,
-    private val authTokenRefresher: AuthTokenRefresher,
-    private val httpClient: HttpClient,
 ) : AuthRepository {
     override suspend fun checkLoginStatus(): LoginStatusResult {
         val token = authLocalDataSource.getToken().first()
-        if (!token?.accessToken.isNullOrBlank()) return LoginStatusResult.Authenticated
-
-        val refreshToken = token?.refreshToken
-        if (refreshToken.isNullOrBlank()) return LoginStatusResult.Unauthenticated
-
-        return when (val result = authTokenRefresher.reissueToken(httpClient, refreshToken)) {
-            is AuthTokenRefreshResult.Success -> {
-                httpClient.clearAuthTokens()
-                LoginStatusResult.Authenticated
-            }
-
-            is AuthTokenRefreshResult.Failure.Unrecoverable -> {
-                httpClient.clearAuthTokens()
-                LoginStatusResult.Unauthenticated
-            }
-
-            is AuthTokenRefreshResult.Failure.Retryable -> LoginStatusResult.RetryableFailure(result.throwable)
-        }
+        return if (token == null) LoginStatusResult.Unauthenticated else LoginStatusResult.Authenticated
     }
 
     override suspend fun logout(): AuthActionResult {
@@ -64,7 +41,7 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun login(idToken: String): Result<Unit> =
         when (val response = authRemoteDataSource.login(idToken = idToken)) {
-            is ApiResponse.Success -> saveTokens(response.data).map { Unit }
+            is ApiResponse.Success -> saveTokens(response.data)
             is ApiResponse.Failure.HttpError -> Result.failure(response.throwable)
             is ApiResponse.Failure.NetworkError -> Result.failure(response.throwable)
         }
@@ -93,14 +70,9 @@ internal class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun saveTokens(response: LoginResponse): Result<AuthToken> {
+    private suspend fun saveTokens(response: LoginResponse): Result<Unit> {
         val token = response.toAuthToken()
-
-        return authLocalDataSource
-            .saveToken(token)
-            .onSuccess {
-                httpClient.clearAuthTokens()
-            }.map { token }
+        return authLocalDataSource.saveToken(token)
     }
 
     private fun LoginResponse.toAuthToken(): AuthToken =
@@ -125,12 +97,7 @@ internal class AuthRepositoryImpl @Inject constructor(
             onFailure = { throwable -> AuthActionResult.Failure(throwable) },
         )
 
-    private suspend fun clearTokens(): Result<Unit> =
-        authLocalDataSource
-            .clear()
-            .onSuccess {
-                httpClient.clearAuthTokens()
-            }
+    private suspend fun clearTokens(): Result<Unit> = authLocalDataSource.clear()
 
     private fun Result<Unit>.toAuthActionSuccessResult(): AuthActionResult =
         fold(
