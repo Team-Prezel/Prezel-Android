@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface AuthLocalDataSource {
     fun getToken(): Flow<AuthToken?>
 
-    suspend fun saveToken(token: AuthToken): Result<Unit>
+    suspend fun saveToken(
+        token: AuthToken,
+        invalidateCache: Boolean = true,
+    ): Result<Unit>
 
     suspend fun clear(): Result<Unit>
 }

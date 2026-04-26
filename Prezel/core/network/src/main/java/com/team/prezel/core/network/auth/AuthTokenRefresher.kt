@@ -9,7 +9,6 @@ import com.team.prezel.core.network.model.auth.ReissueTokenRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.auth.AuthCircuitBreaker
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 import io.ktor.client.request.HttpRequestBuilder
@@ -60,20 +59,6 @@ class AuthTokenRefresher @Inject constructor(
             }
         }
 
-    suspend fun reissueToken(
-        client: HttpClient,
-        refreshToken: String,
-    ): AuthTokenRefreshResult =
-        mutex.withLock {
-            requestTokenReissue(
-                client = client,
-                refreshToken = refreshToken,
-                markAsRefreshTokenRequest = {
-                    attributes.put(AuthCircuitBreaker, Unit)
-                },
-            )
-        }
-
     private suspend fun requestTokenReissue(
         client: HttpClient,
         refreshToken: String,
@@ -91,8 +76,10 @@ class AuthTokenRefresher @Inject constructor(
                 refreshToken = response.refreshToken,
             )
             authLocalDataSource
-                .saveToken(token)
-                .onFailure { throwable ->
+                .saveToken(
+                    token = token,
+                    invalidateCache = false,
+                ).onFailure { throwable ->
                     Timber.e(throwable, "재발급된 토큰 저장에 실패했습니다.")
                     return AuthTokenRefreshResult.Failure.Retryable(throwable)
                 }

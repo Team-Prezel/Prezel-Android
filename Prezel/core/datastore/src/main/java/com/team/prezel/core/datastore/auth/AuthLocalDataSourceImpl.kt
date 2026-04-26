@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,28 +48,36 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
                 preferences.toAuthToken()
             }
 
-    override suspend fun saveToken(token: AuthToken): Result<Unit> =
-        runSuspendCatching {
+    override suspend fun saveToken(
+        token: AuthToken,
+        invalidateCache: Boolean,
+    ): Result<Unit> {
+        val result = runSuspendCatching {
             dataStore.edit { preferences ->
                 preferences[KEY_AUTH_TOKEN] = json.encodeToString(token)
             }
-            invalidateAuthTokenCaches()
         }
+        if (result.isSuccess && invalidateCache) invalidateAuthTokenCaches()
+        return result
+    }
 
-    override suspend fun clear(): Result<Unit> =
-        runSuspendCatching {
+    override suspend fun clear(): Result<Unit> {
+        val result = runSuspendCatching {
             dataStore.edit { preferences ->
                 preferences.remove(KEY_AUTH_TOKEN)
             }
-            invalidateAuthTokenCaches()
         }
+        if (result.isSuccess) invalidateAuthTokenCaches()
+        return result
+    }
 
     private suspend inline fun runSuspendCatching(crossinline block: suspend () -> Unit): Result<Unit> =
         try {
             block()
             Result.success(Unit)
+        } catch (t: CancellationException) {
+            throw t
         } catch (t: Throwable) {
-            if (t is CancellationException) throw t
             Result.failure(t)
         }
 
@@ -79,7 +88,13 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
             }?.takeIf { token -> token.accessToken.isNotBlank() && token.refreshToken.isNotBlank() }
 
     private fun invalidateAuthTokenCaches() {
-        authTokenCacheInvalidator.invalidate()
+        try {
+            authTokenCacheInvalidator.invalidate()
+        } catch (t: CancellationException) {
+            throw t
+        } catch (t: Throwable) {
+            Timber.e(t, "인증 토큰 캐시 무효화에 실패했습니다.")
+        }
     }
 
     private companion object {
