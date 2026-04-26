@@ -1,6 +1,5 @@
 package com.team.prezel.core.network.auth
 
-import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.model.auth.AuthToken
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.model.ApiErrorResponse
@@ -27,14 +26,15 @@ import kotlin.coroutines.cancellation.CancellationException
 @Singleton
 class AuthTokenRefresher @Inject constructor(
     private val json: Json,
-    private val authLocalDataSource: AuthLocalDataSource,
+    private val authTokenStore: AuthTokenStore,
+    private val authSessionExpiredNotifier: AuthSessionExpiredNotifier,
 ) {
     private val mutex = Mutex()
 
     suspend fun refreshBearerTokens(params: RefreshTokensParams): BearerTokens? =
         mutex.withLock {
             val refreshToken = params.oldTokens?.refreshToken
-                ?: authLocalDataSource.getToken().first()?.refreshToken
+                ?: authTokenStore.getToken().first()?.refreshToken
                 ?: return@withLock null
 
             when (
@@ -75,11 +75,9 @@ class AuthTokenRefresher @Inject constructor(
                 accessToken = response.accessToken,
                 refreshToken = response.refreshToken,
             )
-            authLocalDataSource
-                .saveToken(
-                    token = token,
-                    invalidateCache = false,
-                ).onFailure { throwable ->
+            authTokenStore
+                .saveToken(token)
+                .onFailure { throwable ->
                     Timber.e(throwable, "재발급된 토큰 저장에 실패했습니다.")
                     return AuthTokenRefreshResult.Failure.Retryable(throwable)
                 }
@@ -90,11 +88,12 @@ class AuthTokenRefresher @Inject constructor(
         } catch (t: Throwable) {
             t.rethrowIfCancellation()
             if (t.isSessionRecoveryUnrecoverable()) {
-                authLocalDataSource
+                authTokenStore
                     .clear()
                     .onFailure { throwable ->
                         Timber.e(throwable, "인증 토큰 삭제에 실패했습니다.")
                     }
+                authSessionExpiredNotifier.notifySessionExpired()
                 Timber.e(t, "토큰 재발급에 실패했습니다.")
                 AuthTokenRefreshResult.Failure.Unrecoverable(t)
             } else {

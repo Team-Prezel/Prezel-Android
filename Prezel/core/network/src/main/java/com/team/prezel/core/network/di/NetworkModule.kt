@@ -1,11 +1,11 @@
 package com.team.prezel.core.network.di
 
 import android.os.Build
-import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.auth.AuthPathPolicy
 import com.team.prezel.core.network.auth.AuthTokenRefresher
+import com.team.prezel.core.network.auth.AuthTokenStore
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
@@ -50,9 +50,9 @@ object NetworkModule {
     @Singleton
     internal fun provideHttpClient(
         json: Json,
-        authLocalDataSource: AuthLocalDataSource,
+        authTokenStore: AuthTokenStore,
         authTokenRefresher: AuthTokenRefresher,
-    ): HttpClient = createHttpClient(json) { configureAuthenticatedClient(authLocalDataSource, authTokenRefresher) }
+    ): HttpClient = createHttpClient(json) { configureAuthenticatedClient(authTokenStore, authTokenRefresher) }
 
     @Provides
     @Singleton
@@ -75,14 +75,14 @@ object NetworkModule {
         }
 
     private fun HttpClientConfig<*>.configureAuthenticatedClient(
-        authLocalDataSource: AuthLocalDataSource,
+        authTokenStore: AuthTokenStore,
         authTokenRefresher: AuthTokenRefresher,
     ) {
         install(Auth) {
             bearer {
-                cacheTokens = true
+                cacheTokens = false
                 loadTokens {
-                    authLocalDataSource.toBearerTokens()
+                    authTokenStore.toBearerTokens()
                 }
 
                 refreshTokens {
@@ -96,7 +96,7 @@ object NetworkModule {
         }
     }
 
-    private suspend fun AuthLocalDataSource.toBearerTokens(): BearerTokens? {
+    private suspend fun AuthTokenStore.toBearerTokens(): BearerTokens? {
         val token = getToken().first() ?: return null
 
         return BearerTokens(

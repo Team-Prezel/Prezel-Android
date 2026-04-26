@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,11 +18,14 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
+import com.team.prezel.core.domain.session.AuthSessionEvent
+import com.team.prezel.core.domain.session.AuthSessionEventStream
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
 
@@ -29,6 +33,8 @@ import kotlinx.collections.immutable.ImmutableSet
 fun PrezelApp(
     appState: PrezelAppState,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
+    authSessionEventStream: AuthSessionEventStream,
+    onSessionExpired: () -> Unit,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -37,6 +43,17 @@ fun PrezelApp(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
+        LaunchedEffect(authSessionEventStream, navigator) {
+            authSessionEventStream.events.collect { event ->
+                when (event) {
+                    AuthSessionEvent.Expired -> {
+                        onSessionExpired()
+                        navigator.replaceRoot(LoginNavKey)
+                    }
+                }
+            }
+        }
+
         DoubleBackToExitHandler(navigationState = appState.navigationState)
 
         PrezelAppContent(

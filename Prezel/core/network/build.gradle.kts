@@ -17,8 +17,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.coreDatastore)
     implementation(projects.coreModel)
+
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.auth)
@@ -27,7 +27,6 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
-
     implementation(libs.ktorfit.lib)
     ksp(libs.ktorfit.ksp)
 

@@ -6,8 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.domain.session.AuthSessionEventStream
 import com.team.prezel.ui.PrezelApp
 import com.team.prezel.ui.rememberPrezelAppState
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +20,12 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var authManager: AuthManager
+
+    @Inject
+    lateinit var authSessionEventStream: AuthSessionEventStream
 
     @Inject
     lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
@@ -35,6 +43,8 @@ class MainActivity : ComponentActivity() {
                 PrezelApp(
                     appState = appState,
                     entryBuilders = entryBuilders.toImmutableSet(),
+                    authSessionEventStream = authSessionEventStream,
+                    onSessionExpired = authManager::clearCurrentProvider,
                 )
             }
         }

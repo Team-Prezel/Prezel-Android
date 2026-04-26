@@ -33,6 +33,7 @@ dependencies {
     implementation(projects.coreAuth)
     implementation(projects.coreData)
     implementation(projects.coreDesignsystem)
+    implementation(projects.coreDomain)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
 
