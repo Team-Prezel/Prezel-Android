@@ -31,6 +31,7 @@ dependencies {
     ksp(libs.ktorfit.ksp)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
 }
 
 androidComponents {
