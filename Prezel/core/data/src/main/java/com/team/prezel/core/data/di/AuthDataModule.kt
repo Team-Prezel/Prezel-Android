@@ -2,9 +2,9 @@ package com.team.prezel.core.data.di
 
 import com.team.prezel.core.data.auth.DataAuthSessionExpiredNotifier
 import com.team.prezel.core.data.auth.DataAuthTokenStore
-import com.team.prezel.core.data.auth.DefaultAuthSessionEventBus
+import com.team.prezel.core.data.auth.DefaultAuthSessionMonitor
 import com.team.prezel.core.domain.session.AuthSessionEventPublisher
-import com.team.prezel.core.domain.session.AuthSessionEventStream
+import com.team.prezel.core.domain.session.AuthSessionMonitor
 import com.team.prezel.core.network.auth.AuthSessionExpiredNotifier
 import com.team.prezel.core.network.auth.AuthTokenStore
 import dagger.Binds
@@ -26,9 +26,9 @@ internal abstract class AuthDataModule {
 
     @Singleton
     @Binds
-    abstract fun bindAuthSessionEventPublisher(eventBus: DefaultAuthSessionEventBus): AuthSessionEventPublisher
+    abstract fun bindAuthSessionEventPublisher(monitor: DefaultAuthSessionMonitor): AuthSessionEventPublisher
 
     @Singleton
     @Binds
-    abstract fun bindAuthSessionEventStream(eventBus: DefaultAuthSessionEventBus): AuthSessionEventStream
+    abstract fun bindAuthSessionMonitor(monitor: DefaultAuthSessionMonitor): AuthSessionMonitor
 }

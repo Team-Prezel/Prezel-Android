@@ -9,7 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.domain.session.AuthSessionEventStream
+import com.team.prezel.core.domain.session.AuthSessionMonitor
 import com.team.prezel.ui.PrezelApp
 import com.team.prezel.ui.rememberPrezelAppState
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
     lateinit var authManager: AuthManager
 
     @Inject
-    lateinit var authSessionEventStream: AuthSessionEventStream
+    lateinit var authSessionMonitor: AuthSessionMonitor
 
     @Inject
     lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
@@ -38,12 +38,12 @@ class MainActivity : ComponentActivity() {
             PrezelTheme {
                 val appState = rememberPrezelAppState(
                     networkMonitor = networkMonitor,
+                    authSessionMonitor = authSessionMonitor,
                 )
 
                 PrezelApp(
                     appState = appState,
                     entryBuilders = entryBuilders.toImmutableSet(),
-                    authSessionEventStream = authSessionEventStream,
                     onSessionExpired = authManager::clearCurrentProvider,
                 )
             }

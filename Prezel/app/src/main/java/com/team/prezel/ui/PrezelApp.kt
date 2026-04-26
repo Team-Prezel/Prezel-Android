@@ -19,7 +19,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.domain.session.AuthSessionEvent
-import com.team.prezel.core.domain.session.AuthSessionEventStream
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
@@ -33,23 +32,23 @@ import kotlinx.collections.immutable.ImmutableSet
 fun PrezelApp(
     appState: PrezelAppState,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
-    authSessionEventStream: AuthSessionEventStream,
     onSessionExpired: () -> Unit,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val authSessionMonitor = appState.authSessionMonitor
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
-        LaunchedEffect(authSessionEventStream, navigator) {
-            authSessionEventStream.events.collect { event ->
+        LaunchedEffect(authSessionMonitor, navigator) {
+            authSessionMonitor.sessionEvents.collect { event ->
                 when (event) {
                     AuthSessionEvent.Expired -> {
                         onSessionExpired()
                         navigator.replaceRoot(LoginNavKey)
-                        authSessionEventStream.clearSessionExpiredEvent()
+                        authSessionMonitor.acknowledgeSessionEvent()
                     }
                 }
             }
