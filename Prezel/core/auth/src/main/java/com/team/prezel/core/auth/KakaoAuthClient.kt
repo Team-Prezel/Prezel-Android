@@ -1,6 +1,7 @@
 package com.team.prezel.core.auth
 
 import android.content.Context
+import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.common.model.AuthErrorCause
@@ -15,6 +16,18 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 class KakaoAuthClient @Inject constructor() : AuthClient {
+    override suspend fun isLoggedIn(): Boolean {
+        if (!AuthApiClient.instance.hasToken()) return false
+
+        return suspendCancellableCoroutine { continuation ->
+            UserApiClient.instance.accessTokenInfo { _, error ->
+                if (continuation.isActive) {
+                    continuation.resume(error == null)
+                }
+            }
+        }
+    }
+
     override suspend fun login(context: Context): AuthResult =
         suspendCancellableCoroutine { continuation ->
             if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
@@ -37,6 +50,22 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
                 }
 
                 Timber.d("카카오 로그아웃에 성공했습니다.")
+                continuation.resume(Result.success(Unit))
+            }
+        }
+
+    override suspend fun unlink(): Result<Unit> =
+        suspendCancellableCoroutine { continuation ->
+            Timber.d("카카오 회원탈퇴 시도")
+
+            UserApiClient.instance.unlink { error ->
+                if (error != null) {
+                    Timber.e(error, "카카오 회원탈퇴에 실패했습니다.")
+                    continuation.resume(Result.failure(error))
+                    return@unlink
+                }
+
+                Timber.d("카카오 회원탈퇴에 성공했습니다.")
                 continuation.resume(Result.success(Unit))
             }
         }

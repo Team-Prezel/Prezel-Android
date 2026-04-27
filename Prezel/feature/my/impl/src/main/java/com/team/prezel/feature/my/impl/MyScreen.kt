@@ -47,8 +47,8 @@ internal fun MyScreen(
 
     MyScreenContent(
         uiState = uiState,
-        onLogout = viewModel::logout,
-        onWithdraw = viewModel::withdraw,
+        onLogout = {},
+        onWithdraw = {},
         modifier = modifier,
     )
 }
