@@ -20,12 +20,13 @@ import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.core.common.event.GlobalEvent
 import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
+import com.team.prezel.core.designsystem.component.PrezelNavigationScope
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
-import com.team.prezel.feature.login.api.LoginNavKey
+import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
 
@@ -59,16 +60,11 @@ private fun PrezelAppContent(
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
-    val snackbarHostState = LocalSnackbarHostState.current
-    val showNavigationBar = appState.shouldShowNavigationBar
 
-    LaunchedEffect(globalEventBus, navigator) {
-        globalEventBus.events.collect { event ->
-            when (event) {
-                GlobalEvent.ForceLogout -> navigator.replaceRoot(LoginNavKey)
-            }
-        }
-    }
+    ObserveGlobalEvents(
+        globalEventBus = globalEventBus,
+        navigateToSplash = { navigator.replaceRoot(SplashNavKey) },
+    )
 
     SharedTransitionLayout {
         ProvideSharedTransitionScope(this@SharedTransitionLayout) {
@@ -79,18 +75,9 @@ private fun PrezelAppContent(
             }
 
             PrezelNavigationScaffold(
-                showNavigationBar = showNavigationBar,
-                snackbarHostState = snackbarHostState,
-                navigationItems = {
-                    MAIN_NAV_ITEMS.forEach { (key, item) ->
-                        Item(
-                            selected = key == appState.navigationState.currentTopLevelKey,
-                            onClick = { navigator.navigate(key) },
-                            label = stringResource(item.titleTextId),
-                            iconResId = item.iconRes,
-                        )
-                    }
-                },
+                showNavigationBar = appState.shouldShowNavigationBar,
+                snackbarHostState = LocalSnackbarHostState.current,
+                navigationItems = { AppNavigationItems(appState = appState, navigateToKey = { key -> navigator.navigate(key) }) },
             ) { padding ->
                 NavDisplay(
                     entries = appState.navigationState.toEntries(provider),
@@ -111,5 +98,34 @@ private fun PrezelAppContent(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ObserveGlobalEvents(
+    globalEventBus: GlobalEventBus,
+    navigateToSplash: () -> Unit,
+) {
+    LaunchedEffect(globalEventBus) {
+        globalEventBus.events.collect { event ->
+            when (event) {
+                GlobalEvent.ForceLogout -> navigateToSplash()
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrezelNavigationScope.AppNavigationItems(
+    appState: PrezelAppState,
+    navigateToKey: (NavKey) -> Unit,
+) {
+    MAIN_NAV_ITEMS.forEach { (key, item) ->
+        Item(
+            selected = key == appState.navigationState.currentTopLevelKey,
+            onClick = { navigateToKey(key) },
+            label = stringResource(item.titleTextId),
+            iconResId = item.iconRes,
+        )
     }
 }
