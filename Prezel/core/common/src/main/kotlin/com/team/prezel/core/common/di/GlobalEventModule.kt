@@ -1,4 +1,4 @@
-package com.team.prezel
+package com.team.prezel.core.common.di
 
 import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.common.event.GlobalEventBusImpl
