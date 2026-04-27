@@ -6,7 +6,7 @@ import com.team.prezel.core.network.auth.TokenProvider
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-internal class DefaultTokenProvider @Inject constructor(
+internal class TokenProviderImpl @Inject constructor(
     private val dataSource: AuthLocalDataSource,
 ) : TokenProvider {
     override suspend fun getTokens(): AuthTokens? = dataSource.tokens.firstOrNull()

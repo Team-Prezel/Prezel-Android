@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DefaultGlobalEventBus @Inject constructor() : GlobalEventBus {
+class GlobalEventBusImpl @Inject constructor() : GlobalEventBus {
     private val _events = MutableSharedFlow<GlobalEvent>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
