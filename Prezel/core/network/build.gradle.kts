@@ -17,6 +17,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreCommon)
     implementation(projects.coreModel)
 
     implementation(libs.ktor.client.core)

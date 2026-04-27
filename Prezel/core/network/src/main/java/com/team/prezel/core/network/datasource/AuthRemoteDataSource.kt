@@ -1,15 +1,14 @@
 package com.team.prezel.core.network.datasource
 
-import com.team.prezel.core.network.model.ApiResponse
 import com.team.prezel.core.network.model.auth.LoginResponse
 
 interface AuthRemoteDataSource {
-    suspend fun logout(): ApiResponse<String>
+    suspend fun logout()
 
-    suspend fun login(idToken: String): ApiResponse<LoginResponse>
+    suspend fun login(idToken: String): LoginResponse
 
     suspend fun withdraw(
         reasonCategory: String,
         reasonText: String,
-    ): ApiResponse<String>
+    )
 }

@@ -5,102 +5,56 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.team.prezel.core.model.auth.AuthToken
+import com.team.prezel.core.model.auth.AuthTokens
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 internal class AuthLocalDataSourceImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : AuthLocalDataSource {
-    private val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
-    private val cacheMutex = Mutex()
-    private val cachedToken = MutableStateFlow<AuthToken?>(null)
-
-    @Volatile
-    private var isCacheInitialized = false
-
-    override fun getToken(): Flow<AuthToken?> =
-        flow {
-            ensureCacheInitialized()
-            emitAll(cachedToken)
-        }
-
-    override suspend fun saveToken(token: AuthToken): Result<Unit> =
-        runSuspendCatching {
-            dataStore.edit { preferences ->
-                preferences[KEY_AUTH_TOKEN] = json.encodeToString(token)
-            }
-        }.onSuccess {
-            updateCache(token)
-        }
-
-    override suspend fun clear(): Result<Unit> =
-        runSuspendCatching {
-            dataStore.edit { preferences ->
-                preferences.remove(KEY_AUTH_TOKEN)
-            }
-        }.onSuccess {
-            updateCache(null)
-        }
-
-    private suspend fun ensureCacheInitialized() {
-        if (isCacheInitialized) return
-
-        cacheMutex.withLock {
-            if (isCacheInitialized) return
-
-            cachedToken.value = readTokenFromDataStore()
-            isCacheInitialized = true
-        }
-    }
-
-    private suspend fun readTokenFromDataStore(): AuthToken? =
-        dataStore.data
-            .catch { exception ->
-                if (exception is IOException) emit(emptyPreferences()) else throw exception
+    override val tokens: Flow<AuthTokens?>
+        get() = dataStore.data
+            .catch { throwable ->
+                if (throwable is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw throwable
+                }
             }.map { preferences ->
-                preferences.toAuthToken()
-            }.first()
+                val accessToken = preferences[ACCESS_TOKEN_KEY]
+                val refreshToken = preferences[REFRESH_TOKEN_KEY]
 
-    private fun updateCache(token: AuthToken?) {
-        cachedToken.value = token
-        isCacheInitialized = true
+                if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+                    null
+                } else {
+                    AuthTokens(
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                    )
+                }
+            }
+
+    override suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        dataStore.edit { preferences ->
+            preferences[ACCESS_TOKEN_KEY] = accessToken
+            preferences[REFRESH_TOKEN_KEY] = refreshToken
+        }
     }
 
-    private suspend inline fun runSuspendCatching(crossinline block: suspend () -> Unit): Result<Unit> =
-        try {
-            block()
-            Result.success(Unit)
-        } catch (t: CancellationException) {
-            throw t
-        } catch (t: Throwable) {
-            Result.failure(t)
+    override suspend fun clearTokens() {
+        dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
-
-    private fun Preferences.toAuthToken(): AuthToken? =
-        this[KEY_AUTH_TOKEN]
-            ?.let { tokenJson ->
-                runCatching { json.decodeFromString<AuthToken>(tokenJson) }.getOrNull()
-            }?.takeIf { token -> token.accessToken.isNotBlank() && token.refreshToken.isNotBlank() }
+    }
 
     private companion object {
-        val KEY_AUTH_TOKEN = stringPreferencesKey("auth_token")
+        val ACCESS_TOKEN_KEY = stringPreferencesKey("auth_access_token")
+        val REFRESH_TOKEN_KEY = stringPreferencesKey("auth_refresh_token")
     }
 }

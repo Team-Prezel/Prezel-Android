@@ -1,6 +1,6 @@
 package com.team.prezel.core.data.di
 
-import com.team.prezel.core.data.repository.AuthRepositoryImpl
+import com.team.prezel.core.data.repository.DefaultAuthRepository
 import com.team.prezel.core.data.repository.UserRepositoryImpl
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.repository.profile.UserRepository
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 internal abstract class RepositoryModule {
     @Binds
     @Singleton
-    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+    abstract fun bindAuthRepository(impl: DefaultAuthRepository): AuthRepository
 
     @Binds
     @Singleton

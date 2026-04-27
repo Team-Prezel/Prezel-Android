@@ -8,6 +8,7 @@ android {
 
 dependencies {
     implementation(projects.coreDomain)
+    implementation(projects.coreModel)
     implementation(projects.featureSplashApi)
     implementation(projects.featureLoginApi)
     implementation(projects.featureHomeApi)

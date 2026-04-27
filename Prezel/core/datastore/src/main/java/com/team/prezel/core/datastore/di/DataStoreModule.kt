@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +17,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DataStoreModule {
+    private const val PREFERENCES_NAME = "auth_token_preferences"
+
     @Provides
     @Singleton
     fun providePreferencesDataStore(
@@ -26,6 +29,4 @@ internal object DataStoreModule {
             scope = scope,
             produceFile = { context.preferencesDataStoreFile(PREFERENCES_NAME) },
         )
-
-    private const val PREFERENCES_NAME = "auth_token_preferences"
 }

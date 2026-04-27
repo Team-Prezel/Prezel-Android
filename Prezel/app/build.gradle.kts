@@ -36,6 +36,7 @@ dependencies {
     implementation(projects.coreDomain)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
+    implementation(projects.coreCommon)
 
     implementation(projects.featureSplashApi)
     implementation(projects.featureSplashImpl)
