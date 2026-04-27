@@ -6,7 +6,10 @@ import kotlinx.coroutines.flow.Flow
 interface AuthLocalDataSource {
     val tokens: Flow<AuthTokens?>
 
-    suspend fun saveTokens(accessToken: String, refreshToken: String)
+    suspend fun saveTokens(
+        accessToken: String,
+        refreshToken: String,
+    )
 
     suspend fun clearTokens()
 }

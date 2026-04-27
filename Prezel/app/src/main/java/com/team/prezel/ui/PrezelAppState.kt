@@ -5,7 +5,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.team.prezel.core.data.NetworkMonitor
-import com.team.prezel.core.domain.session.AuthSessionMonitor
 import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.navigation.rememberNavigationState
 import com.team.prezel.feature.splash.api.SplashNavKey
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.stateIn
 @Composable
 fun rememberPrezelAppState(
     networkMonitor: NetworkMonitor,
-    authSessionMonitor: AuthSessionMonitor,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): PrezelAppState {
     val navigationState = rememberNavigationState(
@@ -32,13 +30,11 @@ fun rememberPrezelAppState(
         navigationState,
         coroutineScope,
         networkMonitor,
-        authSessionMonitor,
     ) {
         PrezelAppState(
             navigationState = navigationState,
             coroutineScope = coroutineScope,
             networkMonitor = networkMonitor,
-            authSessionMonitor = authSessionMonitor,
         )
     }
 }
@@ -46,7 +42,6 @@ fun rememberPrezelAppState(
 @Stable
 class PrezelAppState(
     val navigationState: NavigationState,
-    val authSessionMonitor: AuthSessionMonitor,
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor,
 ) {

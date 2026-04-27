@@ -39,7 +39,10 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
                 }
             }
 
-    override suspend fun saveTokens(accessToken: String, refreshToken: String) {
+    override suspend fun saveTokens(
+        accessToken: String,
+        refreshToken: String,
+    ) {
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = accessToken
             preferences[REFRESH_TOKEN_KEY] = refreshToken

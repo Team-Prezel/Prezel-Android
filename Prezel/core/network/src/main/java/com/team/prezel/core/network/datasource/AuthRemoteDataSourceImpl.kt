@@ -1,9 +1,9 @@
 package com.team.prezel.core.network.datasource
 
-import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.model.auth.LoginRequest
 import com.team.prezel.core.network.model.auth.LoginResponse
 import com.team.prezel.core.network.model.auth.WithdrawRequest
+import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.service.AuthService
 import javax.inject.Inject
 
@@ -14,15 +14,15 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
         authService.logout().requireData()
     }
 
-    override suspend fun login(idToken: String): LoginResponse =
-        authService.login(request = LoginRequest(idToken = idToken)).requireData()
+    override suspend fun login(idToken: String): LoginResponse = authService.login(request = LoginRequest(idToken = idToken)).requireData()
 
     override suspend fun withdraw(
         reasonCategory: String,
         reasonText: String,
     ) {
-        authService.withdraw(
-            request = WithdrawRequest(reasonCategory = reasonCategory, reasonText = reasonText),
-        ).requireData()
+        authService
+            .withdraw(
+                request = WithdrawRequest(reasonCategory = reasonCategory, reasonText = reasonText),
+            ).requireData()
     }
 }

@@ -25,8 +25,6 @@ enum class ServerErrorCode(
     ;
 
     companion object {
-        fun from(code: String?): ServerErrorCode {
-            return entries.firstOrNull { it.code == code } ?: UNKNOWN
-        }
+        fun from(code: String?): ServerErrorCode = entries.firstOrNull { it.code == code } ?: UNKNOWN
     }
 }

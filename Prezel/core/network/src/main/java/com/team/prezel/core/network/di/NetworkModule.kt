@@ -27,7 +27,6 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.observer.ResponseObserver
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
@@ -54,69 +53,70 @@ object NetworkModule {
         tokenProvider: TokenProvider,
         authServiceProvider: Provider<AuthService>,
         globalEventBus: GlobalEventBus,
-    ): HttpClient = HttpClient(OkHttp) {
-        defaultRequest {
-            contentType(ContentType.Application.Json)
-        }
-        install(ContentNegotiation) { json(networkJson) }
-
-        install(UserAgent) { agent = buildUserAgent() }
-
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    Timber.tag("KTOR-LOG").d(message)
-                }
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            defaultRequest {
+                contentType(ContentType.Application.Json)
             }
-            sanitizeHeader { header -> header == HttpHeaders.Authorization }
-            level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
-        }
+            install(ContentNegotiation) { json(networkJson) }
 
-        install(Auth) {
-            bearer {
-                cacheTokens = true
-                loadTokens {
-                    tokenProvider.getTokens()?.let { tokens ->
-                        BearerTokens(
-                            accessToken = tokens.accessToken,
-                            refreshToken = tokens.refreshToken,
-                        )
+            install(UserAgent) { agent = buildUserAgent() }
+
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Timber.tag("KTOR-LOG").d(message)
                     }
                 }
+                sanitizeHeader { header -> header == HttpHeaders.Authorization }
+                level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
+            }
 
-                refreshTokens {
-                    val oldRefreshToken = oldTokens?.refreshToken ?: return@refreshTokens null
-                    return@refreshTokens try {
-                        val response = authServiceProvider.get()
-                            .reissue(request = ReissueRequest(oldRefreshToken))
-                            .requireData()
-                        with(response) {
-                            tokenProvider.updateTokens(accessToken = accessToken, refreshToken = refreshToken)
-                            BearerTokens(accessToken = accessToken, refreshToken = refreshToken).also { client.clearAuthTokens() }
+            install(Auth) {
+                bearer {
+                    cacheTokens = true
+                    loadTokens {
+                        tokenProvider.getTokens()?.let { tokens ->
+                            BearerTokens(
+                                accessToken = tokens.accessToken,
+                                refreshToken = tokens.refreshToken,
+                            )
                         }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (_: Exception) {
-                        tokenProvider.clearTokens()
-                        client.clearAuthTokens()
-                        globalEventBus.emit(GlobalEvent.ForceLogout)
-                        null
                     }
-                }
 
-                sendWithoutRequest { request ->
-                    request.attributes.getOrNull(AuthRequestAttributes.SkipAuthKey) != true
+                    refreshTokens {
+                        val oldRefreshToken = oldTokens?.refreshToken ?: return@refreshTokens null
+                        return@refreshTokens try {
+                            val response = authServiceProvider
+                                .get()
+                                .reissue(request = ReissueRequest(oldRefreshToken))
+                                .requireData()
+                            with(response) {
+                                tokenProvider.updateTokens(accessToken = accessToken, refreshToken = refreshToken)
+                                BearerTokens(accessToken = accessToken, refreshToken = refreshToken).also { client.clearAuthTokens() }
+                            }
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Exception) {
+                            tokenProvider.clearTokens()
+                            client.clearAuthTokens()
+                            globalEventBus.emit(GlobalEvent.ForceLogout)
+                            null
+                        }
+                    }
+
+                    sendWithoutRequest { request ->
+                        request.attributes.getOrNull(AuthRequestAttributes.SkipAuthKey) != true
+                    }
                 }
             }
         }
-    }
 
     @Provides
     @Singleton
-    fun provideKtorfit(
-        httpClient: HttpClient,
-    ): Ktorfit =
-        Ktorfit.Builder()
+    fun provideKtorfit(httpClient: HttpClient): Ktorfit =
+        Ktorfit
+            .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .httpClient(httpClient)
             .build()

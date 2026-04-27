@@ -13,7 +13,5 @@ import javax.inject.Singleton
 internal abstract class GlobalEventModule {
     @Binds
     @Singleton
-    abstract fun bindsGlobalEventBus(
-        globalEventBus: DefaultGlobalEventBus,
-    ): GlobalEventBus
+    abstract fun bindsGlobalEventBus(globalEventBus: DefaultGlobalEventBus): GlobalEventBus
 }

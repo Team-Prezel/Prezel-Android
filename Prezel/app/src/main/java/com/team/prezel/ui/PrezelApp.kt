@@ -17,8 +17,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.team.prezel.core.common.event.GlobalEvent
+import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
-import com.team.prezel.core.domain.session.AuthSessionEvent
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
@@ -27,42 +28,25 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
-import timber.log.Timber
 
 @Composable
 fun PrezelApp(
     appState: PrezelAppState,
+    globalEventBus: GlobalEventBus,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
-    onSessionExpired: suspend () -> Unit,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val authSessionMonitor = appState.authSessionMonitor
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
-        LaunchedEffect(authSessionMonitor, navigator) {
-            authSessionMonitor.sessionEvents.collect { event ->
-                when (event) {
-                    AuthSessionEvent.Expired -> {
-                        authSessionMonitor.acknowledgeSessionEvent()
-                        runCatching {
-                            onSessionExpired()
-                        }.onFailure { throwable ->
-                            Timber.w(throwable, "세션 만료 후 인증 세션 정리에 실패했습니다.")
-                        }
-                        navigator.replaceRoot(LoginNavKey)
-                    }
-                }
-            }
-        }
-
         DoubleBackToExitHandler(navigationState = appState.navigationState)
 
         PrezelAppContent(
             appState = appState,
+            globalEventBus = globalEventBus,
             entryBuilders = entryBuilders,
         )
     }
@@ -71,11 +55,20 @@ fun PrezelApp(
 @Composable
 private fun PrezelAppContent(
     appState: PrezelAppState,
+    globalEventBus: GlobalEventBus,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
     val snackbarHostState = LocalSnackbarHostState.current
     val showNavigationBar = appState.shouldShowNavigationBar
+
+    LaunchedEffect(globalEventBus, navigator) {
+        globalEventBus.events.collect { event ->
+            when (event) {
+                GlobalEvent.ForceLogout -> navigator.replaceRoot(LoginNavKey)
+            }
+        }
+    }
 
     SharedTransitionLayout {
         ProvideSharedTransitionScope(this@SharedTransitionLayout) {
