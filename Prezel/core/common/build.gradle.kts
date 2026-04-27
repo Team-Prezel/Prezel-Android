@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.prezel.jvm.library)
+    alias(libs.plugins.prezel.hilt)
 }
 
 dependencies {

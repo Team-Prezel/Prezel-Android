@@ -1,7 +1,7 @@
 package com.team.prezel.core.data.repository
 
+import com.team.prezel.core.common.di.ApplicationScope
 import com.team.prezel.core.datastore.auth.AuthLocalDataSource
-import com.team.prezel.core.datastore.di.ApplicationScope
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.model.auth.LoginStatus
 import com.team.prezel.core.model.auth.WithdrawReason

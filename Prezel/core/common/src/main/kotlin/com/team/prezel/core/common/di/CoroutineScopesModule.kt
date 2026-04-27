@@ -1,4 +1,4 @@
-package com.team.prezel.core.datastore.di
+package com.team.prezel.core.common.di
 
 import dagger.Module
 import dagger.Provides
