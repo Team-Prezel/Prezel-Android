@@ -3,7 +3,6 @@ package com.team.prezel.feature.my.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.AuthManager
-import com.team.prezel.core.domain.result.auth.AuthActionResult
 import com.team.prezel.core.domain.usecase.auth.LogoutUseCase
 import com.team.prezel.core.domain.usecase.auth.WithdrawUseCase
 import com.team.prezel.core.model.auth.WithdrawReason
@@ -39,7 +38,7 @@ internal class MyViewModel @Inject constructor(
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val result = logoutUseCase()
-                handleAuthActionResult(
+                handleResult(
                     result = result,
                     onSuccess = {
                         authManager
@@ -64,9 +63,9 @@ internal class MyViewModel @Inject constructor(
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val result = withdrawUseCase(reason = WithdrawReason.Other("임시 테스트 탈퇴"))
-                handleAuthActionResult(
+                handleResult(
                     result = result,
-                    onSuccess = { authManager.clearCurrentProvider() },
+                    onSuccess = { authManager.clearLoginState() },
                     failureLog = "회원탈퇴에 실패했습니다.",
                     failureMessage = MyUiMessage.WITHDRAW_FAILED,
                 )
@@ -76,28 +75,21 @@ internal class MyViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleAuthActionResult(
-        result: AuthActionResult,
+    private suspend fun handleResult(
+        result: Result<Unit>,
         onSuccess: suspend () -> Unit,
         failureLog: String,
         failureMessage: MyUiMessage,
     ) {
-        when (result) {
-            AuthActionResult.Success -> {
+        result.fold(
+            onSuccess = {
                 onSuccess()
                 _uiEffect.emit(MyUiEffect.NavigateToLogin)
-            }
-
-            AuthActionResult.AuthenticationRequired -> {
-                authManager.clearCurrentProvider()
-                _uiEffect.emit(MyUiEffect.ShowMessage(MyUiMessage.AUTHENTICATION_EXPIRED))
-                _uiEffect.emit(MyUiEffect.NavigateToLogin)
-            }
-
-            is AuthActionResult.Failure -> {
-                Timber.e(result.throwable, failureLog)
+            },
+            onFailure = { throwable ->
+                Timber.e(throwable, failureLog)
                 _uiEffect.emit(MyUiEffect.ShowMessage(failureMessage))
-            }
-        }
+            },
+        )
     }
 }

@@ -1,7 +1,6 @@
 package com.team.prezel.feature.login.impl.landing
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
 import com.team.prezel.core.domain.usecase.auth.LoginUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -19,58 +18,34 @@ internal class LoginViewModel @Inject constructor(
 ) : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>(LoginUiState()) {
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
-            is LoginUiIntent.OnClickLogin -> handleClickLogin(provider = intent.provider)
+            LoginUiIntent.OnClickLogin -> handleClickLogin()
             is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
         }
     }
 
-    private fun handleClickLogin(provider: AuthProvider) {
+    private fun handleClickLogin() {
         if (currentState.isLoading) return
 
         viewModelScope.launch {
-            updateState {
-                copy(
-                    isLoading = true,
-                    pendingProvider = provider,
-                )
-            }
-            sendEffect(LoginUiEffect.LaunchLogin(provider = provider))
+            updateState { copy(isLoading = true) }
+            sendEffect(LoginUiEffect.LaunchLogin)
         }
     }
 
     private fun handleLoginResult(result: AuthResult) {
-        viewModelScope.launch {
-            when (result) {
-                is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
-                AuthResult.Cancelled -> {
-                    updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_CANCELLED))
+        viewModelScope
+            .launch {
+                when (result) {
+                    is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
+                    is AuthResult.Failure -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
+                    AuthResult.Cancelled -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_CANCELLED))
                 }
-
-                is AuthResult.Failure -> {
-                    updateState { copy(isLoading = false, pendingProvider = null) }
-                    sendEffect(LoginUiEffect.ShowMessage(result.toUiMessage()))
-                }
-            }
-        }
+            }.invokeOnCompletion { updateState { copy(isLoading = false) } }
     }
 
     private suspend fun handleServerLogin(idToken: String) {
-        loginUseCase(idToken = idToken).fold(
-            onSuccess = {
-                updateState { copy(isLoading = false, pendingProvider = null) }
-                sendEffect(LoginUiEffect.NavigateToTerms)
-            },
-            onFailure = {
-                updateState { copy(isLoading = false, pendingProvider = null) }
-                sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
-            },
-        )
+        loginUseCase(idToken = idToken)
+            .onSuccess { sendEffect(LoginUiEffect.NavigateToTerms) }
+            .onFailure { sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN)) }
     }
-
-    private fun AuthResult.Failure.toUiMessage(): LoginUiMessage =
-        when (this) {
-            AuthResult.Failure.RateLimited -> LoginUiMessage.LOGIN_FAILED_RATE_LIMITED
-            AuthResult.Failure.Unknown -> LoginUiMessage.LOGIN_FAILED_UNKNOWN
-        }
 }

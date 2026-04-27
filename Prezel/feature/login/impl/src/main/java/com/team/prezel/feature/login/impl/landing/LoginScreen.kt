@@ -30,7 +30,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.team.prezel.core.auth.AuthManager
-import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -68,28 +67,19 @@ internal fun SharedTransitionScope.LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                is LoginUiEffect.LaunchLogin -> {
-                    authManager.login(context = context, provider = effect.provider).also { result ->
-                        viewModel.onIntent(
-                            LoginUiIntent.OnLoginResult(
-                                provider = effect.provider,
-                                result = result,
-                            ),
-                        )
-                    }
+                LoginUiEffect.LaunchLogin -> {
+                    val result = authManager.login(context = context)
+                    viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
                 }
 
                 LoginUiEffect.NavigateToHome -> navigateToHome()
 
                 LoginUiEffect.NavigateToTerms -> navigateToTerms()
 
-                LoginUiEffect.NavigateToHome -> navigateToHome()
-
                 is LoginUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
                         LoginUiMessage.LOGIN_CANCELLED -> R.string.feature_login_impl_kakao_cancelled
-                        LoginUiMessage.LOGIN_FAILED_RATE_LIMITED -> R.string.feature_login_impl_kakao_rate_limited
-                        LoginUiMessage.LOGIN_FAILED_UNKNOWN -> R.string.feature_login_impl_kakao_failure
+                        LoginUiMessage.LOGIN_FAILED_UNKNOWN -> R.string.feature_login_impl_login_failed
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
@@ -100,7 +90,7 @@ internal fun SharedTransitionScope.LoginScreen(
     LoginScreen(
         uiState = uiState,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin(provider = AuthProvider.KAKAO)) },
+        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
         modifier = modifier,
     )
 }

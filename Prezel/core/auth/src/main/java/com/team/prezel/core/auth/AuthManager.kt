@@ -1,66 +1,47 @@
 package com.team.prezel.core.auth
 
 import android.content.Context
-import com.team.prezel.core.auth.model.AuthProvider
 import com.team.prezel.core.auth.model.AuthResult
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthManager @Inject constructor(
-    private val authClients: Map<AuthProvider, @JvmSuppressWildcards AuthClient>,
+    private val authClient: AuthClient,
 ) {
-    var currentProvider: AuthProvider? = null
-        private set
+    private var isLoggedInToOAuthProvider: Boolean = false
 
-    suspend fun login(
-        context: Context,
-        provider: AuthProvider,
-    ): AuthResult {
-        val authClient = authClients[provider] ?: return AuthResult.Failure.Unknown
+    suspend fun login(context: Context): AuthResult {
         val result = authClient.login(context = context)
 
         if (result is AuthResult.Success) {
-            currentProvider = provider
+            isLoggedInToOAuthProvider = true
         }
 
         return result
     }
 
     suspend fun logout(): Result<Unit> {
-        val provider =
-            currentProvider ?: authClients.keys.singleOrNull() ?: return Result.failure(
-                IllegalStateException("로그인된 AuthProvider가 없습니다."),
-            )
-
-        val authClient = authClients[provider] ?: return Result.failure(
-            IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),
-        )
+        if (!isLoggedInToOAuthProvider) {
+            return Result.failure(IllegalStateException("로그인된 OAuth 세션이 없습니다."))
+        }
 
         return authClient.logout().onSuccess {
-            currentProvider = null
+            isLoggedInToOAuthProvider = false
         }
     }
 
-    fun clearCurrentProvider() {
-        currentProvider = null
+    fun clearLoginState() {
+        isLoggedInToOAuthProvider = false
     }
 
     suspend fun clearAuthSession(): Result<Unit> {
-        val provider = currentProvider ?: return Result.success(Unit)
-        val authClient = authClients[provider]
-
-        if (authClient == null) {
-            currentProvider = null
-            return Result.failure(
-                IllegalStateException("해당 AuthProvider에 대한 AuthClient를 찾을 수 없습니다. provider=$provider"),
-            )
+        if (!isLoggedInToOAuthProvider) {
+            return Result.success(Unit)
         }
 
         return authClient
             .logout()
-            .also {
-                currentProvider = null
-            }
+            .also { isLoggedInToOAuthProvider = false }
     }
 }
