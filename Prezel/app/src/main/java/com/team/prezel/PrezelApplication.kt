@@ -2,6 +2,7 @@ package com.team.prezel
 
 import android.app.Application
 import com.team.prezel.core.auth.AuthInitializer
+import com.team.prezel.util.PrettyLoggerTree
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -9,10 +10,8 @@ import timber.log.Timber
 class PrezelApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
 
+        Timber.plant(PrettyLoggerTree())
         AuthInitializer.init(this)
     }
 }

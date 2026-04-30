@@ -54,7 +54,7 @@ fun PrezelLottie(
 private fun PrezelLottiePreview() {
     PrezelTheme {
         PrezelLottie(
-            resId = R.raw.asset_loading,
+            resId = R.raw.core_ui_asset_loading,
             iterations = LottieConstants.IterateForever,
         )
     }

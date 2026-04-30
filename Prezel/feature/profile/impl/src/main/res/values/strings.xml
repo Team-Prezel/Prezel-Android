@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_profile_impl_topbar_create_title">프로필 생성</string>
     <string name="feature_profile_impl_topbar_edit_title">프로필 편집</string>

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Login Screen  -->
-    <string name="feature_login_impl_kakao_failure">카카오 로그인에 문제가 발생했어요.\n잠시 후 다시 시도해 주세요.</string>
-    <string name="feature_login_impl_kakao_rate_limited">로그인 시도가 너무 많아요.\n잠시 후 다시 시도해 주세요.</string>
+    <string name="feature_login_impl_login_failed">로그인에 문제가 발생했어요.\n잠시 후 다시 시도해 주세요.</string>
     <string name="feature_login_impl_kakao_cancelled">로그인이 취소되었어요.</string>
     <string name="feature_login_impl_start_with_kakao">카카오로 시작하기</string>
     <string name="feature_login_impl_back_icon_description">뒤로가기</string>
