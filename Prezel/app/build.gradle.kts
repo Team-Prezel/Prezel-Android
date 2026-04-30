@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.orhanobut.logger)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
 }

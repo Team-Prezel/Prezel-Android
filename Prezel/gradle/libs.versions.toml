@@ -20,6 +20,7 @@ desugarJdk = "2.1.5"
 ktor = "3.4.3"
 ktorfit = "2.7.2"
 timber = "5.0.1"
+orhanobutLogger = "2.2.0"
 navigation3 = "1.0.0"
 kotlinxDatetime = "0.7.1"
 kotlinxCoroutines = "1.10.2"
@@ -66,6 +67,7 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktorfit-lib = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
 ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+orhanobut-logger = { group = "com.orhanobut", name = "logger", version.ref = "orhanobutLogger" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
