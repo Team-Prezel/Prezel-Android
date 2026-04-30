@@ -1,37 +1,42 @@
 package com.team.prezel.core.network.client
 
 import io.ktor.client.plugins.logging.Logger
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
 
-internal class KtorPrettyLogger(
-    private val json: Json,
-) : Logger {
-    override fun log(message: String) {
-        Timber.tag(TAG).d(message.formatJsonLogMessage())
+@OptIn(ExperimentalSerializationApi::class)
+internal object KtorPrettyLogger : Logger {
+    private val json = Json {
+        prettyPrint = true
+        prettyPrintIndent = "\t"
+        isLenient = true
     }
 
-    private fun String.formatJsonLogMessage(): String =
-        toPrettyJsonOrNull()
-            ?: lineSequence()
-                .joinToString(separator = "\n") { line ->
-                    line.toPrettyJsonOrNull() ?: line
-                }
+    override fun log(message: String) {
+        Timber.tag(TAG).d(message.toPrettyLogMessage())
+    }
 
-    private fun String.toPrettyJsonOrNull(): String? {
+    private fun String.toPrettyLogMessage(): String =
+        parsePrettyJson() ?: lines()
+            .joinToString(separator = "\n") { line ->
+                line.parsePrettyJson() ?: line
+            }
+
+    private fun String.parsePrettyJson(): String? {
         val candidate = trim()
-        if (!candidate.isJsonObjectOrArray()) return null
+
+        if (!candidate.looksLikeJson()) return null
 
         return runCatching {
-            val jsonElement = json.parseToJsonElement(candidate)
-            json.encodeToString(JsonElement.serializer(), jsonElement)
+            val element = json.parseToJsonElement(candidate)
+            json.encodeToString(element)
         }.getOrNull()
     }
 
-    private fun String.isJsonObjectOrArray(): Boolean = (startsWith("{") && endsWith("}")) || (startsWith("[") && endsWith("]"))
+    private fun String.looksLikeJson(): Boolean =
+        (startsWith("{") && endsWith("}")) ||
+            (startsWith("[") && endsWith("]"))
 
-    private companion object {
-        const val TAG = "KTOR-LOG"
-    }
+    private const val TAG = "KTOR-LOG"
 }

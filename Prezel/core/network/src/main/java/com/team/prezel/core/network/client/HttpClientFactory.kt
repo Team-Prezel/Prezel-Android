@@ -47,8 +47,6 @@ internal class HttpClientFactory @Inject constructor(
             prettyPrint = true
         }
 
-    private val ktorLogger = KtorPrettyLogger(networkJson)
-
     fun create(
         block: HttpClientConfig<*>.() -> Unit = {
             configureDefaultRequest()
@@ -79,7 +77,7 @@ internal class HttpClientFactory @Inject constructor(
 
     internal fun HttpClientConfig<*>.installLogging() {
         install(Logging) {
-            logger = ktorLogger
+            logger = KtorPrettyLogger
             sanitizeHeader { header -> header == HttpHeaders.Authorization }
             level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
         }
