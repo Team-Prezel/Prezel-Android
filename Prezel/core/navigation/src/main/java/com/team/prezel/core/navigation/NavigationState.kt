@@ -13,7 +13,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import com.team.prezel.core.navigation.decorator.LoggingDecorator
 import kotlinx.collections.immutable.ImmutableSet
 
 /**
@@ -84,7 +83,6 @@ fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): Snap
         val decorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
             rememberViewModelStoreNavEntryDecorator<NavKey>(),
-            LoggingDecorator(),
         )
 
         rememberDecoratedNavEntries(
