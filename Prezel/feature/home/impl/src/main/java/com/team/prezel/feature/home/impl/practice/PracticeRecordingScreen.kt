@@ -30,9 +30,14 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
+import com.team.prezel.feature.home.impl.practice.component.PracticeAnalysisSpeed
+import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisErrorPage
+import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisLoadingPage
+import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisSuccessPage
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingButtonArea
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingContent
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingControlState
+import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingPhase
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState
@@ -40,6 +45,7 @@ import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiSt
 @Composable
 internal fun PracticeRecordingScreen(
     onBack: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PracticeRecordingViewModel = hiltViewModel(),
 ) {
@@ -81,13 +87,13 @@ internal fun PracticeRecordingScreen(
         uiState = uiState,
         practiceScript = practiceScript,
         onClickControl = ::onClickRecordingControl,
-        onClickAnalyze = {},
+        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.ClickAnalyze) },
         onBack = onBack,
+        navigateToHome = navigateToHome,
         modifier = modifier,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PracticeRecordingScreen(
     uiState: PracticeRecordingUiState,
@@ -95,27 +101,75 @@ private fun PracticeRecordingScreen(
     onClickControl: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onBack)
 
+    if (uiState.analysisStatus != PracticeRecordingAnalysisStatus.Ready) {
+        PracticeRecordingAnalysisScreen(
+            analysisStatus = uiState.analysisStatus,
+            onBack = onBack,
+            onRetry = onClickAnalyze,
+            onComplete = navigateToHome,
+            modifier = modifier,
+        )
+        return
+    }
+
+    PracticeRecordingReadyScreen(
+        uiState = uiState,
+        practiceScript = practiceScript,
+        onClickControl = onClickControl,
+        onClickAnalyze = onClickAnalyze,
+        onBack = onBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun PracticeRecordingAnalysisScreen(
+    analysisStatus: PracticeRecordingAnalysisStatus,
+    onBack: () -> Unit,
+    onRetry: () -> Unit,
+    onComplete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (analysisStatus) {
+        PracticeRecordingAnalysisStatus.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
+        PracticeRecordingAnalysisStatus.Success -> PracticeRecordingAnalysisSuccessPage(
+            pronunciationScore = 90,
+            speed = PracticeAnalysisSpeed.ADEQUATE,
+            onBack = onBack,
+            onComplete = onComplete,
+            modifier = modifier,
+        )
+
+        is PracticeRecordingAnalysisStatus.Error -> PracticeRecordingAnalysisErrorPage(
+            errorType = analysisStatus.type,
+            onRetry = onRetry,
+            modifier = modifier,
+        )
+
+        PracticeRecordingAnalysisStatus.Ready -> Unit
+    }
+}
+
+@Composable
+private fun PracticeRecordingReadyScreen(
+    uiState: PracticeRecordingUiState,
+    practiceScript: String,
+    onClickControl: () -> Unit,
+    onClickAnalyze: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        PrezelTopAppBar(
-            title = { Text(text = stringResource(R.string.feature_home_impl_practice_recording_title)) },
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.ArrowLeft),
-                        contentDescription = stringResource(R.string.feature_home_impl_practice_recording_back),
-                    )
-                }
-            },
-        )
-
+        PracticeRecordingTopAppBar(onBack = onBack)
         PracticeRecordingContent(
             practiceScript = practiceScript,
             currentSeconds = uiState.currentSeconds,
@@ -124,12 +178,24 @@ private fun PracticeRecordingScreen(
             onClickControl = onClickControl,
             modifier = Modifier.weight(1f),
         )
-
-        PracticeRecordingButtonArea(
-            enabled = uiState.analyzeEnabled,
-            onClickAnalyze = onClickAnalyze,
-        )
+        PracticeRecordingButtonArea(enabled = uiState.analyzeEnabled, onClickAnalyze = onClickAnalyze)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PracticeRecordingTopAppBar(onBack: () -> Unit) {
+    PrezelTopAppBar(
+        title = { Text(text = stringResource(R.string.feature_home_impl_practice_recording_title)) },
+        leadingIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    painter = painterResource(PrezelIcons.ArrowLeft),
+                    contentDescription = stringResource(R.string.feature_home_impl_practice_recording_back),
+                )
+            }
+        },
+    )
 }
 
 private fun PracticeRecordingPhase.toControlState(): PracticeRecordingControlState =
@@ -197,5 +263,6 @@ private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiSt
         onClickControl = {},
         onClickAnalyze = {},
         onBack = {},
+        navigateToHome = {},
     )
 }

@@ -2,6 +2,7 @@ package com.team.prezel.feature.home.impl.practice
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.ui.base.BaseViewModel
+import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingPhase
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
@@ -21,10 +22,12 @@ internal class PracticeRecordingViewModel @Inject constructor(
     private val audioController = audioControllerFactory.create()
     private var recordingFilePath: String? = null
     private var timerJob: Job? = null
+    private var analysisJob: Job? = null
 
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
             PracticeRecordingUiIntent.ClickControl -> onClickControl()
+            PracticeRecordingUiIntent.ClickAnalyze -> startAnalysis()
         }
     }
 
@@ -94,6 +97,15 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
+    private fun startAnalysis() {
+        analysisJob?.cancel()
+        analysisJob = viewModelScope.launch {
+            updateState { copy(analysisStatus = PracticeRecordingAnalysisStatus.Loading) }
+            delay(ANALYSIS_LOADING_DELAY_MILLIS)
+            updateState { copy(analysisStatus = PracticeRecordingAnalysisStatus.Success) }
+        }
+    }
+
     private fun startRecordingTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -116,7 +128,12 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
     override fun onCleared() {
         timerJob?.cancel()
+        analysisJob?.cancel()
         audioController.release()
         super.onCleared()
+    }
+
+    private companion object {
+        const val ANALYSIS_LOADING_DELAY_MILLIS = 3_000L
     }
 }

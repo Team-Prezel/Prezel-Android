@@ -4,4 +4,6 @@ import com.team.prezel.core.ui.base.UiIntent
 
 internal sealed interface PracticeRecordingUiIntent : UiIntent {
     data object ClickControl : PracticeRecordingUiIntent
+
+    data object ClickAnalyze : PracticeRecordingUiIntent
 }

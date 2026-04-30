@@ -20,7 +20,10 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
     entry<PracticeRecordingNavKey> {
         val navigator = LocalNavigator.current
 
-        PracticeRecordingScreen(onBack = navigator::goBack)
+        PracticeRecordingScreen(
+            onBack = navigator::goBack,
+            navigateToHome = { navigator.replaceRoot(HomeNavKey) },
+        )
     }
 }
 

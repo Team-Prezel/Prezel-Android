@@ -10,9 +10,27 @@ internal enum class PracticeRecordingPhase {
     PLAYING,
 }
 
+internal sealed interface PracticeRecordingAnalysisStatus {
+    data object Ready : PracticeRecordingAnalysisStatus
+
+    data object Loading : PracticeRecordingAnalysisStatus
+
+    data object Success : PracticeRecordingAnalysisStatus
+
+    data class Error(
+        val type: PracticeRecordingAnalysisErrorType,
+    ) : PracticeRecordingAnalysisStatus
+}
+
+internal enum class PracticeRecordingAnalysisErrorType {
+    ANALYZE,
+    VOICE,
+}
+
 @Immutable
 internal data class PracticeRecordingUiState(
     val phase: PracticeRecordingPhase = PracticeRecordingPhase.IDLE,
+    val analysisStatus: PracticeRecordingAnalysisStatus = PracticeRecordingAnalysisStatus.Ready,
     val recordingSeconds: Int = 0,
     val playbackSeconds: Int = 0,
     val recordedDurationSeconds: Int = 0,
