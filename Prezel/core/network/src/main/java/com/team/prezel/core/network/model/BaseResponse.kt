@@ -10,21 +10,29 @@ data class BaseResponse<T>(
     @SerialName("status")
     val status: Int,
     @SerialName("code")
-    val code: String,
+    val code: String?,
     @SerialName("data")
-    val data: T,
+    val data: T?,
     @SerialName("message")
-    val message: String,
+    val message: String?,
 )
 
 internal fun <T> BaseResponse<T>.requireData(): T {
-    if (status !in 200..299) {
-        throw ApiException(
-            status = status,
-            errorCode = ServerErrorCode.from(code),
-            message = message,
-        )
-    }
+    requireSuccess()
 
-    return data
+    return data ?: throw ApiException(
+        status = status,
+        errorCode = ServerErrorCode.UNKNOWN,
+        message = "Response data is null",
+    )
+}
+
+internal fun BaseResponse<*>.requireSuccess() {
+    if (status in 200..299) return
+
+    throw ApiException(
+        status = status,
+        errorCode = ServerErrorCode.from(code),
+        message = message.orEmpty(),
+    )
 }

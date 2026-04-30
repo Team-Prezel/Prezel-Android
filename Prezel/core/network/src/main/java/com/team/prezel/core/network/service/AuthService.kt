@@ -14,7 +14,7 @@ import de.jensklingenberg.ktorfit.http.Tag
 
 internal interface AuthService {
     @POST("auth/logout")
-    suspend fun logout(): BaseResponse<String>
+    suspend fun logout(): BaseResponse<Unit>
 
     @POST("auth/login")
     suspend fun login(
@@ -25,7 +25,7 @@ internal interface AuthService {
     @DELETE("auth/withdraw")
     suspend fun withdraw(
         @Body request: WithdrawRequest,
-    ): BaseResponse<String>
+    ): BaseResponse<Unit>
 
     @POST("auth/reissue")
     suspend fun reissue(

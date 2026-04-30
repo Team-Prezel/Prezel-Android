@@ -23,7 +23,6 @@ import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -31,7 +30,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -49,12 +47,7 @@ internal class HttpClientFactory @Inject constructor(
             prettyPrint = true
         }
 
-    private val ktorLogger: Logger =
-        object : Logger {
-            override fun log(message: String) {
-                Timber.tag("KTOR-LOG").d(message)
-            }
-        }
+    private val ktorLogger = KtorPrettyLogger(networkJson)
 
     fun create(
         block: HttpClientConfig<*>.() -> Unit = {
