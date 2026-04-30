@@ -15,9 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SplashViewModel @Inject constructor(
     private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
-) : BaseViewModel<SplashUiState, SplashUiIntent, SplashUiEffect>(
-        SplashUiState(),
-    ) {
+) : BaseViewModel<SplashUiState, SplashUiIntent, SplashUiEffect>(SplashUiState()) {
     override fun onIntent(intent: SplashUiIntent) {
         when (intent) {
             SplashUiIntent.CheckLoginStatus -> checkLoginStatus()
@@ -29,7 +27,7 @@ internal class SplashViewModel @Inject constructor(
 
         viewModelScope
             .launch {
-                when (checkLoginStatusUseCase().first { it != LoginStatus.LOADING }) {
+                when (checkLoginStatusUseCase().first { status -> status != LoginStatus.LOADING }) {
                     LoginStatus.AUTHENTICATED -> sendEffect(SplashUiEffect.NavigateToHome)
                     LoginStatus.UNAUTHENTICATED -> sendEffect(SplashUiEffect.NavigateToLogin)
                     LoginStatus.LOADING -> Unit
