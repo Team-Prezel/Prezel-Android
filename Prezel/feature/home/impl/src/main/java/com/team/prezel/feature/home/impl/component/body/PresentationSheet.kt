@@ -1,12 +1,15 @@
 package com.team.prezel.feature.home.impl.component.body
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
@@ -17,14 +20,24 @@ import kotlinx.datetime.LocalDate
 @Composable
 internal fun PresentationSheet(
     practiceCount: Int,
+    onClickPracticeRecording: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val itemModifier = Modifier.padding(horizontal = PrezelTheme.spacing.V20)
 
-    HomeBottomSheetContent(modifier = modifier) {
+    HomeBottomSheetContent(
+        modifier = modifier,
+        contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32),
+    ) {
         HomeBottomSheetTitle(
             title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, practiceCount),
             modifier = itemModifier,
+        )
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+        PrezelButton(
+            text = stringResource(R.string.feature_home_impl_practice_recording_action),
+            modifier = itemModifier,
+            onClick = onClickPracticeRecording,
         )
     }
 }
@@ -47,7 +60,10 @@ private fun PresentationContentPreview() {
                 .height(100.dp)
                 .padding(top = 16.dp),
         ) {
-            PresentationSheet(practiceCount = presentation.practiceCount)
+            PresentationSheet(
+                practiceCount = presentation.practiceCount,
+                onClickPracticeRecording = {},
+            )
         }
     }
 }

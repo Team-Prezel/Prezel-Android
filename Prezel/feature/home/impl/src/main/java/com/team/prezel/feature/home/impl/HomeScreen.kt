@@ -24,6 +24,7 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.component.HomePageLayout
@@ -37,6 +38,7 @@ import com.team.prezel.feature.home.impl.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.contract.HomeUiState
 import com.team.prezel.feature.home.impl.model.HomeUiMessage
 import com.team.prezel.feature.home.impl.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.navigation.PracticeRecordingNavKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -50,6 +52,7 @@ internal fun HomeScreen(
     val pagerState = rememberPagerState(0) { uiState.presentationCount() }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
+    val navigator = LocalNavigator.current
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)
@@ -70,6 +73,7 @@ internal fun HomeScreen(
         uiState = uiState,
         pagerState = pagerState,
         onClickAddPresentation = { },
+        onClickPracticeRecording = { navigator.navigate(PracticeRecordingNavKey) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
         modifier = modifier,
@@ -82,6 +86,7 @@ private fun HomeScreen(
     uiState: HomeUiState,
     pagerState: PagerState,
     onClickAddPresentation: () -> Unit,
+    onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     modifier: Modifier = Modifier,
@@ -99,6 +104,7 @@ private fun HomeScreen(
                 maxHeight = maxScreenHeight,
                 headerHeight = headerHeight,
                 onClickAddPresentation = onClickAddPresentation,
+                onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
             )
@@ -120,6 +126,7 @@ private fun HomeContent(
     maxHeight: Dp,
     headerHeight: Dp,
     onClickAddPresentation: () -> Unit,
+    onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
 ) {
@@ -131,6 +138,7 @@ private fun HomeContent(
                 headerHeight = headerHeight,
                 uiState = uiState,
                 onClickAddPresentation = onClickAddPresentation,
+                onClickPracticeRecording = onClickPracticeRecording,
             )
         }
 
@@ -139,6 +147,7 @@ private fun HomeContent(
                 uiState = uiState,
                 maxHeight = maxHeight,
                 headerHeight = headerHeight,
+                onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
             )
@@ -150,6 +159,7 @@ private fun HomeContent(
                 pagerState = pagerState,
                 maxHeight = maxHeight,
                 headerHeight = headerHeight,
+                onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
             )
@@ -163,11 +173,12 @@ private fun HomeEmptyContent(
     headerHeight: Dp,
     uiState: HomeUiState.Empty,
     onClickAddPresentation: () -> Unit,
+    onClickPracticeRecording: () -> Unit,
 ) {
     HomePageLayout(
         maxHeight = maxHeight,
         headerHeight = headerHeight,
-        sheetContent = { EmptyPresentationSheet() },
+        sheetContent = { EmptyPresentationSheet(onClickPracticeRecording = onClickPracticeRecording) },
         heroContent = {
             EmptyPresentationHero(
                 nickname = uiState.nickname,
@@ -182,6 +193,7 @@ private fun HomeSingleContent(
     uiState: HomeUiState.SingleContent,
     maxHeight: Dp,
     headerHeight: Dp,
+    onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
 ) {
@@ -190,7 +202,12 @@ private fun HomeSingleContent(
     HomePageLayout(
         maxHeight = maxHeight,
         headerHeight = headerHeight,
-        sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+        sheetContent = {
+            PresentationSheet(
+                practiceCount = presentation.practiceCount,
+                onClickPracticeRecording = onClickPracticeRecording,
+            )
+        },
         heroContent = {
             PresentationHero(
                 presentation = presentation,
@@ -207,6 +224,7 @@ private fun HomeMultipleContent(
     pagerState: PagerState,
     maxHeight: Dp,
     headerHeight: Dp,
+    onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
 ) {
@@ -222,7 +240,12 @@ private fun HomeMultipleContent(
         HomePageLayout(
             maxHeight = maxHeight,
             headerHeight = headerHeight,
-            sheetContent = { PresentationSheet(practiceCount = presentation.practiceCount) },
+            sheetContent = {
+                PresentationSheet(
+                    practiceCount = presentation.practiceCount,
+                    onClickPracticeRecording = onClickPracticeRecording,
+                )
+            },
             heroContent = {
                 PresentationHero(
                     presentation = presentation,
@@ -243,6 +266,7 @@ private fun HomeScreenEmptyPreview() {
             uiState = uiState,
             pagerState = rememberPagerState(0) { uiState.presentationCount() },
             onClickAddPresentation = { },
+            onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
         )
@@ -266,6 +290,7 @@ private fun HomeScreenSinglePreview() {
             uiState = uiState,
             pagerState = rememberPagerState(0) { uiState.presentationCount() },
             onClickAddPresentation = { },
+            onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
         )
@@ -291,6 +316,7 @@ private fun HomeScreenMultiplePreview() {
             uiState = uiState,
             pagerState = rememberPagerState(0) { uiState.presentationCount() },
             onClickAddPresentation = { },
+            onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
         )

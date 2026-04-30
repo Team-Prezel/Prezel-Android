@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.navigation.rememberNavigationState
-import com.team.prezel.feature.splash.api.SplashNavKey
+import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.navigation.MAIN_NAV_KEYS
 import com.team.prezel.navigation.TOP_LEVEL_KEYS
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,7 @@ fun rememberPrezelAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): PrezelAppState {
     val navigationState = rememberNavigationState(
-        startKey = SplashNavKey,
+        startKey = HomeNavKey,
         topLevelKeys = TOP_LEVEL_KEYS,
     )
 
