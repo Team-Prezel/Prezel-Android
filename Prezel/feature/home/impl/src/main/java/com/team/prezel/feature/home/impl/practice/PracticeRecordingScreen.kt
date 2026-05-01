@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -54,7 +53,6 @@ internal fun PracticeRecordingScreen(
     viewModel: PracticeRecordingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val practiceScript = rememberPracticeScript()
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
     val recordAudioPermissionState = rememberRecordAudioPermissionState(
@@ -68,11 +66,17 @@ internal fun PracticeRecordingScreen(
     )
 
     LaunchedEffect(Unit) {
+        viewModel.onIntent(PracticeRecordingUiIntent.LoadPracticeScript)
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is PracticeRecordingUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
                         PracticeRecordingUiMessage.RECORDING_START_FAILED -> R.string.feature_home_impl_practice_recording_failed
+                        PracticeRecordingUiMessage.RECORDING_STOP_FAILED -> R.string.feature_home_impl_practice_recording_stop_failed
+                        PracticeRecordingUiMessage.PLAYBACK_START_FAILED -> R.string.feature_home_impl_practice_recording_playback_failed
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
@@ -82,7 +86,6 @@ internal fun PracticeRecordingScreen(
 
     PracticeRecordingScreen(
         uiState = uiState,
-        practiceScript = practiceScript,
         onClickControl = onClickRecordingControl,
         onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.ClickAnalyze) },
         onBack = onBack,
@@ -94,7 +97,6 @@ internal fun PracticeRecordingScreen(
 @Composable
 private fun PracticeRecordingScreen(
     uiState: PracticeRecordingUiState,
-    practiceScript: String,
     onClickControl: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
@@ -106,7 +108,6 @@ private fun PracticeRecordingScreen(
     when (uiState.analysisStatus) {
         PracticeRecordingAnalysisStatus.Ready -> PracticeRecordingReadyScreen(
             uiState = uiState,
-            practiceScript = practiceScript,
             onClickControl = onClickControl,
             onClickAnalyze = onClickAnalyze,
             onBack = onBack,
@@ -126,7 +127,6 @@ private fun PracticeRecordingScreen(
 @Composable
 private fun PracticeRecordingReadyScreen(
     uiState: PracticeRecordingUiState,
-    practiceScript: String,
     onClickControl: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
@@ -142,7 +142,7 @@ private fun PracticeRecordingReadyScreen(
         PracticeRecordingTopAppBar(onBack = onBack)
 
         PracticeRecordingContent(
-            practiceScript = practiceScript,
+            practiceScript = uiState.practiceScript,
             currentSeconds = uiState.currentSeconds,
             totalSeconds = uiState.totalSeconds,
             controlState = uiState.recordingState.toControlState(),
@@ -174,12 +174,6 @@ private fun PracticeRecordingTopAppBar(onBack: () -> Unit) {
             }
         },
     )
-}
-
-@Composable
-private fun rememberPracticeScript(): String {
-    val scripts = stringArrayResource(R.array.feature_home_impl_practice_recording_scripts)
-    return remember { scripts.random() }
 }
 
 @Composable
@@ -297,8 +291,9 @@ private fun PracticeRecordingScreenPlayingPreview() {
 @Composable
 private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiState) {
     PracticeRecordingScreen(
-        uiState = uiState,
-        practiceScript = "내가 그린 기린 그림은 잘 그린 기린 그림이고,\n네가 그린 기린 그림은 잘못 그린 기린 그림이다.",
+        uiState = uiState.copy(
+            practiceScript = "내가 그린 기린 그림은 잘 그린 기린 그림이고,\n네가 그린 기린 그림은 잘못 그린 기린 그림이다.",
+        ),
         onClickControl = {},
         onClickAnalyze = {},
         onBack = {},

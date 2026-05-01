@@ -1,6 +1,9 @@
 package com.team.prezel.feature.home.impl.practice
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.domain.usecase.practice.FetchPracticeRecordingAnalysisResultUseCase
+import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
+import com.team.prezel.core.domain.usecase.practice.UploadPracticeRecordingUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.home.impl.practice.audio.PracticeRecordingAudioControllerFactory
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisErrorType
@@ -19,6 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class PracticeRecordingViewModel @Inject constructor(
     audioControllerFactory: PracticeRecordingAudioControllerFactory,
+    private val fetchPracticeScriptUseCase: FetchPracticeScriptUseCase,
+    private val uploadPracticeRecordingUseCase: UploadPracticeRecordingUseCase,
+    private val fetchPracticeRecordingAnalysisResultUseCase: FetchPracticeRecordingAnalysisResultUseCase,
 ) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(PracticeRecordingUiState()) {
     private val audioController = audioControllerFactory.create()
     private var recordingFilePath: String? = null
@@ -27,6 +33,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
+            PracticeRecordingUiIntent.LoadPracticeScript -> fetchPracticeScript()
             PracticeRecordingUiIntent.ClickControl -> onClickControl()
             PracticeRecordingUiIntent.ClickAnalyze -> startAnalysis()
         }
@@ -66,13 +73,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
-                viewModelScope.launch {
-                    sendEffect(
-                        PracticeRecordingUiEffect.ShowMessage(
-                            PracticeRecordingUiMessage.RECORDING_START_FAILED,
-                        ),
-                    )
-                }
+                sendMessage(PracticeRecordingUiMessage.RECORDING_START_FAILED)
             }
     }
 
@@ -99,11 +100,10 @@ internal class PracticeRecordingViewModel @Inject constructor(
                 updateState {
                     copy(
                         recordingState = PracticeRecordingState.Idle,
-                        analysisStatus = PracticeRecordingAnalysisStatus.Error(
-                            PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED,
-                        ),
+                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
+                sendMessage(PracticeRecordingUiMessage.RECORDING_STOP_FAILED)
             }
     }
 
@@ -111,7 +111,11 @@ internal class PracticeRecordingViewModel @Inject constructor(
         val previousState = currentState.recordingState
         if (previousState !is PracticeRecordingState.Recorded) return
 
-        val filePath = recordingFilePath ?: return
+        val filePath = recordingFilePath
+        if (filePath == null) {
+            sendMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
+            return
+        }
 
         audioController
             .startPlayback(filePath) {
@@ -142,11 +146,10 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         recordingState = PracticeRecordingState.Recorded(
                             recordedDurationSeconds = previousState.recordedDurationSeconds,
                         ),
-                        analysisStatus = PracticeRecordingAnalysisStatus.Error(
-                            PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED,
-                        ),
+                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
+                sendMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
             }
     }
 
@@ -168,6 +171,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
     private fun startAnalysis() {
         if (!currentState.analyzeEnabled) return
+        val filePath = recordingFilePath ?: return
 
         analysisJob?.cancel()
         analysisJob = viewModelScope.launch {
@@ -177,9 +181,37 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
             delay(ANALYSIS_LOADING_DELAY_MILLIS)
 
-            updateState {
-                copy(analysisStatus = PracticeRecordingAnalysisStatus.Success)
-            }
+            uploadPracticeRecordingUseCase(recordingFilePath = filePath)
+                .mapCatching { upload ->
+                    fetchPracticeRecordingAnalysisResultUseCase(recordingId = upload.id).getOrThrow()
+                }.onSuccess { result ->
+                    updateState {
+                        copy(
+                            analysisStatus = PracticeRecordingAnalysisStatus.Success(
+                                result = result,
+                            ),
+                        )
+                    }
+                }.onFailure {
+                    updateState {
+                        copy(
+                            analysisStatus = PracticeRecordingAnalysisStatus.Error(
+                                type = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
+                            ),
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun fetchPracticeScript() {
+        viewModelScope.launch {
+            fetchPracticeScriptUseCase()
+                .onSuccess { script ->
+                    updateState {
+                        copy(practiceScript = script.content)
+                    }
+                }
         }
     }
 
@@ -221,6 +253,12 @@ internal class PracticeRecordingViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun sendMessage(message: PracticeRecordingUiMessage) {
+        viewModelScope.launch {
+            sendEffect(PracticeRecordingUiEffect.ShowMessage(message))
         }
     }
 

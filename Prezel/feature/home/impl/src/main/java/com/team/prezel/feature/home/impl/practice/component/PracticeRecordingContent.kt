@@ -41,7 +41,9 @@ internal fun PracticeRecordingContent(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
         Box(
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
                 .clip(RoundedCornerShape(PrezelTheme.radius.V6))
                 .background(PrezelTheme.colors.bgMedium)
                 .padding(horizontal = PrezelTheme.spacing.V16, vertical = PrezelTheme.spacing.V12),

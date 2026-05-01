@@ -1,10 +1,12 @@
 package com.team.prezel.feature.home.impl.practice.contract
 
 import androidx.compose.runtime.Immutable
+import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult
 import com.team.prezel.core.ui.base.UiState
 
 @Immutable
 internal data class PracticeRecordingUiState(
+    val practiceScript: String = "",
     val recordingState: PracticeRecordingState = PracticeRecordingState.Idle,
     val analysisStatus: PracticeRecordingAnalysisStatus = PracticeRecordingAnalysisStatus.Ready,
 ) : UiState {
@@ -65,7 +67,9 @@ internal sealed interface PracticeRecordingAnalysisStatus {
 
     data object Loading : PracticeRecordingAnalysisStatus
 
-    data object Success : PracticeRecordingAnalysisStatus
+    data class Success(
+        val result: PracticeRecordingAnalysisResult,
+    ) : PracticeRecordingAnalysisStatus
 
     data class Error(
         val type: PracticeRecordingAnalysisErrorType,
