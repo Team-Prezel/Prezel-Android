@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice
+package com.team.prezel.feature.home.impl.practice.audio
 
 import android.content.Context
 import android.media.MediaPlayer

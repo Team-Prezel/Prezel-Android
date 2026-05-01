@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice.component
+package com.team.prezel.feature.home.impl.practice.analysis.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

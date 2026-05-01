@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,13 +35,10 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.practice.component.PracticeAnalysisSpeed
-import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisErrorPage
-import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisLoadingPage
-import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingAnalysisSuccessPage
+import com.team.prezel.feature.home.impl.practice.analysis.PracticeRecordingAnalysisScreen
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingButtonArea
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingContent
-import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingControlState
+import com.team.prezel.feature.home.impl.practice.component.toControlState
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
@@ -55,24 +53,19 @@ internal fun PracticeRecordingScreen(
     modifier: Modifier = Modifier,
     viewModel: PracticeRecordingViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val practiceScript = rememberPracticeScript()
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    var hasRecordAudioPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED,
-        )
-    }
-    val scripts = stringArrayResource(R.array.feature_home_impl_practice_recording_scripts)
-    val practiceScript = remember { scripts.random() }
-
-    val recordAudioPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        hasRecordAudioPermission = isGranted
-        if (isGranted) viewModel.onIntent(PracticeRecordingUiIntent.ClickControl)
-    }
+    val recordAudioPermissionState = rememberRecordAudioPermissionState(
+        onPermissionGranted = { viewModel.onIntent(PracticeRecordingUiIntent.ClickControl) },
+    )
+    val onClickRecordingControl = rememberClickRecordingControlHandler(
+        recordingState = uiState.recordingState,
+        hasRecordAudioPermission = recordAudioPermissionState.isGranted,
+        onRequestRecordAudioPermission = recordAudioPermissionState.request,
+        onClickControl = { viewModel.onIntent(PracticeRecordingUiIntent.ClickControl) },
+    )
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -87,27 +80,10 @@ internal fun PracticeRecordingScreen(
         }
     }
 
-    fun onClickRecordingControl() {
-        when (uiState.recordingState) {
-            PracticeRecordingState.Idle -> {
-                if (hasRecordAudioPermission) {
-                    viewModel.onIntent(PracticeRecordingUiIntent.ClickControl)
-                } else {
-                    recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                }
-            }
-
-            is PracticeRecordingState.Recording,
-            is PracticeRecordingState.Recorded,
-            is PracticeRecordingState.Playing,
-            -> viewModel.onIntent(PracticeRecordingUiIntent.ClickControl)
-        }
-    }
-
     PracticeRecordingScreen(
         uiState = uiState,
         practiceScript = practiceScript,
-        onClickControl = ::onClickRecordingControl,
+        onClickControl = onClickRecordingControl,
         onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.ClickAnalyze) },
         onBack = onBack,
         navigateToHome = navigateToHome,
@@ -127,52 +103,23 @@ private fun PracticeRecordingScreen(
 ) {
     BackHandler(onBack = onBack)
 
-    if (uiState.analysisStatus != PracticeRecordingAnalysisStatus.Ready) {
-        PracticeRecordingAnalysisScreen(
+    when (uiState.analysisStatus) {
+        PracticeRecordingAnalysisStatus.Ready -> PracticeRecordingReadyScreen(
+            uiState = uiState,
+            practiceScript = practiceScript,
+            onClickControl = onClickControl,
+            onClickAnalyze = onClickAnalyze,
+            onBack = onBack,
+            modifier = modifier,
+        )
+
+        else -> PracticeRecordingAnalysisScreen(
             analysisStatus = uiState.analysisStatus,
             onBack = onBack,
             onRetry = onClickAnalyze,
             onComplete = navigateToHome,
             modifier = modifier,
         )
-        return
-    }
-
-    PracticeRecordingReadyScreen(
-        uiState = uiState,
-        practiceScript = practiceScript,
-        onClickControl = onClickControl,
-        onClickAnalyze = onClickAnalyze,
-        onBack = onBack,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun PracticeRecordingAnalysisScreen(
-    analysisStatus: PracticeRecordingAnalysisStatus,
-    onBack: () -> Unit,
-    onRetry: () -> Unit,
-    onComplete: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    when (analysisStatus) {
-        PracticeRecordingAnalysisStatus.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
-        PracticeRecordingAnalysisStatus.Success -> PracticeRecordingAnalysisSuccessPage(
-            pronunciationScore = 90,
-            speed = PracticeAnalysisSpeed.ADEQUATE,
-            onBack = onBack,
-            onComplete = onComplete,
-            modifier = modifier,
-        )
-
-        is PracticeRecordingAnalysisStatus.Error -> PracticeRecordingAnalysisErrorPage(
-            errorType = analysisStatus.type,
-            onRetry = onRetry,
-            modifier = modifier,
-        )
-
-        PracticeRecordingAnalysisStatus.Ready -> Unit
     }
 }
 
@@ -219,12 +166,71 @@ private fun PracticeRecordingTopAppBar(onBack: () -> Unit) {
     )
 }
 
-private fun PracticeRecordingState.toControlState(): PracticeRecordingControlState =
-    when (this) {
-        PracticeRecordingState.Idle -> PracticeRecordingControlState.READY_TO_RECORD
-        is PracticeRecordingState.Recording -> PracticeRecordingControlState.RECORDING
-        is PracticeRecordingState.Recorded -> PracticeRecordingControlState.READY_TO_PLAY
-        is PracticeRecordingState.Playing -> PracticeRecordingControlState.PLAYING
+@Composable
+private fun rememberPracticeScript(): String {
+    val scripts = stringArrayResource(R.array.feature_home_impl_practice_recording_scripts)
+    return remember { scripts.random() }
+}
+
+@Composable
+private fun rememberRecordAudioPermissionState(onPermissionGranted: () -> Unit): RecordAudioPermissionState {
+    val context = LocalContext.current
+    val currentOnPermissionGranted by rememberUpdatedState(onPermissionGranted)
+    var hasRecordAudioPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED,
+        )
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        hasRecordAudioPermission = isGranted
+        if (isGranted) currentOnPermissionGranted()
+    }
+
+    return remember(hasRecordAudioPermission, launcher) {
+        RecordAudioPermissionState(
+            isGranted = hasRecordAudioPermission,
+            request = { launcher.launch(Manifest.permission.RECORD_AUDIO) },
+        )
+    }
+}
+
+private data class RecordAudioPermissionState(
+    val isGranted: Boolean,
+    val request: () -> Unit,
+)
+
+@Composable
+private fun rememberClickRecordingControlHandler(
+    recordingState: PracticeRecordingState,
+    hasRecordAudioPermission: Boolean,
+    onRequestRecordAudioPermission: () -> Unit,
+    onClickControl: () -> Unit,
+): () -> Unit =
+    remember(
+        recordingState,
+        hasRecordAudioPermission,
+        onRequestRecordAudioPermission,
+        onClickControl,
+    ) {
+        {
+            when (recordingState) {
+                PracticeRecordingState.Idle -> {
+                    if (hasRecordAudioPermission) {
+                        onClickControl()
+                    } else {
+                        onRequestRecordAudioPermission()
+                    }
+                }
+
+                is PracticeRecordingState.Recording,
+                is PracticeRecordingState.Recorded,
+                is PracticeRecordingState.Playing,
+                -> onClickControl()
+            }
+        }
     }
 
 @BasicPreview

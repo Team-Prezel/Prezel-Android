@@ -19,6 +19,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
 
 internal enum class PracticeRecordingControlState {
     READY_TO_RECORD,
@@ -26,6 +27,14 @@ internal enum class PracticeRecordingControlState {
     READY_TO_PLAY,
     PLAYING,
 }
+
+internal fun PracticeRecordingState.toControlState(): PracticeRecordingControlState =
+    when (this) {
+        PracticeRecordingState.Idle -> PracticeRecordingControlState.READY_TO_RECORD
+        is PracticeRecordingState.Recording -> PracticeRecordingControlState.RECORDING
+        is PracticeRecordingState.Recorded -> PracticeRecordingControlState.READY_TO_PLAY
+        is PracticeRecordingState.Playing -> PracticeRecordingControlState.PLAYING
+    }
 
 @Composable
 internal fun PracticeRecordingControl(
