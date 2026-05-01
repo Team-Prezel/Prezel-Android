@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice.analysis.component
+package com.team.prezel.feature.home.impl.practice.result.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -64,7 +64,7 @@ private enum class PracticeAnalysisOverallResult(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun PracticeRecordingAnalysisSuccessPage(
+internal fun PracticeRecordingResultPage(
     pronunciationScore: Int,
     speed: PracticeAnalysisSpeed,
     onBack: () -> Unit,
@@ -92,7 +92,7 @@ internal fun PracticeRecordingAnalysisSuccessPage(
             },
         )
 
-        PracticeRecordingAnalysisSuccessContent(
+        PracticeRecordingResultContent(
             cardResId = overallResult.cardResId,
             cardContentDescription = stringResource(overallResult.contentDescriptionResId),
             pronunciationScore = pronunciationScore,
@@ -100,12 +100,12 @@ internal fun PracticeRecordingAnalysisSuccessPage(
             modifier = Modifier.weight(1f),
         )
 
-        PracticeRecordingAnalysisSuccessButtonArea(onComplete = onComplete)
+        PracticeRecordingResultButtonArea(onComplete = onComplete)
     }
 }
 
 @Composable
-private fun PracticeRecordingAnalysisSuccessContent(
+private fun PracticeRecordingResultContent(
     @DrawableRes cardResId: Int,
     cardContentDescription: String,
     pronunciationScore: Int,
@@ -136,7 +136,7 @@ private fun PracticeRecordingAnalysisSuccessContent(
 }
 
 @Composable
-private fun PracticeRecordingAnalysisSuccessButtonArea(
+private fun PracticeRecordingResultButtonArea(
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -234,9 +234,9 @@ private fun PracticeAnalysisMetricLabel(
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisPerfectPagePreview() {
+private fun PracticeRecordingResultPerfectPagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisSuccessPage(
+        PracticeRecordingResultPage(
             pronunciationScore = 96,
             speed = PracticeAnalysisSpeed.ADEQUATE,
             onBack = {},
@@ -247,9 +247,9 @@ private fun PracticeRecordingAnalysisPerfectPagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisGoodPagePreview() {
+private fun PracticeRecordingResultGoodPagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisSuccessPage(
+        PracticeRecordingResultPage(
             pronunciationScore = 90,
             speed = PracticeAnalysisSpeed.ADEQUATE,
             onBack = {},
@@ -260,9 +260,9 @@ private fun PracticeRecordingAnalysisGoodPagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisTryPagePreview() {
+private fun PracticeRecordingResultTryPagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisSuccessPage(
+        PracticeRecordingResultPage(
             pronunciationScore = 58,
             speed = PracticeAnalysisSpeed.FAST,
             onBack = {},

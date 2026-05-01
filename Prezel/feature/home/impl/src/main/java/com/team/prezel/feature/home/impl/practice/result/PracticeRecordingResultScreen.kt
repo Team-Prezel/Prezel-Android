@@ -1,15 +1,15 @@
-package com.team.prezel.feature.home.impl.practice.analysis
+package com.team.prezel.feature.home.impl.practice.result
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.feature.home.impl.practice.analysis.component.PracticeAnalysisSpeed
-import com.team.prezel.feature.home.impl.practice.analysis.component.PracticeRecordingAnalysisErrorPage
-import com.team.prezel.feature.home.impl.practice.analysis.component.PracticeRecordingAnalysisLoadingPage
-import com.team.prezel.feature.home.impl.practice.analysis.component.PracticeRecordingAnalysisSuccessPage
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
+import com.team.prezel.feature.home.impl.practice.result.component.PracticeAnalysisSpeed
+import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisFailurePage
+import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisLoadingPage
+import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingResultPage
 
 @Composable
-internal fun PracticeRecordingAnalysisScreen(
+internal fun PracticeRecordingResultScreen(
     analysisStatus: PracticeRecordingAnalysisStatus,
     onBack: () -> Unit,
     onRetry: () -> Unit,
@@ -18,7 +18,7 @@ internal fun PracticeRecordingAnalysisScreen(
 ) {
     when (analysisStatus) {
         PracticeRecordingAnalysisStatus.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
-        PracticeRecordingAnalysisStatus.Success -> PracticeRecordingAnalysisSuccessPage(
+        PracticeRecordingAnalysisStatus.Success -> PracticeRecordingResultPage(
             pronunciationScore = 90,
             speed = PracticeAnalysisSpeed.ADEQUATE,
             onBack = onBack,
@@ -26,7 +26,7 @@ internal fun PracticeRecordingAnalysisScreen(
             modifier = modifier,
         )
 
-        is PracticeRecordingAnalysisStatus.Error -> PracticeRecordingAnalysisErrorPage(
+        is PracticeRecordingAnalysisStatus.Error -> PracticeRecordingAnalysisFailurePage(
             errorType = analysisStatus.type,
             onRetry = onRetry,
             modifier = modifier,

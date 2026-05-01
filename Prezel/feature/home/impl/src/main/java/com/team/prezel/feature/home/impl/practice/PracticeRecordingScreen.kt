@@ -29,14 +29,13 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
+import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.practice.analysis.PracticeRecordingAnalysisScreen
-import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingButtonArea
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingContent
 import com.team.prezel.feature.home.impl.practice.component.toControlState
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
@@ -45,6 +44,7 @@ import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEf
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingUiMessage
+import com.team.prezel.feature.home.impl.practice.result.PracticeRecordingResultScreen
 
 @Composable
 internal fun PracticeRecordingScreen(
@@ -113,7 +113,7 @@ private fun PracticeRecordingScreen(
             modifier = modifier,
         )
 
-        else -> PracticeRecordingAnalysisScreen(
+        else -> PracticeRecordingResultScreen(
             analysisStatus = uiState.analysisStatus,
             onBack = onBack,
             onRetry = onClickAnalyze,
@@ -132,12 +132,15 @@ private fun PracticeRecordingReadyScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val analyzeLabel = stringResource(R.string.feature_home_impl_practice_recording_analyze)
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
         PracticeRecordingTopAppBar(onBack = onBack)
+
         PracticeRecordingContent(
             practiceScript = practiceScript,
             currentSeconds = uiState.currentSeconds,
@@ -146,7 +149,14 @@ private fun PracticeRecordingReadyScreen(
             onClickControl = onClickControl,
             modifier = Modifier.weight(1f),
         )
-        PracticeRecordingButtonArea(enabled = uiState.analyzeEnabled, onClickAnalyze = onClickAnalyze)
+
+        PrezelButtonArea(modifier = modifier) {
+            MainButton(
+                label = analyzeLabel,
+                enabled = uiState.analyzeEnabled,
+                onClick = onClickAnalyze,
+            )
+        }
     }
 }
 

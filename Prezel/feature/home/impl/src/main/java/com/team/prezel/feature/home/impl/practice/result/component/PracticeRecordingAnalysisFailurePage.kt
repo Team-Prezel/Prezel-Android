@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice.analysis.component
+package com.team.prezel.feature.home.impl.practice.result.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -15,29 +15,13 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.component.PrezelLottie
 import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisErrorType
 import com.team.prezel.core.ui.R as CoreUiR
 
 @Composable
-internal fun PracticeRecordingAnalysisLoadingPage(modifier: Modifier = Modifier) {
-    StatusView(
-        title = stringResource(R.string.feature_home_impl_practice_recording_analysis_loading_title),
-        description = stringResource(R.string.feature_home_impl_practice_recording_analysis_loading_description),
-        modifier = modifier,
-        visual = {
-            PrezelLottie(
-                resId = CoreUiR.raw.core_ui_asset_loading,
-                modifier = Modifier.size(80.dp),
-            )
-        },
-    )
-}
-
-@Composable
-internal fun PracticeRecordingAnalysisErrorPage(
+internal fun PracticeRecordingAnalysisFailurePage(
     errorType: PracticeRecordingAnalysisErrorType,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -76,17 +60,9 @@ private val PracticeRecordingAnalysisErrorType.drawableResId: Int
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisLoadingPagePreview() {
+private fun PracticeRecordingAnalysisAnalyzeFailurePagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisLoadingPage()
-    }
-}
-
-@BasicPreview
-@Composable
-private fun PracticeRecordingAnalysisAnalyzeErrorPagePreview() {
-    PrezelTheme {
-        PracticeRecordingAnalysisErrorPage(
+        PracticeRecordingAnalysisFailurePage(
             errorType = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
             onRetry = {},
         )
@@ -95,9 +71,9 @@ private fun PracticeRecordingAnalysisAnalyzeErrorPagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisVoiceErrorPagePreview() {
+private fun PracticeRecordingAnalysisVoiceFailurePagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisErrorPage(
+        PracticeRecordingAnalysisFailurePage(
             errorType = PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED,
             onRetry = {},
         )
