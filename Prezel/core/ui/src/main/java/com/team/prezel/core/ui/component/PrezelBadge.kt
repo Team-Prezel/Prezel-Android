@@ -83,7 +83,8 @@ private fun BadgeImage(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(1f),
+            .aspectRatio(1f)
+            .clip(shape = PrezelTheme.shapes.V16),
     ) {
         Image(
             painter = painterResource(resId),
@@ -96,7 +97,6 @@ private fun BadgeImage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(shape = PrezelTheme.shapes.V16)
                     .background(color = PrezelTheme.colors.bgScrim),
                 contentAlignment = Alignment.Center,
             ) {
