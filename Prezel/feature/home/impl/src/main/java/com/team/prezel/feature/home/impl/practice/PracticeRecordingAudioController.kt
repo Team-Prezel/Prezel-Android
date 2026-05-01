@@ -17,54 +17,75 @@ internal class PracticeRecordingAudioController(
     private var recordingStartedAt: Long = 0L
     private var recordingFile: File? = null
 
-    fun startRecording(): String {
-        stopPlayback()
-        releaseRecorder()
+    fun startRecording(): Result<String> =
+        runCatching {
+            stopPlayback()
+            releaseRecorder()
 
-        val file = File.createTempFile("practice_recording_", ".m4a", context.cacheDir)
-        val newRecorder = createMediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(file.absolutePath)
-            prepare()
-            start()
+            val file = File.createTempFile("practice_recording_", ".m4a", context.cacheDir)
+            var pendingRecorder: MediaRecorder? = null
+            val newRecorder = runCatching {
+                val recorder = createMediaRecorder()
+                pendingRecorder = recorder
+                recorder.apply {
+                    setAudioSource(MediaRecorder.AudioSource.MIC)
+                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                    setOutputFile(file.absolutePath)
+                    prepare()
+                    start()
+                }
+            }.getOrElse { throwable ->
+                pendingRecorder?.release()
+                file.delete()
+                throw throwable
+            }
+
+            recorder = newRecorder
+            recordingFile = file
+            recordingStartedAt = System.currentTimeMillis()
+            file.absolutePath
         }
 
-        recorder = newRecorder
-        recordingFile = file
-        recordingStartedAt = System.currentTimeMillis()
-        return file.absolutePath
-    }
-
-    fun stopRecording(): Int {
+    fun stopRecording(): Result<Int> {
         val durationSeconds = ((System.currentTimeMillis() - recordingStartedAt) / 1_000L).toInt()
 
-        recorder?.runCatching { stop() }
-        releaseRecorder()
-
-        return max(durationSeconds, 0)
+        return runCatching {
+            recorder?.stop()
+            max(durationSeconds, 0)
+        }.also {
+            releaseRecorder()
+        }
     }
 
     fun startPlayback(
         filePath: String,
         onComplete: () -> Unit,
-    ): Int {
-        stopPlayback()
+    ): Result<Int> =
+        runCatching {
+            stopPlayback()
 
-        val newPlayer = MediaPlayer().apply {
-            setDataSource(filePath)
-            prepare()
-            setOnCompletionListener {
-                stopPlayback()
-                onComplete()
+            var pendingPlayer: MediaPlayer? = null
+            val newPlayer = runCatching {
+                val mediaPlayer = MediaPlayer()
+                pendingPlayer = mediaPlayer
+                mediaPlayer.apply {
+                    setDataSource(filePath)
+                    prepare()
+                    setOnCompletionListener {
+                        stopPlayback()
+                        onComplete()
+                    }
+                    start()
+                }
+            }.getOrElse { throwable ->
+                pendingPlayer?.release()
+                throw throwable
             }
-            start()
-        }
 
-        player = newPlayer
-        return newPlayer.duration.toSeconds()
-    }
+            player = newPlayer
+            newPlayer.duration.toSeconds()
+        }
 
     fun stopPlayback() {
         player?.runCatching { stop() }
@@ -72,7 +93,7 @@ internal class PracticeRecordingAudioController(
         player = null
     }
 
-    fun playbackPositionSeconds(): Int = player?.currentPosition?.toSeconds() ?: 0
+    fun playbackPositionSeconds(): Int = runCatching { player?.currentPosition?.toSeconds() }.getOrNull() ?: 0
 
     fun release() {
         releaseRecorder()

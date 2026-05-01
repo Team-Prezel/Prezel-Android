@@ -70,8 +70,8 @@ internal fun PracticeRecordingAnalysisErrorPage(
 private val PracticeRecordingAnalysisErrorType.drawableResId: Int
     @DrawableRes
     get() = when (this) {
-        PracticeRecordingAnalysisErrorType.ANALYZE -> CoreUiR.drawable.core_ui_error_analyze
-        PracticeRecordingAnalysisErrorType.VOICE -> CoreUiR.drawable.core_ui_error_voice
+        PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED -> CoreUiR.drawable.core_ui_error_analyze
+        PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED -> CoreUiR.drawable.core_ui_error_voice
     }
 
 @BasicPreview
@@ -87,7 +87,7 @@ private fun PracticeRecordingAnalysisLoadingPagePreview() {
 private fun PracticeRecordingAnalysisAnalyzeErrorPagePreview() {
     PrezelTheme {
         PracticeRecordingAnalysisErrorPage(
-            errorType = PracticeRecordingAnalysisErrorType.ANALYZE,
+            errorType = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
             onRetry = {},
         )
     }
@@ -98,7 +98,7 @@ private fun PracticeRecordingAnalysisAnalyzeErrorPagePreview() {
 private fun PracticeRecordingAnalysisVoiceErrorPagePreview() {
     PrezelTheme {
         PracticeRecordingAnalysisErrorPage(
-            errorType = PracticeRecordingAnalysisErrorType.VOICE,
+            errorType = PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED,
             onRetry = {},
         )
     }

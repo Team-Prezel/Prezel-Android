@@ -24,6 +24,7 @@
     <string name="feature_home_impl_practice_recording_back">뒤로가기</string>
     <string name="feature_home_impl_practice_recording_instruction">아래 문장을 소리내어 읽어주세요.</string>
     <string name="feature_home_impl_practice_recording_analyze">분석하기</string>
+    <string name="feature_home_impl_practice_recording_failed">녹음을 시작하지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_analysis_loading_title">분석중</string>
     <string name="feature_home_impl_practice_recording_analysis_loading_description">잠시만 기다려주세요</string>
     <string name="feature_home_impl_practice_recording_analysis_error_title">분석에 실패했어요</string>
