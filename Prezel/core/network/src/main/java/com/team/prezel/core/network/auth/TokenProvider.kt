@@ -1,7 +1,5 @@
 package com.team.prezel.core.network.auth
 
-import com.team.prezel.core.model.auth.AuthTokens
-
 interface TokenProvider {
     suspend fun getTokens(): AuthTokens?
 
@@ -11,4 +9,9 @@ interface TokenProvider {
     )
 
     suspend fun clearTokens()
+
+    data class AuthTokens(
+        val accessToken: String,
+        val refreshToken: String,
+    )
 }

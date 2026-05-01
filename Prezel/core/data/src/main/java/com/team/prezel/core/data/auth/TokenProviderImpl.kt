@@ -1,7 +1,6 @@
 package com.team.prezel.core.data.auth
 
 import com.team.prezel.core.datastore.auth.AuthLocalDataSource
-import com.team.prezel.core.model.auth.AuthTokens
 import com.team.prezel.core.network.auth.TokenProvider
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -9,7 +8,7 @@ import javax.inject.Inject
 internal class TokenProviderImpl @Inject constructor(
     private val dataSource: AuthLocalDataSource,
 ) : TokenProvider {
-    override suspend fun getTokens(): AuthTokens? = dataSource.tokens.firstOrNull()
+    override suspend fun getTokens(): TokenProvider.AuthTokens? = dataSource.tokens.firstOrNull()
 
     override suspend fun updateTokens(
         accessToken: String,

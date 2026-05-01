@@ -6,5 +6,11 @@ import com.team.prezel.core.model.profile.User
 interface UserRepository {
     suspend fun fetchUserInfo(isRefresh: Boolean): Result<User>
 
+    suspend fun patchProfile(
+        nickname: String,
+        profileImageBytes: ByteArray?,
+        mimeType: String?,
+    ): Result<Unit>
+
     suspend fun checkNicknameDuplication(nickname: Nickname): Result<Boolean>
 }

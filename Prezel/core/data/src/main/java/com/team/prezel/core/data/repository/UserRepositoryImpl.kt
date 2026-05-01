@@ -3,30 +3,51 @@ package com.team.prezel.core.data.repository
 import com.team.prezel.core.domain.repository.profile.UserRepository
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
-import kotlinx.coroutines.delay
+import com.team.prezel.core.network.datasource.UserRemoteDataSource
 import javax.inject.Inject
 
-internal class UserRepositoryImpl @Inject constructor() : UserRepository {
+internal class UserRepositoryImpl @Inject constructor(
+    private val userRemoteDataSource: UserRemoteDataSource,
+) : UserRepository {
     private var cachedUserInfo: User? = null
 
     override suspend fun fetchUserInfo(isRefresh: Boolean): Result<User> =
         runCatching {
             if (!isRefresh && cachedUserInfo != null) return Result.success(cachedUserInfo!!)
-
-            User(
-                id = 1,
-                email = "test@gmail.com",
-                nickname = "닉네임",
-                profileImage = User.ProfileImage(url = "https://picsum.photos/200", isDefault = true),
-                isRegistered = false,
-            )
+            userRemoteDataSource.getUser()
+        }.mapCatching { response ->
+            with(response) {
+                User(
+                    id = id.toLong(),
+                    email = email,
+                    nickname = nickname,
+                    profileImage = User.ProfileImage(
+                        url = profileImgUrl.url,
+                        isDefault = profileImgUrl.isDefault,
+                    ),
+                    isRegistered = isProfileComplete && isTermsAgreement,
+                )
+            }
         }.onSuccess { user ->
             cachedUserInfo = user
         }
 
-    override suspend fun checkNicknameDuplication(nickname: Nickname): Result<Boolean> {
-        // todo: 실제 API 연동 후 서버 중복 검사 결과를 반환하도록 교체
-        delay(200)
-        return Result.success(false)
-    }
+    override suspend fun patchProfile(
+        nickname: String,
+        profileImageBytes: ByteArray?,
+        mimeType: String?,
+    ): Result<Unit> =
+        runCatching {
+            userRemoteDataSource.patchProfile(
+                nickname = nickname,
+                profileImageBytes = profileImageBytes,
+                mimeType = mimeType,
+            )
+            cachedUserInfo = null
+        }
+
+    override suspend fun checkNicknameDuplication(nickname: Nickname): Result<Boolean> =
+        runCatching {
+            userRemoteDataSource.checkNickname(nickname = nickname.value)
+        }
 }
