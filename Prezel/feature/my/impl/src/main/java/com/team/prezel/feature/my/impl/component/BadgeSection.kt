@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -72,7 +71,6 @@ private fun BadgeListTitle(modifier: Modifier = Modifier) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BadgeList(
     badges: ImmutableList<BadgeUiModel>,
