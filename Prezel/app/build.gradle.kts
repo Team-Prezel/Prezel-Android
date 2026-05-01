@@ -33,8 +33,10 @@ dependencies {
     implementation(projects.coreAuth)
     implementation(projects.coreData)
     implementation(projects.coreDesignsystem)
+    implementation(projects.coreDomain)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
+    implementation(projects.coreCommon)
 
     implementation(projects.featureSplashApi)
     implementation(projects.featureSplashImpl)
@@ -51,6 +53,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.orhanobut.logger)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
 }

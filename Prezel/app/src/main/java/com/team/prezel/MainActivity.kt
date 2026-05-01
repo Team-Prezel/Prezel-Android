@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.ui.PrezelApp
@@ -20,6 +21,9 @@ class MainActivity : ComponentActivity() {
     lateinit var networkMonitor: NetworkMonitor
 
     @Inject
+    lateinit var globalEventBus: GlobalEventBus
+
+    @Inject
     lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,12 +32,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PrezelTheme {
-                val appState = rememberPrezelAppState(
-                    networkMonitor = networkMonitor,
-                )
+                val appState = rememberPrezelAppState(networkMonitor = networkMonitor)
 
                 PrezelApp(
                     appState = appState,
+                    globalEventBus = globalEventBus,
                     entryBuilders = entryBuilders.toImmutableSet(),
                 )
             }

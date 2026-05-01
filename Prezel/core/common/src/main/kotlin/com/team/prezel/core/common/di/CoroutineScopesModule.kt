@@ -1,13 +1,11 @@
-package com.team.prezel.core.network.di
+package com.team.prezel.core.common.di
 
-import com.team.prezel.core.network.Dispatcher
-import com.team.prezel.core.network.PrezelDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -22,7 +20,5 @@ internal object CoroutineScopesModule {
     @Provides
     @Singleton
     @ApplicationScope
-    fun providesCoroutineScope(
-        @Dispatcher(PrezelDispatchers.Default) dispatcher: CoroutineDispatcher,
-    ): CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+    fun providesCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 }

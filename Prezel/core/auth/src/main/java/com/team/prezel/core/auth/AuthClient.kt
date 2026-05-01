@@ -4,7 +4,11 @@ import android.content.Context
 import com.team.prezel.core.auth.model.AuthResult
 
 interface AuthClient {
+    suspend fun isLoggedIn(): Boolean
+
     suspend fun login(context: Context): AuthResult
 
     suspend fun logout(): Result<Unit>
+
+    suspend fun unlink(): Result<Unit>
 }

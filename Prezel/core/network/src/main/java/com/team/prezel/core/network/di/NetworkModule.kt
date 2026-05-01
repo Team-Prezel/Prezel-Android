@@ -1,24 +1,15 @@
 package com.team.prezel.core.network.di
 
-import com.team.prezel.core.network.ApiResponseConverterFactory
 import com.team.prezel.core.network.BuildConfig
+import com.team.prezel.core.network.client.HttpClientFactory
+import com.team.prezel.core.network.service.AuthService
+import com.team.prezel.core.network.service.createAuthService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
-import timber.log.Timber
 import javax.inject.Singleton
 
 @Module
@@ -26,37 +17,7 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideJson(): Json =
-        Json {
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-            encodeDefaults = true
-            prettyPrint = false
-        }
-
-    @Provides
-    @Singleton
-    fun provideHttpClient(json: Json): HttpClient =
-        HttpClient(OkHttp) {
-            expectSuccess = true
-
-            install(ContentNegotiation) {
-                json(json)
-            }
-
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        Timber.tag("KtorClient").d(message)
-                    }
-                }
-                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
-            }
-
-            defaultRequest {
-                contentType(ContentType.Application.Json)
-            }
-        }
+    internal fun provideHttpClient(factory: HttpClientFactory): HttpClient = factory.create()
 
     @Provides
     @Singleton
@@ -65,6 +26,9 @@ object NetworkModule {
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .httpClient(httpClient)
-            .converterFactories(ApiResponseConverterFactory())
             .build()
+
+    @Provides
+    @Singleton
+    internal fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
 }
