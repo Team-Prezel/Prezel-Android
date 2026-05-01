@@ -1,6 +1,5 @@
 package com.team.prezel.feature.my.impl.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -20,9 +19,7 @@ import com.team.prezel.feature.my.impl.R
 @Composable
 internal fun MyTopAppBar(onClickSetting: () -> Unit) {
     PrezelTopAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(PrezelTheme.colors.bgRegular),
+        modifier = Modifier.fillMaxWidth(),
         title = { Text(text = stringResource(R.string.feature_my_impl_title)) },
         trailingIcons = {
             PrezelIconButton(
