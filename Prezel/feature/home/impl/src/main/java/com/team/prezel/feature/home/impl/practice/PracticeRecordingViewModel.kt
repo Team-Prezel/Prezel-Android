@@ -34,8 +34,25 @@ internal class PracticeRecordingViewModel @Inject constructor(
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
             PracticeRecordingUiIntent.LoadPracticeScript -> fetchPracticeScript()
+            PracticeRecordingUiIntent.DenyRecordAudioPermission -> showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED)
+            PracticeRecordingUiIntent.DenyRecordAudioPermissionPermanently -> showMessage(
+                PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED,
+            )
             PracticeRecordingUiIntent.ClickControl -> onClickControl()
             PracticeRecordingUiIntent.ClickAnalyze -> startAnalysis()
+        }
+    }
+
+    private fun fetchPracticeScript() {
+        viewModelScope.launch {
+            fetchPracticeScriptUseCase()
+                .onSuccess { script ->
+                    updateState {
+                        copy(practiceScript = script.content)
+                    }
+                }.onFailure {
+                    showMessage(PracticeRecordingUiMessage.FETCH_PRACTICE_SCRIPT_FAILED)
+                }
         }
     }
 
@@ -73,7 +90,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
-                sendMessage(PracticeRecordingUiMessage.RECORDING_START_FAILED)
+                showMessage(PracticeRecordingUiMessage.RECORDING_START_FAILED)
             }
     }
 
@@ -103,7 +120,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
-                sendMessage(PracticeRecordingUiMessage.RECORDING_STOP_FAILED)
+                showMessage(PracticeRecordingUiMessage.RECORDING_STOP_FAILED)
             }
     }
 
@@ -113,7 +130,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
         val filePath = recordingFilePath
         if (filePath == null) {
-            sendMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
+            showMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
             return
         }
 
@@ -149,7 +166,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         analysisStatus = PracticeRecordingAnalysisStatus.Ready,
                     )
                 }
-                sendMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
+                showMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
             }
     }
 
@@ -204,17 +221,6 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPracticeScript() {
-        viewModelScope.launch {
-            fetchPracticeScriptUseCase()
-                .onSuccess { script ->
-                    updateState {
-                        copy(practiceScript = script.content)
-                    }
-                }
-        }
-    }
-
     private fun startRecordingTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -256,7 +262,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun sendMessage(message: PracticeRecordingUiMessage) {
+    private fun showMessage(message: PracticeRecordingUiMessage) {
         viewModelScope.launch {
             sendEffect(PracticeRecordingUiEffect.ShowMessage(message))
         }

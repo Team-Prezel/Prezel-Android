@@ -24,6 +24,9 @@
     <string name="feature_home_impl_practice_recording_back">뒤로가기</string>
     <string name="feature_home_impl_practice_recording_instruction">아래 문장을 소리내어 읽어주세요.</string>
     <string name="feature_home_impl_practice_recording_analyze">분석하기</string>
+    <string name="feature_home_impl_practice_recording_fetch_script_failed">대본을 불러오지 못했습니다.</string>
+    <string name="feature_home_impl_practice_recording_permission_denied">마이크 권한이 필요합니다.</string>
+    <string name="feature_home_impl_practice_recording_permission_permanently_denied">설정에서 마이크 권한을 허용해 주세요.</string>
     <string name="feature_home_impl_practice_recording_failed">녹음을 시작하지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_stop_failed">녹음을 저장하지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_playback_failed">녹음을 재생하지 못했습니다.</string>
