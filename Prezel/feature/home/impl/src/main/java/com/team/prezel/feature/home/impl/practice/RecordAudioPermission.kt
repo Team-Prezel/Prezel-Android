@@ -28,24 +28,21 @@ internal fun rememberRecordAudioPermissionControlClickHandler(
         onPermissionDenied = onPermissionDenied,
         onPermissionPermanentlyDenied = onPermissionPermanentlyDenied,
     )
-    val currentOnClickControl by rememberUpdatedState(onClickControl)
 
-    return remember(recordingState, permissionRequest) {
-        {
-            when (recordingState) {
-                PracticeRecordingState.Idle -> {
-                    when {
-                        permissionRequest.isGranted -> currentOnClickControl()
-                        permissionRequest.isPermanentlyDenied -> permissionRequest.onPermanentlyDenied()
-                        else -> permissionRequest.launch()
-                    }
+    return {
+        when (recordingState) {
+            PracticeRecordingState.Idle -> {
+                when {
+                    permissionRequest.isGranted -> onClickControl()
+                    permissionRequest.isPermanentlyDenied -> permissionRequest.onPermanentlyDenied()
+                    else -> permissionRequest.launch()
                 }
-
-                is PracticeRecordingState.Recording,
-                is PracticeRecordingState.Recorded,
-                is PracticeRecordingState.Playing,
-                -> currentOnClickControl()
             }
+
+            is PracticeRecordingState.Recording,
+            is PracticeRecordingState.Recorded,
+            is PracticeRecordingState.Playing,
+            -> onClickControl()
         }
     }
 }
@@ -90,14 +87,12 @@ private fun rememberRecordAudioPermissionRequest(
         }
     }
 
-    return remember(hasRecordAudioPermission, isPermanentlyDenied, launcher) {
-        RecordAudioPermissionRequest(
-            isGranted = hasRecordAudioPermission,
-            isPermanentlyDenied = isPermanentlyDenied,
-            launch = { launcher.launch(Manifest.permission.RECORD_AUDIO) },
-            onPermanentlyDenied = currentOnPermissionPermanentlyDenied,
-        )
-    }
+    return RecordAudioPermissionRequest(
+        isGranted = hasRecordAudioPermission,
+        isPermanentlyDenied = isPermanentlyDenied,
+        launch = { launcher.launch(Manifest.permission.RECORD_AUDIO) },
+        onPermanentlyDenied = currentOnPermissionPermanentlyDenied,
+    )
 }
 
 private data class RecordAudioPermissionRequest(

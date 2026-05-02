@@ -111,6 +111,7 @@ internal class PracticeRecordingAudioController(
     private fun releaseRecorder() {
         recorder?.release()
         recorder = null
+        recordingStartedAt = 0L
     }
 }
 
