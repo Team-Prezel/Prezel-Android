@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.team.prezel.feature.home.impl"
+    namespace = "com.team.prezel.feature.analysis.impl"
 }
 
 dependencies {

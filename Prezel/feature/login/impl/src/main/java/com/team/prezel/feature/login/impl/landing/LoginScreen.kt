@@ -22,30 +22,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
-import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.R
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
 import com.team.prezel.feature.login.impl.landing.contract.LoginUiState
-import com.team.prezel.feature.login.impl.landing.model.LoginUiMessage
 import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
@@ -53,36 +47,16 @@ private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
 
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
-    authManager: AuthManager,
     navigateToHome: () -> Unit,
-    navigateToTerms: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
-    val resources = LocalResources.current
-    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                LoginUiEffect.LaunchLogin -> {
-                    val result = authManager.login(context = context)
-                    viewModel.onIntent(LoginUiIntent.OnLoginResult(result = result))
-                }
-
                 LoginUiEffect.NavigateToHome -> navigateToHome()
-
-                LoginUiEffect.NavigateToTerms -> navigateToTerms()
-
-                is LoginUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        LoginUiMessage.LOGIN_CANCELLED -> R.string.feature_login_impl_kakao_cancelled
-                        LoginUiMessage.LOGIN_FAILED_UNKNOWN -> R.string.feature_login_impl_login_failed
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
-                }
             }
         }
     }
