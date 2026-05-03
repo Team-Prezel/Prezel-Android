@@ -21,6 +21,7 @@ internal class PracticeRecordingAudioController(
         runCatching {
             stopPlayback()
             releaseRecorder()
+            val previousRecordingFile = recordingFile
 
             val file = File.createTempFile("practice_recording_", ".m4a", context.cacheDir)
             var pendingRecorder: MediaRecorder? = null
@@ -44,10 +45,15 @@ internal class PracticeRecordingAudioController(
             recorder = newRecorder
             recordingFile = file
             recordingStartedAt = System.currentTimeMillis()
+            previousRecordingFile?.delete()
             file.absolutePath
         }
 
     fun stopRecording(): Result<Int> {
+        if (recorder == null || recordingStartedAt <= 0L) {
+            return Result.failure(IllegalStateException("Recording is not active."))
+        }
+
         val durationSeconds = ((System.currentTimeMillis() - recordingStartedAt) / 1_000L).toInt()
 
         return runCatching {
@@ -98,6 +104,8 @@ internal class PracticeRecordingAudioController(
     fun release() {
         releaseRecorder()
         stopPlayback()
+        recordingFile?.delete()
+        recordingFile = null
     }
 
     @Suppress("DEPRECATION")
