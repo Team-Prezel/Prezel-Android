@@ -15,5 +15,7 @@ internal sealed interface ProfileUiIntent : UiIntent {
         val profileImageFile: File?,
     ) : ProfileUiIntent
 
+    data object ClearProfileImage : ProfileUiIntent
+
     data object SubmitProfile : ProfileUiIntent
 }

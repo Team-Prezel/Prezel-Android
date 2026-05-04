@@ -1,5 +1,7 @@
 package com.team.prezel.feature.profile.impl
 
+import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -55,10 +58,7 @@ internal fun ProfileScreen(
         if (uri == null) return@rememberLauncherForActivityResult
         val imageFile = context.copyProfileImageToCache(uri) ?: return@rememberLauncherForActivityResult
         viewModel.onIntent(
-            ProfileUiIntent.UpdateProfileImage(
-                profileUrl = uri.toString(),
-                profileImageFile = imageFile,
-            ),
+            ProfileUiIntent.UpdateProfileImage(profileUrl = uri.toString(), profileImageFile = imageFile),
         )
     }
 
@@ -81,6 +81,12 @@ internal fun ProfileScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            (uiState as? ProfileUiState.Content)?.editing?.profileImageFile?.delete()
+        }
+    }
+
     ProfileScreen(
         uiState = uiState,
         isNewProfile = isNewProfile,
@@ -93,12 +99,7 @@ internal fun ProfileScreen(
                 return@ProfileScreen
             }
 
-            viewModel.onIntent(
-                ProfileUiIntent.UpdateProfileImage(
-                    profileUrl = "",
-                    profileImageFile = null,
-                ),
-            )
+            viewModel.onIntent(ProfileUiIntent.ClearProfileImage)
         },
         onClickSubmit = { viewModel.onIntent(ProfileUiIntent.SubmitProfile) },
         onBack = onBack,
@@ -183,27 +184,16 @@ private fun ProfileScreenContent(
     }
 }
 
-private fun android.content.Context.copyProfileImageToCache(uri: android.net.Uri): File? {
-    val displayName = contentResolver
-        .query(
-            uri,
-            arrayOf(android.provider.OpenableColumns.DISPLAY_NAME),
-            null,
-            null,
-            null,
-        )?.use { cursor ->
-            val columnIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-            if (columnIndex == -1 || !cursor.moveToFirst()) null else cursor.getString(columnIndex)
-        }
-    val targetFile = File(
-        cacheDir,
-        displayName?.takeIf { it.isNotBlank() } ?: "profile_image_${System.currentTimeMillis()}",
-    )
-    contentResolver.openInputStream(uri)?.use { input ->
+private fun Context.copyProfileImageToCache(uri: Uri): File? {
+    val inputStream = contentResolver.openInputStream(uri) ?: return null
+    val targetFile = File.createTempFile("profile_image_", null, cacheDir)
+
+    inputStream.use { input ->
         targetFile.outputStream().use { output ->
             input.copyTo(output)
         }
-    } ?: return null
+    }
+
     return targetFile
 }
 

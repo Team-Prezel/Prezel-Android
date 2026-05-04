@@ -52,6 +52,11 @@ internal class ProfileViewModel @Inject constructor(
                 profileImageFile = intent.profileImageFile,
             )
 
+            ProfileUiIntent.ClearProfileImage -> handleProfileImageChanged(
+                profileUrl = "",
+                profileImageFile = null,
+            )
+
             ProfileUiIntent.SubmitProfile -> submitProfile()
         }
     }
