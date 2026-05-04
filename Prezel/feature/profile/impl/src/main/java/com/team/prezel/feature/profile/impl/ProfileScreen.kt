@@ -24,7 +24,6 @@ import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.profile.impl.component.NicknameTextField
@@ -112,8 +111,8 @@ private fun ProfileScreen(
         )
 
         ProfileScreenContent(
-            profileUrl = contentState?.profileImage?.url.orEmpty(),
-            isDefaultProfileImage = contentState?.profileImage?.isDefault ?: true,
+            profileUrl = contentState?.profileImageUrl.orEmpty(),
+            isDefaultProfileImage = contentState?.profileImageUrl.isNullOrBlank(),
             nickname = contentState?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
             nicknameValidationState = contentState?.nicknameValidation ?: NicknameValidationState.Unchecked,
@@ -176,10 +175,10 @@ private fun CreateProfileScreenPreview() {
         ProfileScreen(
             uiState = ProfileUiState.Content(
                 originalNickname = "",
-                originalProfileImage = User.ProfileImage(url = "", isDefault = true),
+                originalProfileImageUrl = null,
                 nickname = "",
                 nicknameValidation = NicknameValidationState.Unchecked,
-                profileImage = User.ProfileImage(url = "", isDefault = true),
+                profileImageUrl = null,
             ),
             isNewProfile = true,
             onNicknameChanged = {},

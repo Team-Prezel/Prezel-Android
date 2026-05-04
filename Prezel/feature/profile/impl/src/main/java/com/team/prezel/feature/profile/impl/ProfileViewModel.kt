@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
 import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
-import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
@@ -87,14 +86,11 @@ internal class ProfileViewModel @Inject constructor(
 
     private fun handleProfileImageChanged(profileUrl: String) {
         val uiState = currentState as? ProfileUiState.Content ?: return
-        if (profileUrl == uiState.profileImage.url) return
+        if (profileUrl == uiState.profileImageUrl.orEmpty()) return
 
         updateState {
             uiState.copy(
-                profileImage = User.ProfileImage(
-                    url = profileUrl,
-                    isDefault = profileUrl.isBlank(),
-                ),
+                profileImageUrl = profileUrl.ifBlank { null },
             )
         }
     }

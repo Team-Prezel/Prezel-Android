@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.landing.contract
+package com.team.prezel.feature.login.impl.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.ui.base.UiState

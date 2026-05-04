@@ -14,7 +14,7 @@ data class GetUserResponse(
     @SerialName("isTermsAgreement")
     val isTermsAgreement: Boolean,
     @SerialName("nickname")
-    val nickname: String,
+    val nickname: String?,
     @SerialName("profileImgUrl")
     val profileImgUrl: ProfileImgUrl,
 ) {
@@ -23,6 +23,6 @@ data class GetUserResponse(
         @SerialName("isDefault")
         val isDefault: Boolean,
         @SerialName("url")
-        val url: String,
+        val url: String?,
     )
 }

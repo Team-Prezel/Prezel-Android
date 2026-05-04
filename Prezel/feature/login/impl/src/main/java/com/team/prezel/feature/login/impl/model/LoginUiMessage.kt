@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.landing.model
+package com.team.prezel.feature.login.impl.model
 
 internal enum class LoginUiMessage {
     LOGIN_CANCELLED,

@@ -1,7 +1,7 @@
-package com.team.prezel.feature.login.impl.landing.contract
+package com.team.prezel.feature.login.impl.contract
 
 import com.team.prezel.core.ui.base.UiEffect
-import com.team.prezel.feature.login.impl.landing.model.LoginUiMessage
+import com.team.prezel.feature.login.impl.model.LoginUiMessage
 
 internal sealed interface LoginUiEffect : UiEffect {
     data object LaunchLogin : LoginUiEffect

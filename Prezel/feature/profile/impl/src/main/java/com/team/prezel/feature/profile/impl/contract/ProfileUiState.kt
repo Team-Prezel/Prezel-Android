@@ -7,29 +7,29 @@ import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 
 @Immutable
 internal sealed interface ProfileUiState : UiState {
-    val shouldLaunchPhotoPicker get(): Boolean = (this as? Content)?.profileImage?.isDefault == true
+    val shouldLaunchPhotoPicker get(): Boolean = (this as? Content)?.profileImageUrl.isNullOrBlank()
 
     data object Loading : ProfileUiState
 
     data class Content(
         private val originalNickname: String,
-        private val originalProfileImage: User.ProfileImage,
+        private val originalProfileImageUrl: String?,
         val nickname: String,
         val nicknameValidation: NicknameValidationState,
-        val profileImage: User.ProfileImage,
+        val profileImageUrl: String?,
     ) : ProfileUiState {
         val submitButtonEnabled: Boolean =
             nicknameValidation == NicknameValidationState.Available &&
-                (nickname != originalNickname || profileImage != originalProfileImage)
+                (nickname != originalNickname || profileImageUrl != originalProfileImageUrl)
 
         companion object {
             fun User.toUiState(): ProfileUiState =
                 Content(
                     originalNickname = nickname,
-                    originalProfileImage = profileImage,
+                    originalProfileImageUrl = profileImageUrl,
                     nickname = nickname,
                     nicknameValidation = if (isRegistered) NicknameValidationState.Available else NicknameValidationState.Unchecked,
-                    profileImage = profileImage,
+                    profileImageUrl = profileImageUrl,
                 )
         }
     }

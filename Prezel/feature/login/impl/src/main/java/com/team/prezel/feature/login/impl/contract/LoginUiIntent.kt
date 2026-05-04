@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.landing.contract
+package com.team.prezel.feature.login.impl.contract
 
 import com.team.prezel.core.auth.model.AuthResult
 import com.team.prezel.core.ui.base.UiIntent

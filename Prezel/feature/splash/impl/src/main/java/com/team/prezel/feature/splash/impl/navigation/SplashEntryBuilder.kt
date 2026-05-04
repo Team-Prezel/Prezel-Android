@@ -7,8 +7,10 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.LocalSharedTransitionScope
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.login.api.LoginNavKey
+import com.team.prezel.feature.profile.api.ProfileNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.feature.splash.impl.SplashScreen
+import com.team.prezel.feature.terms.api.TermsNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +29,14 @@ internal fun EntryProviderScope<NavKey>.featureSplashEntryBuilder() {
                 },
                 navigateToLogin = {
                     navigator.replaceRoot(LoginNavKey)
+                },
+                navigateToTerms = {
+                    navigator.replaceRoot(LoginNavKey)
+                    navigator.navigate(TermsNavKey)
+                },
+                navigateToCreateProfile = {
+                    navigator.replaceRoot(LoginNavKey)
+                    navigator.navigate(ProfileNavKey.Create)
                 },
             )
         }

@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class TermsRemoteDataSourceImpl @Inject constructor(
     private val termsService: TermsService,
 ) : TermsRemoteDataSource {
-    override suspend fun agreeTerms(request: AgreeTermsRequest) {
+    override suspend fun agreeTerms(request: List<AgreeTermsRequest>) {
         termsService.agreeTerms(request = request).requireSuccess()
     }
 }

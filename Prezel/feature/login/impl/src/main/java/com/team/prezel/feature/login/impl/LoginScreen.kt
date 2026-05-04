@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.landing
+package com.team.prezel.feature.login.impl
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -41,11 +41,10 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
-import com.team.prezel.feature.login.impl.R
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiState
-import com.team.prezel.feature.login.impl.landing.model.LoginUiMessage
+import com.team.prezel.feature.login.impl.contract.LoginUiEffect
+import com.team.prezel.feature.login.impl.contract.LoginUiIntent
+import com.team.prezel.feature.login.impl.contract.LoginUiState
+import com.team.prezel.feature.login.impl.model.LoginUiMessage
 import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300

@@ -8,6 +8,6 @@ import de.jensklingenberg.ktorfit.http.POST
 interface TermsService {
     @POST("terms/agree")
     suspend fun agreeTerms(
-        @Body request: AgreeTermsRequest,
+        @Body request: List<AgreeTermsRequest>,
     ): BaseResponse<Unit>
 }

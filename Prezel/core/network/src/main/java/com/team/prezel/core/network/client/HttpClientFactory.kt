@@ -112,8 +112,7 @@ internal class HttpClientFactory @Inject constructor(
                     contentType(ContentType.Application.Json)
                     setBody(ReissueRequest(refreshToken))
                     attributes.put(AuthRequestAttributes.SkipAuthKey, true)
-                }
-                .body<BaseResponse<ReissueResponse>>()
+                }.body<BaseResponse<ReissueResponse>>()
                 .requireData()
                 .let { newTokens ->
                     tokenProvider.updateTokens(
@@ -131,7 +130,10 @@ internal class HttpClientFactory @Inject constructor(
         }
     }
 
-    private suspend fun handleExpiredRefreshToken(client: HttpClient, exception: Exception) {
+    private suspend fun handleExpiredRefreshToken(
+        client: HttpClient,
+        exception: Exception,
+    ) {
         if (!exception.isSessionInvalidForReissue()) return
 
         tokenProvider.clearTokens()
@@ -152,11 +154,12 @@ internal class HttpClientFactory @Inject constructor(
         )
 
     private fun Throwable.isSessionInvalidForReissue(): Boolean =
-        this is ApiException && errorCode in listOf(
-            ServerErrorCode.INVALID_TOKEN,
-            ServerErrorCode.TOKEN_STOLEN,
-            ServerErrorCode.USER_NOT_FOUND,
-        )
+        this is ApiException &&
+            errorCode in listOf(
+                ServerErrorCode.INVALID_TOKEN,
+                ServerErrorCode.TOKEN_STOLEN,
+                ServerErrorCode.USER_NOT_FOUND,
+            )
 
     private fun buildUserAgent(): String =
         buildString {

@@ -1,5 +1,6 @@
 package com.team.prezel.core.data.repository
 
+import com.team.prezel.core.data.error.mapDomainFailure
 import com.team.prezel.core.domain.repository.profile.UserRepository
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
@@ -20,17 +21,15 @@ internal class UserRepositoryImpl @Inject constructor(
                 User(
                     id = id.toLong(),
                     email = email,
-                    nickname = nickname,
-                    profileImage = User.ProfileImage(
-                        url = profileImgUrl.url,
-                        isDefault = profileImgUrl.isDefault,
-                    ),
-                    isRegistered = isProfileComplete && isTermsAgreement,
+                    nickname = nickname.orEmpty(),
+                    profileImageUrl = profileImgUrl.url?.takeIf { it.isNotBlank() },
+                    isProfileComplete = isProfileComplete,
+                    isTermsAgreement = isTermsAgreement,
                 )
             }
         }.onSuccess { user ->
             cachedUserInfo = user
-        }
+        }.mapDomainFailure()
 
     override suspend fun patchProfile(
         nickname: String,
@@ -44,10 +43,10 @@ internal class UserRepositoryImpl @Inject constructor(
                 mimeType = mimeType,
             )
             cachedUserInfo = null
-        }
+        }.mapDomainFailure()
 
     override suspend fun checkNicknameDuplication(nickname: Nickname): Result<Boolean> =
         runCatching {
             userRemoteDataSource.checkNickname(nickname = nickname.value)
-        }
+        }.mapDomainFailure()
 }

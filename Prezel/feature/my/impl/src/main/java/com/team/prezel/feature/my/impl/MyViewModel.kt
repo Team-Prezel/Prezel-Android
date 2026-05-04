@@ -44,7 +44,7 @@ internal class MyViewModel @Inject constructor(
             updateState {
                 copy(
                     isLoading = false,
-                    profileImageUrl = user?.profileImage?.url ?: this.profileImageUrl,
+                    profileImageUrl = user?.profileImageUrl ?: this.profileImageUrl,
                     nickname = user?.nickname ?: this.nickname,
                     badges = badges ?: this.badges,
                 )

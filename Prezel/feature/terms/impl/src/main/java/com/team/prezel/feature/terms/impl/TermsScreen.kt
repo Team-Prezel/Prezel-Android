@@ -37,9 +37,9 @@ import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.PrezelHyperlinkButton
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
-import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
@@ -319,7 +319,7 @@ private fun TermsScreenPreview() {
             onBack = {},
             onToggleAll = {
                 val next = !uiState.isAllChecked
-            uiState = uiState.copy(
+                uiState = uiState.copy(
                     isTermsOfServiceChecked = next,
                     isPrivacyPolicyChecked = next,
                     isMarketingConsentChecked = next,

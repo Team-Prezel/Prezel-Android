@@ -1,15 +1,15 @@
-package com.team.prezel.feature.login.impl.landing
+package com.team.prezel.feature.login.impl
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.auth.model.AuthResult
+import com.team.prezel.core.domain.usecase.auth.CheckLoginStatusUseCase
 import com.team.prezel.core.domain.usecase.auth.LoginUseCase
-import com.team.prezel.core.domain.usecase.auth.ResolveAuthStepUseCase
-import com.team.prezel.core.model.auth.AuthStep
+import com.team.prezel.core.model.auth.AuthCheckResult
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiEffect
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiIntent
-import com.team.prezel.feature.login.impl.landing.contract.LoginUiState
-import com.team.prezel.feature.login.impl.landing.model.LoginUiMessage
+import com.team.prezel.feature.login.impl.contract.LoginUiEffect
+import com.team.prezel.feature.login.impl.contract.LoginUiIntent
+import com.team.prezel.feature.login.impl.contract.LoginUiState
+import com.team.prezel.feature.login.impl.model.LoginUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val resolveAuthStepUseCase: ResolveAuthStepUseCase,
+    private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
 ) : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>(LoginUiState()) {
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
@@ -50,16 +50,16 @@ internal class LoginViewModel @Inject constructor(
     private suspend fun handleServerLogin(idToken: String) {
         loginUseCase(idToken = idToken)
             .onSuccess {
-                when (resolveAuthStepUseCase().first { step -> step != AuthStep.Loading }) {
-                    AuthStep.Ready -> sendEffect(LoginUiEffect.NavigateToHome)
-                    AuthStep.TermsRequired -> sendEffect(LoginUiEffect.NavigateToTerms)
-                    AuthStep.ProfileRequired -> sendEffect(LoginUiEffect.NavigateToCreateProfile)
-                    AuthStep.Unauthenticated,
-                    AuthStep.RetryableFailure,
-                    AuthStep.Loading,
+                when (checkLoginStatusUseCase().first { result -> result != AuthCheckResult.Loading }) {
+                    AuthCheckResult.Authenticated -> sendEffect(LoginUiEffect.NavigateToHome)
+                    AuthCheckResult.NeedsTermsAgreement -> sendEffect(LoginUiEffect.NavigateToTerms)
+                    AuthCheckResult.NeedsProfileCompletion -> sendEffect(LoginUiEffect.NavigateToCreateProfile)
+                    AuthCheckResult.Unauthenticated,
+                    AuthCheckResult.RetryableFailure,
                     -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
+
+                    AuthCheckResult.Loading -> Unit
                 }
-            }
-            .onFailure { sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN)) }
+            }.onFailure { sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN)) }
     }
 }

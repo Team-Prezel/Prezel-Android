@@ -59,6 +59,8 @@ includeAuto(
     ":feature:profile:impl",
     ":feature:login:api",
     ":feature:login:impl",
+    ":feature:terms:api",
+    ":feature:terms:impl",
     ":feature:splash:api",
     ":feature:splash:impl",
 )

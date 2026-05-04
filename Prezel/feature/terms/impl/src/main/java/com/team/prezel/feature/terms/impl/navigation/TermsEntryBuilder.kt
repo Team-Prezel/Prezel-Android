@@ -3,7 +3,6 @@ package com.team.prezel.feature.terms.impl.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
-import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.profile.api.ProfileNavKey
 import com.team.prezel.feature.terms.api.TermsNavKey
 import com.team.prezel.feature.terms.impl.TermsScreen
