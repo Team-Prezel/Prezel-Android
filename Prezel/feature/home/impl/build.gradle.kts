@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreAudio)
     implementation(projects.coreDomain)
     implementation(projects.coreModel)
     implementation(projects.featureHomeApi)

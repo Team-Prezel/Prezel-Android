@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice.audio
+package com.team.prezel.core.audio
 
 import android.content.Context
 import android.media.MediaPlayer
@@ -23,7 +23,7 @@ internal class MediaRecordingAudioController @Inject constructor(
             releaseRecorder()
             val previousRecordingFile = recordingFile
 
-            val file = File.createTempFile("practice_recording_", ".m4a", context.cacheDir)
+            val file = File.createTempFile("recording_", ".m4a", context.cacheDir)
             var pendingRecorder: MediaRecorder? = null
             val newRecorder = runCatching {
                 val recorder = createMediaRecorder()

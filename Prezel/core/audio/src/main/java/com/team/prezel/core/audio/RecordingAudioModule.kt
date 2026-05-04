@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.practice.audio
+package com.team.prezel.core.audio
 
 import dagger.Binds
 import dagger.Module

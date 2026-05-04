@@ -1,5 +1,7 @@
 package com.team.prezel.core.ui.util
 
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,25 +33,16 @@ fun rememberPermissionRequest(
     val currentOnPermissionGranted by rememberUpdatedState(onPermissionGranted)
     val currentOnPermissionDenied by rememberUpdatedState(onPermissionDenied)
     val currentOnPermissionPermanentlyDenied by rememberUpdatedState(onPermissionPermanentlyDenied)
-    var isGranted by remember(permission) {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED,
-        )
-    }
+    var isGranted by remember(permission) { mutableStateOf(context.isPermissionGranted(permission)) }
     var hasRequestedPermission by remember(permission) { mutableStateOf(false) }
     var isPermanentlyDenied by remember(permission) { mutableStateOf(false) }
 
     fun syncPermissionState() {
-        val syncedIsGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        val syncedIsGranted = context.isPermissionGranted(permission)
         isGranted = syncedIsGranted
-        isPermanentlyDenied = if (syncedIsGranted) {
-            false
-        } else {
+        isPermanentlyDenied = !syncedIsGranted &&
             hasRequestedPermission &&
-                activity?.let {
-                    !ActivityCompat.shouldShowRequestPermissionRationale(it, permission)
-                } == true
-        }
+            activity.isPermissionPermanentlyDenied(permission)
     }
 
     DisposableEffect(lifecycleOwner, context, activity, permission) {
@@ -69,16 +62,15 @@ fun rememberPermissionRequest(
     ) { launcherIsGranted ->
         hasRequestedPermission = true
         isGranted = launcherIsGranted
-        if (launcherIsGranted) {
-            isPermanentlyDenied = false
-            currentOnPermissionGranted()
-        } else {
-            isPermanentlyDenied = activity?.let {
-                !ActivityCompat.shouldShowRequestPermissionRationale(it, permission)
-            } == true
-            if (isPermanentlyDenied) {
+        isPermanentlyDenied = !launcherIsGranted && activity.isPermissionPermanentlyDenied(permission)
+        when {
+            launcherIsGranted -> {
+                currentOnPermissionGranted()
+            }
+            isPermanentlyDenied -> {
                 currentOnPermissionPermanentlyDenied()
-            } else {
+            }
+            else -> {
                 currentOnPermissionDenied()
             }
         }
@@ -91,6 +83,14 @@ fun rememberPermissionRequest(
         onPermanentlyDenied = currentOnPermissionPermanentlyDenied,
     )
 }
+
+private fun Context.isPermissionGranted(permission: String): Boolean =
+    ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+
+private fun Activity?.isPermissionPermanentlyDenied(permission: String): Boolean =
+    this?.let {
+        !ActivityCompat.shouldShowRequestPermissionRationale(it, permission)
+    } == true
 
 data class PermissionRequest(
     val isGranted: Boolean,

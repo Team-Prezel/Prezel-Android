@@ -39,6 +39,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 includeAuto(
     ":app",
+    ":core:audio",
     ":core:auth",
     ":core:common",
     ":core:data",

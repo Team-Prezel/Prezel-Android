@@ -1,12 +1,12 @@
 package com.team.prezel.feature.home.impl.practice
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.AnalyzePracticeRecordingUseCase
 import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
 import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.home.impl.practice.audio.RecordingAudioController
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState

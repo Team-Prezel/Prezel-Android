@@ -1,6 +1,6 @@
-package com.team.prezel.feature.home.impl.practice.audio
+package com.team.prezel.core.audio
 
-internal interface RecordingAudioController {
+interface RecordingAudioController {
     fun startRecording(): Result<String>
 
     fun stopRecording(): Result<Int>
