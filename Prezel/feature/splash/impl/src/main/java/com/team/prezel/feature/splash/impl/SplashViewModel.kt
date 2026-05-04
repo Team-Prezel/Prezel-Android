@@ -33,6 +33,7 @@ internal class SplashViewModel @Inject constructor(
                     }.onFailure { exception ->
                         Timber.e(exception)
                         sendEffect(SplashUiEffect.ShowRetryableFailureMessage)
+                        sendEffect(SplashUiEffect.NavigateToLogin)
                     }
             }.invokeOnCompletion { updateState { copy(isLoading = false) } }
     }
