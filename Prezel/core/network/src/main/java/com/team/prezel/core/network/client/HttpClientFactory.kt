@@ -62,6 +62,7 @@ internal class HttpClientFactory @Inject constructor(
 
     internal fun HttpClientConfig<*>.configureDefaultRequest() {
         defaultRequest {
+            url(BuildConfig.BASE_URL)
             contentType(ContentType.Application.Json)
         }
     }

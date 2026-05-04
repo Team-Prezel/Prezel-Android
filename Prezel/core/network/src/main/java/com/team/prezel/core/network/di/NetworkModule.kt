@@ -1,6 +1,5 @@
 package com.team.prezel.core.network.di
 
-import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.client.HttpClientFactory
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.TermsService
@@ -28,7 +27,6 @@ object NetworkModule {
     fun provideKtorfit(httpClient: HttpClient): Ktorfit =
         Ktorfit
             .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
             .httpClient(httpClient)
             .build()
 

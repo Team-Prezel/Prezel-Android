@@ -2,6 +2,7 @@ package com.team.prezel.core.designsystem.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -110,6 +111,7 @@ fun PrezelNavigationScaffold(
             AnimatedVisibility(
                 visible = showNavigationBar,
                 exit = ExitTransition.None,
+                enter = EnterTransition.None,
             ) {
                 PrezelNavigationBar {
                     PrezelNavigationScope(this).navigationItems()
