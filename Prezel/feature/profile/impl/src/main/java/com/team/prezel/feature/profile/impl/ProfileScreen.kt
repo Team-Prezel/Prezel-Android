@@ -3,6 +3,7 @@ package com.team.prezel.feature.profile.impl
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -50,32 +51,23 @@ internal fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
-    val context = LocalContext.current
     val resources = LocalResources.current
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        val imageFile = context.copyProfileImageToCache(uri) ?: return@rememberLauncherForActivityResult
+    val photoPickerLauncher = rememberProfileImagePicker { profileUrl, profileImageFile ->
         viewModel.onIntent(
-            ProfileUiIntent.UpdateProfileImage(profileUrl = uri.toString(), profileImageFile = imageFile),
+            ProfileUiIntent.UpdateProfileImage(profileUrl = profileUrl, profileImageFile = profileImageFile),
         )
     }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(ProfileUiIntent.FetchData)
-
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
                 ProfileUiEffect.NavigateToBack -> onBack()
                 is ProfileUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
-                        ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
-                        ProfileUiMessage.PATCH_USER_PROFILE_FAILED -> R.string.feature_profile_impl_patch_user_profile_failed_message
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(
+                        message = resources.getString(effect.message.resId),
+                    )
                 }
             }
         }
@@ -92,14 +84,9 @@ internal fun ProfileScreen(
         isNewProfile = isNewProfile,
         onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.UpdateNickname(nickname)) },
         onClickProfileImage = {
-            if (uiState.shouldLaunchPhotoPicker) {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly),
-                )
-                return@ProfileScreen
+            handleProfileImageClick(shouldLaunchPhotoPicker = uiState.shouldLaunchPhotoPicker, photoPickerLauncher = photoPickerLauncher) {
+                viewModel.onIntent(ProfileUiIntent.ClearProfileImage)
             }
-
-            viewModel.onIntent(ProfileUiIntent.ClearProfileImage)
         },
         onClickSubmit = { viewModel.onIntent(ProfileUiIntent.SubmitProfile) },
         onBack = onBack,
@@ -131,7 +118,8 @@ private fun ProfileScreen(
             isDefaultProfileImage = contentState?.editing?.profileImageUrl.isNullOrBlank(),
             nickname = contentState?.editing?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
-            nicknameValidationState = contentState?.editing?.nicknameValidation ?: NicknameValidationState.Unchecked,
+            nicknameValidationState = contentState?.editing?.nicknameValidation
+                ?: NicknameValidationState.Unchecked,
             onClickProfileImage = onClickProfileImage,
             modifier = Modifier.weight(1f),
         )
@@ -184,6 +172,41 @@ private fun ProfileScreenContent(
     }
 }
 
+@Composable
+private fun rememberProfileImagePicker(
+    context: Context = LocalContext.current,
+    onImagePicked: (profileUrl: String, profileImageFile: File) -> Unit,
+) = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.PickVisualMedia(),
+) { uri ->
+    if (uri == null) return@rememberLauncherForActivityResult
+
+    val imageFile = context.copyProfileImageToCache(uri)
+        ?: return@rememberLauncherForActivityResult
+
+    onImagePicked(
+        uri.toString(),
+        imageFile,
+    )
+}
+
+private fun handleProfileImageClick(
+    shouldLaunchPhotoPicker: Boolean,
+    photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>,
+    onClearProfileImage: () -> Unit,
+) {
+    if (shouldLaunchPhotoPicker) {
+        photoPickerLauncher.launch(
+            PickVisualMediaRequest(
+                mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly,
+            ),
+        )
+        return
+    }
+
+    onClearProfileImage()
+}
+
 private fun Context.copyProfileImageToCache(uri: Uri): File? {
     val inputStream = contentResolver.openInputStream(uri) ?: return null
     val targetFile = File.createTempFile("profile_image_", null, cacheDir)
@@ -196,6 +219,13 @@ private fun Context.copyProfileImageToCache(uri: Uri): File? {
 
     return targetFile
 }
+
+private val ProfileUiMessage.resId: Int
+    get() = when (this) {
+        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
+        ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
+        ProfileUiMessage.PATCH_USER_PROFILE_FAILED -> R.string.feature_profile_impl_patch_user_profile_failed_message
+    }
 
 @BasicPreview
 @Composable
