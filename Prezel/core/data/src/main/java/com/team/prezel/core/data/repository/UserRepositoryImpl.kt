@@ -5,6 +5,8 @@ import com.team.prezel.core.domain.repository.profile.UserRepository
 import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.network.datasource.UserRemoteDataSource
+import com.team.prezel.core.network.model.user.GetUserResponse
+import java.io.File
 import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
@@ -17,30 +19,19 @@ internal class UserRepositoryImpl @Inject constructor(
             if (!isRefresh && cachedUserInfo != null) return Result.success(cachedUserInfo!!)
             userRemoteDataSource.getUser()
         }.mapCatching { response ->
-            with(response) {
-                User(
-                    id = id.toLong(),
-                    email = email,
-                    nickname = nickname.orEmpty(),
-                    profileImageUrl = profileImgUrl.url?.takeIf { it.isNotBlank() },
-                    isProfileComplete = isProfileComplete,
-                    isTermsAgreement = isTermsAgreement,
-                )
-            }
+            response.toDomain()
         }.onSuccess { user ->
             cachedUserInfo = user
         }.mapDomainFailure()
 
     override suspend fun patchProfile(
         nickname: String,
-        profileImageBytes: ByteArray?,
-        mimeType: String?,
+        profileImageFile: File?,
     ): Result<Unit> =
         runCatching {
             userRemoteDataSource.patchProfile(
                 nickname = nickname,
-                profileImageBytes = profileImageBytes,
-                mimeType = mimeType,
+                profileImageFile = profileImageFile,
             )
             cachedUserInfo = null
         }.mapDomainFailure()
@@ -49,4 +40,14 @@ internal class UserRepositoryImpl @Inject constructor(
         runCatching {
             userRemoteDataSource.checkNickname(nickname = nickname.value)
         }.mapDomainFailure()
+
+    private fun GetUserResponse.toDomain(): User =
+        User(
+            id = id,
+            email = email,
+            nickname = nickname.orEmpty(),
+            profileImageUrl = profileImgUrl.url?.takeIf { url -> url.isNotBlank() },
+            isProfileComplete = isProfileComplete,
+            isTermsAgreement = isTermsAgreement,
+        )
 }

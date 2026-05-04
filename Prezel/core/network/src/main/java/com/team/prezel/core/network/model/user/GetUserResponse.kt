@@ -8,7 +8,7 @@ data class GetUserResponse(
     @SerialName("email")
     val email: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("isProfileComplete")
     val isProfileComplete: Boolean,
     @SerialName("isTermsAgreement")

@@ -1,6 +1,7 @@
 package com.team.prezel.core.domain.usecase.user
 
 import com.team.prezel.core.domain.repository.profile.UserRepository
+import java.io.File
 import javax.inject.Inject
 
 class PatchUserProfileUseCase @Inject constructor(
@@ -8,12 +9,10 @@ class PatchUserProfileUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         nickname: String,
-        profileImageBytes: ByteArray?,
-        mimeType: String?,
+        profileImageFile: File?,
     ): Result<Unit> =
         userRepository.patchProfile(
             nickname = nickname,
-            profileImageBytes = profileImageBytes,
-            mimeType = mimeType,
+            profileImageFile = profileImageFile,
         )
 }
