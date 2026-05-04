@@ -5,7 +5,7 @@ import com.team.prezel.core.model.profile.User
 import java.io.File
 
 interface UserRepository {
-    suspend fun fetchUserInfo(isRefresh: Boolean): Result<User>
+    suspend fun fetchUserInfo(): Result<User>
 
     suspend fun patchProfile(
         nickname: String,

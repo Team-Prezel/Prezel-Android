@@ -14,9 +14,9 @@ internal class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
     private var cachedUserInfo: User? = null
 
-    override suspend fun fetchUserInfo(isRefresh: Boolean): Result<User> =
+    override suspend fun fetchUserInfo(): Result<User> =
         runCatching {
-            if (!isRefresh && cachedUserInfo != null) return Result.success(cachedUserInfo!!)
+            if (cachedUserInfo != null) return Result.success(cachedUserInfo!!)
             userRemoteDataSource.getUser()
         }.mapCatching { response ->
             response.toDomain()

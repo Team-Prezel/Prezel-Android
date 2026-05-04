@@ -10,5 +10,5 @@ import javax.inject.Inject
 class FetchUserInfoUseCase @Inject constructor(
     private val userRepository: UserRepository,
 ) {
-    suspend operator fun invoke(isRefresh: Boolean = false): Result<User> = userRepository.fetchUserInfo(isRefresh = isRefresh)
+    suspend operator fun invoke(): Result<User> = userRepository.fetchUserInfo()
 }
