@@ -35,21 +35,21 @@ internal class LoginViewModel @Inject constructor(
     }
 
     private fun handleLoginResult(result: AuthResult) {
-        viewModelScope.launch {
-            when (result) {
-                is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
-                is AuthResult.Failure -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
-                AuthResult.Cancelled -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_CANCELLED))
-            }
-        }.invokeOnCompletion { updateState { copy(isLoading = false) } }
+        viewModelScope
+            .launch {
+                when (result) {
+                    is AuthResult.Success -> handleServerLogin(idToken = result.idToken)
+                    is AuthResult.Failure -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
+                    AuthResult.Cancelled -> sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_CANCELLED))
+                }
+            }.invokeOnCompletion { updateState { copy(isLoading = false) } }
     }
 
     private suspend fun handleServerLogin(idToken: String) {
         loginUseCase(idToken = idToken)
             .onSuccess { user ->
                 user?.let { routeUser(user) } ?: sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
-            }
-            .onFailure { exception ->
+            }.onFailure { exception ->
                 Timber.e(exception)
                 sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
             }

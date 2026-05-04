@@ -30,8 +30,7 @@ internal class SplashViewModel @Inject constructor(
                 checkLoginStatusUseCase()
                     .onSuccess { user ->
                         user?.let { routeUser(user) } ?: sendEffect(SplashUiEffect.NavigateToLogin)
-                    }
-                    .onFailure { exception ->
+                    }.onFailure { exception ->
                         Timber.e(exception)
                         sendEffect(SplashUiEffect.ShowRetryableFailureMessage)
                     }
