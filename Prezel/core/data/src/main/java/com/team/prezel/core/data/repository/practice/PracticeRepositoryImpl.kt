@@ -1,4 +1,4 @@
-package com.team.prezel.core.data.repository
+package com.team.prezel.core.data.repository.practice
 
 import com.team.prezel.core.domain.repository.practice.PracticeRepository
 import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult

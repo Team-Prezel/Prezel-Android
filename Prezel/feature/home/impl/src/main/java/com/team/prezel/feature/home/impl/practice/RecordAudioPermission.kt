@@ -3,7 +3,7 @@ package com.team.prezel.feature.home.impl.practice
 import android.Manifest
 import androidx.compose.runtime.Composable
 import com.team.prezel.core.ui.util.rememberPermissionRequest
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 
 @Composable
 internal fun rememberRecordAudioPermissionControlClickHandler(

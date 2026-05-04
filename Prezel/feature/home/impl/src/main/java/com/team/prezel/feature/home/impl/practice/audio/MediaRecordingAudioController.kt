@@ -9,15 +9,15 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.math.max
 
-internal class PracticeRecordingAudioController(
-    private val context: Context,
-) {
+internal class MediaRecordingAudioController @Inject constructor(
+    @param:ApplicationContext private val context: Context,
+) : RecordingAudioController {
     private var recorder: MediaRecorder? = null
     private var player: MediaPlayer? = null
     private var recordingStartedAt: Long = 0L
     private var recordingFile: File? = null
 
-    fun startRecording(): Result<String> =
+    override fun startRecording(): Result<String> =
         runCatching {
             stopPlayback()
             releaseRecorder()
@@ -49,7 +49,7 @@ internal class PracticeRecordingAudioController(
             file.absolutePath
         }
 
-    fun stopRecording(): Result<Int> {
+    override fun stopRecording(): Result<Int> {
         if (recorder == null || recordingStartedAt <= 0L) {
             return Result.failure(IllegalStateException("Recording is not active."))
         }
@@ -64,7 +64,7 @@ internal class PracticeRecordingAudioController(
         }
     }
 
-    fun startPlayback(
+    override fun startPlayback(
         filePath: String,
         onComplete: () -> Unit,
     ): Result<Int> =
@@ -93,15 +93,15 @@ internal class PracticeRecordingAudioController(
             newPlayer.duration.toSeconds()
         }
 
-    fun stopPlayback() {
+    override fun stopPlayback() {
         player?.runCatching { stop() }
         player?.release()
         player = null
     }
 
-    fun playbackPositionSeconds(): Int = runCatching { player?.currentPosition?.toSeconds() }.getOrNull() ?: 0
+    override fun playbackPositionSeconds(): Int = runCatching { player?.currentPosition?.toSeconds() }.getOrNull() ?: 0
 
-    fun release() {
+    override fun release() {
         releaseRecorder()
         stopPlayback()
         recordingFile?.delete()
@@ -121,12 +121,6 @@ internal class PracticeRecordingAudioController(
         recorder = null
         recordingStartedAt = 0L
     }
-}
-
-internal class PracticeRecordingAudioControllerFactory @Inject constructor(
-    @param:ApplicationContext private val context: Context,
-) {
-    fun create(): PracticeRecordingAudioController = PracticeRecordingAudioController(context)
 }
 
 private fun Int.toSeconds(): Int = this / 1_000

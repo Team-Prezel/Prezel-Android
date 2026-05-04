@@ -1,8 +1,8 @@
 package com.team.prezel.core.data.di
 
 import com.team.prezel.core.data.repository.AuthRepositoryImpl
-import com.team.prezel.core.data.repository.PracticeRepositoryImpl
 import com.team.prezel.core.data.repository.UserRepositoryImpl
+import com.team.prezel.core.data.repository.practice.PracticeRepositoryImpl
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.repository.practice.PracticeRepository
 import com.team.prezel.core.domain.repository.profile.UserRepository

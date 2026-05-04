@@ -21,11 +21,11 @@ import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingContent
 import com.team.prezel.feature.home.impl.practice.component.PracticeRecordingTopAppBar
 import com.team.prezel.feature.home.impl.practice.component.toControlState
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisStatus
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingUiMessage
 import com.team.prezel.feature.home.impl.practice.result.PracticeRecordingResultScreen
 import kotlinx.coroutines.flow.collectLatest
@@ -42,10 +42,10 @@ internal fun PracticeRecordingScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val onClickRecordingControl = rememberRecordAudioPermissionControlClickHandler(
         recordingState = uiState.recordingState,
-        onClickControl = { viewModel.onIntent(PracticeRecordingUiIntent.ClickControl) },
-        onPermissionDenied = { viewModel.onIntent(PracticeRecordingUiIntent.DenyRecordAudioPermission) },
+        onClickControl = { viewModel.onIntent(PracticeRecordingUiIntent.ToggleRecordingControl) },
+        onPermissionDenied = { viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionDenied) },
         onPermissionPermanentlyDenied = {
-            viewModel.onIntent(PracticeRecordingUiIntent.DenyRecordAudioPermissionPermanently)
+            viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionPermanentlyDenied)
         },
     )
 
@@ -69,7 +69,7 @@ internal fun PracticeRecordingScreen(
     PracticeRecordingScreen(
         uiState = uiState,
         onClickControl = onClickRecordingControl,
-        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.ClickAnalyze) },
+        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeClicked) },
         onBack = onBack,
         navigateToHome = navigateToHome,
         modifier = modifier,

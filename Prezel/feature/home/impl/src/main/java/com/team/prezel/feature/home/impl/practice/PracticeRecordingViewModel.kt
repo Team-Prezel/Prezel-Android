@@ -1,17 +1,20 @@
 package com.team.prezel.feature.home.impl.practice
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.domain.usecase.practice.FetchPracticeRecordingAnalysisResultUseCase
+import com.team.prezel.core.domain.usecase.practice.AnalyzePracticeRecordingUseCase
 import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
-import com.team.prezel.core.domain.usecase.practice.UploadPracticeRecordingUseCase
+import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult
+import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.home.impl.practice.audio.PracticeRecordingAudioControllerFactory
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisErrorType
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
+import com.team.prezel.feature.home.impl.practice.audio.RecordingAudioController
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisErrorType
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisSpeed
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisStatus
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisUiModel
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,12 +24,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class PracticeRecordingViewModel @Inject constructor(
-    audioControllerFactory: PracticeRecordingAudioControllerFactory,
+    private val audioController: RecordingAudioController,
     private val fetchPracticeScriptUseCase: FetchPracticeScriptUseCase,
-    private val uploadPracticeRecordingUseCase: UploadPracticeRecordingUseCase,
-    private val fetchPracticeRecordingAnalysisResultUseCase: FetchPracticeRecordingAnalysisResultUseCase,
+    private val analyzePracticeRecordingUseCase: AnalyzePracticeRecordingUseCase,
 ) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(PracticeRecordingUiState()) {
-    private val audioController = audioControllerFactory.create()
     private var recordingFilePath: String? = null
     private var timerJob: Job? = null
     private var analysisJob: Job? = null
@@ -34,12 +35,13 @@ internal class PracticeRecordingViewModel @Inject constructor(
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
             PracticeRecordingUiIntent.LoadPracticeScript -> fetchPracticeScript()
-            PracticeRecordingUiIntent.DenyRecordAudioPermission -> showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED)
-            PracticeRecordingUiIntent.DenyRecordAudioPermissionPermanently -> showMessage(
+            PracticeRecordingUiIntent.RecordAudioPermissionDenied -> showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED)
+            PracticeRecordingUiIntent.RecordAudioPermissionPermanentlyDenied -> showMessage(
                 PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED,
             )
-            PracticeRecordingUiIntent.ClickControl -> onClickControl()
-            PracticeRecordingUiIntent.ClickAnalyze -> startAnalysis()
+
+            PracticeRecordingUiIntent.ToggleRecordingControl -> toggleRecordingControl()
+            PracticeRecordingUiIntent.AnalyzeClicked -> startAnalysis()
         }
     }
 
@@ -56,7 +58,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun onClickControl() {
+    private fun toggleRecordingControl() {
         when (currentState.recordingState) {
             PracticeRecordingState.Idle -> startRecording()
             is PracticeRecordingState.Recording -> stopRecording()
@@ -190,6 +192,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
         if (!currentState.analyzeEnabled) return
         val filePath = recordingFilePath ?: return
 
+        audioController.stopPlayback()
         analysisJob?.cancel()
         analysisJob = viewModelScope.launch {
             updateState {
@@ -198,14 +201,12 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
             delay(ANALYSIS_LOADING_DELAY_MILLIS)
 
-            uploadPracticeRecordingUseCase(recordingFilePath = filePath)
-                .mapCatching { upload ->
-                    fetchPracticeRecordingAnalysisResultUseCase(recordingId = upload.id).getOrThrow()
-                }.onSuccess { result ->
+            analyzePracticeRecordingUseCase(recordingFilePath = filePath)
+                .onSuccess { result ->
                     updateState {
                         copy(
                             analysisStatus = PracticeRecordingAnalysisStatus.Success(
-                                result = result,
+                                result = result.toUiModel(),
                             ),
                         )
                     }
@@ -281,3 +282,16 @@ internal class PracticeRecordingViewModel @Inject constructor(
         const val PLAYBACK_TIMER_DELAY_MILLIS = 250L
     }
 }
+
+private fun PracticeRecordingAnalysisResult.toUiModel(): PracticeRecordingAnalysisUiModel =
+    PracticeRecordingAnalysisUiModel(
+        pronunciationScore = pronunciationScore,
+        speed = speed.toUiModel(),
+    )
+
+private fun PracticeRecordingSpeed.toUiModel(): PracticeRecordingAnalysisSpeed =
+    when (this) {
+        PracticeRecordingSpeed.SLOW -> PracticeRecordingAnalysisSpeed.SLOW
+        PracticeRecordingSpeed.ADEQUATE -> PracticeRecordingAnalysisSpeed.ADEQUATE
+        PracticeRecordingSpeed.FAST -> PracticeRecordingAnalysisSpeed.FAST
+    }

@@ -19,7 +19,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingState
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 
 internal enum class PracticeRecordingControlState {
     READY_TO_RECORD,

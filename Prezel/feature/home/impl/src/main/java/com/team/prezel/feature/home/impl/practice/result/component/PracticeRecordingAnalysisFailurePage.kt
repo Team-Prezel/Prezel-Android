@@ -17,7 +17,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisErrorType
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisErrorType
 import com.team.prezel.core.ui.R as CoreUiR
 
 @Composable

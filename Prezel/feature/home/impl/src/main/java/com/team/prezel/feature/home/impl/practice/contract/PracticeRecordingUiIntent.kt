@@ -5,11 +5,11 @@ import com.team.prezel.core.ui.base.UiIntent
 internal sealed interface PracticeRecordingUiIntent : UiIntent {
     data object LoadPracticeScript : PracticeRecordingUiIntent
 
-    data object DenyRecordAudioPermission : PracticeRecordingUiIntent
+    data object RecordAudioPermissionDenied : PracticeRecordingUiIntent
 
-    data object DenyRecordAudioPermissionPermanently : PracticeRecordingUiIntent
+    data object RecordAudioPermissionPermanentlyDenied : PracticeRecordingUiIntent
 
-    data object ClickControl : PracticeRecordingUiIntent
+    data object ToggleRecordingControl : PracticeRecordingUiIntent
 
-    data object ClickAnalyze : PracticeRecordingUiIntent
+    data object AnalyzeClicked : PracticeRecordingUiIntent
 }

@@ -2,8 +2,8 @@ package com.team.prezel.feature.home.impl.practice.result
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.model.practice.PracticeRecordingSpeed
-import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingAnalysisStatus
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisSpeed
+import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeAnalysisSpeed
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisFailurePage
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisLoadingPage
@@ -37,9 +37,9 @@ internal fun PracticeRecordingResultScreen(
     }
 }
 
-private fun PracticeRecordingSpeed.toUiModel(): PracticeAnalysisSpeed =
+private fun PracticeRecordingAnalysisSpeed.toUiModel(): PracticeAnalysisSpeed =
     when (this) {
-        PracticeRecordingSpeed.SLOW -> PracticeAnalysisSpeed.SLOW
-        PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisSpeed.ADEQUATE
-        PracticeRecordingSpeed.FAST -> PracticeAnalysisSpeed.FAST
+        PracticeRecordingAnalysisSpeed.SLOW -> PracticeAnalysisSpeed.SLOW
+        PracticeRecordingAnalysisSpeed.ADEQUATE -> PracticeAnalysisSpeed.ADEQUATE
+        PracticeRecordingAnalysisSpeed.FAST -> PracticeAnalysisSpeed.FAST
     }
