@@ -47,7 +47,6 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.FILE_UPLOAD_FAILED,
         -> AppError.SERVER_ERROR
 
-        ServerErrorCode.USER_NOT_FOUND,
         ServerErrorCode.TERMS_NOT_FOUND,
         -> AppError.NOT_FOUND
 
@@ -57,7 +56,9 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.FORBIDDEN,
         ServerErrorCode.INVALID_TOKEN,
         ServerErrorCode.TOKEN_STOLEN,
+        ServerErrorCode.USER_NOT_FOUND,
         ServerErrorCode.INVALID_ID_TOKEN,
-        ServerErrorCode.UNKNOWN,
-        -> AppError.UNKNOWN
+        -> AppError.UNAUTHORIZED
+
+        ServerErrorCode.UNKNOWN -> AppError.UNKNOWN
     }

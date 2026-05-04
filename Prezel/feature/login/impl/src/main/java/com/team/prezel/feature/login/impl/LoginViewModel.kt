@@ -47,9 +47,8 @@ internal class LoginViewModel @Inject constructor(
 
     private suspend fun handleServerLogin(idToken: String) {
         loginUseCase(idToken = idToken)
-            .onSuccess { user ->
-                user?.let { routeUser(user) } ?: sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
-            }.onFailure { exception ->
+            .onSuccess { user -> routeUser(user) }
+            .onFailure { exception ->
                 Timber.e(exception)
                 sendEffect(LoginUiEffect.ShowMessage(LoginUiMessage.LOGIN_FAILED_UNKNOWN))
             }

@@ -82,7 +82,10 @@ internal class TermsViewModel @Inject constructor(
         val error = (this as? AppException)?.error
 
         return when (error) {
-            AppError.INVALID_REQUEST -> TermsUiMessage.AGREE_TERMS_FAILED_INVALID_REQUEST
+            AppError.UNAUTHORIZED,
+            AppError.INVALID_REQUEST,
+            -> TermsUiMessage.AGREE_TERMS_FAILED_INVALID_REQUEST
+
             AppError.NETWORK -> TermsUiMessage.AGREE_TERMS_FAILED_NETWORK
             AppError.SERVER_ERROR -> TermsUiMessage.AGREE_TERMS_FAILED_SERVER
             AppError.NOT_FOUND,
