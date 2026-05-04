@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.terms.component
+package com.team.prezel.feature.terms.impl.component
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
@@ -22,7 +22,7 @@ import androidx.compose.ui.zIndex
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.login.impl.R
+import com.team.prezel.feature.terms.impl.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +44,7 @@ internal fun TermsDetailModal(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         painter = painterResource(PrezelIcons.Cancel),
-                        contentDescription = stringResource(R.string.feature_login_impl_cancel_icon_description),
+                        contentDescription = stringResource(R.string.feature_terms_impl_cancel_icon_description),
                     )
                 }
             },

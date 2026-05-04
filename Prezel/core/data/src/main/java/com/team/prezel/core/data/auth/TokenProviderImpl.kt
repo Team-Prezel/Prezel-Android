@@ -8,7 +8,13 @@ import javax.inject.Inject
 internal class TokenProviderImpl @Inject constructor(
     private val dataSource: AuthLocalDataSource,
 ) : TokenProvider {
-    override suspend fun getTokens(): TokenProvider.AuthTokens? = dataSource.tokens.firstOrNull()
+    override suspend fun getTokens(): TokenProvider.AuthTokens? =
+        dataSource.tokens.firstOrNull()?.let { tokens ->
+            TokenProvider.AuthTokens(
+                accessToken = tokens.accessToken,
+                refreshToken = tokens.refreshToken,
+            )
+        }
 
     override suspend fun updateTokens(
         accessToken: String,

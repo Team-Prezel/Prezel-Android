@@ -29,9 +29,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.ktorfit.lib)
     ksp(libs.ktorfit.ksp)
-
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.ktor.client.mock)
 }
 
 androidComponents {

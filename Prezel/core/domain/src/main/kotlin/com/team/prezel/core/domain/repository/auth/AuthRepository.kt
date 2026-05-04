@@ -1,11 +1,11 @@
 package com.team.prezel.core.domain.repository.auth
 
-import com.team.prezel.core.model.auth.LoginStatus
+import com.team.prezel.core.model.auth.AuthCheckResult
 import com.team.prezel.core.model.auth.WithdrawReason
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    val loginStatus: Flow<LoginStatus>
+    val authCheckResult: Flow<AuthCheckResult>
 
     suspend fun logout(): Result<Unit>
 

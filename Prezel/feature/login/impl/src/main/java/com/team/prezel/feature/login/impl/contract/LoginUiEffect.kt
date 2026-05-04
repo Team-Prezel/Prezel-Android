@@ -10,6 +10,8 @@ internal sealed interface LoginUiEffect : UiEffect {
 
     data object NavigateToTerms : LoginUiEffect
 
+    data object NavigateToCreateProfile : LoginUiEffect
+
     data class ShowMessage(
         val message: LoginUiMessage,
     ) : LoginUiEffect

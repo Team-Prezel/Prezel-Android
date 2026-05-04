@@ -1,4 +1,4 @@
-package com.team.prezel.feature.login.impl.terms
+package com.team.prezel.feature.terms.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,14 +39,15 @@ import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.PrezelHyperlinkButton
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.login.impl.BuildConfig
-import com.team.prezel.feature.login.impl.R
-import com.team.prezel.feature.login.impl.terms.component.TermsDetailModal
-import com.team.prezel.feature.login.impl.terms.contract.TermsUiEffect
-import com.team.prezel.feature.login.impl.terms.contract.TermsUiIntent
-import com.team.prezel.feature.login.impl.terms.contract.TermsUiState
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.feature.terms.impl.component.TermsDetailModal
+import com.team.prezel.feature.terms.impl.contract.TermsUiEffect
+import com.team.prezel.feature.terms.impl.contract.TermsUiIntent
+import com.team.prezel.feature.terms.impl.contract.TermsUiState
+import com.team.prezel.feature.terms.impl.model.TermsUiMessage
 
 @Composable
 internal fun TermsScreen(
@@ -56,12 +57,24 @@ internal fun TermsScreen(
     viewModel: TermsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSnackbarHostState.current
     var activeDetailUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 TermsUiEffect.NavigateToProfile -> navigateToProfile()
+
+                is TermsUiEffect.ShowMessage -> {
+                    val resId = when (effect.message) {
+                        TermsUiMessage.AGREE_TERMS_FAILED_INVALID_REQUEST -> R.string.feature_terms_impl_agree_terms_failed_invalid_request
+                        TermsUiMessage.AGREE_TERMS_FAILED_NETWORK -> R.string.feature_terms_impl_agree_terms_failed_network
+                        TermsUiMessage.AGREE_TERMS_FAILED_SERVER -> R.string.feature_terms_impl_agree_terms_failed_server
+                        TermsUiMessage.AGREE_TERMS_FAILED_UNKNOWN -> R.string.feature_terms_impl_agree_terms_failed_unknown
+                    }
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                }
             }
         }
     }
@@ -119,8 +132,8 @@ private fun TermsScreenScreen(
 
         PrezelButtonArea {
             MainButton(
-                label = resources.getString(R.string.feature_login_impl_terms_continue_button_text),
-                enabled = uiState.isRequiredChecked,
+                label = resources.getString(R.string.feature_terms_impl_terms_continue_button_text),
+                enabled = uiState.isRequiredChecked && !uiState.isLoading,
                 onClick = onContinue,
             )
         }
@@ -136,13 +149,13 @@ private fun TermsScreenTopAppBar(
     PrezelTopAppBar(
         modifier = modifier,
         title = {
-            Text(text = stringResource(R.string.feature_login_impl_terms_title))
+            Text(text = stringResource(R.string.feature_terms_impl_terms_title))
         },
         leadingIcon = {
             IconButton(onClick = onBack) {
                 Icon(
                     painter = painterResource(PrezelIcons.ArrowLeft),
-                    contentDescription = stringResource(R.string.feature_login_impl_back_icon_description),
+                    contentDescription = stringResource(R.string.feature_terms_impl_back_icon_description),
                 )
             }
         },
@@ -177,24 +190,24 @@ private fun TermsAgreementContent(
         TermsAgreementSection {
             TermsAgreementRow(
                 checked = uiState.isTermsOfServiceChecked,
-                title = stringResource(R.string.feature_login_impl_terms_of_service),
-                summary = stringResource(R.string.feature_login_impl_terms_of_service_summary),
+                title = stringResource(R.string.feature_terms_impl_terms_of_service),
+                summary = stringResource(R.string.feature_terms_impl_terms_of_service_summary),
                 isShowDetailButton = true,
                 onCheckedChange = { onToggleTermsOfService() },
                 onClickDetail = onClickTermsOfServiceDetail,
             )
             TermsAgreementRow(
                 checked = uiState.isPrivacyPolicyChecked,
-                title = stringResource(R.string.feature_login_impl_privacy_policy),
-                summary = stringResource(R.string.feature_login_impl_privacy_policy_summary),
+                title = stringResource(R.string.feature_terms_impl_privacy_policy),
+                summary = stringResource(R.string.feature_terms_impl_privacy_policy_summary),
                 isShowDetailButton = true,
                 onCheckedChange = { onTogglePrivacyPolicy() },
                 onClickDetail = onClickPrivacyPolicyDetail,
             )
             TermsAgreementRow(
                 checked = uiState.isMarketingConsentChecked,
-                title = stringResource(R.string.feature_login_impl_marketing_consent),
-                summary = stringResource(R.string.feature_login_impl_marketing_consent_summary),
+                title = stringResource(R.string.feature_terms_impl_marketing_consent),
+                summary = stringResource(R.string.feature_terms_impl_marketing_consent_summary),
                 isShowDetailButton = false,
                 onCheckedChange = { onToggleMarketingConsent() },
                 onClickDetail = {},
@@ -215,7 +228,7 @@ private fun TermsSelectAllRow(
             indication = null,
             interactionSource = null,
         ),
-        title = stringResource(R.string.feature_login_impl_terms_all),
+        title = stringResource(R.string.feature_terms_impl_terms_all),
         size = PrezelListSize.REGULAR,
         nested = true,
         leadingContent = {
@@ -273,7 +286,7 @@ private fun TermsAgreementRow(
         trailingContent = {
             if (isShowDetailButton) {
                 PrezelHyperlinkButton(
-                    text = stringResource(R.string.feature_login_impl_terms_detail_button_text),
+                    text = stringResource(R.string.feature_terms_impl_terms_detail_button_text),
                     onClick = onClickDetail,
                 )
             }
@@ -305,11 +318,11 @@ private fun TermsScreenPreview() {
             uiState = uiState,
             onBack = {},
             onToggleAll = {
-                val checked = !uiState.isAllChecked
-                uiState = uiState.copy(
-                    isTermsOfServiceChecked = checked,
-                    isPrivacyPolicyChecked = checked,
-                    isMarketingConsentChecked = checked,
+                val next = !uiState.isAllChecked
+            uiState = uiState.copy(
+                    isTermsOfServiceChecked = next,
+                    isPrivacyPolicyChecked = next,
+                    isMarketingConsentChecked = next,
                 )
             },
             onToggleTermsOfService = { uiState = uiState.copy(isTermsOfServiceChecked = !uiState.isTermsOfServiceChecked) },
