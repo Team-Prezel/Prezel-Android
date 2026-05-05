@@ -3,16 +3,15 @@ plugins {
 }
 
 android {
-    namespace = "com.team.prezel.feature.my.impl"
+    namespace = "com.team.prezel.feature.setting.impl"
 }
 
 dependencies {
+    implementation(projects.coreAuth)
     implementation(projects.coreDomain)
     implementation(projects.coreModel)
 
-    implementation(projects.featureMyApi)
     implementation(projects.featureSettingApi)
-    implementation(projects.featureProfileApi)
-
-    implementation(libs.kotlinx.collections.immutable)
+    implementation(projects.featureSplashApi)
+    implementation(projects.featureTermsApi)
 }
