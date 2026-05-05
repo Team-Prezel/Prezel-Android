@@ -1,4 +1,4 @@
-package com.team.prezel.core.model.base
+package com.team.prezel.core.common.error
 
 enum class AppError {
     UNAUTHORIZED,

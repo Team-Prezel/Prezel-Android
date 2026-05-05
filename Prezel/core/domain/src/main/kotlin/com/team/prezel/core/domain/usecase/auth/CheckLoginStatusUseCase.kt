@@ -1,9 +1,9 @@
 package com.team.prezel.core.domain.usecase.auth
 
+import com.team.prezel.core.common.error.AppError
+import com.team.prezel.core.common.error.AppException
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.repository.profile.UserRepository
-import com.team.prezel.core.model.base.AppError
-import com.team.prezel.core.model.base.AppException
 import com.team.prezel.core.model.profile.User
 import javax.inject.Inject
 

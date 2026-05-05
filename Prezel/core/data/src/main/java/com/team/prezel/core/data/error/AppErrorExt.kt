@@ -1,7 +1,7 @@
 package com.team.prezel.core.data.error
 
-import com.team.prezel.core.model.base.AppError
-import com.team.prezel.core.model.base.AppException
+import com.team.prezel.core.common.error.AppError
+import com.team.prezel.core.common.error.AppException
 import com.team.prezel.core.network.model.ApiException
 import com.team.prezel.core.network.model.ServerErrorCode
 import java.io.IOException

@@ -1,9 +1,9 @@
 package com.team.prezel.feature.terms.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.common.error.AppError
+import com.team.prezel.core.common.error.AppException
 import com.team.prezel.core.domain.usecase.terms.AgreeTermsUseCase
-import com.team.prezel.core.model.base.AppError
-import com.team.prezel.core.model.base.AppException
 import com.team.prezel.core.model.terms.TermsAgreement
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.terms.impl.contract.TermsUiEffect
