@@ -2,6 +2,7 @@ package com.team.prezel.feature.profile.impl
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -70,12 +70,6 @@ internal fun ProfileScreen(
                     )
                 }
             }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            (uiState as? ProfileUiState.Content)?.editing?.profileImageFile?.delete()
         }
     }
 
@@ -208,14 +202,16 @@ private fun handleProfileImageClick(
 }
 
 private fun Context.copyProfileImageToCache(uri: Uri): File? {
-    val inputStream = contentResolver.openInputStream(uri) ?: return null
-    val targetFile = File.createTempFile("profile_image_", null, cacheDir)
+    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri)) ?: "tmp"
+    val targetFile = File(cacheDir, "profile_image.$extension")
 
-    inputStream.use { input ->
-        targetFile.outputStream().use { output ->
-            input.copyTo(output)
-        }
-    }
+    cacheDir
+        .listFiles { file -> file.name.startsWith("profile_image") }
+        ?.forEach { file -> file.delete() }
+
+    contentResolver.openInputStream(uri)?.use { input ->
+        targetFile.outputStream().use { input.copyTo(it) }
+    } ?: return null
 
     return targetFile
 }
