@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.designsystem.util.NoRippleInteractionSource
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -76,5 +77,6 @@ private fun PrezelTab(
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,
         unselectedContentColor = PrezelTheme.colors.textDisabled,
+        interactionSource = NoRippleInteractionSource,
     )
 }

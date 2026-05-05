@@ -2,10 +2,8 @@ package com.team.prezel.feature.analysis.impl
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,12 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,14 +27,13 @@ import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
-import com.team.prezel.core.designsystem.component.list.PrezelList
-import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
 import com.team.prezel.feature.analysis.impl.component.toFileName
@@ -46,7 +44,7 @@ import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import kotlinx.collections.immutable.persistentListOf
 
 private const val SCRIPT_MAX_LENGTH = 5_000
-private const val SCRIPT_FILE_MIME_TYPE = "text/*"
+private val SCRIPT_FILE_MIME_TYPES = arrayOf("application/pdf", "text/plain", "text/*", "application/octet-stream")
 private const val SCRIPT_INPUT_TAB_COUNT = 2
 
 @Composable
@@ -59,7 +57,7 @@ internal fun ScriptInputScreen(
     onSkip: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val scriptPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val scriptPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         onScriptFileSelected(uri?.toString())
     }
 
@@ -69,7 +67,7 @@ internal fun ScriptInputScreen(
         buttonEnabled = uiState.canMoveNext,
         onSelectInputType = onSelectInputType,
         onScriptChange = onScriptChange,
-        onScriptFileUploadClick = { scriptPicker.launch(SCRIPT_FILE_MIME_TYPE) },
+        onScriptFileUploadClick = { scriptPicker.launch(SCRIPT_FILE_MIME_TYPES) },
         onScriptFileClear = { onScriptFileSelected(null) },
         onNext = onNext,
         onSkip = onSkip,
@@ -181,83 +179,84 @@ private fun ScriptUploadCard(
     onClick: () -> Unit,
     onClear: () -> Unit,
 ) {
-    Column(
+    if (fileUri == null) {
+        EmptyScriptUploadContent(onClick = onClick)
+    } else {
+        UploadedScriptFileCard(fileUri = fileUri, onClear = onClear)
+    }
+}
+
+@Composable
+private fun EmptyScriptUploadContent(
+    onClick: () -> Unit,
+) {
+    StatusView(
+        title = stringResource(R.string.feature_analysis_impl_script_file_placeholder),
+        description = stringResource(R.string.feature_analysis_impl_script_file_format),
         modifier = Modifier
             .fillMaxWidth()
-            .background(PrezelTheme.colors.bgMedium, PrezelTheme.shapes.V8)
-            .padding(all = PrezelTheme.spacing.V20),
-    ) {
-        if (fileUri != null) {
-            UploadedScriptFileContent(
-                fileName = fileUri.toFileName(),
-                onClear = onClear,
+            .height(420.dp),
+        visual = {
+            Image(
+                painter = painterResource(R.drawable.feature_analysis_impl_no_script),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp),
             )
-            return@Column
-        }
-
-        Text(
-            text = stringResource(R.string.feature_analysis_impl_script_file_placeholder),
-            color = PrezelTheme.colors.textLarge,
-            style = PrezelTheme.typography.body3Bold,
-        )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
-        Text(
-            text = stringResource(R.string.feature_analysis_impl_script_file_format),
-            color = PrezelTheme.colors.textSmall,
-            style = PrezelTheme.typography.caption2Medium,
-        )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V20))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-        ) {
+        },
+        action = {
             PrezelButton(
                 text = stringResource(R.string.feature_analysis_impl_script_upload_button),
                 iconResId = PrezelIcons.Plus,
                 type = ButtonType.OUTLINED,
                 size = ButtonSize.REGULAR,
+                isRounded = true,
                 onClick = onClick,
             )
-        }
-    }
+        },
+    )
 }
 
 @Composable
-private fun UploadedScriptFileContent(
-    fileName: String,
+private fun UploadedScriptFileCard(
+    fileUri: String,
     onClear: () -> Unit,
 ) {
-    Text(
-        text = stringResource(R.string.feature_analysis_impl_script_file_placeholder),
-        color = PrezelTheme.colors.textLarge,
-        style = PrezelTheme.typography.body3Bold,
-    )
-    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-    CompositionLocalProvider(LocalContentColor provides PrezelTheme.colors.textLarge) {
-        PrezelList(
-            title = fileName,
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = PrezelTheme.stroke.V1,
-                    color = PrezelTheme.colors.borderSmall,
-                    shape = PrezelTheme.shapes.V8,
-                ),
-            size = PrezelListSize.SMALL,
-            trailingContent = {
-                PrezelTouchArea(
-                    extraTouchPadding = PaddingValues(PrezelTheme.spacing.V8),
-                    onClick = onClear,
-                ) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.CancelCircleFilled),
-                        contentDescription = stringResource(R.string.feature_analysis_impl_script_file_remove),
-                        modifier = Modifier.size(24.dp),
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
-            },
+    val context = LocalContext.current
+    val fileName = remember(context, fileUri) { fileUri.toFileName(context) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = PrezelTheme.stroke.V1,
+                color = PrezelTheme.colors.borderRegular,
+                shape = PrezelTheme.shapes.V8,
+            )
+            .padding(
+                horizontal = PrezelTheme.spacing.V12,
+                vertical = PrezelTheme.spacing.V24,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = fileName,
+            modifier = Modifier.weight(1f).padding(start = PrezelTheme.spacing.V4),
+            color = PrezelTheme.colors.textMedium,
+            style = PrezelTheme.typography.body3Medium,
         )
+
+        PrezelTouchArea(
+            extraTouchPadding = PaddingValues(PrezelTheme.spacing.V8),
+            isUseRipple = false,
+            onClick = onClear,
+        ) {
+            Icon(
+                painter = painterResource(PrezelIcons.CancelCircleFilled),
+                contentDescription = stringResource(R.string.feature_analysis_impl_script_file_remove),
+                modifier = Modifier.size(24.dp),
+                tint = PrezelTheme.colors.iconRegular,
+            )
+        }
     }
 }
 

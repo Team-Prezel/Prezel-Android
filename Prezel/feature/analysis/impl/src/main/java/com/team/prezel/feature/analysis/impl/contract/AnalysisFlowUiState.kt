@@ -25,7 +25,8 @@ internal data class AnalysisFlowUiState(
 
     val canMoveNext: Boolean
         get() = when (step) {
-            AnalysisFlowStep.PRESENTATION_SCHEDULE -> form.presentationTitle.isNotBlank() && form.presentationDate.isNotBlank()
+            AnalysisFlowStep.PRESENTATION_SCHEDULE ->
+                form.presentationTitle.trim().length >= 2 && form.presentationDate.isNotBlank()
             AnalysisFlowStep.PRESENTATION_SITUATION -> {
                 form.category != null && form.purpose != null && form.style != null && form.audience != null
             }

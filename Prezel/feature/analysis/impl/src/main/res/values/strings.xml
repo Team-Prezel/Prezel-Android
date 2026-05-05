@@ -39,12 +39,12 @@
     <string name="feature_analysis_impl_situation_audience_team">팀/동료</string>
 
     <string name="feature_analysis_impl_script_title">대본 입력</string>
-    <string name="feature_analysis_impl_script_headline">발표 대본을 입력해주세요.</string>
-    <string name="feature_analysis_impl_script_description">대본 파일을 업로드하거나, 직접 입력할 수 있어요.</string>
+    <string name="feature_analysis_impl_script_headline">발표에 사용할 대본을 추가해주세요.</string>
+    <string name="feature_analysis_impl_script_description">대본 파일을 업로드하거나 직접 입력할 수 있어요.</string>
     <string name="feature_analysis_impl_script_placeholder">발표 대본을 입력해주세요</string>
-    <string name="feature_analysis_impl_script_file_placeholder">대본 파일을 업로드하세요</string>
-    <string name="feature_analysis_impl_script_file_format">제공하는 파일 형식 : .txt</string>
-    <string name="feature_analysis_impl_script_upload_button">파일 업로드하기</string>
+    <string name="feature_analysis_impl_script_file_placeholder">대본 파일을 추가해주세요.</string>
+    <string name="feature_analysis_impl_script_file_format">제공하는 파일 형식 : pdf, txt</string>
+    <string name="feature_analysis_impl_script_upload_button">파일 추가하기</string>
     <string name="feature_analysis_impl_script_file_remove">대본 파일 삭제</string>
     <string name="feature_analysis_impl_script_direct_input">직접 입력</string>
 

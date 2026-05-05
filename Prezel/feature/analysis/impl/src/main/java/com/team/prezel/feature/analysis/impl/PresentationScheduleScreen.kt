@@ -124,7 +124,7 @@ private fun PresentationScheduleScreen(
                     modifier = Modifier
                         .matchParentSize()
                         .clickable(
-                            interactionSource = dateFieldInteractionSource,
+                            interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = { showDatePicker.value = true },
                         ),
@@ -134,11 +134,11 @@ private fun PresentationScheduleScreen(
     }
 }
 
-private fun LocalDate.toPresentationDateText(): String = "%04d.%02d.%02d".format(year, month.ordinal + 1, day)
+private fun LocalDate.toPresentationDateText(): String = "%04d년 %02d월 %02d일".format(year, month.ordinal + 1, day)
 
 private fun String.toLocalDateOrNull(): LocalDate? =
     runCatching {
-        val (year, month, day) = split(".")
+        val (year, month, day) = split("년 ", "월 ", "일")
 
         LocalDate(
             year = year.toInt(),
@@ -170,7 +170,7 @@ private fun PresentationScheduleScreenDateSelectedPreview() {
         PresentationScheduleScreen(
             form = AnalysisForm(
                 presentationTitle = "졸업 발표",
-                presentationDate = "2026.05.09",
+                presentationDate = "2026년 05월 09일",
             ),
             progress = 0.25f,
             buttonEnabled = true,

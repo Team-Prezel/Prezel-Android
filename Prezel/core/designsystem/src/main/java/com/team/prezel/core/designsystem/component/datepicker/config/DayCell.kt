@@ -31,6 +31,7 @@ internal fun DayCell(
             .padding(PrezelTheme.spacing.V4)
             .clip(PrezelTheme.shapes.V1000)
             .background(color = config.dayContainerColor(dayCell = dayCell)),
+        isUseRipple = false,
         onClick = onClick,
     ) {
         if (dayCell == null) return@PrezelTouchArea
