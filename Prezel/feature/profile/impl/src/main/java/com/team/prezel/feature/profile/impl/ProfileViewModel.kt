@@ -2,9 +2,9 @@ package com.team.prezel.feature.profile.impl
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
+import com.team.prezel.core.domain.usecase.user.PatchUserProfileUseCase
 import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
-import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
@@ -21,12 +21,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
 internal class ProfileViewModel @Inject constructor(
     private val fetchUserInfoUseCase: FetchUserInfoUseCase,
+    private val patchUserProfileUseCase: PatchUserProfileUseCase,
     private val validateNicknameUseCase: ValidateNicknameUseCase,
 ) : BaseViewModel<ProfileUiState, ProfileUiIntent, ProfileUiEffect>(ProfileUiState.Loading) {
     private val nicknameChanges = MutableStateFlow<String?>(null)
@@ -45,7 +47,16 @@ internal class ProfileViewModel @Inject constructor(
         when (intent) {
             ProfileUiIntent.FetchData -> fetchUserInfo()
             is ProfileUiIntent.UpdateNickname -> handleNicknameChanged(intent.nickname)
-            is ProfileUiIntent.UpdateProfileImage -> handleProfileImageChanged(intent.profileUrl)
+            is ProfileUiIntent.UpdateProfileImage -> handleProfileImageChanged(
+                profileUrl = intent.profileUrl,
+                profileImageFile = intent.profileImageFile,
+            )
+
+            ProfileUiIntent.ClearProfileImage -> handleProfileImageChanged(
+                profileUrl = "",
+                profileImageFile = null,
+            )
+
             ProfileUiIntent.SubmitProfile -> submitProfile()
         }
     }
@@ -64,65 +75,72 @@ internal class ProfileViewModel @Inject constructor(
     private fun handleNicknameChanged(nickname: String) {
         val uiState = currentState as? ProfileUiState.Content ?: return
 
-        val sanitizedNickname = nickname
-            .filterNot(Char::isWhitespace)
-            .take(Nickname.MAX_LENGTH)
-        if (sanitizedNickname == uiState.nickname) return
+        val sanitizedNickname = nickname.sanitizeNickname()
+        if (sanitizedNickname == uiState.editing.nickname) return
 
-        updateState {
-            val validationState = when {
-                sanitizedNickname.isBlank() && uiState.nickname.isNotBlank() -> NicknameValidationState.TooShort
-                sanitizedNickname.isBlank() -> NicknameValidationState.Unchecked
-                else -> NicknameValidationState.Checking
-            }
-
-            uiState.copy(
-                nickname = sanitizedNickname,
-                nicknameValidation = validationState,
-            )
-        }
+        updateState { uiState.updateNickname(sanitizedNickname) }
 
         nicknameChanges.value = sanitizedNickname
     }
 
-    private fun handleProfileImageChanged(profileUrl: String) {
+    private fun handleProfileImageChanged(
+        profileUrl: String,
+        profileImageFile: File?,
+    ) {
         val uiState = currentState as? ProfileUiState.Content ?: return
-        if (profileUrl == uiState.profileImage.url) return
+        if (profileUrl == uiState.editing.profileImageUrl.orEmpty()) return
 
         updateState {
             uiState.copy(
-                profileImage = User.ProfileImage(
-                    url = profileUrl,
-                    isDefault = profileUrl.isBlank(),
+                editing = uiState.editing.copy(
+                    profileImageUrl = profileUrl.ifBlank { null },
+                    profileImageFile = profileImageFile,
                 ),
             )
         }
     }
 
-    private suspend fun validateNickname(nickname: String) {
-        if (nickname.isBlank()) return
+    private fun submitProfile() {
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (!uiState.submitButtonEnabled) return
 
-        val validationState = when (val result = validateNicknameUseCase(nickname)) {
-            is ValidateNicknameUseCase.Result.Available -> NicknameValidationState.Available
-            is ValidateNicknameUseCase.Result.Invalid -> {
-                when (result) {
-                    is ValidateNicknameUseCase.Result.Invalid.Format -> result.reason.toValidationState()
-                    is ValidateNicknameUseCase.Result.Invalid.Duplicated -> NicknameValidationState.Duplicated
-                }
+        viewModelScope.launch {
+            patchUserProfileUseCase(
+                nickname = uiState.editing.nickname,
+                profileImageFile = uiState.editing.profileImageFile,
+            ).onSuccess {
+                if (uiState.isRegistered) return@launch sendEffect(ProfileUiEffect.NavigateToBack)
+                sendEffect(ProfileUiEffect.NavigateToHome)
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+                sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.PATCH_USER_PROFILE_FAILED))
             }
+        }
+    }
 
+    private suspend fun validateNickname(nickname: String) {
+        val uiState = currentState as? ProfileUiState.Content ?: return
+        if (nickname.isBlank() || !uiState.isNicknameChanged) return
+
+        val validationState = validateNicknameState(nickname)
+
+        updateState {
+            val uiState = currentState as? ProfileUiState.Content ?: return@updateState currentState
+            if (uiState.editing.nickname != nickname) return@updateState currentState
+            uiState.updateNicknameValidation(validationState)
+        }
+    }
+
+    private suspend fun validateNicknameState(nickname: String): NicknameValidationState =
+        when (val result = validateNicknameUseCase(nickname)) {
+            is ValidateNicknameUseCase.Result.Available -> NicknameValidationState.Available
+            is ValidateNicknameUseCase.Result.Invalid.Format -> result.reason.toValidationState()
+            is ValidateNicknameUseCase.Result.Invalid.Duplicated -> NicknameValidationState.Duplicated
             is ValidateNicknameUseCase.Result.Error -> {
                 sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.CHECK_NICKNAME_FAILED))
                 NicknameValidationState.Unchecked
             }
         }
-
-        updateState {
-            val uiState = currentState as? ProfileUiState.Content ?: return@updateState currentState
-            if (uiState.nickname != nickname) return@updateState currentState
-            uiState.copy(nicknameValidation = validationState)
-        }
-    }
 
     private fun Nickname.InvalidReason.toValidationState(): NicknameValidationState =
         when (this) {
@@ -131,26 +149,28 @@ internal class ProfileViewModel @Inject constructor(
             Nickname.InvalidReason.INVALID_CHARACTER -> NicknameValidationState.InvalidCharacter
         }
 
-    private fun submitProfile() {
-        val uiState = currentState as? ProfileUiState.Content ?: return
-        if (!uiState.submitButtonEnabled) return
+    private fun String.sanitizeNickname(): String =
+        filterNot(Char::isWhitespace)
+            .take(Nickname.MAX_LENGTH)
 
-        viewModelScope.launch {
-            // todo: 프로필 수정 API 호출 필요
-//            patchUserProfileUseCase(fetchedState.profileImage, fetchedState.nickname)
-//                .onSuccess {
-//                    when(fetchedState) {
-//                        is ProfileUiState.Create -> ProfileUiEffect.NavigateToHome
-//                        is ProfileUiState.Edit -> ProfileUiEffect.OnBack
-//                    }.let(sendEffect)
-//                }
-//                .onFailure { throwable ->
-//                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.PATCH_USER_PROFILE_FAILED))
-//                    Timber.e(throwable)
-//                }
-            sendEffect(ProfileUiEffect.NavigateToHome)
-        }
+    private fun ProfileUiState.Content.updateNickname(nickname: String): ProfileUiState.Content {
+        val updatedState = copy(editing = editing.copy(nickname = nickname))
+
+        return updatedState.updateNicknameValidation(
+            validationState = updatedState.resolveNicknameValidationState(previousNickname = editing.nickname),
+        )
     }
+
+    private fun ProfileUiState.Content.resolveNicknameValidationState(previousNickname: String): NicknameValidationState =
+        when {
+            !isNicknameChanged -> NicknameValidationState.Unchecked
+            editing.nickname.isBlank() && previousNickname.isNotBlank() -> NicknameValidationState.TooShort
+            editing.nickname.isBlank() -> NicknameValidationState.Unchecked
+            else -> NicknameValidationState.Checking
+        }
+
+    private fun ProfileUiState.Content.updateNicknameValidation(validationState: NicknameValidationState): ProfileUiState.Content =
+        copy(editing = editing.copy(nicknameValidation = validationState))
 
     private companion object {
         const val NICKNAME_VALIDATION_DEBOUNCE_MILLIS = 300L

@@ -7,10 +7,11 @@ android {
 }
 
 dependencies {
-    implementation(projects.coreAuth)
     implementation(projects.coreDomain)
     implementation(projects.coreModel)
 
-    implementation(projects.featureLoginApi)
     implementation(projects.featureMyApi)
+    implementation(projects.featureProfileApi)
+
+    implementation(libs.kotlinx.collections.immutable)
 }

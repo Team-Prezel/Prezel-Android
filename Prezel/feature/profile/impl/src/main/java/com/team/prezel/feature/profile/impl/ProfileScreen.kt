@@ -1,6 +1,10 @@
 package com.team.prezel.feature.profile.impl
 
+import android.content.Context
+import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -15,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -24,7 +29,6 @@ import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.profile.impl.component.NicknameTextField
@@ -35,6 +39,7 @@ import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
+import java.io.File
 
 @Composable
 internal fun ProfileScreen(
@@ -47,26 +52,22 @@ internal fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        viewModel.onIntent(ProfileUiIntent.UpdateProfileImage(profileUrl = uri.toString()))
+    val photoPickerLauncher = rememberProfileImagePicker { profileUrl, profileImageFile ->
+        viewModel.onIntent(
+            ProfileUiIntent.UpdateProfileImage(profileUrl = profileUrl, profileImageFile = profileImageFile),
+        )
     }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(ProfileUiIntent.FetchData)
-
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
                 ProfileUiEffect.NavigateToBack -> onBack()
                 is ProfileUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
-                        ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(
+                        message = resources.getString(effect.message.resId),
+                    )
                 }
             }
         }
@@ -77,14 +78,9 @@ internal fun ProfileScreen(
         isNewProfile = isNewProfile,
         onNicknameChanged = { nickname -> viewModel.onIntent(ProfileUiIntent.UpdateNickname(nickname)) },
         onClickProfileImage = {
-            if (uiState.shouldLaunchPhotoPicker) {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly),
-                )
-                return@ProfileScreen
+            handleProfileImageClick(shouldLaunchPhotoPicker = uiState.shouldLaunchPhotoPicker, photoPickerLauncher = photoPickerLauncher) {
+                viewModel.onIntent(ProfileUiIntent.ClearProfileImage)
             }
-
-            viewModel.onIntent(ProfileUiIntent.UpdateProfileImage(profileUrl = ""))
         },
         onClickSubmit = { viewModel.onIntent(ProfileUiIntent.SubmitProfile) },
         onBack = onBack,
@@ -112,11 +108,12 @@ private fun ProfileScreen(
         )
 
         ProfileScreenContent(
-            profileUrl = contentState?.profileImage?.url.orEmpty(),
-            isDefaultProfileImage = contentState?.profileImage?.isDefault ?: true,
-            nickname = contentState?.nickname.orEmpty(),
+            profileUrl = contentState?.editing?.profileImageUrl.orEmpty(),
+            isDefaultProfileImage = contentState?.editing?.profileImageUrl.isNullOrBlank(),
+            nickname = contentState?.editing?.nickname.orEmpty(),
             onNicknameChanged = onNicknameChanged,
-            nicknameValidationState = contentState?.nicknameValidation ?: NicknameValidationState.Unchecked,
+            nicknameValidationState = contentState?.editing?.nicknameValidation
+                ?: NicknameValidationState.Unchecked,
             onClickProfileImage = onClickProfileImage,
             modifier = Modifier.weight(1f),
         )
@@ -169,17 +166,80 @@ private fun ProfileScreenContent(
     }
 }
 
+@Composable
+private fun rememberProfileImagePicker(
+    context: Context = LocalContext.current,
+    onImagePicked: (profileUrl: String, profileImageFile: File) -> Unit,
+) = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.PickVisualMedia(),
+) { uri ->
+    if (uri == null) return@rememberLauncherForActivityResult
+
+    val imageFile = context.copyProfileImageToCache(uri)
+        ?: return@rememberLauncherForActivityResult
+
+    onImagePicked(
+        uri.toString(),
+        imageFile,
+    )
+}
+
+private fun handleProfileImageClick(
+    shouldLaunchPhotoPicker: Boolean,
+    photoPickerLauncher: ActivityResultLauncher<PickVisualMediaRequest>,
+    onClearProfileImage: () -> Unit,
+) {
+    if (shouldLaunchPhotoPicker) {
+        photoPickerLauncher.launch(
+            PickVisualMediaRequest(
+                mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly,
+            ),
+        )
+        return
+    }
+
+    onClearProfileImage()
+}
+
+private fun Context.copyProfileImageToCache(uri: Uri): File? {
+    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri)) ?: "tmp"
+    val targetFile = File(cacheDir, "profile_image.$extension")
+
+    cacheDir
+        .listFiles { file -> file.name.startsWith("profile_image") }
+        ?.forEach { file -> file.delete() }
+
+    contentResolver.openInputStream(uri)?.use { input ->
+        targetFile.outputStream().use { input.copyTo(it) }
+    } ?: return null
+
+    return targetFile
+}
+
+private val ProfileUiMessage.resId: Int
+    get() = when (this) {
+        ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
+        ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
+        ProfileUiMessage.PATCH_USER_PROFILE_FAILED -> R.string.feature_profile_impl_patch_user_profile_failed_message
+    }
+
 @BasicPreview
 @Composable
 private fun CreateProfileScreenPreview() {
     PrezelTheme {
         ProfileScreen(
             uiState = ProfileUiState.Content(
-                originalNickname = "",
-                originalProfileImage = User.ProfileImage(url = "", isDefault = true),
-                nickname = "",
-                nicknameValidation = NicknameValidationState.Unchecked,
-                profileImage = User.ProfileImage(url = "", isDefault = true),
+                isRegistered = false,
+                original = ProfileUiState.OriginalProfile(
+                    nickname = "",
+                    profileImageUrl = null,
+                ),
+                editing = ProfileUiState.EditingProfile(
+                    nickname = "",
+                    nicknameValidation = NicknameValidationState.Unchecked,
+                    profileImageUrl = null,
+                    profileImageFile = null,
+                ),
             ),
             isNewProfile = true,
             onNicknameChanged = {},

@@ -1,0 +1,64 @@
+package com.team.prezel.core.data.error
+
+import com.team.prezel.core.common.error.AppError
+import com.team.prezel.core.common.error.AppException
+import com.team.prezel.core.network.model.ApiException
+import com.team.prezel.core.network.model.ServerErrorCode
+import java.io.IOException
+
+internal fun <T> Result<T>.mapDomainFailure(): Result<T> =
+    fold(
+        onSuccess = { Result.success(it) },
+        onFailure = { throwable -> Result.failure(throwable.toDomainThrowable()) },
+    )
+
+private fun Throwable.toDomainThrowable(): Throwable =
+    when (this) {
+        is ApiException ->
+            AppException(
+                error = errorCode.toDomainError(),
+                message = message,
+                cause = this,
+            )
+
+        is IOException ->
+            AppException(
+                error = AppError.NETWORK,
+                message = message ?: "Network error",
+                cause = this,
+            )
+
+        else ->
+            AppException(
+                error = AppError.UNKNOWN,
+                message = message ?: "Unknown error",
+                cause = this,
+            )
+    }
+
+private fun ServerErrorCode.toDomainError(): AppError =
+    when (this) {
+        ServerErrorCode.INVALID_REQUEST,
+        ServerErrorCode.REQUIRED_TERMS_DISAGREED,
+        ServerErrorCode.FILE_IS_EMPTY,
+        -> AppError.INVALID_REQUEST
+
+        ServerErrorCode.SERVER_ERROR,
+        ServerErrorCode.FILE_UPLOAD_FAILED,
+        -> AppError.SERVER_ERROR
+
+        ServerErrorCode.TERMS_NOT_FOUND,
+        -> AppError.NOT_FOUND
+
+        ServerErrorCode.DUPLICATE_NICKNAME -> AppError.DUPLICATE
+
+        ServerErrorCode.UNAUTHORIZED,
+        ServerErrorCode.FORBIDDEN,
+        ServerErrorCode.INVALID_TOKEN,
+        ServerErrorCode.TOKEN_STOLEN,
+        ServerErrorCode.USER_NOT_FOUND,
+        ServerErrorCode.INVALID_ID_TOKEN,
+        -> AppError.UNAUTHORIZED
+
+        ServerErrorCode.UNKNOWN -> AppError.UNKNOWN
+    }

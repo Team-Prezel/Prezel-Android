@@ -30,6 +30,8 @@ internal fun SharedTransitionScope.SplashScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToHome: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToTerms: () -> Unit,
+    navigateToCreateProfile: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
@@ -45,6 +47,8 @@ internal fun SharedTransitionScope.SplashScreen(
             when (effect) {
                 SplashUiEffect.NavigateToHome -> navigateToHome()
                 SplashUiEffect.NavigateToLogin -> navigateToLogin()
+                SplashUiEffect.NavigateToTerms -> navigateToTerms()
+                SplashUiEffect.NavigateToCreateProfile -> navigateToCreateProfile()
                 SplashUiEffect.ShowRetryableFailureMessage -> {
                     snackbarHostState.showPrezelSnackbar(
                         resources.getString(R.string.feature_splash_impl_retryable_failure),

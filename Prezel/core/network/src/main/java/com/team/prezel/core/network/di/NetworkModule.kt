@@ -1,9 +1,12 @@
 package com.team.prezel.core.network.di
 
-import com.team.prezel.core.network.BuildConfig
 import com.team.prezel.core.network.client.HttpClientFactory
 import com.team.prezel.core.network.service.AuthService
+import com.team.prezel.core.network.service.TermsService
+import com.team.prezel.core.network.service.UserService
 import com.team.prezel.core.network.service.createAuthService
+import com.team.prezel.core.network.service.createTermsService
+import com.team.prezel.core.network.service.createUserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,11 +27,18 @@ object NetworkModule {
     fun provideKtorfit(httpClient: HttpClient): Ktorfit =
         Ktorfit
             .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
             .httpClient(httpClient)
             .build()
 
     @Provides
     @Singleton
     internal fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
+
+    @Provides
+    @Singleton
+    internal fun provideUserService(ktorfit: Ktorfit): UserService = ktorfit.createUserService()
+
+    @Provides
+    @Singleton
+    internal fun provideTermsService(ktorfit: Ktorfit): TermsService = ktorfit.createTermsService()
 }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_my_impl_logout_failed">로그아웃에 실패했습니다.</string>
-    <string name="feature_my_impl_withdraw_failed">회원탈퇴에 실패했습니다.</string>
-    <string name="feature_my_impl_authentication_expired">인증이 만료되었어요. 다시 로그인해 주세요.</string>
+    <string name="feature_my_impl_title">프로필</string>
+    <string name="feature_my_impl_edit_profile">프로필 편집</string>
+
+    <!-- Message -->
+    <string name="feature_my_impl_message_fetch_user_info_failed">유저 정보를 가져오는데 실패했습니다.</string>
+    <string name="feature_my_impl_message_fetch_user_badges_failed">유저 뱃지를 가져오는데 실패했습니다.</string>
 </resources>

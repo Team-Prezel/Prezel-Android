@@ -4,11 +4,10 @@ data class User(
     val id: Long,
     val email: String,
     val nickname: String,
-    val profileImage: ProfileImage,
-    val isRegistered: Boolean,
+    val profileImageUrl: String?,
+    val isProfileComplete: Boolean,
+    val isTermsAgreement: Boolean,
 ) {
-    data class ProfileImage(
-        val url: String,
-        val isDefault: Boolean,
-    )
+    val isRegistered: Boolean
+        get() = isProfileComplete && isTermsAgreement
 }

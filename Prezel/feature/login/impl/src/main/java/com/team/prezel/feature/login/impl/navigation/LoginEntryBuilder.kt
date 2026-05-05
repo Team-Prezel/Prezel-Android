@@ -7,9 +7,9 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.LocalSharedTransitionScope
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.login.api.LoginNavKey
-import com.team.prezel.feature.login.impl.landing.LoginScreen
-import com.team.prezel.feature.login.impl.terms.TermsScreen
+import com.team.prezel.feature.login.impl.LoginScreen
 import com.team.prezel.feature.profile.api.ProfileNavKey
+import com.team.prezel.feature.terms.api.TermsNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,23 +27,13 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
                     navigator.replaceRoot(HomeNavKey)
                 },
                 navigateToTerms = {
-                    navigator.navigate(LoginTermsNavKey)
+                    navigator.navigate(TermsNavKey)
+                },
+                navigateToCreateProfile = {
+                    navigator.navigate(ProfileNavKey.Create)
                 },
             )
         }
-    }
-
-    entry<LoginTermsNavKey> {
-        val navigator = LocalNavigator.current
-
-        TermsScreen(
-            navigateBack = {
-                navigator.goBack()
-            },
-            navigateToProfile = {
-                navigator.navigate(ProfileNavKey.Create)
-            },
-        )
     }
 }
 

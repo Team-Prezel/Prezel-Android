@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.team.prezel.core.model.auth.AuthTokens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -17,8 +16,8 @@ import javax.inject.Singleton
 internal class AuthLocalDataSourceImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : AuthLocalDataSource {
-    override val tokens: Flow<AuthTokens?>
-        get() = dataStore.data
+    override val tokens: Flow<AuthLocalDataSource.AuthTokens?> =
+        dataStore.data
             .catch { throwable ->
                 if (throwable is IOException) {
                     emit(emptyPreferences())
@@ -32,7 +31,7 @@ internal class AuthLocalDataSourceImpl @Inject constructor(
                 if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
                     null
                 } else {
-                    AuthTokens(
+                    AuthLocalDataSource.AuthTokens(
                         accessToken = accessToken,
                         refreshToken = refreshToken,
                     )
