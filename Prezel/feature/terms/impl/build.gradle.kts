@@ -22,6 +22,5 @@ dependencies {
     implementation(projects.coreModel)
 
     implementation(projects.featureTermsApi)
-    implementation(projects.featureLoginApi)
     implementation(projects.featureProfileApi)
 }
