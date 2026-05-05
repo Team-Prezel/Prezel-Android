@@ -4,4 +4,12 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object TermsNavKey : NavKey
+sealed interface TermsNavKey : NavKey {
+    @Serializable
+    data object List : TermsNavKey
+
+    @Serializable
+    data class Detail(
+        val document: TermsDocumentType,
+    ) : TermsNavKey
+}

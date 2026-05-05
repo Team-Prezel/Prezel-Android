@@ -27,7 +27,7 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
                     navigator.replaceRoot(HomeNavKey)
                 },
                 navigateToTerms = {
-                    navigator.navigate(TermsNavKey)
+                    navigator.navigate(TermsNavKey.List)
                 },
                 navigateToCreateProfile = {
                     navigator.navigate(ProfileNavKey.Create)
