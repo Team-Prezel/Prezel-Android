@@ -22,6 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -40,16 +43,9 @@ fun PrezelButtonArea(
     showBackground: Boolean = false,
     isNested: Boolean = false,
     config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(),
-    content: ButtonAreaScope.() -> Unit,
+    mainButton: @Composable (Modifier) -> Unit,
+    subButton: @Composable ((Modifier) -> Unit)? = null,
 ) {
-    val scope = DefaultButtonAreaScope().apply {
-        this.content()
-    }
-
-    val mainButton = requireNotNull(scope.buttons.firstOrNull()) {
-        "PrezelButtonArea에는 최소 1개의 버튼이 필요합니다."
-    }
-    val subButton = scope.buttons.getOrNull(1)
     val contentModifier = if (isNested) Modifier else Modifier.padding(config.contentPadding)
 
     Column(
@@ -247,21 +243,29 @@ private fun ButtonAreaPreviewSample(
         isVertical = variant.isVertical,
         isStrongStrength = variant.isStrongStrength,
         showBackground = showBackground,
-    ) {
-        MainButton(
-            iconResId = PrezelIcons.Blank,
-            label = "Label",
-            enabled = enabled,
-            onClick = {},
-        )
-
-        SubButton(
-            iconResId = PrezelIcons.Blank,
-            label = "Label",
-            enabled = enabled,
-            onClick = {},
-        )
-    }
+        mainButton = { modifier ->
+            PrezelButton(
+                modifier = modifier,
+                text = "Label",
+                iconResId = PrezelIcons.Blank,
+                onClick = { },
+                enabled = enabled,
+                type = ButtonType.FILLED,
+                hierarchy = ButtonHierarchy.PRIMARY,
+            )
+        },
+        subButton = { modifier ->
+            PrezelButton(
+                modifier = modifier,
+                text = "Label",
+                iconResId = PrezelIcons.Blank,
+                onClick = { },
+                enabled = enabled,
+                type = ButtonType.FILLED,
+                hierarchy = ButtonHierarchy.SECONDARY,
+            )
+        },
+    )
 }
 
 @Composable

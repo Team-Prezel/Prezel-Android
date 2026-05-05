@@ -26,6 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -99,7 +102,6 @@ private fun ProfileScreen(
     modifier: Modifier = Modifier,
 ) {
     val contentState = uiState as? ProfileUiState.Content
-    val submitButtonText = stringResource(R.string.feature_profile_impl_submit_button_text)
 
     Column(modifier = modifier.fillMaxSize()) {
         ProfileScreenTopAppBar(
@@ -121,13 +123,17 @@ private fun ProfileScreen(
         PrezelButtonArea(
             showBackground = true,
             modifier = Modifier.advancedImePadding(),
-        ) {
-            MainButton(
-                label = submitButtonText,
-                enabled = contentState?.submitButtonEnabled ?: false,
-                onClick = onClickSubmit,
-            )
-        }
+            mainButton = { modifier ->
+                PrezelButton(
+                    modifier = modifier,
+                    text = stringResource(R.string.feature_profile_impl_submit_button_text),
+                    onClick = onClickSubmit,
+                    enabled = contentState?.submitButtonEnabled ?: false,
+                    type = ButtonType.FILLED,
+                    hierarchy = ButtonHierarchy.PRIMARY,
+                )
+            },
+        )
     }
 }
 

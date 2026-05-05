@@ -130,13 +130,18 @@ private fun TermsScreenScreen(
             onToggleMarketingConsent = onToggleMarketingConsent,
         )
 
-        PrezelButtonArea {
-            MainButton(
-                label = resources.getString(R.string.feature_terms_impl_terms_continue_button_text),
-                enabled = uiState.isRequiredChecked && !uiState.isLoading,
-                onClick = onContinue,
-            )
-        }
+        PrezelButtonArea(
+            mainButton = { modifier ->
+                PrezelButton(
+                    modifier = modifier,
+                    text = stringResource(R.string.feature_terms_impl_terms_continue_button_text),
+                    onClick = onContinue,
+                    enabled = uiState.isRequiredChecked && !uiState.isLoading,
+                    type = ButtonType.FILLED,
+                    hierarchy = ButtonHierarchy.PRIMARY,
+                )
+            },
+        )
     }
 }
 
