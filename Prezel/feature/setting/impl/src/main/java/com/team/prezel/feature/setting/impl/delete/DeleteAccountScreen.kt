@@ -1,0 +1,153 @@
+package com.team.prezel.feature.setting.impl.delete
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.feature.setting.impl.R
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountActionSection
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountConfirmDialog
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountContentSection
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountTopAppBar
+import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiEffect
+import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiIntent
+import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiState
+import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountReasonOption
+import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountStep
+import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountUiMessage
+
+@Composable
+internal fun DeleteAccountScreen(
+    navigateBack: () -> Unit,
+    navigateToSplash: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: DeleteAccountViewModel = hiltViewModel(),
+) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    val resources = LocalResources.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                DeleteAccountUiEffect.NavigateToSplash -> navigateToSplash()
+                is DeleteAccountUiEffect.ShowMessage -> {
+                    val message = when (effect.message) {
+                        DeleteAccountUiMessage.WITHDRAW_FAILED -> R.string.feature_setting_impl_delete_account_withdraw_failed
+                    }
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(message))
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        navigateBack()
+    }
+
+    DeleteAccountScreen(
+        uiState = uiState,
+        onClickClose = navigateBack,
+        onToggleNoticeChecked = { checked ->
+            viewModel.onIntent(DeleteAccountUiIntent.ToggleNoticeChecked(checked))
+        },
+        onClickNext = { viewModel.onIntent(DeleteAccountUiIntent.ClickNext) },
+        onSelectReason = { reason -> viewModel.onIntent(DeleteAccountUiIntent.SelectReason(reason)) },
+        onOtherReasonChanged = { value -> viewModel.onIntent(DeleteAccountUiIntent.ChangeOtherReason(value)) },
+        onClickWithdraw = { viewModel.onIntent(DeleteAccountUiIntent.ClickWithdraw) },
+        onDismissDialog = { viewModel.onIntent(DeleteAccountUiIntent.DismissDialog) },
+        onConfirmWithdraw = { viewModel.onIntent(DeleteAccountUiIntent.ConfirmWithdraw) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun DeleteAccountScreen(
+    uiState: DeleteAccountUiState,
+    onClickClose: () -> Unit,
+    onToggleNoticeChecked: (Boolean) -> Unit,
+    onClickNext: () -> Unit,
+    onSelectReason: (DeleteAccountReasonOption) -> Unit,
+    onOtherReasonChanged: (String) -> Unit,
+    onClickWithdraw: () -> Unit,
+    onDismissDialog: () -> Unit,
+    onConfirmWithdraw: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (uiState.isConfirmDialogVisible) {
+        DeleteAccountConfirmDialog(
+            onDismissDialog = onDismissDialog,
+            onConfirmWithdraw = onConfirmWithdraw,
+        )
+    }
+
+    Column(modifier = modifier.fillMaxSize()) {
+        DeleteAccountTopAppBar(onClickClose = onClickClose)
+
+        DeleteAccountContentSection(
+            uiState = uiState,
+            onToggleNoticeChecked = onToggleNoticeChecked,
+            onSelectReason = onSelectReason,
+            onOtherReasonChanged = onOtherReasonChanged,
+            modifier = Modifier.weight(1f),
+        )
+
+        DeleteAccountActionSection(
+            step = uiState.step,
+            enabled = uiState.isPrimaryActionEnabled,
+            onClickNext = onClickNext,
+            onClickWithdraw = onClickWithdraw,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun DeleteAccountNoticeStepScreenPreview() {
+    PrezelTheme {
+        DeleteAccountScreen(
+            uiState = DeleteAccountUiState(
+                step = DeleteAccountStep.NOTICE,
+            ),
+            onClickClose = {},
+            onToggleNoticeChecked = {},
+            onClickNext = {},
+            onSelectReason = {},
+            onOtherReasonChanged = {},
+            onClickWithdraw = {},
+            onDismissDialog = {},
+            onConfirmWithdraw = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun DeleteAccountReasonStepScreenPreview() {
+    PrezelTheme {
+        DeleteAccountScreen(
+            uiState = DeleteAccountUiState(
+                step = DeleteAccountStep.REASON,
+                selectedReason = DeleteAccountReasonOption.OTHER,
+            ),
+            onClickClose = {},
+            onToggleNoticeChecked = {},
+            onClickNext = {},
+            onSelectReason = {},
+            onOtherReasonChanged = {},
+            onClickWithdraw = {},
+            onDismissDialog = {},
+            onConfirmWithdraw = {},
+        )
+    }
+}
