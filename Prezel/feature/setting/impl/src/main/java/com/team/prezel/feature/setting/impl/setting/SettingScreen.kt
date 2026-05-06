@@ -49,17 +49,11 @@ internal fun SettingScreen(
                 SettingUiEffect.NavigateToSplash -> {
                     shouldShowLogoutDialog = false
                     navigateToSplash()
+                    snackbarHostState.showPrezelSnackbar(message = resource.getString(R.string.feature_setting_impl_logout_success))
                 }
 
                 is SettingUiEffect.ShowMessage -> {
-                    val messageRes = when (effect.message) {
-                        SettingUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_setting_impl_fetch_user_info_failed
-                        SettingUiMessage.LOGOUT_FAILED -> R.string.feature_setting_impl_logout_failed
-                    }
-
-                    snackbarHostState.showPrezelSnackbar(
-                        message = resource.getString(messageRes),
-                    )
+                    snackbarHostState.showPrezelSnackbar(message = resource.getString(effect.message.toMessageRes()))
                 }
             }
         }
@@ -82,6 +76,12 @@ internal fun SettingScreen(
         modifier = modifier,
     )
 }
+
+private fun SettingUiMessage.toMessageRes(): Int =
+    when (this) {
+        SettingUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_setting_impl_fetch_user_info_failed
+        SettingUiMessage.LOGOUT_FAILED -> R.string.feature_setting_impl_logout_failed
+    }
 
 @Composable
 private fun SettingScreen(

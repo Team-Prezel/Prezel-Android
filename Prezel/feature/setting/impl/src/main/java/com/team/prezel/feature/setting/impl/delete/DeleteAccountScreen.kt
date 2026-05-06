@@ -43,12 +43,12 @@ internal fun DeleteAccountScreen(
     LaunchedEffect(viewModel) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                DeleteAccountUiEffect.NavigateToSplash -> navigateToSplash()
+                DeleteAccountUiEffect.NavigateToSplash -> {
+                    navigateToSplash()
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(R.string.feature_setting_impl_delete_account_withdraw_success))
+                }
                 is DeleteAccountUiEffect.ShowMessage -> {
-                    val message = when (effect.message) {
-                        DeleteAccountUiMessage.WITHDRAW_FAILED -> R.string.feature_setting_impl_delete_account_withdraw_failed
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(message))
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toMessageRes()))
                 }
             }
         }
@@ -73,6 +73,11 @@ internal fun DeleteAccountScreen(
         modifier = modifier,
     )
 }
+
+private fun DeleteAccountUiMessage.toMessageRes(): Int =
+    when (this) {
+        DeleteAccountUiMessage.WITHDRAW_FAILED -> R.string.feature_setting_impl_delete_account_withdraw_failed
+    }
 
 @Composable
 private fun DeleteAccountScreen(
