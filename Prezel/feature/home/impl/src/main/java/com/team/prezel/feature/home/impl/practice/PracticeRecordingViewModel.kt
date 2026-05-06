@@ -1,6 +1,9 @@
 package com.team.prezel.feature.home.impl.practice
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.audio.AudioSessionEvent
+import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.audio.AudioSource
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.AnalyzePracticeRecordingUseCase
 import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
@@ -17,7 +20,6 @@ import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysi
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,9 +30,10 @@ internal class PracticeRecordingViewModel @Inject constructor(
     private val fetchPracticeScriptUseCase: FetchPracticeScriptUseCase,
     private val analyzePracticeRecordingUseCase: AnalyzePracticeRecordingUseCase,
 ) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(PracticeRecordingUiState()) {
-    private var recordingFilePath: String? = null
-    private var timerJob: Job? = null
-    private var analysisJob: Job? = null
+    init {
+        collectAudioSessionState()
+        collectAudioSessionEvent()
+    }
 
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
@@ -40,8 +43,47 @@ internal class PracticeRecordingViewModel @Inject constructor(
                 PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED,
             )
 
-            PracticeRecordingUiIntent.ToggleRecordingControl -> toggleRecordingControl()
+            PracticeRecordingUiIntent.StartRecording -> {
+                updateState { copy(analysisStatus = PracticeRecordingAnalysisStatus.Ready) }
+                audioController.startRecording()
+            }
+
+            PracticeRecordingUiIntent.PauseRecording -> audioController.pauseRecording()
+            PracticeRecordingUiIntent.ResumeRecording -> audioController.resumeRecording()
+            PracticeRecordingUiIntent.StopRecording -> audioController.stopRecording()
+            PracticeRecordingUiIntent.ResetRecording -> {
+                updateState { copy(analysisStatus = PracticeRecordingAnalysisStatus.Ready) }
+                audioController.resetRecording()
+            }
+
+            is PracticeRecordingUiIntent.AudioFileSelected -> {
+                updateState { copy(analysisStatus = PracticeRecordingAnalysisStatus.Ready) }
+                audioController.loadAudioFile(intent.uri)
+            }
+
+            PracticeRecordingUiIntent.StartPlayback -> audioController.startPlayback()
+            PracticeRecordingUiIntent.PausePlayback -> audioController.pausePlayback()
+            PracticeRecordingUiIntent.ResumePlayback -> audioController.resumePlayback()
+            PracticeRecordingUiIntent.StopPlayback -> audioController.stopPlayback()
             PracticeRecordingUiIntent.AnalyzeClicked -> startAnalysis()
+        }
+    }
+
+    private fun collectAudioSessionState() {
+        viewModelScope.launch {
+            audioController.audioSessionState.collect { audioState ->
+                updateState {
+                    copy(recordingState = audioState.toPracticeRecordingState())
+                }
+            }
+        }
+    }
+
+    private fun collectAudioSessionEvent() {
+        viewModelScope.launch {
+            audioController.audioSessionEvent.collect { event ->
+                showMessage(event.toUiMessage())
+            }
         }
     }
 
@@ -58,143 +100,12 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun toggleRecordingControl() {
-        when (currentState.recordingState) {
-            PracticeRecordingState.Idle -> startRecording()
-            is PracticeRecordingState.Recording -> stopRecording()
-            is PracticeRecordingState.Recorded -> startPlayback()
-            is PracticeRecordingState.Playing -> stopPlayback()
-        }
-    }
-
-    private fun startRecording() {
-        audioController
-            .startRecording()
-            .onSuccess { filePath ->
-                recordingFilePath = filePath
-
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Recording(
-                            recordingSeconds = 0,
-                        ),
-                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
-                    )
-                }
-
-                startRecordingTimer()
-            }.onFailure {
-                recordingFilePath = null
-                timerJob?.cancel()
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Idle,
-                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
-                    )
-                }
-                showMessage(PracticeRecordingUiMessage.RECORDING_START_FAILED)
-            }
-    }
-
-    private fun stopRecording() {
-        val previousState = currentState.recordingState
-        if (previousState !is PracticeRecordingState.Recording) return
-
-        timerJob?.cancel()
-
-        audioController
-            .stopRecording()
-            .onSuccess { durationSeconds ->
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Recorded(
-                            recordedDurationSeconds = durationSeconds.coerceAtLeast(
-                                previousState.recordingSeconds,
-                            ),
-                        ),
-                    )
-                }
-            }.onFailure {
-                recordingFilePath = null
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Idle,
-                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
-                    )
-                }
-                showMessage(PracticeRecordingUiMessage.RECORDING_STOP_FAILED)
-            }
-    }
-
-    private fun startPlayback() {
-        val previousState = currentState.recordingState
-        if (previousState !is PracticeRecordingState.Recorded) return
-
-        val filePath = recordingFilePath
-        if (filePath == null) {
-            showMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
-            return
-        }
-
-        audioController
-            .startPlayback(filePath) {
-                timerJob?.cancel()
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Recorded(
-                            recordedDurationSeconds = previousState.recordedDurationSeconds,
-                        ),
-                    )
-                }
-            }.onSuccess { durationSeconds ->
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Playing(
-                            playbackSeconds = 0,
-                            recordedDurationSeconds = durationSeconds.coerceAtLeast(
-                                previousState.recordedDurationSeconds,
-                            ),
-                        ),
-                    )
-                }
-
-                startPlaybackTimer()
-            }.onFailure {
-                updateState {
-                    copy(
-                        recordingState = PracticeRecordingState.Recorded(
-                            recordedDurationSeconds = previousState.recordedDurationSeconds,
-                        ),
-                        analysisStatus = PracticeRecordingAnalysisStatus.Ready,
-                    )
-                }
-                showMessage(PracticeRecordingUiMessage.PLAYBACK_START_FAILED)
-            }
-    }
-
-    private fun stopPlayback() {
-        val previousState = currentState.recordingState
-        if (previousState !is PracticeRecordingState.Playing) return
-
-        audioController.stopPlayback()
-        timerJob?.cancel()
-
-        updateState {
-            copy(
-                recordingState = PracticeRecordingState.Recorded(
-                    recordedDurationSeconds = previousState.recordedDurationSeconds,
-                ),
-            )
-        }
-    }
-
     private fun startAnalysis() {
         if (!currentState.analyzeEnabled) return
-        val filePath = recordingFilePath ?: return
+        val filePath = currentState.recordingState.filePath ?: return
 
         audioController.stopPlayback()
-        analysisJob?.cancel()
-        analysisJob = viewModelScope.launch {
+        viewModelScope.launch {
             updateState {
                 copy(analysisStatus = PracticeRecordingAnalysisStatus.Loading)
             }
@@ -222,47 +133,6 @@ internal class PracticeRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun startRecordingTimer() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (true) {
-                delay(TIMER_DELAY_MILLIS)
-
-                updateState {
-                    val state = recordingState
-                    if (state !is PracticeRecordingState.Recording) return@updateState this
-
-                    copy(
-                        recordingState = PracticeRecordingState.Recording(
-                            recordingSeconds = state.recordingSeconds + 1,
-                        ),
-                    )
-                }
-            }
-        }
-    }
-
-    private fun startPlaybackTimer() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (true) {
-                delay(PLAYBACK_TIMER_DELAY_MILLIS)
-
-                updateState {
-                    val state = recordingState
-                    if (state !is PracticeRecordingState.Playing) return@updateState this
-
-                    copy(
-                        recordingState = PracticeRecordingState.Playing(
-                            playbackSeconds = audioController.playbackPositionSeconds(),
-                            recordedDurationSeconds = state.recordedDurationSeconds,
-                        ),
-                    )
-                }
-            }
-        }
-    }
-
     private fun showMessage(message: PracticeRecordingUiMessage) {
         viewModelScope.launch {
             sendEffect(PracticeRecordingUiEffect.ShowMessage(message))
@@ -270,18 +140,64 @@ internal class PracticeRecordingViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        timerJob?.cancel()
-        analysisJob?.cancel()
         audioController.release()
         super.onCleared()
     }
 
     private companion object {
         const val ANALYSIS_LOADING_DELAY_MILLIS = 3_000L
-        const val TIMER_DELAY_MILLIS = 1_000L
-        const val PLAYBACK_TIMER_DELAY_MILLIS = 250L
     }
 }
+
+private fun AudioSessionState.toPracticeRecordingState(): PracticeRecordingState =
+    when (this) {
+        AudioSessionState.Idle -> PracticeRecordingState.Idle
+        is AudioSessionState.Recording -> PracticeRecordingState.Recording(
+            recordingSeconds = elapsedSeconds,
+        )
+
+        is AudioSessionState.RecordingPaused -> PracticeRecordingState.RecordingPaused(
+            recordingSeconds = elapsedSeconds,
+        )
+
+        is AudioSessionState.ReadyToPlay -> PracticeRecordingState.ReadyToPlay(
+            filePath = source.filePath,
+            durationSeconds = durationSeconds,
+            sourceType = source.toPracticeSourceType(),
+        )
+
+        is AudioSessionState.Playing -> PracticeRecordingState.Playing(
+            filePath = source.filePath,
+            playbackSeconds = positionSeconds,
+            durationSeconds = durationSeconds,
+            sourceType = source.toPracticeSourceType(),
+        )
+
+        is AudioSessionState.PlaybackPaused -> PracticeRecordingState.PlaybackPaused(
+            filePath = source.filePath,
+            playbackSeconds = positionSeconds,
+            durationSeconds = durationSeconds,
+            sourceType = source.toPracticeSourceType(),
+        )
+    }
+
+private fun AudioSource.toPracticeSourceType(): PracticeRecordingState.SourceType =
+    when (this) {
+        is AudioSource.RecordedFile -> PracticeRecordingState.SourceType.RECORDED_FILE
+        is AudioSource.ExternalFile -> PracticeRecordingState.SourceType.EXTERNAL_FILE
+    }
+
+private fun AudioSessionEvent.toUiMessage(): PracticeRecordingUiMessage =
+    when (this) {
+        AudioSessionEvent.RecordingStartFailed,
+        AudioSessionEvent.RecordingPauseFailed,
+        AudioSessionEvent.RecordingResumeFailed,
+        -> PracticeRecordingUiMessage.RECORDING_START_FAILED
+
+        AudioSessionEvent.RecordingStopFailed -> PracticeRecordingUiMessage.RECORDING_STOP_FAILED
+        AudioSessionEvent.PlaybackStartFailed -> PracticeRecordingUiMessage.PLAYBACK_START_FAILED
+        AudioSessionEvent.FileLoadFailed -> PracticeRecordingUiMessage.AUDIO_FILE_LOAD_FAILED
+    }
 
 private fun PracticeRecordingAnalysisResult.toUiModel(): PracticeRecordingAnalysisUiModel =
     PracticeRecordingAnalysisUiModel(

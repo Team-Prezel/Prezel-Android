@@ -8,13 +8,13 @@ import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 @Composable
 internal fun rememberRecordAudioPermissionControlClickHandler(
     recordingState: PracticeRecordingState,
-    onClickControl: () -> Unit,
+    onStartRecording: () -> Unit,
     onPermissionDenied: () -> Unit,
     onPermissionPermanentlyDenied: () -> Unit,
 ): () -> Unit {
     val permissionRequest = rememberPermissionRequest(
         permission = Manifest.permission.RECORD_AUDIO,
-        onPermissionGranted = onClickControl,
+        onPermissionGranted = onStartRecording,
         onPermissionDenied = onPermissionDenied,
         onPermissionPermanentlyDenied = onPermissionPermanentlyDenied,
     )
@@ -23,16 +23,18 @@ internal fun rememberRecordAudioPermissionControlClickHandler(
         when (recordingState) {
             PracticeRecordingState.Idle -> {
                 when {
-                    permissionRequest.isGranted -> onClickControl()
+                    permissionRequest.isGranted -> onStartRecording()
                     permissionRequest.isPermanentlyDenied -> permissionRequest.onPermanentlyDenied()
                     else -> permissionRequest.launch()
                 }
             }
 
             is PracticeRecordingState.Recording,
-            is PracticeRecordingState.Recorded,
+            is PracticeRecordingState.RecordingPaused,
+            is PracticeRecordingState.ReadyToPlay,
             is PracticeRecordingState.Playing,
-            -> onClickControl()
+            is PracticeRecordingState.PlaybackPaused,
+            -> Unit
         }
     }
 }

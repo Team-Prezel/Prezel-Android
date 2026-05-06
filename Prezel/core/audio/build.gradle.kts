@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.team.prezel.core.audio"
 }
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+}

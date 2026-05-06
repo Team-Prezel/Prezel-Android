@@ -24,7 +24,16 @@ internal fun PracticeRecordingContent(
     currentSeconds: Int,
     totalSeconds: Int,
     controlState: PracticeRecordingControlState,
-    onClickControl: () -> Unit,
+    onStartRecording: () -> Unit,
+    onPauseRecording: () -> Unit,
+    onResumeRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+    onSelectAudioFile: () -> Unit,
+    onStartPlayback: () -> Unit,
+    onPausePlayback: () -> Unit,
+    onResumePlayback: () -> Unit,
+    onStopPlayback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -63,7 +72,16 @@ internal fun PracticeRecordingContent(
             currentSeconds = currentSeconds,
             totalSeconds = totalSeconds,
             state = controlState,
-            onClickControl = onClickControl,
+            onStartRecording = onStartRecording,
+            onPauseRecording = onPauseRecording,
+            onResumeRecording = onResumeRecording,
+            onStopRecording = onStopRecording,
+            onResetRecording = onResetRecording,
+            onSelectAudioFile = onSelectAudioFile,
+            onStartPlayback = onStartPlayback,
+            onPausePlayback = onPausePlayback,
+            onResumePlayback = onResumePlayback,
+            onStopPlayback = onStopPlayback,
         )
     }
 }

@@ -30,6 +30,7 @@
     <string name="feature_home_impl_practice_recording_failed">녹음을 시작하지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_stop_failed">녹음을 저장하지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_playback_failed">녹음을 재생하지 못했습니다.</string>
+    <string name="feature_home_impl_practice_recording_file_load_failed">음성 파일을 불러오지 못했습니다.</string>
     <string name="feature_home_impl_practice_recording_analysis_loading_title">분석중</string>
     <string name="feature_home_impl_practice_recording_analysis_loading_description">잠시만 기다려주세요</string>
     <string name="feature_home_impl_practice_recording_analysis_error_title">분석에 실패했어요</string>

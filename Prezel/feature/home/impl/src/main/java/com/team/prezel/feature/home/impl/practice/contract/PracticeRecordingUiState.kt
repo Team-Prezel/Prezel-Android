@@ -18,6 +18,6 @@ internal data class PracticeRecordingUiState(
         get() = recordingState.totalSeconds
 
     val analyzeEnabled: Boolean
-        get() = recordingState is PracticeRecordingState.Recorded &&
+        get() = recordingState is PracticeRecordingState.ReadyToPlay &&
             analysisStatus !is PracticeRecordingAnalysisStatus.Loading
 }

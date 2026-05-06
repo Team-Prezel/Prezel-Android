@@ -1,6 +1,8 @@
 package com.team.prezel.feature.home.impl.practice
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,9 +42,15 @@ internal fun PracticeRecordingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val onClickRecordingControl = rememberRecordAudioPermissionControlClickHandler(
+    val audioFilePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        viewModel.onIntent(PracticeRecordingUiIntent.AudioFileSelected(uri))
+    }
+    val onStartRecording = rememberRecordAudioPermissionControlClickHandler(
         recordingState = uiState.recordingState,
-        onClickControl = { viewModel.onIntent(PracticeRecordingUiIntent.ToggleRecordingControl) },
+        onStartRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StartRecording) },
         onPermissionDenied = { viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionDenied) },
         onPermissionPermanentlyDenied = {
             viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionPermanentlyDenied)
@@ -68,7 +76,16 @@ internal fun PracticeRecordingScreen(
 
     PracticeRecordingScreen(
         uiState = uiState,
-        onClickControl = onClickRecordingControl,
+        onStartRecording = onStartRecording,
+        onPauseRecording = { viewModel.onIntent(PracticeRecordingUiIntent.PauseRecording) },
+        onResumeRecording = { viewModel.onIntent(PracticeRecordingUiIntent.ResumeRecording) },
+        onStopRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StopRecording) },
+        onResetRecording = { viewModel.onIntent(PracticeRecordingUiIntent.ResetRecording) },
+        onSelectAudioFile = { audioFilePickerLauncher.launch(AUDIO_FILE_MIME_TYPE) },
+        onStartPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StartPlayback) },
+        onPausePlayback = { viewModel.onIntent(PracticeRecordingUiIntent.PausePlayback) },
+        onResumePlayback = { viewModel.onIntent(PracticeRecordingUiIntent.ResumePlayback) },
+        onStopPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StopPlayback) },
         onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeClicked) },
         onBack = onBack,
         navigateToHome = navigateToHome,
@@ -79,7 +96,16 @@ internal fun PracticeRecordingScreen(
 @Composable
 private fun PracticeRecordingScreen(
     uiState: PracticeRecordingUiState,
-    onClickControl: () -> Unit,
+    onStartRecording: () -> Unit,
+    onPauseRecording: () -> Unit,
+    onResumeRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+    onSelectAudioFile: () -> Unit,
+    onStartPlayback: () -> Unit,
+    onPausePlayback: () -> Unit,
+    onResumePlayback: () -> Unit,
+    onStopPlayback: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
     navigateToHome: () -> Unit,
@@ -90,7 +116,16 @@ private fun PracticeRecordingScreen(
     when (uiState.analysisStatus) {
         PracticeRecordingAnalysisStatus.Ready -> PracticeRecordingReadyScreen(
             uiState = uiState,
-            onClickControl = onClickControl,
+            onStartRecording = onStartRecording,
+            onPauseRecording = onPauseRecording,
+            onResumeRecording = onResumeRecording,
+            onStopRecording = onStopRecording,
+            onResetRecording = onResetRecording,
+            onSelectAudioFile = onSelectAudioFile,
+            onStartPlayback = onStartPlayback,
+            onPausePlayback = onPausePlayback,
+            onResumePlayback = onResumePlayback,
+            onStopPlayback = onStopPlayback,
             onClickAnalyze = onClickAnalyze,
             onBack = onBack,
             modifier = modifier,
@@ -109,7 +144,16 @@ private fun PracticeRecordingScreen(
 @Composable
 private fun PracticeRecordingReadyScreen(
     uiState: PracticeRecordingUiState,
-    onClickControl: () -> Unit,
+    onStartRecording: () -> Unit,
+    onPauseRecording: () -> Unit,
+    onResumeRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+    onSelectAudioFile: () -> Unit,
+    onStartPlayback: () -> Unit,
+    onPausePlayback: () -> Unit,
+    onResumePlayback: () -> Unit,
+    onStopPlayback: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -128,7 +172,16 @@ private fun PracticeRecordingReadyScreen(
             currentSeconds = uiState.currentSeconds,
             totalSeconds = uiState.totalSeconds,
             controlState = uiState.recordingState.toControlState(),
-            onClickControl = onClickControl,
+            onStartRecording = onStartRecording,
+            onPauseRecording = onPauseRecording,
+            onResumeRecording = onResumeRecording,
+            onStopRecording = onStopRecording,
+            onResetRecording = onResetRecording,
+            onSelectAudioFile = onSelectAudioFile,
+            onStartPlayback = onStartPlayback,
+            onPausePlayback = onPausePlayback,
+            onResumePlayback = onResumePlayback,
+            onStopPlayback = onStopPlayback,
             modifier = Modifier.weight(1f),
         )
 
@@ -152,6 +205,7 @@ private val PracticeRecordingUiMessage.resId: Int
         PracticeRecordingUiMessage.RECORDING_START_FAILED -> R.string.feature_home_impl_practice_recording_failed
         PracticeRecordingUiMessage.RECORDING_STOP_FAILED -> R.string.feature_home_impl_practice_recording_stop_failed
         PracticeRecordingUiMessage.PLAYBACK_START_FAILED -> R.string.feature_home_impl_practice_recording_playback_failed
+        PracticeRecordingUiMessage.AUDIO_FILE_LOAD_FAILED -> R.string.feature_home_impl_practice_recording_file_load_failed
     }
 
 @BasicPreview
@@ -182,8 +236,10 @@ private fun PracticeRecordingScreenRecordedPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
             uiState = PracticeRecordingUiState(
-                recordingState = PracticeRecordingState.Recorded(
-                    recordedDurationSeconds = 32,
+                recordingState = PracticeRecordingState.ReadyToPlay(
+                    filePath = "",
+                    durationSeconds = 32,
+                    sourceType = PracticeRecordingState.SourceType.RECORDED_FILE,
                 ),
             ),
         )
@@ -197,8 +253,10 @@ private fun PracticeRecordingScreenPlayingPreview() {
         PracticeRecordingScreenPreviewContent(
             uiState = PracticeRecordingUiState(
                 recordingState = PracticeRecordingState.Playing(
+                    filePath = "",
                     playbackSeconds = 12,
-                    recordedDurationSeconds = 32,
+                    durationSeconds = 32,
+                    sourceType = PracticeRecordingState.SourceType.RECORDED_FILE,
                 ),
             ),
         )
@@ -211,9 +269,20 @@ private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiSt
         uiState = uiState.copy(
             practiceScript = "내가 그린 기린 그림은 잘 그린 기린 그림이고,\n네가 그린 기린 그림은 잘못 그린 기린 그림이다.",
         ),
-        onClickControl = {},
+        onStartRecording = {},
+        onPauseRecording = {},
+        onResumeRecording = {},
+        onStopRecording = {},
+        onResetRecording = {},
+        onSelectAudioFile = {},
+        onStartPlayback = {},
+        onPausePlayback = {},
+        onResumePlayback = {},
+        onStopPlayback = {},
         onClickAnalyze = {},
         onBack = {},
         navigateToHome = {},
     )
 }
+
+private const val AUDIO_FILE_MIME_TYPE = "audio/*"

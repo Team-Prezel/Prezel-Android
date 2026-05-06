@@ -1,5 +1,6 @@
 package com.team.prezel.feature.home.impl.practice.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,16 +25,20 @@ import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 internal enum class PracticeRecordingControlState {
     READY_TO_RECORD,
     RECORDING,
+    RECORDING_PAUSED,
     READY_TO_PLAY,
     PLAYING,
+    PLAYBACK_PAUSED,
 }
 
 internal fun PracticeRecordingState.toControlState(): PracticeRecordingControlState =
     when (this) {
         PracticeRecordingState.Idle -> PracticeRecordingControlState.READY_TO_RECORD
         is PracticeRecordingState.Recording -> PracticeRecordingControlState.RECORDING
-        is PracticeRecordingState.Recorded -> PracticeRecordingControlState.READY_TO_PLAY
+        is PracticeRecordingState.RecordingPaused -> PracticeRecordingControlState.RECORDING_PAUSED
+        is PracticeRecordingState.ReadyToPlay -> PracticeRecordingControlState.READY_TO_PLAY
         is PracticeRecordingState.Playing -> PracticeRecordingControlState.PLAYING
+        is PracticeRecordingState.PlaybackPaused -> PracticeRecordingControlState.PLAYBACK_PAUSED
     }
 
 @Composable
@@ -41,9 +46,31 @@ internal fun PracticeRecordingControl(
     currentSeconds: Int,
     totalSeconds: Int,
     state: PracticeRecordingControlState,
-    onClickControl: () -> Unit,
+    onStartRecording: () -> Unit,
+    onPauseRecording: () -> Unit,
+    onResumeRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+    onSelectAudioFile: () -> Unit,
+    onStartPlayback: () -> Unit,
+    onPausePlayback: () -> Unit,
+    onResumePlayback: () -> Unit,
+    onStopPlayback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val actions = state.actions(
+        onStartRecording = onStartRecording,
+        onPauseRecording = onPauseRecording,
+        onResumeRecording = onResumeRecording,
+        onStopRecording = onStopRecording,
+        onResetRecording = onResetRecording,
+        onSelectAudioFile = onSelectAudioFile,
+        onStartPlayback = onStartPlayback,
+        onPausePlayback = onPausePlayback,
+        onResumePlayback = onResumePlayback,
+        onStopPlayback = onStopPlayback,
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -55,22 +82,29 @@ internal fun PracticeRecordingControl(
             state = state,
         )
 
-        PrezelIconButton(
-            iconResId = state.iconResId,
-            modifier = Modifier.size(48.dp),
-            isRounded = true,
-            buttonDefault = PrezelButtonDefaults.getDefault(
-                isIconOnly = true,
-                isRounded = true,
-                type = ButtonType.FILLED,
-                size = ButtonSize.REGULAR,
-                hierarchy = ButtonHierarchy.SECONDARY,
-                contentColor = state.iconColor(),
-                backgroundColor = PrezelTheme.colors.bgLarge,
-                iconSize = 20.dp,
-            ),
-            onClick = onClickControl,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            actions.forEach { action ->
+                PrezelIconButton(
+                    iconResId = action.iconResId,
+                    modifier = Modifier.size(48.dp),
+                    isRounded = true,
+                    buttonDefault = PrezelButtonDefaults.getDefault(
+                        isIconOnly = true,
+                        isRounded = true,
+                        type = ButtonType.FILLED,
+                        size = ButtonSize.REGULAR,
+                        hierarchy = ButtonHierarchy.SECONDARY,
+                        contentColor = action.iconColor(),
+                        backgroundColor = PrezelTheme.colors.bgLarge,
+                        iconSize = 20.dp,
+                    ),
+                    onClick = action.onClick,
+                )
+            }
+        }
     }
 }
 
@@ -80,7 +114,7 @@ private fun PracticeRecordingTimeText(
     totalSeconds: Int,
     state: PracticeRecordingControlState,
 ) {
-    if (state != PracticeRecordingControlState.PLAYING) {
+    if (state != PracticeRecordingControlState.PLAYING && state != PracticeRecordingControlState.PLAYBACK_PAUSED) {
         Text(
             text = state
                 .displaySeconds(
@@ -110,21 +144,130 @@ private fun PracticeRecordingTimeText(
     )
 }
 
-private val PracticeRecordingControlState.iconResId: Int
-    get() = when (this) {
-        PracticeRecordingControlState.READY_TO_RECORD -> PrezelIcons.Recording
-        PracticeRecordingControlState.RECORDING -> PrezelIcons.Stop
-        PracticeRecordingControlState.READY_TO_PLAY -> PrezelIcons.Play
-        PracticeRecordingControlState.PLAYING -> PrezelIcons.Stop
+private data class PracticeRecordingControlAction(
+    @param:DrawableRes val iconResId: Int,
+    val colorType: PracticeRecordingControlActionColorType,
+    val onClick: () -> Unit,
+)
+
+private enum class PracticeRecordingControlActionColorType {
+    RECORD,
+    REGULAR,
+}
+
+private fun PracticeRecordingControlState.actions(
+    onStartRecording: () -> Unit,
+    onPauseRecording: () -> Unit,
+    onResumeRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+    onSelectAudioFile: () -> Unit,
+    onStartPlayback: () -> Unit,
+    onPausePlayback: () -> Unit,
+    onResumePlayback: () -> Unit,
+    onStopPlayback: () -> Unit,
+): List<PracticeRecordingControlAction> =
+    when (this) {
+        PracticeRecordingControlState.READY_TO_RECORD -> listOf(
+            PracticeRecordingControlAction(
+                iconResId = PrezelIcons.Recording,
+                colorType = PracticeRecordingControlActionColorType.RECORD,
+                onClick = onStartRecording,
+            ),
+            PracticeRecordingControlAction(
+                iconResId = PrezelIcons.Folder,
+                colorType = PracticeRecordingControlActionColorType.REGULAR,
+                onClick = onSelectAudioFile,
+            ),
+        )
+
+        PracticeRecordingControlState.RECORDING -> recordingActions(
+            primaryIconResId = PrezelIcons.Pause,
+            onPrimaryClick = onPauseRecording,
+            onStopRecording = onStopRecording,
+            onResetRecording = onResetRecording,
+        )
+
+        PracticeRecordingControlState.RECORDING_PAUSED -> recordingActions(
+            primaryIconResId = PrezelIcons.Play,
+            onPrimaryClick = onResumeRecording,
+            onStopRecording = onStopRecording,
+            onResetRecording = onResetRecording,
+        )
+
+        PracticeRecordingControlState.READY_TO_PLAY -> listOf(
+            PracticeRecordingControlAction(
+                iconResId = PrezelIcons.Play,
+                colorType = PracticeRecordingControlActionColorType.REGULAR,
+                onClick = onStartPlayback,
+            ),
+            PracticeRecordingControlAction(
+                iconResId = PrezelIcons.Folder,
+                colorType = PracticeRecordingControlActionColorType.REGULAR,
+                onClick = onSelectAudioFile,
+            ),
+        )
+
+        PracticeRecordingControlState.PLAYING -> playbackActions(
+            primaryIconResId = PrezelIcons.Pause,
+            onPrimaryClick = onPausePlayback,
+            onStopPlayback = onStopPlayback,
+        )
+
+        PracticeRecordingControlState.PLAYBACK_PAUSED -> playbackActions(
+            primaryIconResId = PrezelIcons.Play,
+            onPrimaryClick = onResumePlayback,
+            onStopPlayback = onStopPlayback,
+        )
     }
 
+private fun recordingActions(
+    @DrawableRes primaryIconResId: Int,
+    onPrimaryClick: () -> Unit,
+    onStopRecording: () -> Unit,
+    onResetRecording: () -> Unit,
+): List<PracticeRecordingControlAction> =
+    listOf(
+        PracticeRecordingControlAction(
+            iconResId = primaryIconResId,
+            colorType = PracticeRecordingControlActionColorType.REGULAR,
+            onClick = onPrimaryClick,
+        ),
+        PracticeRecordingControlAction(
+            iconResId = PrezelIcons.Stop,
+            colorType = PracticeRecordingControlActionColorType.REGULAR,
+            onClick = onStopRecording,
+        ),
+        PracticeRecordingControlAction(
+            iconResId = PrezelIcons.Reset,
+            colorType = PracticeRecordingControlActionColorType.REGULAR,
+            onClick = onResetRecording,
+        ),
+    )
+
+private fun playbackActions(
+    @DrawableRes primaryIconResId: Int,
+    onPrimaryClick: () -> Unit,
+    onStopPlayback: () -> Unit,
+): List<PracticeRecordingControlAction> =
+    listOf(
+        PracticeRecordingControlAction(
+            iconResId = primaryIconResId,
+            colorType = PracticeRecordingControlActionColorType.REGULAR,
+            onClick = onPrimaryClick,
+        ),
+        PracticeRecordingControlAction(
+            iconResId = PrezelIcons.Stop,
+            colorType = PracticeRecordingControlActionColorType.REGULAR,
+            onClick = onStopPlayback,
+        ),
+    )
+
 @Composable
-private fun PracticeRecordingControlState.iconColor() =
-    when (this) {
-        PracticeRecordingControlState.READY_TO_RECORD -> PrezelTheme.colors.feedbackBadRegular
-        PracticeRecordingControlState.RECORDING -> PrezelTheme.colors.iconRegular
-        PracticeRecordingControlState.READY_TO_PLAY -> PrezelTheme.colors.iconRegular
-        PracticeRecordingControlState.PLAYING -> PrezelTheme.colors.iconRegular
+private fun PracticeRecordingControlAction.iconColor() =
+    when (colorType) {
+        PracticeRecordingControlActionColorType.RECORD -> PrezelTheme.colors.feedbackBadRegular
+        PracticeRecordingControlActionColorType.REGULAR -> PrezelTheme.colors.iconRegular
     }
 
 private fun PracticeRecordingControlState.displaySeconds(
