@@ -53,7 +53,7 @@ internal fun SettingScreen(
 
                 is SettingUiEffect.ShowMessage -> {
                     val messageRes = when (effect.message) {
-                        SettingUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_setting_impl_title
+                        SettingUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_setting_impl_fetch_user_info_failed
                         SettingUiMessage.LOGOUT_FAILED -> R.string.feature_setting_impl_logout_failed
                     }
 

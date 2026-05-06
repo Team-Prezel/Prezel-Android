@@ -5,6 +5,7 @@
     <string name="feature_setting_impl_close_icon_content_description">닫기</string>
     <string name="feature_setting_impl_profile_image_content_description">프로필 이미지</string>
     <string name="feature_setting_impl_kakao_account_content_description">카카오 계정</string>
+    <string name="feature_setting_impl_fetch_user_info_failed">유저 정보 조회에 실패했어요.</string>
     <string name="feature_setting_impl_logout_failed">로그아웃에 실패했어요. 다시 시도해 주세요.</string>
     <string name="feature_setting_impl_logout_dialog_title">로그아웃 하시겠어요?</string>
     <string name="feature_setting_impl_cancel">취소</string>
