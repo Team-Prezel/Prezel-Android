@@ -45,9 +45,8 @@ internal fun DoubleBackToExitHandler(navigationState: NavigationState) {
         snackbarState.showPrezelSnackbar(
             id = SNACKBAR_IDENTIFIER,
             message = resources.getString(R.string.double_back_to_exit_snackbar_message),
-            actionLabel = resources.getString(R.string.double_back_to_exit_snackbar_action_label),
-            onAction = { backPressState = BackPressState.Idle },
             onDismiss = { backPressState = BackPressState.Idle },
+            useRaisedPosition = false,
         )
     }
 
