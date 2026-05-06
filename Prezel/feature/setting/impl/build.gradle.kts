@@ -7,7 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.coreAuth)
     implementation(projects.coreDomain)
     implementation(projects.coreModel)
 
