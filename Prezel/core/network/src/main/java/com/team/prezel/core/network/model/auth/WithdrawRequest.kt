@@ -8,5 +8,5 @@ data class WithdrawRequest(
     @SerialName("reasonCategory")
     val reasonCategory: String,
     @SerialName("reasonText")
-    val reasonText: String,
+    val reasonText: String?,
 )

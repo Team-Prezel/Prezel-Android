@@ -41,7 +41,7 @@ internal class DeleteAccountViewModel @Inject constructor(
         updateState {
             copy(
                 selectedReason = reason,
-                otherReasonText = if (reason == DeleteAccountReasonOption.OTHER) otherReasonText else "",
+                otherReasonText = if (reason == DeleteAccountReasonOption.Etc) otherReasonText else "",
             )
         }
     }
@@ -80,12 +80,12 @@ internal class DeleteAccountViewModel @Inject constructor(
 
     private fun DeleteAccountUiState.toWithdrawReason(): WithdrawReason? =
         when (selectedReason) {
-            DeleteAccountReasonOption.NOT_USED_OFTEN -> WithdrawReason.NotUsedOften
-            DeleteAccountReasonOption.NO_LONGER_NEEDED -> WithdrawReason.NoLongerNeeded
-            DeleteAccountReasonOption.TOO_DIFFICULT_OR_COMPLEX -> WithdrawReason.TooDifficultOrComplex
-            DeleteAccountReasonOption.ANALYSIS_RESULT_INACCURATE -> WithdrawReason.AnalysisResultInaccurate
-            DeleteAccountReasonOption.TOO_MANY_ERRORS -> WithdrawReason.TooManyErrors
-            DeleteAccountReasonOption.OTHER -> WithdrawReason.Other(text = otherReasonText.trim())
+            DeleteAccountReasonOption.NotUsedOften -> WithdrawReason.NotUsedOften
+            DeleteAccountReasonOption.NoLongerNeeded -> WithdrawReason.NoLongerNeeded
+            DeleteAccountReasonOption.TooComplex -> WithdrawReason.TooComplex
+            DeleteAccountReasonOption.InaccurateAnalysis -> WithdrawReason.InaccurateAnalysis
+            DeleteAccountReasonOption.ManyErrors -> WithdrawReason.ManyErrors
+            DeleteAccountReasonOption.Etc -> WithdrawReason.Etc(text = otherReasonText.trim())
 
             null -> null
         }

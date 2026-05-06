@@ -14,4 +14,6 @@ dependencies {
     implementation(projects.featureSettingApi)
     implementation(projects.featureSplashApi)
     implementation(projects.featureTermsApi)
+
+    implementation(libs.kotlinx.collections.immutable)
 }

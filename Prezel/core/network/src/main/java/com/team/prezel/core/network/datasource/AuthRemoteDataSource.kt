@@ -12,6 +12,6 @@ interface AuthRemoteDataSource {
 
     suspend fun withdraw(
         reasonCategory: String,
-        reasonText: String,
+        reasonText: String?,
     )
 }

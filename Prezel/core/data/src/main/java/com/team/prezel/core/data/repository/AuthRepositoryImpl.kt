@@ -1,5 +1,6 @@
 package com.team.prezel.core.data.repository
 
+import com.team.prezel.core.common.extensions.toSnakeCase
 import com.team.prezel.core.data.error.mapDomainFailure
 import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.domain.repository.auth.AuthRepository
@@ -37,27 +38,11 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun withdraw(reason: WithdrawReason): Result<Unit> =
         runCatching {
             authRemoteDataSource.withdraw(
-                reasonCategory = reason.toCategory(),
-                reasonText = reason.toReasonText(),
+                reasonCategory = reason.javaClass.simpleName.toSnakeCase(),
+                reasonText = (reason as? WithdrawReason.Etc)?.text,
             )
             clearLocalSession()
         }.mapDomainFailure()
-
-    private fun WithdrawReason.toCategory(): String =
-        when (this) {
-            WithdrawReason.NotUsedOften -> "NOT_USED_OFTEN"
-            WithdrawReason.NoLongerNeeded -> "NO_LONGER_NEEDED"
-            WithdrawReason.TooDifficultOrComplex -> "TOO_COMPLEX"
-            WithdrawReason.AnalysisResultInaccurate -> "INACCURATE_ANALYSIS"
-            WithdrawReason.TooManyErrors -> "MANY_ERRORS"
-            is WithdrawReason.Other -> "ETC"
-        }
-
-    private fun WithdrawReason.toReasonText(): String =
-        when (this) {
-            is WithdrawReason.Other -> text
-            else -> ""
-        }
 
     private suspend fun clearLocalSession() {
         authLocalDataSource.clearTokens()

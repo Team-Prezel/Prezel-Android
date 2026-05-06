@@ -25,6 +25,8 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.setting.impl.R
 import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountReasonOption
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 internal fun DeleteAccountReasonStep(
@@ -34,17 +36,6 @@ internal fun DeleteAccountReasonStep(
     onOtherReasonChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val reasonOptions = listOf(
-        DeleteAccountReasonOption.OTHER to stringResource(R.string.feature_setting_impl_delete_account_reason_other),
-        DeleteAccountReasonOption.NOT_USED_OFTEN to stringResource(R.string.feature_setting_impl_delete_account_reason_not_used_often),
-        DeleteAccountReasonOption.NO_LONGER_NEEDED to stringResource(R.string.feature_setting_impl_delete_account_reason_no_longer_needed),
-        DeleteAccountReasonOption.TOO_DIFFICULT_OR_COMPLEX to
-            stringResource(R.string.feature_setting_impl_delete_account_reason_too_difficult_or_complex),
-        DeleteAccountReasonOption.ANALYSIS_RESULT_INACCURATE to
-            stringResource(R.string.feature_setting_impl_delete_account_reason_analysis_result_inaccurate),
-        DeleteAccountReasonOption.TOO_MANY_ERRORS to stringResource(R.string.feature_setting_impl_delete_account_reason_too_many_errors),
-    )
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -52,40 +43,66 @@ internal fun DeleteAccountReasonStep(
             .padding(horizontal = PrezelTheme.spacing.V12)
             .padding(top = PrezelTheme.spacing.V16, bottom = PrezelTheme.spacing.V24),
     ) {
-        DeleteAccountReasonHeader()
+        DeleteAccountReasonHeader(modifier = Modifier.padding(horizontal = PrezelTheme.spacing.V8))
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
-            CompositionLocalProvider(LocalContentColor provides PrezelTheme.colors.textLarge) {
-                reasonOptions.forEach { (reason, label) ->
-                    DeleteAccountReasonOptionItem(
-                        reason = reason,
-                        label = label,
-                        selectedReason = selectedReason,
-                        otherReasonText = otherReasonText,
-                        onSelectReason = onSelectReason,
-                        onOtherReasonChanged = onOtherReasonChanged,
-                    )
-                }
-            }
-        }
+        DeleteAccountReasons(
+            selectedReason = selectedReason,
+            otherReasonText = otherReasonText,
+            onSelectReason = onSelectReason,
+            onOtherReasonChanged = onOtherReasonChanged,
+        )
     }
 }
 
 @Composable
-private fun DeleteAccountReasonHeader() {
-    Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8)) {
+private fun DeleteAccountReasonHeader(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.feature_setting_impl_delete_account_reason_title),
             style = PrezelTheme.typography.title2Bold,
             color = PrezelTheme.colors.textLarge,
         )
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
         Text(
             text = stringResource(R.string.feature_setting_impl_delete_account_reason_description),
             style = PrezelTheme.typography.body3Regular,
             color = PrezelTheme.colors.textRegular,
         )
+    }
+}
+
+@Composable
+private fun DeleteAccountReasons(
+    selectedReason: DeleteAccountReasonOption?,
+    otherReasonText: String,
+    onSelectReason: (DeleteAccountReasonOption) -> Unit,
+    onOtherReasonChanged: (String) -> Unit,
+    reasonOptions: ImmutableList<Pair<DeleteAccountReasonOption, String>> = persistentListOf(
+        DeleteAccountReasonOption.Etc to stringResource(R.string.feature_setting_impl_delete_account_reason_other),
+        DeleteAccountReasonOption.NotUsedOften to stringResource(R.string.feature_setting_impl_delete_account_reason_not_used_often),
+        DeleteAccountReasonOption.NoLongerNeeded to stringResource(R.string.feature_setting_impl_delete_account_reason_no_longer_needed),
+        DeleteAccountReasonOption.TooComplex to stringResource(R.string.feature_setting_impl_delete_account_reason_too_difficult_or_complex),
+        DeleteAccountReasonOption.InaccurateAnalysis to stringResource(
+            R.string.feature_setting_impl_delete_account_reason_analysis_result_inaccurate,
+        ),
+        DeleteAccountReasonOption.ManyErrors to stringResource(R.string.feature_setting_impl_delete_account_reason_too_many_errors),
+    ),
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
+        CompositionLocalProvider(LocalContentColor provides PrezelTheme.colors.textLarge) {
+            reasonOptions.forEach { (reason, label) ->
+                DeleteAccountReasonOptionItem(
+                    reason = reason,
+                    label = label,
+                    selectedReason = selectedReason,
+                    otherReasonText = otherReasonText,
+                    onSelectReason = onSelectReason,
+                    onOtherReasonChanged = onOtherReasonChanged,
+                )
+            }
+        }
     }
 }
 
@@ -109,12 +126,10 @@ private fun DeleteAccountReasonOptionItem(
                     onCheckedChange = { checked -> if (checked) onSelectReason(reason) },
                 )
             },
-            modifier = Modifier.noRippleClickable(
-                onClick = { onSelectReason(reason) },
-            ),
+            modifier = Modifier.noRippleClickable { onSelectReason(reason) },
         )
 
-        if (reason == DeleteAccountReasonOption.OTHER && selectedReason == DeleteAccountReasonOption.OTHER) {
+        if (reason == DeleteAccountReasonOption.Etc && selectedReason == DeleteAccountReasonOption.Etc) {
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
             PrezelTextArea(
                 value = otherReasonText,
@@ -136,7 +151,7 @@ private fun DeleteAccountReasonOptionItem(
 private fun DeleteAccountReasonStepPreview() {
     PrezelTheme {
         DeleteAccountReasonStep(
-            selectedReason = DeleteAccountReasonOption.NOT_USED_OFTEN,
+            selectedReason = DeleteAccountReasonOption.Etc,
             otherReasonText = "",
             onSelectReason = {},
             onOtherReasonChanged = {},

@@ -168,7 +168,7 @@ private fun DeleteAccountReasonStepScreenPreview() {
         DeleteAccountScreen(
             uiState = DeleteAccountUiState(
                 step = DeleteAccountStep.REASON,
-                selectedReason = DeleteAccountReasonOption.OTHER,
+                selectedReason = DeleteAccountReasonOption.Etc,
             ),
             onClickClose = {},
             onToggleNoticeChecked = {},
