@@ -15,20 +15,11 @@
 
     <!-- Delete Account Notice Step -->
     <string name="feature_setting_impl_delete_account_notice_title">회원을 탈퇴하시면</string>
-    <string name="feature_setting_impl_delete_account_notice_description_1">추가한 발표, 발표 연습 기록, 획득한 뱃지 등을</string>
-    <string name="feature_setting_impl_delete_account_notice_description_2_prefix">포함한 이용 내역 및 개인정보가</string>
-    <string name="feature_setting_impl_delete_account_notice_description_2_highlight">영구 삭제</string>
-    <string name="feature_setting_impl_delete_account_notice_description_2_suffix">되며,</string>
-    <string name="feature_setting_impl_delete_account_notice_description_3">다시 복구할 수 없어요.</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_1_prefix">회원 탈퇴 시 즉시 탈퇴 처리되며,</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_1_highlight">이후 서비스 이용이 불가합니다.</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_1_suffix">탈퇴 후에는 동일 계정으로 재가입하더라도 기존 정보는 복구되지 않습니다.</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_2_prefix">회원 탈퇴 시 아래 정보의 복구가 불가능합니다.</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_2_highlight">연습 녹음 기록, 음성 분석 결과 및 리포트, 발표 대본 및 연습 히스토리 등의 데이터가 삭제</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_2_suffix">되며, 탈퇴 후에는 삭제된 데이터에 대한 복구 요청이 불가합니다.</string>
+    <string name="feature_setting_impl_delete_account_notice_description">추가한 발표, 발표 연습 기록, 획득한 뱃지 등을\n포함한 이용 내역 및 개인정보가 &lt;highlight&gt;&lt;bold&gt;영구 삭제&lt;/bold&gt;&lt;/highlight&gt;되며,\n&lt;bold&gt;다시 복구할 수 없어요.&lt;/bold&gt;</string>
+    <string name="feature_setting_impl_delete_account_notice_detail_1">회원 탈퇴 시 즉시 탈퇴 처리되며, &lt;highlight&gt;이후 서비스 이용이 불가합니다.&lt;/highlight&gt; 탈퇴 후에는 동일 계정으로 재가입하더라도 기존 정보는 복구되지 않습니다.</string>
+    <string name="feature_setting_impl_delete_account_notice_detail_2">회원 탈퇴 시 아래 정보의 복구가 불가능합니다. &lt;highlight&gt;연습 녹음 기록, 음성 분석 결과 및 리포트, 발표 대본 및 연습 히스토리 등의 데이터가 삭제&lt;/highlight&gt;되며, 탈퇴 후에는 삭제된 데이터에 대한 복구 요청이 불가합니다.</string>
     <string name="feature_setting_impl_delete_account_notice_detail_3">탈퇴 시 진행 중인 발표 연습, 분석 요청은 모두 종료됩니다. 미완료된 분석 결과는 제공되지 않습니다.</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_4_prefix">탈퇴 후 동일한 카카오 계정으로 재가입은 가능하나,</string>
-    <string name="feature_setting_impl_delete_account_notice_detail_4_highlight">이전 이용 기록 및 연습 데이터는 새로 생성되지 않습니다.</string>
+    <string name="feature_setting_impl_delete_account_notice_detail_4">탈퇴 후 동일한 카카오 계정으로 재가입은 가능하나, &lt;highlight&gt;이전 이용 기록 및 연습 데이터는 새로 생성되지 않습니다.&lt;/highlight&gt;</string>
     <string name="feature_setting_impl_delete_account_notice_check">탈퇴 시 주의사항을 모두 확인했습니다.</string>
     <string name="feature_setting_impl_delete_account_next">다음</string>
 
