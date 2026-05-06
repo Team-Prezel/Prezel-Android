@@ -3,7 +3,6 @@ package com.team.prezel.core.designsystem.component.actions.button
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
@@ -13,6 +12,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonPreviewContent
 import com.team.prezel.core.designsystem.component.actions.button.config.previewGhostBorder
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.LargeDevicePreview
 
 /**
  * 아이콘과 텍스트를 함께 표시할 수 있는 기본 버튼입니다.
@@ -46,7 +46,7 @@ fun PrezelButton(
     )
 }
 
-@Preview(device = "spec:width=1080dp,height=1400dp")
+@LargeDevicePreview
 @Composable
 private fun PrezelButtonPreview() {
     PrezelButtonPreviewContent(title = "Button/Icon + Text") { type, hierarchy, size, enabled, isRounded ->
