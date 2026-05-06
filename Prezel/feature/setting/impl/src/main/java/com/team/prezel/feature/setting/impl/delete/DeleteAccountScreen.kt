@@ -1,8 +1,10 @@
 package com.team.prezel.feature.setting.impl.delete
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,7 +19,8 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.setting.impl.R
 import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountActionSection
 import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountConfirmDialog
-import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountContentSection
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountNoticeStep
+import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountReasonStep
 import com.team.prezel.feature.setting.impl.delete.component.DeleteAccountTopAppBar
 import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiEffect
 import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiIntent
@@ -94,12 +97,14 @@ private fun DeleteAccountScreen(
     Column(modifier = modifier.fillMaxSize()) {
         DeleteAccountTopAppBar(onClickClose = onClickClose)
 
-        DeleteAccountContentSection(
+        DeleteAccountContent(
             uiState = uiState,
             onToggleNoticeChecked = onToggleNoticeChecked,
             onSelectReason = onSelectReason,
             onOtherReasonChanged = onOtherReasonChanged,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
         )
 
         DeleteAccountActionSection(
@@ -108,6 +113,31 @@ private fun DeleteAccountScreen(
             onClickNext = onClickNext,
             onClickWithdraw = onClickWithdraw,
         )
+    }
+}
+
+@Composable
+private fun DeleteAccountContent(
+    uiState: DeleteAccountUiState,
+    onToggleNoticeChecked: (Boolean) -> Unit,
+    onSelectReason: (DeleteAccountReasonOption) -> Unit,
+    onOtherReasonChanged: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        when (uiState.step) {
+            DeleteAccountStep.NOTICE -> DeleteAccountNoticeStep(
+                isChecked = uiState.isNoticeChecked,
+                onCheckedChange = onToggleNoticeChecked,
+            )
+
+            DeleteAccountStep.REASON -> DeleteAccountReasonStep(
+                selectedReason = uiState.selectedReason,
+                otherReasonText = uiState.otherReasonText,
+                onSelectReason = onSelectReason,
+                onOtherReasonChanged = onOtherReasonChanged,
+            )
+        }
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -54,21 +55,6 @@ internal fun SettingBodySection(
     }
 }
 
-@BasicPreview
-@Composable
-private fun SettingBodySectionPreview() {
-    PrezelTheme {
-        SettingBodySection(
-            uiState = SettingUiState(
-                nickname = "발표잘하고싶어요",
-                email = "email@email.com",
-            ),
-            onClickTermsOfService = {},
-            onClickPrivacyPolicy = {},
-        )
-    }
-}
-
 @Composable
 internal fun AccountSection(
     profileImageUrl: String?,
@@ -83,7 +69,7 @@ internal fun AccountSection(
                 horizontal = PrezelTheme.spacing.V20,
                 vertical = PrezelTheme.spacing.V16,
             ),
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         PrezelAvatar(
             imageUrl = profileImageUrl,
@@ -100,7 +86,7 @@ internal fun AccountSection(
                 style = PrezelTheme.typography.body2Medium,
             )
 
-            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = email,
                     color = PrezelTheme.colors.textRegular,
@@ -119,18 +105,6 @@ internal fun AccountSection(
                 )
             }
         }
-    }
-}
-
-@BasicPreview
-@Composable
-private fun AccountSectionPreview() {
-    PrezelTheme {
-        AccountSection(
-            profileImageUrl = null,
-            nickname = "발표잘하고싶어요",
-            email = "email@email.com",
-        )
     }
 }
 
@@ -180,9 +154,13 @@ internal fun PolicySection(
 
 @BasicPreview
 @Composable
-private fun PolicySectionPreview() {
+private fun SettingBodySectionPreview() {
     PrezelTheme {
-        PolicySection(
+        SettingBodySection(
+            uiState = SettingUiState(
+                nickname = "발표잘하고싶어요",
+                email = "email@email.com",
+            ),
             onClickTermsOfService = {},
             onClickPrivacyPolicy = {},
         )

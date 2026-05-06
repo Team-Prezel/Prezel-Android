@@ -209,14 +209,3 @@ private fun DeleteAccountNoticeStepPreview() {
         )
     }
 }
-
-@BasicPreview
-@Composable
-private fun DeleteAccountNoticeStepCheckedPreview() {
-    PrezelTheme {
-        DeleteAccountNoticeStep(
-            isChecked = true,
-            onCheckedChange = {},
-        )
-    }
-}

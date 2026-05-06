@@ -64,16 +64,3 @@ private fun DeleteAccountActionSectionNoticePreview() {
         )
     }
 }
-
-@BasicPreview
-@Composable
-private fun DeleteAccountActionSectionReasonPreview() {
-    PrezelTheme {
-        DeleteAccountActionSection(
-            step = DeleteAccountStep.REASON,
-            enabled = true,
-            onClickNext = {},
-            onClickWithdraw = {},
-        )
-    }
-}

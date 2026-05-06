@@ -14,15 +14,9 @@ internal data class DeleteAccountUiState(
     val isConfirmDialogVisible: Boolean = false,
     val isSubmitting: Boolean = false,
 ) : UiState {
-    val isOtherReasonSelected: Boolean
-        get() = selectedReason == DeleteAccountReasonOption.OTHER
+    val isNextEnabled: Boolean = isNoticeChecked
 
-    val isNextEnabled: Boolean
-        get() = isNoticeChecked
+    val isWithdrawEnabled: Boolean = selectedReason != null && !isSubmitting
 
-    val isWithdrawEnabled: Boolean
-        get() = selectedReason != null && !isSubmitting
-
-    val isPrimaryActionEnabled: Boolean
-        get() = if (step == DeleteAccountStep.NOTICE) isNextEnabled else isWithdrawEnabled
+    val isPrimaryActionEnabled: Boolean = if (step == DeleteAccountStep.NOTICE) isNextEnabled else isWithdrawEnabled
 }

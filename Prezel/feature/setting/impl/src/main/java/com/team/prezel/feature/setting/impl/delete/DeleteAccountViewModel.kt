@@ -8,6 +8,7 @@ import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiEffec
 import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiIntent
 import com.team.prezel.feature.setting.impl.delete.contract.DeleteAccountUiState
 import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountReasonOption
+import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountStep
 import com.team.prezel.feature.setting.impl.delete.model.DeleteAccountUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ internal class DeleteAccountViewModel @Inject constructor(
 
     private fun moveToReasonStep() {
         if (currentState.isNextEnabled) {
-            updateState { copy(step = com.team.prezel.feature.setting.impl.delete.model.DeleteAccountStep.REASON) }
+            updateState { copy(step = DeleteAccountStep.REASON) }
         }
     }
 

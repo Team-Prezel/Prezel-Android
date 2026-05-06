@@ -143,16 +143,3 @@ private fun DeleteAccountReasonStepPreview() {
         )
     }
 }
-
-@BasicPreview
-@Composable
-private fun DeleteAccountReasonStepOtherPreview() {
-    PrezelTheme {
-        DeleteAccountReasonStep(
-            selectedReason = DeleteAccountReasonOption.OTHER,
-            otherReasonText = "기타 사유를 입력합니다.",
-            onSelectReason = {},
-            onOtherReasonChanged = {},
-        )
-    }
-}
