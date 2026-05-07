@@ -7,49 +7,21 @@ enum class PrezelPlayerResourceTrackType {
     SCRIPT_MATCH,
 }
 
-enum class PrezelSpeechMarkerType {
+enum class PrezelPlayerResourceMarkerType {
     GOOD,
     WARNING,
-}
-
-enum class PrezelScriptMatchMarkerType {
-    GOOD,
     NEUTRAL,
 }
 
 @Immutable
-sealed interface PrezelPlayerResourceMarkerItem {
-    val timeSeconds: Long
+data class PrezelPlayerItem(
+    val id: String,
+    val startMillis: Long,
+)
 
-    @Immutable
-    data class Speech(
-        override val timeSeconds: Long,
-        val type: PrezelSpeechMarkerType,
-    ) : PrezelPlayerResourceMarkerItem
-
-    @Immutable
-    data class ScriptMatch(
-        override val timeSeconds: Long,
-        val type: PrezelScriptMatchMarkerType,
-    ) : PrezelPlayerResourceMarkerItem
-
-    companion object {
-        fun speech(
-            timeSeconds: Long,
-            type: PrezelSpeechMarkerType,
-        ): PrezelPlayerResourceMarkerItem =
-            Speech(
-                timeSeconds = timeSeconds,
-                type = type,
-            )
-
-        fun scriptMatch(
-            timeSeconds: Long,
-            type: PrezelScriptMatchMarkerType,
-        ): PrezelPlayerResourceMarkerItem =
-            ScriptMatch(
-                timeSeconds = timeSeconds,
-                type = type,
-            )
-    }
-}
+@Immutable
+data class PrezelPlayerResourceMarkerItem(
+    val timeSeconds: Long,
+    val trackType: PrezelPlayerResourceTrackType,
+    val markerType: PrezelPlayerResourceMarkerType,
+)

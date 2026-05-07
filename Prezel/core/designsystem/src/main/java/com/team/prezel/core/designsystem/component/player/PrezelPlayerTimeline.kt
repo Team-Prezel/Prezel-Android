@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -43,11 +42,11 @@ internal fun PrezelPlayerTimeline(
     contentDescription: String,
     showHandle: Boolean,
     onSeek: (Float) -> Unit,
+    onDragStarted: () -> Unit,
+    onDragStopped: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var widthPx by remember { mutableIntStateOf(0) }
-    var dragging by remember { mutableStateOf(false) }
-    val handleVisible = showHandle || dragging
 
     fun seekTo(offsetX: Float) {
         if (widthPx > 0) onSeek((offsetX / widthPx).coerceIn(0f, 1f))
@@ -61,16 +60,16 @@ internal fun PrezelPlayerTimeline(
             onSeekTo = ::seekTo,
             onSetProgress = onSeek,
             onDragStarted = { offsetX ->
-                dragging = true
+                onDragStarted()
                 seekTo(offsetX)
             },
-            onDragStopped = { dragging = false },
+            onDragStopped = onDragStopped,
         ),
         contentAlignment = Alignment.CenterStart,
     ) {
         PlayerTimelineBar(
             progress = progress,
-            playedBarVisible = !handleVisible,
+            playedBarVisible = !showHandle,
         )
         PlayerTimelineMarkers(
             markers = markers,
@@ -78,7 +77,7 @@ internal fun PrezelPlayerTimeline(
             durationMillis = durationMillis,
         )
 
-        if (handleVisible) PlayerTimelineHandle(progress = progress, zIndex = markers.size + 1f)
+        if (showHandle) PlayerTimelineHandle(progress = progress, zIndex = markers.size + 1f)
     }
 }
 
@@ -158,7 +157,7 @@ private fun BoxWithConstraintsScope.PlayerTimelineMarkers(
     markers.forEach { marker ->
         if (marker.matchesTrackType(type)) {
             PrezelPlayerResourceMarker(
-                type = marker.resourceMarkerType,
+                type = marker.markerType,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .offset {
@@ -171,17 +170,7 @@ private fun BoxWithConstraintsScope.PlayerTimelineMarkers(
     }
 }
 
-private fun PrezelPlayerResourceMarkerItem.matchesTrackType(type: PrezelPlayerResourceTrackType): Boolean =
-    when (type) {
-        PrezelPlayerResourceTrackType.SPEECH -> this is PrezelPlayerResourceMarkerItem.Speech
-        PrezelPlayerResourceTrackType.SCRIPT_MATCH -> this is PrezelPlayerResourceMarkerItem.ScriptMatch
-    }
-
-private val PrezelPlayerResourceMarkerItem.resourceMarkerType: PrezelPlayerResourceMarkerType
-    get() = when (this) {
-        is PrezelPlayerResourceMarkerItem.Speech -> type.markerType
-        is PrezelPlayerResourceMarkerItem.ScriptMatch -> type.markerType
-    }
+private fun PrezelPlayerResourceMarkerItem.matchesTrackType(type: PrezelPlayerResourceTrackType): Boolean = trackType == type
 
 private fun PrezelPlayerResourceMarkerItem.progressIn(durationMillis: Long): Float =
     if (durationMillis <= 0L) {
@@ -207,15 +196,3 @@ private fun BoxWithConstraintsScope.PlayerTimelineHandle(
             .zIndex(zIndex),
     )
 }
-
-private val PrezelSpeechMarkerType.markerType: PrezelPlayerResourceMarkerType
-    get() = when (this) {
-        PrezelSpeechMarkerType.GOOD -> PrezelPlayerResourceMarkerType.GOOD
-        PrezelSpeechMarkerType.WARNING -> PrezelPlayerResourceMarkerType.WARNING
-    }
-
-private val PrezelScriptMatchMarkerType.markerType: PrezelPlayerResourceMarkerType
-    get() = when (this) {
-        PrezelScriptMatchMarkerType.GOOD -> PrezelPlayerResourceMarkerType.GOOD
-        PrezelScriptMatchMarkerType.NEUTRAL -> PrezelPlayerResourceMarkerType.NEUTRAL
-    }

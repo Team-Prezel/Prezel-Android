@@ -9,19 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
-enum class PrezelPlayerResourceMarkerType {
-    GOOD,
-    WARNING,
-    NEUTRAL,
-}
-
 @Composable
-fun PrezelPlayerResourceMarker(
+internal fun PrezelPlayerResourceMarker(
     type: PrezelPlayerResourceMarkerType,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +35,7 @@ private val PrezelPlayerResourceMarkerType.color: Color
         PrezelPlayerResourceMarkerType.NEUTRAL -> PrezelTheme.colors.iconRegular
     }
 
-@Preview(showBackground = true)
+@BasicPreview
 @Composable
 private fun PrezelPlayerResourceMarkerPreview() {
     PrezelTheme {
