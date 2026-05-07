@@ -22,8 +22,6 @@ enum class PrezelPlayerResourceMarkerType {
     NEUTRAL,
 }
 
-internal val PlayerMarkerSize = 8.dp
-
 @Composable
 fun PrezelPlayerResourceMarker(
     type: PrezelPlayerResourceMarkerType,
@@ -31,13 +29,13 @@ fun PrezelPlayerResourceMarker(
 ) {
     Box(
         modifier = modifier
-            .size(PlayerMarkerSize)
+            .size(8.dp)
             .clip(PrezelTheme.shapes.V1000)
             .background(type.color),
     )
 }
 
-val PrezelPlayerResourceMarkerType.color: Color
+private val PrezelPlayerResourceMarkerType.color: Color
     @Composable
     get() = when (this) {
         PrezelPlayerResourceMarkerType.GOOD -> PrezelTheme.colors.feedbackGoodRegular

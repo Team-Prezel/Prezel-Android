@@ -1,6 +1,5 @@
 package com.team.prezel.core.designsystem.component.player
 
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +17,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -35,7 +38,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun PrezelPlayer(
     playing: Boolean,
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
     durationMillis: Long,
     currentMillis: Long,
     markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
@@ -55,7 +57,6 @@ fun PrezelPlayer(
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
     ) {
         PrezelPlayerTrackSection(
-            progress = progress,
             durationMillis = durationMillis,
             currentMillis = currentMillis,
             markers = markers,
@@ -76,7 +77,6 @@ fun PrezelPlayer(
 
 @Composable
 private fun PrezelPlayerTrackSection(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
     durationMillis: Long,
     currentMillis: Long,
     markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
@@ -86,7 +86,6 @@ private fun PrezelPlayerTrackSection(
     onSeek: (Float) -> Unit,
 ) {
     PrezelPlayerResourceTrack(
-        progress = progress,
         durationMillis = durationMillis,
         currentMillis = currentMillis,
         markers = markers,
@@ -115,19 +114,28 @@ private fun PrezelPlayerControls(
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PrezelPlayerSeekButton(iconResId = PrezelIcons.SkipBackward, onClick = onBackwardClick)
+        PrezelPlayerSeekButton(
+            iconResId = PrezelIcons.SkipBackward,
+            contentDescription = stringResource(R.string.core_designsystem_player_backward_desc),
+            onClick = onBackwardClick,
+        )
         PrezelPlayerPlayPauseButton(
             playing = playing,
             onClick = onPlayPauseClick,
             modifier = Modifier.weight(1f),
         )
-        PrezelPlayerSeekButton(iconResId = PrezelIcons.SkipForward, onClick = onForwardClick)
+        PrezelPlayerSeekButton(
+            iconResId = PrezelIcons.SkipForward,
+            contentDescription = stringResource(R.string.core_designsystem_player_forward_desc),
+            onClick = onForwardClick,
+        )
     }
 }
 
 @Composable
 private fun PrezelPlayerSeekButton(
     iconResId: Int,
+    contentDescription: String,
     onClick: () -> Unit,
 ) {
     PrezelIconButton(
@@ -135,7 +143,9 @@ private fun PrezelPlayerSeekButton(
         type = ButtonType.GHOST,
         hierarchy = ButtonHierarchy.SECONDARY,
         onClick = onClick,
-        modifier = Modifier.widthIn(min = 80.dp),
+        modifier = Modifier
+            .widthIn(min = 80.dp)
+            .semantics { this.contentDescription = contentDescription },
     )
 }
 
@@ -145,10 +155,19 @@ private fun PrezelPlayerPlayPauseButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val playContentDescription = stringResource(R.string.core_designsystem_player_play_desc)
+    val pauseContentDescription = stringResource(R.string.core_designsystem_player_pause_desc)
+
     PrezelIconButton(
         iconResId = if (playing) PrezelIcons.Pause else PrezelIcons.Play,
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics {
+            contentDescription = if (playing) {
+                pauseContentDescription
+            } else {
+                playContentDescription
+            }
+        },
         buttonDefault = PrezelButtonDefaults.getDefault(
             isIconOnly = true,
             type = ButtonType.FILLED,
@@ -169,9 +188,8 @@ private fun PrezelPlayerPreview() {
             PlayerPreviewItem(name = "playing=off") {
                 PrezelPlayer(
                     playing = false,
-                    progress = 0.671f,
-                    durationMillis = 690_000,
-                    currentMillis = 443_000,
+                    durationMillis = 690_000L,
+                    currentMillis = 100_000L,
                     markers = previewMarkers,
                     onPlayPauseClick = {},
                     onBackwardClick = {},
@@ -183,9 +201,8 @@ private fun PrezelPlayerPreview() {
             PlayerPreviewItem(name = "playing=on") {
                 PrezelPlayer(
                     playing = true,
-                    progress = 0.671f,
-                    durationMillis = 690_000,
-                    currentMillis = 443_000,
+                    durationMillis = 690_000L,
+                    currentMillis = 100_000L,
                     markers = previewMarkers,
                     onPlayPauseClick = {},
                     onBackwardClick = {},
@@ -203,9 +220,8 @@ private fun PrezelPlayerPreview() {
 private fun PrezelPlayerPlaybackPreview() {
     PrezelTheme {
         var playing by remember { mutableStateOf(false) }
-        var currentMillis by remember { mutableLongStateOf(443_000L) }
+        var currentMillis by remember { mutableLongStateOf(100_000L) }
         val durationMillis = 690_000L
-        val progress = (currentMillis.toFloat() / durationMillis).coerceIn(0f, 1f)
 
         LaunchedEffect(playing) {
             while (playing) {
@@ -219,7 +235,6 @@ private fun PrezelPlayerPlaybackPreview() {
             PlayerPreviewItem(name = if (playing) "playing" else "paused") {
                 PrezelPlayer(
                     playing = playing,
-                    progress = progress,
                     durationMillis = durationMillis,
                     currentMillis = currentMillis,
                     markers = previewMarkers,
@@ -253,7 +268,7 @@ private fun PlayerPreviewItem(
 }
 
 private val previewMarkers = persistentListOf(
-    PrezelPlayerResourceMarkerItem.speech(position = 0.2188f, type = PrezelSpeechMarkerType.WARNING),
-    PrezelPlayerResourceMarkerItem.speech(position = 0.4594f, type = PrezelSpeechMarkerType.GOOD),
-    PrezelPlayerResourceMarkerItem.speech(position = 0.6469f, type = PrezelSpeechMarkerType.WARNING),
+    PrezelPlayerResourceMarkerItem.speech(timeSeconds = 151, type = PrezelSpeechMarkerType.WARNING),
+    PrezelPlayerResourceMarkerItem.speech(timeSeconds = 317, type = PrezelSpeechMarkerType.GOOD),
+    PrezelPlayerResourceMarkerItem.speech(timeSeconds = 443, type = PrezelSpeechMarkerType.WARNING),
 )

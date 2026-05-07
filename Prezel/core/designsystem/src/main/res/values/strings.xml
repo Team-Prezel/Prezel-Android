@@ -6,6 +6,12 @@
     <string name="core_designsystem_checkbox_desc">체크박스</string>
     <string name="core_designsystem_date_picker_confirm_btn">선택하기</string>
     <string name="core_designsystem_date_picker_month_title">%1$d년 %2$d월</string>
+    <string name="core_designsystem_player_backward_desc">뒤로 이동</string>
+    <string name="core_designsystem_player_forward_desc">앞으로 이동</string>
+    <string name="core_designsystem_player_pause_desc">일시정지</string>
+    <string name="core_designsystem_player_play_desc">재생</string>
+    <string name="core_designsystem_player_script_match_track_desc">스크립트 일치 트랙</string>
+    <string name="core_designsystem_player_speech_track_desc">발화 트랙</string>
 
     <string-array name="core_designsystem_weekday_labels">
         <item>일</item>
