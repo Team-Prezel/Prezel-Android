@@ -11,6 +11,7 @@ dependencies {
     implementation(projects.coreModel)
 
     implementation(projects.featureMyApi)
+    implementation(projects.featureSettingApi)
     implementation(projects.featureProfileApi)
 
     implementation(libs.kotlinx.collections.immutable)

@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.team.prezel.core.auth.AuthManager
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
@@ -153,16 +154,6 @@ private fun LoginFooter(
     modifier: Modifier = Modifier,
 ) {
     var isButtonVisible by remember { mutableStateOf(false) }
-    val startWithKakaoLabel = stringResource(R.string.feature_login_impl_start_with_kakao)
-    val kakaoButtonConfig = PrezelButtonDefaults.getDefault(
-        isIconOnly = false,
-        type = ButtonType.FILLED,
-        size = ButtonSize.REGULAR,
-        hierarchy = ButtonHierarchy.SECONDARY,
-        isRounded = false,
-        backgroundColor = Color(0xFFFEE500),
-        contentColor = PrezelTheme.colors.textLarge,
-    )
 
     LaunchedEffect(Unit) {
         isButtonVisible = true
@@ -180,15 +171,26 @@ private fun LoginFooter(
         ),
         exit = ExitTransition.None,
     ) {
-        PrezelButtonArea {
-            CustomButton(
-                iconResId = PrezelIcons.Kakao,
-                label = startWithKakaoLabel,
-                enabled = enabled,
-                onClick = onLogin,
-                config = kakaoButtonConfig,
-            )
-        }
+        PrezelButtonArea(
+            mainButton = { modifier ->
+                PrezelButton(
+                    modifier = modifier,
+                    text = stringResource(R.string.feature_login_impl_start_with_kakao),
+                    iconResId = PrezelIcons.Kakao,
+                    enabled = enabled,
+                    onClick = onLogin,
+                    config = PrezelButtonDefaults.getDefault(
+                        isIconOnly = false,
+                        type = ButtonType.FILLED,
+                        size = ButtonSize.REGULAR,
+                        hierarchy = ButtonHierarchy.SECONDARY,
+                        isRounded = false,
+                        backgroundColor = Color(0xFFFEE500),
+                        contentColor = PrezelTheme.colors.textLarge,
+                    ),
+                )
+            },
+        )
     }
 }
 
