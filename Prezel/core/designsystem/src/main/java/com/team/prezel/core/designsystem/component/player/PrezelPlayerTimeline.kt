@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,6 +82,7 @@ internal fun PrezelPlayerTimeline(
     }
 }
 
+@Composable
 private fun Modifier.playerTimelineModifier(
     progress: Float,
     contentDescription: String,
@@ -89,19 +91,23 @@ private fun Modifier.playerTimelineModifier(
     onSetProgress: (Float) -> Unit,
     onDragStarted: (Float) -> Unit,
     onDragStopped: () -> Unit,
-): Modifier =
-    fillMaxWidth()
+): Modifier {
+    val currentOnSeekTo by rememberUpdatedState(onSeekTo)
+    val currentOnDragStarted by rememberUpdatedState(onDragStarted)
+    val currentOnDragStopped by rememberUpdatedState(onDragStopped)
+
+    return fillMaxWidth()
         .height(16.dp)
         .onSizeChanged { onWidthChanged(it.width) }
-        .pointerInput(onSeekTo) {
-            detectTapGestures { offset -> onSeekTo(offset.x) }
-        }.pointerInput(onSeekTo, onDragStarted, onDragStopped) {
+        .pointerInput(Unit) {
+            detectTapGestures { offset -> currentOnSeekTo(offset.x) }
+        }.pointerInput(Unit) {
             detectHorizontalDragGestures(
-                onDragStart = { offset -> onDragStarted(offset.x) },
-                onDragEnd = onDragStopped,
-                onDragCancel = onDragStopped,
+                onDragStart = { offset -> currentOnDragStarted(offset.x) },
+                onDragEnd = currentOnDragStopped,
+                onDragCancel = currentOnDragStopped,
                 onHorizontalDrag = { change, _ ->
-                    onSeekTo(change.position.x)
+                    currentOnSeekTo(change.position.x)
                     change.consume()
                 },
             )
@@ -113,6 +119,7 @@ private fun Modifier.playerTimelineModifier(
                 true
             }
         }
+}
 
 @Composable
 private fun PlayerTimelineBar(

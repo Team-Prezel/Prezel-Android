@@ -2,19 +2,16 @@ package com.team.prezel.core.designsystem.component.player
 
 import androidx.compose.runtime.Immutable
 
-@Immutable
 enum class PrezelPlayerResourceTrackType {
     SPEECH,
     SCRIPT_MATCH,
 }
 
-@Immutable
 enum class PrezelSpeechMarkerType {
     GOOD,
     WARNING,
 }
 
-@Immutable
 enum class PrezelScriptMatchMarkerType {
     GOOD,
     NEUTRAL,
