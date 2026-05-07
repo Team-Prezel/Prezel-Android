@@ -3,13 +3,17 @@ package com.team.prezel.core.designsystem.component.player
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,16 +33,19 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.roundToInt
 
 @Composable
 internal fun PrezelPlayerTimeline(
     progress: Float,
     durationMillis: Long,
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
-    type: PrezelPlayerResourceTrackType,
+    items: ImmutableList<PrezelPlayerItem>,
     contentDescription: String,
     showHandle: Boolean,
     onSeek: (Float) -> Unit,
@@ -72,12 +79,11 @@ internal fun PrezelPlayerTimeline(
             playedBarVisible = !showHandle,
         )
         PlayerTimelineMarkers(
-            markers = markers,
-            type = type,
+            items = items,
             durationMillis = durationMillis,
         )
 
-        if (showHandle) PlayerTimelineHandle(progress = progress, zIndex = markers.size + 1f)
+        if (showHandle) PlayerTimelineHandle(progress = progress, zIndex = items.size + 1f)
     }
 }
 
@@ -149,34 +155,31 @@ private fun PlayerTimelinePlayedBar(progress: Float) {
 
 @Composable
 private fun BoxWithConstraintsScope.PlayerTimelineMarkers(
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
-    type: PrezelPlayerResourceTrackType,
+    items: ImmutableList<PrezelPlayerItem>,
     durationMillis: Long,
 ) {
     var visibleMarkerIndex = 0
-    markers.forEach { marker ->
-        if (marker.matchesTrackType(type)) {
-            PrezelPlayerResourceMarker(
-                type = marker.markerType,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset {
-                        val markerX = ((maxWidth.toPx() - 8.dp.toPx()) * marker.progressIn(durationMillis)).roundToInt()
-                        IntOffset(x = markerX, y = 0)
-                    }.zIndex(visibleMarkerIndex.toFloat()),
-            )
-            visibleMarkerIndex += 1
-        }
+    items.forEach { item ->
+        if (item !is PrezelPlayerItem.Marker) return@forEach
+
+        PrezelPlayerResourceMarker(
+            type = item.markerType,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset {
+                    val markerX = ((maxWidth.toPx() - 8.dp.toPx()) * item.progressIn(durationMillis)).roundToInt()
+                    IntOffset(x = markerX, y = 0)
+                }.zIndex(visibleMarkerIndex.toFloat()),
+        )
+        visibleMarkerIndex += 1
     }
 }
 
-private fun PrezelPlayerResourceMarkerItem.matchesTrackType(type: PrezelPlayerResourceTrackType): Boolean = trackType == type
-
-private fun PrezelPlayerResourceMarkerItem.progressIn(durationMillis: Long): Float =
+private fun PrezelPlayerItem.progressIn(durationMillis: Long): Float =
     if (durationMillis <= 0L) {
         0f
     } else {
-        (timeSeconds * 1_000f / durationMillis).coerceIn(0f, 1f)
+        (timeMillis.toFloat() / durationMillis).coerceIn(0f, 1f)
     }
 
 @Composable
@@ -196,3 +199,111 @@ private fun BoxWithConstraintsScope.PlayerTimelineHandle(
             .zIndex(zIndex),
     )
 }
+
+@BasicPreview
+@Composable
+private fun PrezelPlayerTimelinePreview() {
+    PrezelTheme {
+        PreviewSection(title = "Player Timeline") {
+            PreviewColumn {
+                TimelinePreviewItem(name = "played bar") {
+                    PrezelPlayerTimeline(
+                        progress = 0.64f,
+                        durationMillis = 690_000L,
+                        items = previewTimelineItems,
+                        contentDescription = "발화 트랙",
+                        showHandle = false,
+                        onSeek = {},
+                        onDragStarted = {},
+                        onDragStopped = {},
+                        modifier = Modifier.width(320.dp),
+                    )
+                }
+                TimelinePreviewItem(name = "drag handle") {
+                    PrezelPlayerTimeline(
+                        progress = 0.64f,
+                        durationMillis = 690_000L,
+                        items = previewTimelineItems,
+                        contentDescription = "발화 트랙",
+                        showHandle = true,
+                        onSeek = {},
+                        onDragStarted = {},
+                        onDragStopped = {},
+                        modifier = Modifier.width(320.dp),
+                    )
+                }
+                TimelinePreviewItem(name = "overlapping markers") {
+                    PrezelPlayerTimeline(
+                        progress = 0.46f,
+                        durationMillis = 690_000L,
+                        items = previewOverlappingTimelineItems,
+                        contentDescription = "발화 트랙",
+                        showHandle = false,
+                        onSeek = {},
+                        onDragStarted = {},
+                        onDragStopped = {},
+                        modifier = Modifier.width(320.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimelinePreviewItem(
+    name: String,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+    ) {
+        Text(
+            text = name,
+            style = PrezelTheme.typography.body3Medium,
+            color = PrezelTheme.colors.textMedium,
+        )
+        content()
+    }
+}
+
+private val previewTimelineItems = persistentListOf(
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 90_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 151_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+    PrezelPlayerItem.Segment(timeMillis = 234_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
+    ),
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+)
+
+private val previewOverlappingTimelineItems = persistentListOf(
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 90_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 151_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+    PrezelPlayerItem.Segment(timeMillis = 234_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
+    ),
+    PrezelPlayerItem.Segment(timeMillis = 360_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 438_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
+    ),
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+)

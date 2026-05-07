@@ -38,21 +38,20 @@ import kotlinx.coroutines.delay
 @Composable
 fun PrezelPlayer(
     state: PrezelPlayerState,
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
+    trackContentDescription: String,
     modifier: Modifier = Modifier,
-    trackType: PrezelPlayerResourceTrackType = PrezelPlayerResourceTrackType.SPEECH,
 ) {
     PrezelPlayerContent(
         playing = state.playing,
         durationMillis = state.durationMillis,
         currentMillis = state.currentMillis,
-        markers = markers,
+        items = state.items,
+        trackContentDescription = trackContentDescription,
         onPlayPauseClick = state::playPause,
         onPreviousClick = state::moveToPreviousItem,
         onNextClick = state::moveToNextItem,
         onSeek = state::seekToProgress,
         modifier = modifier,
-        trackType = trackType,
         idle = state.idle,
         showHandle = state.showHandle,
         onDragStarted = state::startDrag,
@@ -67,13 +66,13 @@ private fun PrezelPlayerContent(
     playing: Boolean,
     durationMillis: Long,
     currentMillis: Long,
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
+    items: ImmutableList<PrezelPlayerItem>,
+    trackContentDescription: String,
     onPlayPauseClick: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     onSeek: (Float) -> Unit,
     modifier: Modifier = Modifier,
-    trackType: PrezelPlayerResourceTrackType = PrezelPlayerResourceTrackType.SPEECH,
     idle: Boolean = false,
     showHandle: Boolean = false,
     onDragStarted: () -> Unit = {},
@@ -90,8 +89,8 @@ private fun PrezelPlayerContent(
         PrezelPlayerTrackSection(
             durationMillis = durationMillis,
             currentMillis = currentMillis,
-            markers = markers,
-            trackType = trackType,
+            items = items,
+            trackContentDescription = trackContentDescription,
             idle = idle,
             showHandle = showHandle,
             onSeek = onSeek,
@@ -114,8 +113,8 @@ private fun PrezelPlayerContent(
 private fun PrezelPlayerTrackSection(
     durationMillis: Long,
     currentMillis: Long,
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
-    trackType: PrezelPlayerResourceTrackType,
+    items: ImmutableList<PrezelPlayerItem>,
+    trackContentDescription: String,
     idle: Boolean,
     showHandle: Boolean,
     onSeek: (Float) -> Unit,
@@ -125,8 +124,8 @@ private fun PrezelPlayerTrackSection(
     PrezelPlayerResourceTrack(
         durationMillis = durationMillis,
         currentMillis = currentMillis,
-        markers = markers,
-        type = trackType,
+        items = items,
+        contentDescription = trackContentDescription,
         idle = idle,
         showHandle = showHandle,
         onSeek = onSeek,
@@ -240,7 +239,7 @@ private fun PrezelPlayerPreview() {
                         onPlayPauseClick = {},
                         onSeekToMillis = {},
                     ),
-                    markers = previewMarkers,
+                    trackContentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                     modifier = Modifier.width(360.dp),
                 )
             }
@@ -254,7 +253,7 @@ private fun PrezelPlayerPreview() {
                         onPlayPauseClick = {},
                         onSeekToMillis = {},
                     ),
-                    markers = previewMarkers,
+                    trackContentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                     modifier = Modifier.width(360.dp),
                 )
             }
@@ -290,7 +289,7 @@ private fun PrezelPlayerPlaybackPreview() {
             PlayerPreviewItem(name = if (playing) "playing" else "paused") {
                 PrezelPlayer(
                     state = playerState,
-                    markers = previewMarkers,
+                    trackContentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                     modifier = Modifier.width(360.dp),
                 )
             }
@@ -315,27 +314,20 @@ private fun PlayerPreviewItem(
     }
 }
 
-private val previewMarkers = persistentListOf(
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 151,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
-    ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 317,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.GOOD,
-    ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 443,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
-    ),
-)
-
 private val previewPlayerItems = persistentListOf(
-    PrezelPlayerItem(id = "preview-script-item-0", startMillis = 0L),
-    PrezelPlayerItem(id = "preview-script-item-1", startMillis = 151_000L),
-    PrezelPlayerItem(id = "preview-script-item-2", startMillis = 317_000L),
-    PrezelPlayerItem(id = "preview-script-item-3", startMillis = 443_000L),
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 90_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 151_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+    PrezelPlayerItem.Segment(timeMillis = 234_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
+    ),
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
 )

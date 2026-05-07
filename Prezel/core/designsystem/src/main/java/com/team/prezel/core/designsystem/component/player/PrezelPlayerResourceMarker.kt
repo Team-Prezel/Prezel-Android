@@ -16,7 +16,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Composable
 internal fun PrezelPlayerResourceMarker(
-    type: PrezelPlayerResourceMarkerType,
+    type: PrezelPlayerMarkerType,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -27,12 +27,12 @@ internal fun PrezelPlayerResourceMarker(
     )
 }
 
-private val PrezelPlayerResourceMarkerType.color: Color
+private val PrezelPlayerMarkerType.color: Color
     @Composable
     get() = when (this) {
-        PrezelPlayerResourceMarkerType.GOOD -> PrezelTheme.colors.feedbackGoodRegular
-        PrezelPlayerResourceMarkerType.WARNING -> PrezelTheme.colors.feedbackWarningRegular
-        PrezelPlayerResourceMarkerType.NEUTRAL -> PrezelTheme.colors.iconRegular
+        PrezelPlayerMarkerType.GOOD -> PrezelTheme.colors.feedbackGoodRegular
+        PrezelPlayerMarkerType.WARNING -> PrezelTheme.colors.feedbackWarningRegular
+        PrezelPlayerMarkerType.NEUTRAL -> PrezelTheme.colors.iconRegular
     }
 
 @BasicPreview
@@ -41,9 +41,9 @@ private fun PrezelPlayerResourceMarkerPreview() {
     PrezelTheme {
         PreviewSection(title = "Player Resource Marker") {
             Row(horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16)) {
-                PrezelPlayerResourceMarker(type = PrezelPlayerResourceMarkerType.GOOD)
-                PrezelPlayerResourceMarker(type = PrezelPlayerResourceMarkerType.WARNING)
-                PrezelPlayerResourceMarker(type = PrezelPlayerResourceMarkerType.NEUTRAL)
+                PrezelPlayerResourceMarker(type = PrezelPlayerMarkerType.GOOD)
+                PrezelPlayerResourceMarker(type = PrezelPlayerMarkerType.WARNING)
+                PrezelPlayerResourceMarker(type = PrezelPlayerMarkerType.NEUTRAL)
             }
         }
     }

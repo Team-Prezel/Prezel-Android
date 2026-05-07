@@ -76,15 +76,12 @@ class PrezelPlayerState internal constructor(
     val showHandle: Boolean
         get() = dragging
 
-    val currentItemIndex: Int
+    private val currentItemIndex: Int
         get() = if (items.isEmpty()) {
             -1
         } else {
-            items.indexOfLast { item -> currentMillis >= item.startMillis }.coerceAtLeast(0)
+            items.indexOfLast { item -> currentMillis >= item.timeMillis }.coerceAtLeast(0)
         }
-
-    val currentItem: PrezelPlayerItem?
-        get() = items.getOrNull(currentItemIndex)
 
     val previousEnabled: Boolean
         get() = currentItemIndex > 0
@@ -101,11 +98,11 @@ class PrezelPlayerState internal constructor(
     }
 
     fun moveToPreviousItem() {
-        if (previousEnabled) seekToMillis(items[currentItemIndex - 1].startMillis)
+        if (previousEnabled) seekToMillis(items[currentItemIndex - 1].timeMillis)
     }
 
     fun moveToNextItem() {
-        if (nextEnabled) seekToMillis(items[currentItemIndex + 1].startMillis)
+        if (nextEnabled) seekToMillis(items[currentItemIndex + 1].timeMillis)
     }
 
     fun startDrag() {
@@ -117,7 +114,9 @@ class PrezelPlayerState internal constructor(
     }
 
     private fun seekToMillis(targetMillis: Long) {
-        onSeekToMillis(targetMillis.coercePlayerMillis(durationMillis))
+        val coercedMillis = targetMillis.coercePlayerMillis(durationMillis)
+        if (dragging) currentMillis = coercedMillis
+        onSeekToMillis(coercedMillis)
     }
 
     internal fun update(
@@ -128,7 +127,11 @@ class PrezelPlayerState internal constructor(
     ) {
         this.playing = playing
         this.durationMillis = durationMillis.coerceAtLeast(0L)
-        this.currentMillis = currentMillis.coercePlayerMillis(this.durationMillis)
+        if (!dragging) {
+            this.currentMillis = currentMillis.coercePlayerMillis(this.durationMillis)
+        } else {
+            this.currentMillis = this.currentMillis.coercePlayerMillis(this.durationMillis)
+        }
         this.items = items
     }
 }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +24,10 @@ import kotlinx.collections.immutable.persistentListOf
 internal fun PrezelPlayerResourceTrack(
     durationMillis: Long,
     currentMillis: Long,
-    markers: ImmutableList<PrezelPlayerResourceMarkerItem>,
+    items: ImmutableList<PrezelPlayerItem>,
+    contentDescription: String,
     onSeek: (Float) -> Unit,
     modifier: Modifier = Modifier,
-    type: PrezelPlayerResourceTrackType = PrezelPlayerResourceTrackType.SPEECH,
     idle: Boolean = false,
     showHandle: Boolean = false,
     onDragStarted: () -> Unit = {},
@@ -36,25 +36,21 @@ internal fun PrezelPlayerResourceTrack(
     val displayedDurationMillis = durationMillis.coerceAtLeast(0L)
     val displayedCurrentMillis = if (idle) 0L else currentMillis.coercePlayerMillis(displayedDurationMillis)
     val displayedProgress = if (idle) 0f else displayedCurrentMillis.toPlayerProgress(displayedDurationMillis)
-    val timelineContentDescription = stringResource(type.contentDescriptionResId)
 
     Column(
-        modifier = modifier.height(40.dp),
+        modifier = modifier.heightIn(min = 40.dp),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
     ) {
         PrezelPlayerTimeline(
             progress = displayedProgress,
             durationMillis = displayedDurationMillis,
-            markers = markers,
-            type = type,
-            contentDescription = timelineContentDescription,
+            items = items,
+            contentDescription = contentDescription,
             showHandle = showHandle,
             onSeek = onSeek,
             onDragStarted = onDragStarted,
             onDragStopped = onDragStopped,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         PlayerTrackTimeLabels(
@@ -103,38 +99,32 @@ private fun Long.formatPlayerTime(): String {
     return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 }
 
-private val PrezelPlayerResourceTrackType.contentDescriptionResId: Int
-    get() = when (this) {
-        PrezelPlayerResourceTrackType.SPEECH -> R.string.core_designsystem_player_speech_track_desc
-        PrezelPlayerResourceTrackType.SCRIPT_MATCH -> R.string.core_designsystem_player_script_match_track_desc
-    }
-
 @BasicPreview
 @Composable
 private fun PrezelPlayerResourceTrackPreview() {
     PrezelTheme {
         PreviewSection(title = "Player Resource Track") {
             PreviewColumn {
-                PlayerResourceTrackPreviewItem(name = "type=speech / idle=off / showHandle=off") {
+                PlayerResourceTrackPreviewItem(name = "speech / idle=off / showHandle=off") {
                     PrezelPlayerResourceTrack(
                         durationMillis = 690_000,
                         currentMillis = 443_000,
-                        markers = previewSpeechMarkers,
+                        items = previewSpeechItems,
+                        contentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                         onSeek = {},
                         modifier = Modifier.width(320.dp),
-                        type = PrezelPlayerResourceTrackType.SPEECH,
                         idle = false,
                         showHandle = false,
                     )
                 }
-                PlayerResourceTrackPreviewItem(name = "type=scriptMatch / idle=off / showHandle=off") {
+                PlayerResourceTrackPreviewItem(name = "script match / idle=off / showHandle=off") {
                     PrezelPlayerResourceTrack(
                         durationMillis = 690_000,
                         currentMillis = 443_000,
-                        markers = previewScriptMatchMarkers,
+                        items = previewScriptMatchItems,
+                        contentDescription = stringResource(R.string.core_designsystem_player_script_match_track_desc),
                         onSeek = {},
                         modifier = Modifier.width(320.dp),
-                        type = PrezelPlayerResourceTrackType.SCRIPT_MATCH,
                         idle = false,
                         showHandle = false,
                     )
@@ -143,7 +133,8 @@ private fun PrezelPlayerResourceTrackPreview() {
                     PrezelPlayerResourceTrack(
                         durationMillis = 690_000,
                         currentMillis = 443_000,
-                        markers = previewSpeechMarkers,
+                        items = previewSpeechItems,
+                        contentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                         onSeek = {},
                         modifier = Modifier.width(320.dp),
                         idle = true,
@@ -153,7 +144,8 @@ private fun PrezelPlayerResourceTrackPreview() {
                     PrezelPlayerResourceTrack(
                         durationMillis = 690_000,
                         currentMillis = 443_000,
-                        markers = previewSpeechMarkers,
+                        items = previewSpeechItems,
+                        contentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                         onSeek = {},
                         modifier = Modifier.width(320.dp),
                         showHandle = true,
@@ -163,7 +155,8 @@ private fun PrezelPlayerResourceTrackPreview() {
                     PrezelPlayerResourceTrack(
                         durationMillis = 690_000,
                         currentMillis = 443_000,
-                        markers = previewOverlappingMarkers,
+                        items = previewOverlappingItems,
+                        contentDescription = stringResource(R.string.core_designsystem_player_speech_track_desc),
                         onSeek = {},
                         modifier = Modifier.width(320.dp),
                     )
@@ -190,56 +183,56 @@ private fun PlayerResourceTrackPreviewItem(
     }
 }
 
-private val previewSpeechMarkers = persistentListOf(
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 151,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
+private val previewSpeechItems = persistentListOf(
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 90_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 151_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
     ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 317,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.GOOD,
+    PrezelPlayerItem.Segment(timeMillis = 234_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
     ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 443,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
-    ),
-)
-
-private val previewScriptMatchMarkers = persistentListOf(
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 317,
-        trackType = PrezelPlayerResourceTrackType.SCRIPT_MATCH,
-        markerType = PrezelPlayerResourceMarkerType.GOOD,
-    ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 443,
-        trackType = PrezelPlayerResourceTrackType.SCRIPT_MATCH,
-        markerType = PrezelPlayerResourceMarkerType.NEUTRAL,
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
     ),
 )
 
-private val previewOverlappingMarkers = persistentListOf(
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 317,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.GOOD,
+private val previewScriptMatchItems = persistentListOf(
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 151_000L),
+    PrezelPlayerItem.Segment(timeMillis = 234_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
     ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 438,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.GOOD,
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.NEUTRAL,
     ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 151,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
+)
+
+private val previewOverlappingItems = persistentListOf(
+    PrezelPlayerItem.Segment(timeMillis = 0L),
+    PrezelPlayerItem.Segment(timeMillis = 151_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 317_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
     ),
-    PrezelPlayerResourceMarkerItem(
-        timeSeconds = 443,
-        trackType = PrezelPlayerResourceTrackType.SPEECH,
-        markerType = PrezelPlayerResourceMarkerType.WARNING,
+    PrezelPlayerItem.Segment(timeMillis = 360_000L),
+    PrezelPlayerItem.Marker(
+        timeMillis = 438_000L,
+        markerType = PrezelPlayerMarkerType.GOOD,
+    ),
+    PrezelPlayerItem.Marker(
+        timeMillis = 151_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
+    ),
+    PrezelPlayerItem.Marker(
+        timeMillis = 443_000L,
+        markerType = PrezelPlayerMarkerType.WARNING,
     ),
 )

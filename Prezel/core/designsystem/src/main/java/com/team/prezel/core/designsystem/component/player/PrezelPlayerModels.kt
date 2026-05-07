@@ -2,26 +2,24 @@ package com.team.prezel.core.designsystem.component.player
 
 import androidx.compose.runtime.Immutable
 
-enum class PrezelPlayerResourceTrackType {
-    SPEECH,
-    SCRIPT_MATCH,
-}
-
-enum class PrezelPlayerResourceMarkerType {
+enum class PrezelPlayerMarkerType {
     GOOD,
     WARNING,
     NEUTRAL,
 }
 
 @Immutable
-data class PrezelPlayerItem(
-    val id: String,
-    val startMillis: Long,
-)
+sealed interface PrezelPlayerItem {
+    val timeMillis: Long
 
-@Immutable
-data class PrezelPlayerResourceMarkerItem(
-    val timeSeconds: Long,
-    val trackType: PrezelPlayerResourceTrackType,
-    val markerType: PrezelPlayerResourceMarkerType,
-)
+    @Immutable
+    data class Segment(
+        override val timeMillis: Long,
+    ) : PrezelPlayerItem
+
+    @Immutable
+    data class Marker(
+        override val timeMillis: Long,
+        val markerType: PrezelPlayerMarkerType,
+    ) : PrezelPlayerItem
+}
