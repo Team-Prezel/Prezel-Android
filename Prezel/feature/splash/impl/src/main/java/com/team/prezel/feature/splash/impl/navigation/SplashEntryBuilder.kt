@@ -32,7 +32,7 @@ internal fun EntryProviderScope<NavKey>.featureSplashEntryBuilder() {
                 },
                 navigateToTerms = {
                     navigator.replaceRoot(LoginNavKey)
-                    navigator.navigate(TermsNavKey)
+                    navigator.navigate(TermsNavKey.List)
                 },
                 navigateToCreateProfile = {
                     navigator.replaceRoot(LoginNavKey)

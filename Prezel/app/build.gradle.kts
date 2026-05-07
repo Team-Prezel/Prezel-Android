@@ -50,6 +50,8 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
     implementation(projects.featureMyImpl)
+    implementation(projects.featureSettingApi)
+    implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
 
     implementation(libs.androidx.core.ktx)

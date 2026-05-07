@@ -6,6 +6,7 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.my.api.MyNavKey
 import com.team.prezel.feature.my.impl.MyScreen
 import com.team.prezel.feature.profile.api.ProfileNavKey
+import com.team.prezel.feature.setting.api.SettingNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,7 @@ internal fun EntryProviderScope<NavKey>.featureMyEntryBuilder() {
 
         MyScreen(
             navigateToEditProfile = { navigator.navigate(ProfileNavKey.Edit) },
-            navigateToSetting = { /* navigator.navigate(ProfileNavKey.Setting) */ },
+            navigateToSetting = { navigator.navigate(SettingNavKey) },
             navigateToBadge = { /* navigator.navigate(ProfileNavKey.Badge) */ },
         )
     }
