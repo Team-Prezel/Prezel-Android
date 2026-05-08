@@ -1,4 +1,4 @@
-package com.team.prezel.core.designsystem.component.chip.config
+package com.team.prezel.core.designsystem.component.chip.base
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke

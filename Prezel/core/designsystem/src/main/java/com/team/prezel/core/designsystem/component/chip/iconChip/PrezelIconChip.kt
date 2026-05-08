@@ -1,14 +1,10 @@
-package com.team.prezel.core.designsystem.component.chip
+package com.team.prezel.core.designsystem.component.chip.iconChip
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipLayout
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipState
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipStatus
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
+import com.team.prezel.core.designsystem.component.chip.base.PrezelChipLayout
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.LargeDevicePreview
 import com.team.prezel.core.designsystem.preview.PreviewMatrix
@@ -16,20 +12,45 @@ import com.team.prezel.core.designsystem.preview.PreviewMatrixColumn
 import com.team.prezel.core.designsystem.preview.PreviewMatrixRow
 import com.team.prezel.core.designsystem.preview.PreviewSection
 
+@Immutable
+enum class IconChipType {
+    FILLED,
+    OUTLINED,
+}
+
+@Immutable
+enum class IconChipSize {
+    SMALL,
+    REGULAR,
+}
+
+@Immutable
+enum class IconChipState {
+    DEFAULT,
+    ACTIVE,
+    DISABLED,
+}
+
+@Immutable
+enum class IconChipStatus {
+    DEFAULT,
+    BAD,
+}
+
 @Composable
 fun PrezelIconChip(
     @DrawableRes iconResId: Int,
     modifier: Modifier = Modifier,
-    type: PrezelChipType = PrezelChipType.FILLED,
-    size: PrezelChipSize = PrezelChipSize.REGULAR,
-    state: PrezelChipState = PrezelChipState.DEFAULT,
-    status: PrezelChipStatus = PrezelChipStatus.DEFAULT,
+    type: IconChipType = IconChipType.FILLED,
+    size: IconChipSize = IconChipSize.REGULAR,
+    state: IconChipState = IconChipState.DEFAULT,
+    status: IconChipStatus = IconChipStatus.DEFAULT,
 ) {
     PrezelChipLayout(
         modifier = modifier,
         text = null,
         iconResId = iconResId,
-        style = PrezelChipDefaults.iconChipStyle(
+        style = PrezelIconChipDefaults.getDefault(
             type = type,
             size = size,
             state = state,
@@ -39,17 +60,17 @@ fun PrezelIconChip(
 }
 
 private data class IconChipPreviewCase(
-    val type: PrezelChipType,
-    val size: PrezelChipSize = PrezelChipSize.REGULAR,
-    val state: PrezelChipState = PrezelChipState.DEFAULT,
-    val status: PrezelChipStatus = PrezelChipStatus.DEFAULT,
+    val type: IconChipType,
+    val size: IconChipSize = IconChipSize.REGULAR,
+    val state: IconChipState = IconChipState.DEFAULT,
+    val status: IconChipStatus = IconChipStatus.DEFAULT,
 )
 
 private val iconChipPreviewColumns = listOf(
-    PrezelChipSize.SMALL to PrezelChipType.FILLED,
-    PrezelChipSize.SMALL to PrezelChipType.OUTLINED,
-    PrezelChipSize.REGULAR to PrezelChipType.FILLED,
-    PrezelChipSize.REGULAR to PrezelChipType.OUTLINED,
+    IconChipSize.SMALL to IconChipType.FILLED,
+    IconChipSize.SMALL to IconChipType.OUTLINED,
+    IconChipSize.REGULAR to IconChipType.FILLED,
+    IconChipSize.REGULAR to IconChipType.OUTLINED,
 )
 
 private fun iconPreviewCases(transform: IconChipPreviewCase.() -> IconChipPreviewCase = { this }) =
@@ -78,19 +99,15 @@ private fun PrezelIconChipPreview() {
                 ),
                 PreviewMatrixRow(
                     label = "State / Active",
-                    values = iconPreviewCases { copy(state = PrezelChipState.ACTIVE) },
+                    values = iconPreviewCases { copy(state = IconChipState.ACTIVE) },
                 ),
                 PreviewMatrixRow(
                     label = "State / Disabled",
-                    values = iconPreviewCases { copy(state = PrezelChipState.DISABLED) },
+                    values = iconPreviewCases { copy(state = IconChipState.DISABLED) },
                 ),
                 PreviewMatrixRow(
                     label = "Status / Bad",
-                    values = iconPreviewCases { copy(status = PrezelChipStatus.BAD) },
-                ),
-                PreviewMatrixRow(
-                    label = "Status / Warning",
-                    values = iconPreviewCases { copy(status = PrezelChipStatus.WARNING) },
+                    values = iconPreviewCases { copy(status = IconChipStatus.BAD) },
                 ),
             ),
         ) { previewCase ->

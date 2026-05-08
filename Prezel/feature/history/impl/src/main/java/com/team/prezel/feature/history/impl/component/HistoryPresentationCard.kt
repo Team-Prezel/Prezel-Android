@@ -18,12 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
-import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipHierarchy
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipState
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipStatus
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
+import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
+import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
+import com.team.prezel.core.designsystem.component.chip.chip.ChipState
+import com.team.prezel.core.designsystem.component.chip.chip.ChipStatus
+import com.team.prezel.core.designsystem.component.chip.chip.ChipType
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -129,10 +129,10 @@ private fun HistoryCategoryChip(
         text = text,
         modifier = modifier,
         iconResId = PrezelIcons.Blank,
-        type = PrezelChipType.FILLED,
-        size = PrezelChipSize.SMALL,
-        state = PrezelChipState.ACTIVE,
-        hierarchy = PrezelChipHierarchy.PRIMARY,
+        type = ChipType.FILLED,
+        size = ChipSize.SMALL,
+        state = ChipState.ACTIVE,
+        hierarchy = ChipHierarchy.PRIMARY,
     )
 }
 
@@ -144,9 +144,9 @@ private fun HistoryMetaChip(
     PrezelChip(
         text = text,
         modifier = modifier,
-        type = PrezelChipType.OUTLINED,
-        size = PrezelChipSize.SMALL,
-        status = PrezelChipStatus.DEFAULT,
+        type = ChipType.OUTLINED,
+        size = ChipSize.SMALL,
+        status = ChipStatus.DEFAULT,
     )
 }
 
