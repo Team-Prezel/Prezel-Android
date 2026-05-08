@@ -11,5 +11,7 @@ dependencies {
     implementation(projects.coreModel)
     implementation(projects.featureSplashApi)
     implementation(projects.featureLoginApi)
+    implementation(projects.featureTermsApi)
     implementation(projects.featureHomeApi)
+    implementation(projects.featureProfileApi)
 }

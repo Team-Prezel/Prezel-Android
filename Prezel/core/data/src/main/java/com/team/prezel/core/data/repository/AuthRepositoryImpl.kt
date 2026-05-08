@@ -1,37 +1,26 @@
 package com.team.prezel.core.data.repository
 
-import com.team.prezel.core.common.di.ApplicationScope
+import com.team.prezel.core.data.error.mapDomainFailure
 import com.team.prezel.core.datastore.auth.AuthLocalDataSource
 import com.team.prezel.core.domain.repository.auth.AuthRepository
-import com.team.prezel.core.model.auth.LoginStatus
 import com.team.prezel.core.model.auth.WithdrawReason
+import com.team.prezel.core.network.auth.AuthSessionCache
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authLocalDataSource: AuthLocalDataSource,
-    @param:ApplicationScope private val externalScope: CoroutineScope,
+    private val authSessionCache: AuthSessionCache,
 ) : AuthRepository {
-    override val loginStatus: StateFlow<LoginStatus> =
-        authLocalDataSource.tokens
-            .map { tokens -> if (tokens == null) LoginStatus.UNAUTHENTICATED else LoginStatus.AUTHENTICATED }
-            .stateIn(
-                scope = externalScope,
-                started = SharingStarted.Eagerly,
-                initialValue = LoginStatus.LOADING,
-            )
+    override suspend fun hasJwtToken(): Result<Boolean> = Result.success(authLocalDataSource.tokens.firstOrNull() != null)
 
     override suspend fun logout(): Result<Unit> =
         runCatching {
             authRemoteDataSource.logout()
-            authLocalDataSource.clearTokens()
-        }
+            clearLocalSession()
+        }.mapDomainFailure()
 
     override suspend fun login(idToken: String): Result<Unit> =
         runCatching {
@@ -40,30 +29,32 @@ internal class AuthRepositoryImpl @Inject constructor(
                 accessToken = response.accessToken,
                 refreshToken = response.refreshToken,
             )
-        }
+            authSessionCache.clear()
+        }.mapDomainFailure()
+
+    override suspend fun clearSession(): Result<Unit> = runCatching { clearLocalSession() }.mapDomainFailure()
 
     override suspend fun withdraw(reason: WithdrawReason): Result<Unit> =
         runCatching {
             authRemoteDataSource.withdraw(
-                reasonCategory = reason.toCategory(),
-                reasonText = reason.toReasonText(),
+                reasonCategory = reason.toReasonCategory(),
+                reasonText = (reason as? WithdrawReason.Etc)?.text,
             )
-            authLocalDataSource.clearTokens()
-        }
+            clearLocalSession()
+        }.mapDomainFailure()
 
-    private fun WithdrawReason.toCategory(): String =
+    private suspend fun clearLocalSession() {
+        authLocalDataSource.clearTokens()
+        authSessionCache.clear()
+    }
+
+    private fun WithdrawReason.toReasonCategory(): String =
         when (this) {
             WithdrawReason.NotUsedOften -> "NOT_USED_OFTEN"
             WithdrawReason.NoLongerNeeded -> "NO_LONGER_NEEDED"
-            WithdrawReason.TooDifficultOrComplex -> "TOO_COMPLEX"
-            WithdrawReason.AnalysisResultInaccurate -> "INACCURATE_ANALYSIS"
-            WithdrawReason.TooManyErrors -> "MANY_ERRORS"
-            is WithdrawReason.Other -> "ETC"
-        }
-
-    private fun WithdrawReason.toReasonText(): String =
-        when (this) {
-            is WithdrawReason.Other -> text
-            else -> ""
+            WithdrawReason.TooComplex -> "TOO_COMPLEX"
+            WithdrawReason.InaccurateAnalysis -> "INACCURATE_ANALYSIS"
+            WithdrawReason.ManyErrors -> "MANY_ERRORS"
+            is WithdrawReason.Etc -> "ETC"
         }
 }

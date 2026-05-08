@@ -18,7 +18,6 @@ android {
 
 dependencies {
     implementation(projects.coreCommon)
-    implementation(projects.coreModel)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
@@ -30,9 +29,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.ktorfit.lib)
     ksp(libs.ktorfit.ksp)
-
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.ktor.client.mock)
 }
 
 androidComponents {

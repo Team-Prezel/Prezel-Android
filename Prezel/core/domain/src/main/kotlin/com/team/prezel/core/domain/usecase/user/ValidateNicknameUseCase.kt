@@ -20,8 +20,8 @@ class ValidateNicknameUseCase @Inject constructor(
         when (val creationResult = Nickname.create(nickname)) {
             is Nickname.CreationResult.Success -> {
                 userRepository.checkNicknameDuplication(creationResult.nickname).fold(
-                    onSuccess = { isDuplicated ->
-                        if (isDuplicated) Result.Invalid.Duplicated else Result.Available(creationResult.nickname)
+                    onSuccess = { isAvailable ->
+                        if (isAvailable) Result.Available(creationResult.nickname) else Result.Invalid.Duplicated
                     },
                     onFailure = { throwable ->
                         Result.Error(throwable)
