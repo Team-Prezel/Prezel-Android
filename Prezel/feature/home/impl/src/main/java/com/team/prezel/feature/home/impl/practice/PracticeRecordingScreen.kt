@@ -75,6 +75,7 @@ internal fun PracticeRecordingScreen(
         onStartPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StartPlayback) },
         onStopPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StopPlayback) },
         onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeClicked) },
+        onRetryRecording = { viewModel.onIntent(PracticeRecordingUiIntent.RetryRecordingClicked) },
         onBack = onBack,
         navigateToHome = navigateToHome,
         modifier = modifier,
@@ -89,11 +90,18 @@ private fun PracticeRecordingScreen(
     onStartPlayback: () -> Unit,
     onStopPlayback: () -> Unit,
     onClickAnalyze: () -> Unit,
+    onRetryRecording: () -> Unit,
     onBack: () -> Unit,
     navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onBack)
+    BackHandler(
+        onBack = {
+            if (uiState.analysisStatus == PracticeRecordingAnalysisStatus.Ready) {
+                onBack()
+            }
+        },
+    )
 
     when (uiState.analysisStatus) {
         PracticeRecordingAnalysisStatus.Ready -> PracticeRecordingReadyScreen(
@@ -109,8 +117,7 @@ private fun PracticeRecordingScreen(
 
         else -> PracticeRecordingResultScreen(
             analysisStatus = uiState.analysisStatus,
-            onBack = onBack,
-            onRetry = onClickAnalyze,
+            onRetry = onRetryRecording,
             onComplete = navigateToHome,
             modifier = modifier,
         )
@@ -238,6 +245,7 @@ private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiSt
         onStartPlayback = {},
         onStopPlayback = {},
         onClickAnalyze = {},
+        onRetryRecording = {},
         onBack = {},
         navigateToHome = {},
     )

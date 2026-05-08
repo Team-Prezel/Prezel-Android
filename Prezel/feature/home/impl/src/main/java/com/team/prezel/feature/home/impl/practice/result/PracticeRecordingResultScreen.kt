@@ -10,7 +10,6 @@ import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecor
 @Composable
 internal fun PracticeRecordingResultScreen(
     analysisStatus: PracticeRecordingAnalysisStatus,
-    onBack: () -> Unit,
     onRetry: () -> Unit,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -20,7 +19,6 @@ internal fun PracticeRecordingResultScreen(
         is PracticeRecordingAnalysisStatus.Success -> PracticeRecordingResultPage(
             pronunciationScore = analysisStatus.result.pronunciationScore,
             speed = analysisStatus.result.speed,
-            onBack = onBack,
             onComplete = onComplete,
             modifier = modifier,
         )

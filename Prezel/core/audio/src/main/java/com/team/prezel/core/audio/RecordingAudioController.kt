@@ -17,6 +17,8 @@ interface RecordingAudioController {
 
     fun stopPlayback()
 
+    fun reset()
+
     fun release()
 }
 

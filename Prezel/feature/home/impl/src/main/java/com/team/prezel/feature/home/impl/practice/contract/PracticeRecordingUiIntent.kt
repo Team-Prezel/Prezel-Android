@@ -18,4 +18,6 @@ internal sealed interface PracticeRecordingUiIntent : UiIntent {
     data object StopPlayback : PracticeRecordingUiIntent
 
     data object AnalyzeClicked : PracticeRecordingUiIntent
+
+    data object RetryRecordingClicked : PracticeRecordingUiIntent
 }

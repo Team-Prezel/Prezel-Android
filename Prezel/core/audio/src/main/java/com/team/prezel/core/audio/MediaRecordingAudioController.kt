@@ -49,7 +49,7 @@ internal class MediaRecordingAudioController @Inject constructor(
             val file = File.createTempFile("recording_", ".m4a", context.cacheDir)
             var pendingRecorder: MediaRecorder? = null
             val newRecorder = runCatching {
-                val recorder = createMediaRecorder()
+                val recorder = createMediaRecorder(context = context)
                 pendingRecorder = recorder
                 recorder.apply {
                     setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -132,14 +132,18 @@ internal class MediaRecordingAudioController @Inject constructor(
         }
     }
 
-    override fun release() {
+    override fun reset() {
         recordingTimerJob?.cancel()
         playbackTimerJob?.cancel()
         releaseRecorder()
         releasePlayer()
         deleteCurrentAudioFile()
-        controllerScope.cancel()
         _audioSessionState.value = AudioSessionState.Idle
+    }
+
+    override fun release() {
+        reset()
+        controllerScope.cancel()
     }
 
     private fun startPlayback(
@@ -222,14 +226,6 @@ internal class MediaRecordingAudioController @Inject constructor(
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun createMediaRecorder(): MediaRecorder =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRecorder(context)
-        } else {
-            MediaRecorder()
-        }
-
     private fun releaseRecorder() {
         recorder?.release()
         recorder = null
@@ -259,5 +255,13 @@ internal class MediaRecordingAudioController @Inject constructor(
         const val PLAYBACK_TIMER_DELAY_MILLIS = 250L
     }
 }
+
+@Suppress("DEPRECATION")
+private fun createMediaRecorder(context: Context): MediaRecorder =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        MediaRecorder(context)
+    } else {
+        MediaRecorder()
+    }
 
 private fun Int.toSeconds(): Int = this / 1_000

@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,14 +22,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
-import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
@@ -56,12 +51,10 @@ private enum class PracticeAnalysisOverallResult(
     ),
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PracticeRecordingResultPage(
     pronunciationScore: Int,
     speed: PracticeRecordingSpeed,
-    onBack: () -> Unit,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,17 +68,6 @@ internal fun PracticeRecordingResultPage(
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        PrezelTopAppBar(
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.ArrowLeft),
-                        contentDescription = stringResource(R.string.feature_home_impl_practice_recording_back),
-                    )
-                }
-            },
-        )
-
         PracticeRecordingResultContent(
             cardResId = overallResult.cardResId,
             cardContentDescription = stringResource(overallResult.contentDescriptionResId),
@@ -245,7 +227,6 @@ private fun PracticeRecordingResultPerfectPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 96,
             speed = PracticeRecordingSpeed.ADEQUATE,
-            onBack = {},
             onComplete = {},
         )
     }
@@ -258,7 +239,6 @@ private fun PracticeRecordingResultGoodPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 90,
             speed = PracticeRecordingSpeed.ADEQUATE,
-            onBack = {},
             onComplete = {},
         )
     }
@@ -271,7 +251,6 @@ private fun PracticeRecordingResultTryPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 58,
             speed = PracticeRecordingSpeed.FAST,
-            onBack = {},
             onComplete = {},
         )
     }

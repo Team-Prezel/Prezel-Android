@@ -47,6 +47,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
             PracticeRecordingUiIntent.StartPlayback -> audioController.startPlayback()
             PracticeRecordingUiIntent.StopPlayback -> audioController.stopPlayback()
             PracticeRecordingUiIntent.AnalyzeClicked -> startAnalysis()
+            PracticeRecordingUiIntent.RetryRecordingClicked -> resetPracticeRecording()
         }
     }
 
@@ -111,6 +112,13 @@ internal class PracticeRecordingViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun resetPracticeRecording() {
+        audioController.reset()
+        updateState {
+            copy(analysisStatus = PracticeRecordingAnalysisStatus.Ready)
         }
     }
 
