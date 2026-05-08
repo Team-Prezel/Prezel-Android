@@ -83,17 +83,4 @@ internal object ColorTokens {
     val Purple800 = Color(0xFF39018C)
     val Purple900 = Color(0xFF2C0066)
     val Purple950 = Color(0xFF1E0040)
-
-    val Magenta10 = Color(0xFFFFF0F5)
-    val Magenta50 = Color(0xFFFFC7DB)
-    val Magenta100 = Color(0xFFFF9EC5)
-    val Magenta200 = Color(0xFFFF7AB4)
-    val Magenta300 = Color(0xFFFF57A5)
-    val Magenta400 = Color(0xFFFF57A5)
-    val Magenta500 = Color(0xFFFF1091)
-    val Magenta600 = Color(0xFFD90681)
-    val Magenta700 = Color(0xFFB2006B)
-    val Magenta800 = Color(0xFF8B0058)
-    val Magenta900 = Color(0xFF660044)
-    val Magenta950 = Color(0xFF40002D)
 }
