@@ -15,6 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.audio.AudioSource
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 
@@ -23,16 +27,10 @@ internal fun PracticeRecordingContent(
     practiceScript: String,
     currentSeconds: Int,
     totalSeconds: Int,
-    controlState: PracticeRecordingControlState,
+    recordingState: AudioSessionState,
     onStartRecording: () -> Unit,
-    onPauseRecording: () -> Unit,
-    onResumeRecording: () -> Unit,
     onStopRecording: () -> Unit,
-    onResetRecording: () -> Unit,
-    onSelectAudioFile: () -> Unit,
     onStartPlayback: () -> Unit,
-    onPausePlayback: () -> Unit,
-    onResumePlayback: () -> Unit,
     onStopPlayback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,7 +59,15 @@ internal fun PracticeRecordingContent(
             Text(
                 text = practiceScript,
                 style = PrezelTheme.typography.body2Regular,
-                color = PrezelTheme.colors.textLarge,
+                color = when (recordingState) {
+                    is AudioSessionState.ReadyToPlay,
+                    is AudioSessionState.Playing,
+                    -> PrezelTheme.colors.textDisabled
+
+                    AudioSessionState.Idle,
+                    is AudioSessionState.Recording,
+                    -> PrezelTheme.colors.textLarge
+                },
                 textAlign = TextAlign.Center,
             )
         }
@@ -71,17 +77,51 @@ internal fun PracticeRecordingContent(
         PracticeRecordingControl(
             currentSeconds = currentSeconds,
             totalSeconds = totalSeconds,
-            state = controlState,
+            audioSessionState = recordingState,
             onStartRecording = onStartRecording,
-            onPauseRecording = onPauseRecording,
-            onResumeRecording = onResumeRecording,
             onStopRecording = onStopRecording,
-            onResetRecording = onResetRecording,
-            onSelectAudioFile = onSelectAudioFile,
             onStartPlayback = onStartPlayback,
-            onPausePlayback = onPausePlayback,
-            onResumePlayback = onResumePlayback,
             onStopPlayback = onStopPlayback,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PracticeRecordingContentReadyToRecordPreview() {
+    PrezelTheme {
+        PracticeRecordingContent(
+            practiceScript = "안녕하세요. 오늘은 제가 준비한 발표 연습을 시작해보겠습니다.",
+            currentSeconds = 0,
+            totalSeconds = 0,
+            recordingState = AudioSessionState.Idle,
+            onStartRecording = {},
+            onStopRecording = {},
+            onStartPlayback = {},
+            onStopPlayback = {},
+            modifier = Modifier.height(520.dp),
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PracticeRecordingContentReadyToPlayPreview() {
+    PrezelTheme {
+        PracticeRecordingContent(
+            practiceScript = "안녕하세요. 오늘은 제가 준비한 발표 연습을 시작해보겠습니다.",
+            currentSeconds = 12,
+            totalSeconds = 45,
+            recordingState = AudioSessionState.ReadyToPlay(
+                source = AudioSource.RecordedFile(filePath = "preview.m4a"),
+                positionSeconds = 12,
+                durationSeconds = 45,
+            ),
+            onStartRecording = {},
+            onStopRecording = {},
+            onStartPlayback = {},
+            onStopPlayback = {},
+            modifier = Modifier.height(520.dp),
         )
     }
 }

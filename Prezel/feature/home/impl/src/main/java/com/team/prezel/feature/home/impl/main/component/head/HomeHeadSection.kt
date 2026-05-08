@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.component.head
+package com.team.prezel.feature.home.impl.main.component.head
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,8 +17,8 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.contract.HomeUiState
-import com.team.prezel.feature.home.impl.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 

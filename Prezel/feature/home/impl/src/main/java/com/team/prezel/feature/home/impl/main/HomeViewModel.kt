@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl
+package com.team.prezel.feature.home.impl.main
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.model.presentation.Audience
@@ -7,11 +7,11 @@ import com.team.prezel.core.model.presentation.Presentation
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.home.impl.contract.HomeUiEffect
-import com.team.prezel.feature.home.impl.contract.HomeUiIntent
-import com.team.prezel.feature.home.impl.contract.HomeUiState
-import com.team.prezel.feature.home.impl.model.PresentationUiModel
-import com.team.prezel.feature.home.impl.model.PresentationUiModel.Companion.toUiModel
+import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
+import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
+import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.main.model.PresentationUiModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.contract
+package com.team.prezel.feature.home.impl.main.contract
 
 import com.team.prezel.core.ui.base.UiIntent
 

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.component.body
+package com.team.prezel.feature.home.impl.main.component.body
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

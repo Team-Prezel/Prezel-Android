@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl
+package com.team.prezel.feature.home.impl.main
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -27,17 +27,18 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.onHeightChanged
-import com.team.prezel.feature.home.impl.component.HomePageLayout
-import com.team.prezel.feature.home.impl.component.body.EmptyPresentationSheet
-import com.team.prezel.feature.home.impl.component.body.PresentationSheet
-import com.team.prezel.feature.home.impl.component.head.HomeHeadSection
-import com.team.prezel.feature.home.impl.component.title.EmptyPresentationHero
-import com.team.prezel.feature.home.impl.component.title.PresentationHero
-import com.team.prezel.feature.home.impl.contract.HomeUiEffect
-import com.team.prezel.feature.home.impl.contract.HomeUiIntent
-import com.team.prezel.feature.home.impl.contract.HomeUiState
-import com.team.prezel.feature.home.impl.model.HomeUiMessage
-import com.team.prezel.feature.home.impl.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.R
+import com.team.prezel.feature.home.impl.main.component.HomePageLayout
+import com.team.prezel.feature.home.impl.main.component.body.EmptyPresentationSheet
+import com.team.prezel.feature.home.impl.main.component.body.PresentationSheet
+import com.team.prezel.feature.home.impl.main.component.head.HomeHeadSection
+import com.team.prezel.feature.home.impl.main.component.title.EmptyPresentationHero
+import com.team.prezel.feature.home.impl.main.component.title.PresentationHero
+import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
+import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
+import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
+import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.navigation.PracticeRecordingNavKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.component
+package com.team.prezel.feature.home.impl.main.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -24,9 +24,9 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetContent
-import com.team.prezel.feature.home.impl.component.body.HomeBottomSheetTitle
-import com.team.prezel.feature.home.impl.component.title.HomeHeroLayout
+import com.team.prezel.feature.home.impl.main.component.body.HomeBottomSheetContent
+import com.team.prezel.feature.home.impl.main.component.body.HomeBottomSheetTitle
+import com.team.prezel.feature.home.impl.main.component.title.HomeHeroLayout
 
 private data class HomeBottomSheetLayoutState(
     val sheetPeekHeight: Dp,

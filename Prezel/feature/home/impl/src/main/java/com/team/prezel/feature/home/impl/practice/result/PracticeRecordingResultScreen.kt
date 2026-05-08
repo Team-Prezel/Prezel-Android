@@ -2,9 +2,7 @@ package com.team.prezel.feature.home.impl.practice.result
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisSpeed
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisStatus
-import com.team.prezel.feature.home.impl.practice.result.component.PracticeAnalysisSpeed
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisFailurePage
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingAnalysisLoadingPage
 import com.team.prezel.feature.home.impl.practice.result.component.PracticeRecordingResultPage
@@ -21,7 +19,7 @@ internal fun PracticeRecordingResultScreen(
         PracticeRecordingAnalysisStatus.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
         is PracticeRecordingAnalysisStatus.Success -> PracticeRecordingResultPage(
             pronunciationScore = analysisStatus.result.pronunciationScore,
-            speed = analysisStatus.result.speed.toUiModel(),
+            speed = analysisStatus.result.speed,
             onBack = onBack,
             onComplete = onComplete,
             modifier = modifier,
@@ -36,10 +34,3 @@ internal fun PracticeRecordingResultScreen(
         PracticeRecordingAnalysisStatus.Ready -> Unit
     }
 }
-
-private fun PracticeRecordingAnalysisSpeed.toUiModel(): PracticeAnalysisSpeed =
-    when (this) {
-        PracticeRecordingAnalysisSpeed.SLOW -> PracticeAnalysisSpeed.SLOW
-        PracticeRecordingAnalysisSpeed.ADEQUATE -> PracticeAnalysisSpeed.ADEQUATE
-        PracticeRecordingAnalysisSpeed.FAST -> PracticeAnalysisSpeed.FAST
-    }

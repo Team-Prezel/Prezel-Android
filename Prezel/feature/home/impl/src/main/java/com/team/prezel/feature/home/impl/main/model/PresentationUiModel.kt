@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.model
+package com.team.prezel.feature.home.impl.main.model
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Category

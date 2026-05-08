@@ -2,12 +2,12 @@ package com.team.prezel.feature.home.impl.practice
 
 import android.Manifest
 import androidx.compose.runtime.Composable
+import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.ui.util.rememberPermissionRequest
-import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
 
 @Composable
 internal fun rememberRecordAudioPermissionControlClickHandler(
-    recordingState: PracticeRecordingState,
+    recordingState: AudioSessionState,
     onStartRecording: () -> Unit,
     onPermissionDenied: () -> Unit,
     onPermissionPermanentlyDenied: () -> Unit,
@@ -21,7 +21,7 @@ internal fun rememberRecordAudioPermissionControlClickHandler(
 
     return {
         when (recordingState) {
-            PracticeRecordingState.Idle -> {
+            AudioSessionState.Idle -> {
                 when {
                     permissionRequest.isGranted -> onStartRecording()
                     permissionRequest.isPermanentlyDenied -> permissionRequest.onPermanentlyDenied()
@@ -29,11 +29,9 @@ internal fun rememberRecordAudioPermissionControlClickHandler(
                 }
             }
 
-            is PracticeRecordingState.Recording,
-            is PracticeRecordingState.RecordingPaused,
-            is PracticeRecordingState.ReadyToPlay,
-            is PracticeRecordingState.Playing,
-            is PracticeRecordingState.PlaybackPaused,
+            is AudioSessionState.Recording,
+            is AudioSessionState.ReadyToPlay,
+            is AudioSessionState.Playing,
             -> Unit
         }
     }

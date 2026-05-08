@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.home.api.HomeNavKey
-import com.team.prezel.feature.home.impl.HomeScreen
+import com.team.prezel.feature.home.impl.main.HomeScreen
 import com.team.prezel.feature.home.impl.practice.PracticeRecordingScreen
 import dagger.Module
 import dagger.Provides

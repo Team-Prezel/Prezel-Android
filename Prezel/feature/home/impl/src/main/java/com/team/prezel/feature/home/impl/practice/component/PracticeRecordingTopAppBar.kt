@@ -9,6 +9,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,4 +27,12 @@ internal fun PracticeRecordingTopAppBar(onBack: () -> Unit) {
             }
         },
     )
+}
+
+@BasicPreview
+@Composable
+private fun PracticeRecordingTopAppBarPreview() {
+    PrezelTheme {
+        PracticeRecordingTopAppBar(onBack = {})
+    }
 }

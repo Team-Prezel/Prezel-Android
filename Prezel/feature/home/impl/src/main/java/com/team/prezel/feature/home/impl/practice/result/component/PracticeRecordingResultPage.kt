@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
@@ -34,15 +35,8 @@ import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.feature.home.impl.R
-
-internal enum class PracticeAnalysisSpeed(
-    @param:StringRes val labelResId: Int,
-) {
-    SLOW(R.string.feature_home_impl_practice_recording_analysis_speed_slow),
-    ADEQUATE(R.string.feature_home_impl_practice_recording_analysis_speed_adequate),
-    FAST(R.string.feature_home_impl_practice_recording_analysis_speed_fast),
-}
 
 private enum class PracticeAnalysisOverallResult(
     @param:StringRes val contentDescriptionResId: Int,
@@ -66,7 +60,7 @@ private enum class PracticeAnalysisOverallResult(
 @Composable
 internal fun PracticeRecordingResultPage(
     pronunciationScore: Int,
-    speed: PracticeAnalysisSpeed,
+    speed: PracticeRecordingSpeed,
     onBack: () -> Unit,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -109,7 +103,7 @@ private fun PracticeRecordingResultContent(
     @DrawableRes cardResId: Int,
     cardContentDescription: String,
     pronunciationScore: Int,
-    speed: PracticeAnalysisSpeed,
+    speed: PracticeRecordingSpeed,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -142,23 +136,27 @@ private fun PracticeRecordingResultButtonArea(
 ) {
     val completeLabel = stringResource(R.string.feature_home_impl_practice_recording_analysis_complete)
 
-    PrezelButtonArea(modifier = modifier) {
-        MainButton(
-            label = completeLabel,
-            enabled = true,
-            onClick = onComplete,
-        )
-    }
+    PrezelButtonArea(
+        modifier = modifier,
+        mainButton = { buttonModifier ->
+            PrezelButton(
+                text = completeLabel,
+                modifier = buttonModifier,
+                enabled = true,
+                onClick = onComplete,
+            )
+        },
+    )
 }
 
 private fun rememberOverallResult(
     pronunciationScore: Int,
-    speed: PracticeAnalysisSpeed,
+    speed: PracticeRecordingSpeed,
 ): PracticeAnalysisOverallResult =
     when {
-        pronunciationScore >= 95 && speed == PracticeAnalysisSpeed.ADEQUATE -> PracticeAnalysisOverallResult.PERFECT
-        pronunciationScore >= 70 && speed == PracticeAnalysisSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
-        pronunciationScore >= 95 && speed != PracticeAnalysisSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
+        pronunciationScore >= 95 && speed == PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.PERFECT
+        pronunciationScore >= 70 && speed == PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
+        pronunciationScore >= 95 && speed != PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
         pronunciationScore <= 60 -> PracticeAnalysisOverallResult.TRY
         else -> PracticeAnalysisOverallResult.TRY
     }
@@ -166,7 +164,7 @@ private fun rememberOverallResult(
 @Composable
 private fun PracticeAnalysisMetricRow(
     pronunciationScore: Int,
-    speed: PracticeAnalysisSpeed,
+    speed: PracticeRecordingSpeed,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -219,6 +217,14 @@ private fun PracticeAnalysisMetricRow(
     }
 }
 
+private val PracticeRecordingSpeed.labelResId: Int
+    @StringRes
+    get() = when (this) {
+        PracticeRecordingSpeed.SLOW -> R.string.feature_home_impl_practice_recording_analysis_speed_slow
+        PracticeRecordingSpeed.ADEQUATE -> R.string.feature_home_impl_practice_recording_analysis_speed_adequate
+        PracticeRecordingSpeed.FAST -> R.string.feature_home_impl_practice_recording_analysis_speed_fast
+    }
+
 @Composable
 private fun PracticeAnalysisMetricLabel(
     text: String,
@@ -238,7 +244,7 @@ private fun PracticeRecordingResultPerfectPagePreview() {
     PrezelTheme {
         PracticeRecordingResultPage(
             pronunciationScore = 96,
-            speed = PracticeAnalysisSpeed.ADEQUATE,
+            speed = PracticeRecordingSpeed.ADEQUATE,
             onBack = {},
             onComplete = {},
         )
@@ -251,7 +257,7 @@ private fun PracticeRecordingResultGoodPagePreview() {
     PrezelTheme {
         PracticeRecordingResultPage(
             pronunciationScore = 90,
-            speed = PracticeAnalysisSpeed.ADEQUATE,
+            speed = PracticeRecordingSpeed.ADEQUATE,
             onBack = {},
             onComplete = {},
         )
@@ -264,7 +270,7 @@ private fun PracticeRecordingResultTryPagePreview() {
     PrezelTheme {
         PracticeRecordingResultPage(
             pronunciationScore = 58,
-            speed = PracticeAnalysisSpeed.FAST,
+            speed = PracticeRecordingSpeed.FAST,
             onBack = {},
             onComplete = {},
         )

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.component.title
+package com.team.prezel.feature.home.impl.main.component.title
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

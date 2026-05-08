@@ -1,4 +1,4 @@
-package com.team.prezel.feature.home.impl.component.title
+package com.team.prezel.feature.home.impl.main.component.title
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -16,7 +16,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.model.PresentationUiModel
+import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 

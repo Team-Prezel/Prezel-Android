@@ -1,9 +1,12 @@
 package com.team.prezel.feature.home.impl.practice.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,61 +16,32 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.audio.AudioSource
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingState
-
-internal enum class PracticeRecordingControlState {
-    READY_TO_RECORD,
-    RECORDING,
-    RECORDING_PAUSED,
-    READY_TO_PLAY,
-    PLAYING,
-    PLAYBACK_PAUSED,
-}
-
-internal fun PracticeRecordingState.toControlState(): PracticeRecordingControlState =
-    when (this) {
-        PracticeRecordingState.Idle -> PracticeRecordingControlState.READY_TO_RECORD
-        is PracticeRecordingState.Recording -> PracticeRecordingControlState.RECORDING
-        is PracticeRecordingState.RecordingPaused -> PracticeRecordingControlState.RECORDING_PAUSED
-        is PracticeRecordingState.ReadyToPlay -> PracticeRecordingControlState.READY_TO_PLAY
-        is PracticeRecordingState.Playing -> PracticeRecordingControlState.PLAYING
-        is PracticeRecordingState.PlaybackPaused -> PracticeRecordingControlState.PLAYBACK_PAUSED
-    }
 
 @Composable
 internal fun PracticeRecordingControl(
     currentSeconds: Int,
     totalSeconds: Int,
-    state: PracticeRecordingControlState,
+    audioSessionState: AudioSessionState,
     onStartRecording: () -> Unit,
-    onPauseRecording: () -> Unit,
-    onResumeRecording: () -> Unit,
     onStopRecording: () -> Unit,
-    onResetRecording: () -> Unit,
-    onSelectAudioFile: () -> Unit,
     onStartPlayback: () -> Unit,
-    onPausePlayback: () -> Unit,
-    onResumePlayback: () -> Unit,
     onStopPlayback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val actions = state.actions(
+    val actions = audioSessionState.actions(
         onStartRecording = onStartRecording,
-        onPauseRecording = onPauseRecording,
-        onResumeRecording = onResumeRecording,
         onStopRecording = onStopRecording,
-        onResetRecording = onResetRecording,
-        onSelectAudioFile = onSelectAudioFile,
         onStartPlayback = onStartPlayback,
-        onPausePlayback = onPausePlayback,
-        onResumePlayback = onResumePlayback,
         onStopPlayback = onStopPlayback,
     )
 
@@ -79,7 +53,7 @@ internal fun PracticeRecordingControl(
         PracticeRecordingTimeText(
             currentSeconds = currentSeconds,
             totalSeconds = totalSeconds,
-            state = state,
+            audioSessionState = audioSessionState,
         )
 
         Row(
@@ -112,15 +86,11 @@ internal fun PracticeRecordingControl(
 private fun PracticeRecordingTimeText(
     currentSeconds: Int,
     totalSeconds: Int,
-    state: PracticeRecordingControlState,
+    audioSessionState: AudioSessionState,
 ) {
-    if (state != PracticeRecordingControlState.PLAYING && state != PracticeRecordingControlState.PLAYBACK_PAUSED) {
+    if (audioSessionState == AudioSessionState.Idle || audioSessionState is AudioSessionState.Recording) {
         Text(
-            text = state
-                .displaySeconds(
-                    currentSeconds = currentSeconds,
-                    totalSeconds = totalSeconds,
-                ).toTimerText(),
+            text = currentSeconds.toTimerText(),
             style = PrezelTheme.typography.title1Medium,
             color = PrezelTheme.colors.textMedium,
         )
@@ -155,111 +125,40 @@ private enum class PracticeRecordingControlActionColorType {
     REGULAR,
 }
 
-private fun PracticeRecordingControlState.actions(
+private fun AudioSessionState.actions(
     onStartRecording: () -> Unit,
-    onPauseRecording: () -> Unit,
-    onResumeRecording: () -> Unit,
     onStopRecording: () -> Unit,
-    onResetRecording: () -> Unit,
-    onSelectAudioFile: () -> Unit,
     onStartPlayback: () -> Unit,
-    onPausePlayback: () -> Unit,
-    onResumePlayback: () -> Unit,
     onStopPlayback: () -> Unit,
 ): List<PracticeRecordingControlAction> =
     when (this) {
-        PracticeRecordingControlState.READY_TO_RECORD -> listOf(
+        AudioSessionState.Idle -> listOf(
             PracticeRecordingControlAction(
                 iconResId = PrezelIcons.Recording,
                 colorType = PracticeRecordingControlActionColorType.RECORD,
                 onClick = onStartRecording,
             ),
-            PracticeRecordingControlAction(
-                iconResId = PrezelIcons.Folder,
-                colorType = PracticeRecordingControlActionColorType.REGULAR,
-                onClick = onSelectAudioFile,
-            ),
         )
 
-        PracticeRecordingControlState.RECORDING -> recordingActions(
-            primaryIconResId = PrezelIcons.Pause,
-            onPrimaryClick = onPauseRecording,
-            onStopRecording = onStopRecording,
-            onResetRecording = onResetRecording,
-        )
+        is AudioSessionState.Recording -> stopAction(onStop = onStopRecording)
 
-        PracticeRecordingControlState.RECORDING_PAUSED -> recordingActions(
-            primaryIconResId = PrezelIcons.Play,
-            onPrimaryClick = onResumeRecording,
-            onStopRecording = onStopRecording,
-            onResetRecording = onResetRecording,
-        )
-
-        PracticeRecordingControlState.READY_TO_PLAY -> listOf(
+        is AudioSessionState.ReadyToPlay -> listOf(
             PracticeRecordingControlAction(
                 iconResId = PrezelIcons.Play,
                 colorType = PracticeRecordingControlActionColorType.REGULAR,
                 onClick = onStartPlayback,
             ),
-            PracticeRecordingControlAction(
-                iconResId = PrezelIcons.Folder,
-                colorType = PracticeRecordingControlActionColorType.REGULAR,
-                onClick = onSelectAudioFile,
-            ),
         )
 
-        PracticeRecordingControlState.PLAYING -> playbackActions(
-            primaryIconResId = PrezelIcons.Pause,
-            onPrimaryClick = onPausePlayback,
-            onStopPlayback = onStopPlayback,
-        )
-
-        PracticeRecordingControlState.PLAYBACK_PAUSED -> playbackActions(
-            primaryIconResId = PrezelIcons.Play,
-            onPrimaryClick = onResumePlayback,
-            onStopPlayback = onStopPlayback,
-        )
+        is AudioSessionState.Playing -> stopAction(onStop = onStopPlayback)
     }
 
-private fun recordingActions(
-    @DrawableRes primaryIconResId: Int,
-    onPrimaryClick: () -> Unit,
-    onStopRecording: () -> Unit,
-    onResetRecording: () -> Unit,
-): List<PracticeRecordingControlAction> =
+private fun stopAction(onStop: () -> Unit): List<PracticeRecordingControlAction> =
     listOf(
-        PracticeRecordingControlAction(
-            iconResId = primaryIconResId,
-            colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onPrimaryClick,
-        ),
         PracticeRecordingControlAction(
             iconResId = PrezelIcons.Stop,
             colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onStopRecording,
-        ),
-        PracticeRecordingControlAction(
-            iconResId = PrezelIcons.Reset,
-            colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onResetRecording,
-        ),
-    )
-
-private fun playbackActions(
-    @DrawableRes primaryIconResId: Int,
-    onPrimaryClick: () -> Unit,
-    onStopPlayback: () -> Unit,
-): List<PracticeRecordingControlAction> =
-    listOf(
-        PracticeRecordingControlAction(
-            iconResId = primaryIconResId,
-            colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onPrimaryClick,
-        ),
-        PracticeRecordingControlAction(
-            iconResId = PrezelIcons.Stop,
-            colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onStopPlayback,
+            onClick = onStop,
         ),
     )
 
@@ -270,17 +169,69 @@ private fun PracticeRecordingControlAction.iconColor() =
         PracticeRecordingControlActionColorType.REGULAR -> PrezelTheme.colors.iconRegular
     }
 
-private fun PracticeRecordingControlState.displaySeconds(
-    currentSeconds: Int,
-    totalSeconds: Int,
-): Int =
-    when (this) {
-        PracticeRecordingControlState.READY_TO_PLAY -> totalSeconds
-        else -> currentSeconds
-    }
-
 private fun Int.toTimerText(): String {
     val minutes = this / 60
     val seconds = this % 60
     return "%02d:%02d".format(minutes, seconds)
+}
+
+@BasicPreview
+@Composable
+private fun PracticeRecordingControlPreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(PrezelTheme.spacing.V20),
+            verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V20),
+        ) {
+            PracticeRecordingControl(
+                currentSeconds = 0,
+                totalSeconds = 0,
+                audioSessionState = AudioSessionState.Idle,
+                onStartRecording = {},
+                onStopRecording = {},
+                onStartPlayback = {},
+                onStopPlayback = {},
+            )
+
+            PracticeRecordingControl(
+                currentSeconds = 8,
+                totalSeconds = 0,
+                audioSessionState = AudioSessionState.Recording(elapsedSeconds = 8),
+                onStartRecording = {},
+                onStopRecording = {},
+                onStartPlayback = {},
+                onStopPlayback = {},
+            )
+
+            PracticeRecordingControl(
+                currentSeconds = 16,
+                totalSeconds = 45,
+                audioSessionState = AudioSessionState.ReadyToPlay(
+                    source = AudioSource.RecordedFile(filePath = "preview.m4a"),
+                    positionSeconds = 16,
+                    durationSeconds = 45,
+                ),
+                onStartRecording = {},
+                onStopRecording = {},
+                onStartPlayback = {},
+                onStopPlayback = {},
+            )
+
+            PracticeRecordingControl(
+                currentSeconds = 24,
+                totalSeconds = 45,
+                audioSessionState = AudioSessionState.Playing(
+                    source = AudioSource.RecordedFile(filePath = "preview.m4a"),
+                    positionSeconds = 24,
+                    durationSeconds = 45,
+                ),
+                onStartRecording = {},
+                onStopRecording = {},
+                onStartPlayback = {},
+                onStopPlayback = {},
+            )
+        }
+    }
 }
