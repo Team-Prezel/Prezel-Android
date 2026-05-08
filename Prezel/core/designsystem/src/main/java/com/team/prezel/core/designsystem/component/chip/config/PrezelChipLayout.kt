@@ -24,39 +24,37 @@ internal fun PrezelChipLayout(
     modifier: Modifier = Modifier,
     text: String?,
     @DrawableRes iconResId: Int?,
-    config: PrezelChipDefault,
+    style: PrezelChipStyle,
 ) {
     require(text != null || iconResId != null) { "Chip은 text 또는 icon 중 하나는 반드시 필요합니다." }
 
     Surface(
         modifier = modifier,
-        shape = config.shape,
-        color = config.containerColor,
-        border = config.borderColor?.let { color ->
+        shape = style.shape,
+        color = style.colors.containerColor,
+        border = style.colors.borderColor?.let { color ->
             BorderStroke(width = PrezelTheme.stroke.V1, color = color)
         },
     ) {
         Row(
-            modifier = Modifier.padding(config.contentPadding),
+            modifier = Modifier.padding(style.contentPadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             iconResId?.let { resId ->
                 PrezelChipIcon(
                     iconResId = resId,
-                    iconSize = config.iconSize,
-                    tint = config.iconColor,
+                    iconSize = style.iconSize,
+                    tint = style.colors.iconColor,
                 )
             }
 
             if (text != null) {
-                if (iconResId != null) {
-                    Spacer(modifier = Modifier.width(config.iconTextSpacing))
-                }
+                if (iconResId != null) Spacer(modifier = Modifier.width(style.iconTextSpacing))
                 Text(
                     text = text,
-                    color = config.textColor,
-                    style = config.textStyle,
+                    color = style.colors.textColor,
+                    style = style.textStyle,
                 )
             }
         }

@@ -19,8 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
+import com.team.prezel.core.designsystem.component.chip.config.PrezelChipHierarchy
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
+import com.team.prezel.core.designsystem.component.chip.config.PrezelChipState
+import com.team.prezel.core.designsystem.component.chip.config.PrezelChipStatus
 import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
@@ -127,14 +129,10 @@ private fun HistoryCategoryChip(
         text = text,
         modifier = modifier,
         iconResId = PrezelIcons.Blank,
-        config = PrezelChipDefaults.getDefault(
-            iconOnly = false,
-            type = PrezelChipType.FILLED,
-            size = PrezelChipSize.SMALL,
-            containerColor = PrezelTheme.colors.interactiveXSmall,
-            iconColor = PrezelTheme.colors.interactiveRegular,
-            textColor = PrezelTheme.colors.interactiveRegular,
-        ),
+        type = PrezelChipType.FILLED,
+        size = PrezelChipSize.SMALL,
+        state = PrezelChipState.ACTIVE,
+        hierarchy = PrezelChipHierarchy.PRIMARY,
     )
 }
 
@@ -148,6 +146,7 @@ private fun HistoryMetaChip(
         modifier = modifier,
         type = PrezelChipType.OUTLINED,
         size = PrezelChipSize.SMALL,
+        status = PrezelChipStatus.DEFAULT,
     )
 }
 

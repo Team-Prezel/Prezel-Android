@@ -9,10 +9,7 @@ import androidx.compose.runtime.Immutable
  */
 @Immutable
 enum class PrezelChipType {
-    /** 배경이 채워진 칩입니다. */
     FILLED,
-
-    /** 테두리가 있는 칩입니다. */
     OUTLINED,
 }
 
@@ -23,40 +20,53 @@ enum class PrezelChipType {
  */
 @Immutable
 enum class PrezelChipSize {
-    /** 작은 크기의 칩입니다. */
     SMALL,
-
-    /** 기본 크기의 칩입니다. */
     REGULAR,
 }
 
 /**
- * 칩의 상호작용 상태를 정의합니다.
+ * 칩의 시각 상태를 정의합니다.
  *
- * 선택 여부나 비활성 상태에 따라 칩의 강조 수준을 표현할 때 사용합니다.
+ * 기본, 강조, 비활성 상태에 따라 칩의 강조 수준을 표현할 때 사용합니다.
  */
 @Immutable
-enum class PrezelChipInteraction {
-    /** 기본 상태의 칩입니다. */
+enum class PrezelChipState {
     DEFAULT,
-
-    /** 활성화되어 강조된 상태의 칩입니다. */
     ACTIVE,
-
-    /** 비활성화된 상태의 칩입니다. */
     DISABLED,
 }
 
 /**
- * 칩의 피드백 상태를 정의합니다.
+ * 칩의 의미 상태를 정의합니다.
  *
- * 일반 상태 외에 경고성 의미를 함께 전달해야 할 때 사용합니다.
+ * 일반 상태 외에 부정/경고 의미를 함께 전달해야 할 때 사용합니다.
  */
 @Immutable
-enum class PrezelChipFeedback {
-    /** 일반 상태의 칩입니다. */
+enum class PrezelChipStatus {
     DEFAULT,
-
-    /** 부정적 피드백을 표현하는 칩입니다. */
     BAD,
+    WARNING,
+}
+
+/**
+ * 일반 칩의 시각적 계층을 정의합니다.
+ *
+ * 동일한 타입 안에서 정보의 우선순위를 표현할 때 사용합니다.
+ */
+@Immutable
+enum class PrezelChipHierarchy {
+    PRIMARY,
+    SECONDARY,
+}
+
+/**
+ * 일반 칩의 강조 색상을 정의합니다.
+ *
+ * 특정 의미를 컬러로 강조해야 할 때 사용합니다.
+ */
+@Immutable
+enum class PrezelChipAccent {
+    DEFAULT,
+    PURPLE,
+    TEAL,
 }
