@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.team.prezel.core.designsystem.component.chip.base.PrezelChipLayout
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.LargeDevicePreview
@@ -41,13 +43,18 @@ enum class IconChipStatus {
 fun PrezelIconChip(
     @DrawableRes iconResId: Int,
     modifier: Modifier = Modifier,
+    contentDescription: String? = null,
     type: IconChipType = IconChipType.FILLED,
     size: IconChipSize = IconChipSize.REGULAR,
     state: IconChipState = IconChipState.DEFAULT,
     status: IconChipStatus = IconChipStatus.DEFAULT,
 ) {
     PrezelChipLayout(
-        modifier = modifier,
+        modifier = if (contentDescription != null) {
+            modifier.semantics { this.contentDescription = contentDescription }
+        } else {
+            modifier
+        },
         text = null,
         iconResId = iconResId,
         style = PrezelIconChipDefaults.getDefault(
