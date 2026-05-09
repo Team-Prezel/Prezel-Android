@@ -142,13 +142,6 @@ object PrezelChipDefaults {
 
         if (state == ChipState.ACTIVE) return PrezelTheme.colors.interactiveXSmall
         if (type == ChipType.OUTLINED) return PrezelTheme.colors.bgRegular
-        if (
-            state != ChipState.DEFAULT ||
-            status != ChipStatus.DEFAULT ||
-            accent != ChipAccent.DEFAULT
-        ) {
-            return PrezelTheme.colors.bgLarge
-        }
 
         return when (hierarchy) {
             ChipHierarchy.PRIMARY -> PrezelTheme.colors.bgLarge
