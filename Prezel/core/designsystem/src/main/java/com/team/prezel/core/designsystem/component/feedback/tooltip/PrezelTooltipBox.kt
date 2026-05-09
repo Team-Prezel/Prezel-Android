@@ -47,6 +47,7 @@ private fun rememberBalloonBuilder(showArrow: Boolean): Balloon.Builder =
         setPaddingVertical(4)
         setPaddingLeft(8)
         setPaddingRight(6)
+        setDismissWhenTouchOutside(false)
         setBackgroundColor(PrezelColorScheme.Dark.bgMedium)
     }
 
@@ -64,25 +65,35 @@ fun PrezelTooltipBox(
     Box(
         content = content,
         modifier = modifier
+            .noRippleClick { state.showAlignTop() }
             .balloon(state) {
                 TooltipContent(
                     text = text,
                     showDismissIcon = showDismissIcon,
+                    modifier = Modifier.noRippleClick { state.dismiss() },
                 )
-            }.clickable(
-                interactionSource = null,
-                indication = null,
-                onClick = { state.showAlignTop() },
-            ),
+            },
     )
 }
 
 @Composable
+private fun Modifier.noRippleClick(onClick: () -> Unit): Modifier =
+    this.clickable(
+        interactionSource = null,
+        indication = null,
+        onClick = onClick,
+    )
+
+@Composable
 fun TooltipContent(
     text: String,
+    modifier: Modifier = Modifier,
     showDismissIcon: Boolean = false,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
         Text(
             text = text,
             style = PrezelTheme.typography.caption1Regular,
