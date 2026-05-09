@@ -6,6 +6,7 @@
     <string name="core_designsystem_checkbox_desc">체크박스</string>
     <string name="core_designsystem_date_picker_confirm_btn">선택하기</string>
     <string name="core_designsystem_date_picker_month_title">%1$d년 %2$d월</string>
+    <string name="core_designsystem_tooltip_cancel_btn_content_desc">툴팁 닫기</string>
 
     <string-array name="core_designsystem_weekday_labels">
         <item>일</item>
