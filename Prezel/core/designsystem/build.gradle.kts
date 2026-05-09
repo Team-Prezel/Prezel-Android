@@ -13,5 +13,5 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.timber)
 
-    implementation("com.github.skydoves:balloon-compose:1.7.6")
+    implementation(libs.balloon.compose)
 }
