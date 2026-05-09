@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.skydoves.balloon.ArrowPositionRules
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.compose.balloon
 import com.skydoves.balloon.compose.rememberBalloonBuilder
@@ -40,6 +41,8 @@ private fun rememberBalloonBuilder(showArrow: Boolean): Balloon.Builder =
         setIsVisibleArrow(showArrow)
         setArrowWidth(12)
         setArrowHeight(6)
+        setArrowPosition(0.5f)
+        setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
         setCornerRadius(6f)
         setPaddingVertical(4)
         setPaddingLeft(8)
