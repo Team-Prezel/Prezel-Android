@@ -24,9 +24,9 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 @Composable
 fun PrezelDialog(
     title: String,
-    description: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    description: String? = null,
     content: @Composable PrezelDialogScope.() -> Unit,
 ) {
     val scope = remember { PrezelDialogScope() }
@@ -59,7 +59,7 @@ fun PrezelDialog(
 @Composable
 private fun DialogContent(
     title: String,
-    description: String,
+    description: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -67,7 +67,9 @@ private fun DialogContent(
     ) {
         Text(text = title, style = PrezelTheme.typography.title2Bold, color = PrezelTheme.colors.textLarge)
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
-        Text(text = description, style = PrezelTheme.typography.body3Medium, color = PrezelTheme.colors.textRegular)
+        description?.let { text ->
+            Text(text = text, style = PrezelTheme.typography.body3Medium, color = PrezelTheme.colors.textRegular)
+        }
     }
 }
 

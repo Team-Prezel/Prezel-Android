@@ -36,14 +36,16 @@ import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.PrezelHyperlinkButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.list.PrezelList
 import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
-import com.team.prezel.feature.terms.impl.component.TermsDetailModal
 import com.team.prezel.feature.terms.impl.contract.TermsUiEffect
 import com.team.prezel.feature.terms.impl.contract.TermsUiIntent
 import com.team.prezel.feature.terms.impl.contract.TermsUiState
@@ -52,6 +54,8 @@ import com.team.prezel.feature.terms.impl.model.TermsUiMessage
 @Composable
 internal fun TermsScreen(
     navigateBack: () -> Unit,
+    navigateToTermsOfServiceDetail: () -> Unit,
+    navigateToPrivacyPolicyDetail: () -> Unit,
     navigateToProfile: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TermsViewModel = hiltViewModel(),
@@ -59,7 +63,6 @@ internal fun TermsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    var activeDetailUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -79,13 +82,6 @@ internal fun TermsScreen(
         }
     }
 
-    activeDetailUrl?.let { url ->
-        TermsDetailModal(
-            url = url,
-            onDismiss = { activeDetailUrl = null },
-        )
-    }
-
     TermsScreenScreen(
         uiState = uiState,
         onBack = navigateBack,
@@ -93,8 +89,8 @@ internal fun TermsScreen(
         onToggleTermsOfService = { viewModel.onIntent(TermsUiIntent.ToggleTermsOfService) },
         onTogglePrivacyPolicy = { viewModel.onIntent(TermsUiIntent.TogglePrivacyPolicy) },
         onToggleMarketingConsent = { viewModel.onIntent(TermsUiIntent.ToggleMarketingConsent) },
-        onClickTermsOfServiceDetail = { activeDetailUrl = BuildConfig.TERMS_OF_SERVICE_URL },
-        onClickPrivacyPolicyDetail = { activeDetailUrl = BuildConfig.PRIVACY_POLICY_URL },
+        onClickTermsOfServiceDetail = navigateToTermsOfServiceDetail,
+        onClickPrivacyPolicyDetail = navigateToPrivacyPolicyDetail,
         onContinue = { viewModel.onIntent(TermsUiIntent.ClickContinue) },
         modifier = modifier,
     )
@@ -114,8 +110,6 @@ private fun TermsScreenScreen(
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val resources = LocalResources.current
-
     Column(modifier = modifier.fillMaxSize()) {
         TermsScreenTopAppBar(onBack = onBack)
 
@@ -130,13 +124,18 @@ private fun TermsScreenScreen(
             onToggleMarketingConsent = onToggleMarketingConsent,
         )
 
-        PrezelButtonArea {
-            MainButton(
-                label = resources.getString(R.string.feature_terms_impl_terms_continue_button_text),
-                enabled = uiState.isRequiredChecked && !uiState.isLoading,
-                onClick = onContinue,
-            )
-        }
+        PrezelButtonArea(
+            mainButton = { modifier ->
+                PrezelButton(
+                    modifier = modifier,
+                    text = stringResource(R.string.feature_terms_impl_terms_continue_button_text),
+                    onClick = onContinue,
+                    enabled = uiState.isRequiredChecked && !uiState.isLoading,
+                    type = ButtonType.FILLED,
+                    hierarchy = ButtonHierarchy.PRIMARY,
+                )
+            },
+        )
     }
 }
 

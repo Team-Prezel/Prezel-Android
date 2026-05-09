@@ -28,7 +28,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
     @DrawableRes leadingIconResId: Int? = null,
     duration: SnackbarDuration = SnackbarDuration.Short,
     id: String? = null,
-    offsetY: Dp = 0.dp,
+    useRaisedPosition: Boolean = true,
     onDismiss: (() -> Unit)? = null,
 ) {
     val result = showSnackbar(
@@ -38,7 +38,7 @@ suspend fun SnackbarHostState.showPrezelSnackbar(
             duration = duration,
             id = id,
             leadingIconResId = leadingIconResId,
-            offsetY = offsetY,
+            offsetY = if (useRaisedPosition) (-98).dp else 0.dp,
         ),
     )
 

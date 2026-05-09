@@ -5,13 +5,13 @@ sealed interface WithdrawReason {
 
     data object NoLongerNeeded : WithdrawReason
 
-    data object TooDifficultOrComplex : WithdrawReason
+    data object TooComplex : WithdrawReason
 
-    data object AnalysisResultInaccurate : WithdrawReason
+    data object InaccurateAnalysis : WithdrawReason
 
-    data object TooManyErrors : WithdrawReason
+    data object ManyErrors : WithdrawReason
 
-    data class Other(
+    data class Etc(
         val text: String,
     ) : WithdrawReason
 }

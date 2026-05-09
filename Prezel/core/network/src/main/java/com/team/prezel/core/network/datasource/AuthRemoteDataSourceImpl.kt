@@ -24,11 +24,10 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun withdraw(
         reasonCategory: String,
-        reasonText: String,
+        reasonText: String?,
     ) {
         authService
-            .withdraw(
-                request = WithdrawRequest(reasonCategory = reasonCategory, reasonText = reasonText),
-            ).requireSuccess()
+            .withdraw(request = WithdrawRequest(reasonCategory = reasonCategory, reasonText = reasonText))
+            .requireSuccess()
     }
 }
