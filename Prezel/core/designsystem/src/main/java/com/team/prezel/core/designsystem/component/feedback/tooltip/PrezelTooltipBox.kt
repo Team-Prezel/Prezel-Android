@@ -58,6 +58,7 @@ fun PrezelTooltipBox(
     val builder = rememberBalloonBuilder(showArrow)
     val state = rememberBalloonState(builder)
     val view = LocalView.current
+    val visibleFrame = remember { android.graphics.Rect() }
     var shouldRestoreTooltip by remember { mutableStateOf(false) }
     var isAnchorVisibleInWindow by remember { mutableStateOf(true) }
 
@@ -68,12 +69,11 @@ fun PrezelTooltipBox(
     Box(
         content = content,
         modifier = modifier
+            .noRippleClick { shouldRestoreTooltip = true }
             .onGloballyPositioned { coordinates ->
-                val visibleFrame = android.graphics.Rect()
                 view.getWindowVisibleDisplayFrame(visibleFrame)
                 isAnchorVisibleInWindow = coordinates.boundsInWindow().intersects(visibleFrame.toComposeRect())
-            }.noRippleClick { shouldRestoreTooltip = true }
-            .balloon(state) {
+            }.balloon(state) {
                 TooltipContent(
                     text = text,
                     showDismissIcon = showDismissIcon,
