@@ -1,8 +1,8 @@
 package com.team.prezel.core.audio
 
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import javax.annotation.concurrent.Immutable
 
 interface RecordingAudioController {
     val audioSessionState: StateFlow<AudioSessionState>
