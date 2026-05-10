@@ -12,6 +12,7 @@
     <string name="core_designsystem_player_play_desc">재생</string>
     <string name="core_designsystem_player_script_match_track_desc">스크립트 일치 트랙</string>
     <string name="core_designsystem_player_speech_track_desc">발화 트랙</string>
+    <string name="core_designsystem_tooltip_cancel_btn_content_desc">툴팁 닫기</string>
 
     <string-array name="core_designsystem_weekday_labels">
         <item>일</item>
