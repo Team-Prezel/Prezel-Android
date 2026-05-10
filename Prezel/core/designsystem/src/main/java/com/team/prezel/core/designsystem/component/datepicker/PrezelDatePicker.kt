@@ -33,6 +33,9 @@ import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefault
 import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerDefaults
 import com.team.prezel.core.designsystem.component.datepicker.config.DatePickerMonth
@@ -120,18 +123,20 @@ private fun DatePickerFooter(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
-    val buttonLabel = stringResource(R.string.core_designsystem_date_picker_confirm_btn)
-
     PrezelButtonArea(
         isVertical = false,
         showBackground = true,
-    ) {
-        MainButton(
-            label = buttonLabel,
-            enabled = enabled,
-            onClick = onClick,
-        )
-    }
+        mainButton = { modifier ->
+            PrezelButton(
+                modifier = modifier,
+                text = stringResource(R.string.core_designsystem_date_picker_confirm_btn),
+                onClick = onClick,
+                enabled = enabled,
+                type = ButtonType.FILLED,
+                hierarchy = ButtonHierarchy.PRIMARY,
+            )
+        },
+    )
 }
 
 @Composable

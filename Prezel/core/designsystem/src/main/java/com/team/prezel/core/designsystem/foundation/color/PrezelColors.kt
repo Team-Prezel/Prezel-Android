@@ -15,7 +15,6 @@ data class PrezelColors(
     val bgRegular: Color,
     val bgMedium: Color,
     val bgLarge: Color,
-    val bgScrim: Color,
     val bgDisabled: Color,
     // Text
     // 정보와 콘텐츠를 명확하게 전달하기 위해 사용하는 색상입니다.
@@ -51,10 +50,12 @@ data class PrezelColors(
     val accentPurpleRegular: Color,
     val accentTealSmall: Color,
     val accentTealRegular: Color,
-    val accentMagentaSmall: Color,
-    val accentMagentaRegular: Color,
     // Solid
     // 흰색과 검정색을 제공하여 시각적 대비, 보조, 구분 등에 활용되는 절대값 색상입니다.
     val solidWhite: Color,
     val solidBlack: Color,
+    // Component
+    // 컴포넌트를 위한 색상입니다.
+    val chipContainerSecondaryFilledDefault: Color,
+    val scrimContainer: Color,
 )

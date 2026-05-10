@@ -1,0 +1,18 @@
+plugins {
+    alias(libs.plugins.prezel.android.feature.impl)
+}
+
+android {
+    namespace = "com.team.prezel.feature.setting.impl"
+}
+
+dependencies {
+    implementation(projects.coreDomain)
+    implementation(projects.coreModel)
+
+    implementation(projects.featureSettingApi)
+    implementation(projects.featureSplashApi)
+    implementation(projects.featureTermsApi)
+
+    implementation(libs.kotlinx.collections.immutable)
+}

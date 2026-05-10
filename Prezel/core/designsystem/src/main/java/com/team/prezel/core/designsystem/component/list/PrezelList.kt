@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -28,6 +29,7 @@ fun PrezelList(
     modifier: Modifier = Modifier,
     size: PrezelListSize = PrezelListSize.REGULAR,
     nested: Boolean = false,
+    titleTextColor: Color = LocalContentColor.current,
     leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
@@ -42,7 +44,7 @@ fun PrezelList(
             Spacer(modifier = Modifier.width(prezelListIconTextSpacing(size)))
         }
 
-        PrezelListTitle(title, size)
+        PrezelListTitle(title = title, size = size, textColor = titleTextColor)
 
         trailingContent?.let { content ->
             Spacer(modifier = Modifier.width(prezelListTextTrailingSpacing(size)))
@@ -61,13 +63,14 @@ fun PrezelList(
 private fun RowScope.PrezelListTitle(
     title: String,
     size: PrezelListSize,
+    textColor: Color,
 ) {
     Text(
         text = title,
         modifier = Modifier.weight(1f),
         maxLines = 1,
         style = prezelListTextStyle(size),
-        color = LocalContentColor.current,
+        color = textColor,
     )
 }
 

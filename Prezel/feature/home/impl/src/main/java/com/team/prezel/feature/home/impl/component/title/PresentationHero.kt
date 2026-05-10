@@ -10,8 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
+import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
+import com.team.prezel.core.designsystem.component.chip.chip.ChipType
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
@@ -33,11 +34,8 @@ internal fun PresentationHero(
     ) {
         PrezelChip(
             text = stringResource(id = presentation.category.labelResId()),
-            config = PrezelChipDefaults.getDefault(
-                iconOnly = false,
-                containerColor = PrezelTheme.colors.bgRegular,
-                textColor = PrezelTheme.colors.interactiveRegular,
-            ),
+            type = ChipType.OUTLINED,
+            size = ChipSize.SMALL,
         )
 
         Spacer(modifier = Modifier.weight(1f))
