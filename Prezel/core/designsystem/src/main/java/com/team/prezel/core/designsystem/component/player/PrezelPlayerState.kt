@@ -1,50 +1,29 @@
 package com.team.prezel.core.designsystem.component.player
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun rememberPrezelPlayerState(
-    playing: Boolean,
     durationMillis: Long,
-    currentMillis: Long,
-    items: ImmutableList<PrezelPlayerItem>,
-    onPlayPauseClick: () -> Unit,
-    onSeekToMillis: (Long) -> Unit,
-): PrezelPlayerState {
-    val currentOnPlayPauseClick = rememberUpdatedState(onPlayPauseClick)
-    val currentOnSeekToMillis = rememberUpdatedState(onSeekToMillis)
-
-    val state = remember {
+    initialItems: ImmutableList<PrezelPlayerItem>,
+    playing: Boolean = false,
+    currentMillis: Long = 0L,
+): PrezelPlayerState =
+    remember {
         PrezelPlayerState(
             playing = playing,
             durationMillis = durationMillis,
             currentMillis = currentMillis,
-            items = items,
-            onPlayPauseClick = { currentOnPlayPauseClick.value() },
-            onSeekToMillis = { targetMillis -> currentOnSeekToMillis.value(targetMillis) },
+            items = initialItems,
         )
     }
-
-    SideEffect {
-        state.update(
-            playing = playing,
-            durationMillis = durationMillis,
-            currentMillis = currentMillis,
-            items = items,
-        )
-    }
-
-    return state
-}
 
 @Stable
 class PrezelPlayerState internal constructor(
@@ -52,16 +31,14 @@ class PrezelPlayerState internal constructor(
     durationMillis: Long,
     currentMillis: Long,
     items: ImmutableList<PrezelPlayerItem>,
-    private val onPlayPauseClick: () -> Unit,
-    private val onSeekToMillis: (Long) -> Unit,
 ) {
     var playing by mutableStateOf(playing)
         private set
 
-    var durationMillis by mutableLongStateOf(durationMillis.coerceAtLeast(0L))
+    var durationMillis by mutableLongStateOf(durationMillis)
         private set
 
-    var currentMillis by mutableLongStateOf(currentMillis.coercePlayerMillis(this.durationMillis))
+    var currentMillis by mutableLongStateOf(currentMillis)
         private set
 
     var items by mutableStateOf(items)
@@ -89,10 +66,6 @@ class PrezelPlayerState internal constructor(
     val nextEnabled: Boolean
         get() = currentItemIndex >= 0 && currentItemIndex < items.lastIndex
 
-    fun playPause() {
-        onPlayPauseClick()
-    }
-
     fun seekToProgress(progress: Float) {
         seekToMillis((durationMillis * progress.coerceIn(0f, 1f)).toLong())
     }
@@ -105,6 +78,18 @@ class PrezelPlayerState internal constructor(
         if (nextEnabled) seekToMillis(items[currentItemIndex + 1].timeMillis)
     }
 
+    fun updatePlaying(playing: Boolean) {
+        this.playing = playing
+    }
+
+    fun togglePlaying() {
+        playing = !playing
+    }
+
+    fun updateCurrentMillis(currentMillis: Long) {
+        this.currentMillis = currentMillis
+    }
+
     fun startDrag() {
         dragging = true
     }
@@ -114,26 +99,6 @@ class PrezelPlayerState internal constructor(
     }
 
     private fun seekToMillis(targetMillis: Long) {
-        val coercedMillis = targetMillis.coercePlayerMillis(durationMillis)
-        if (dragging) currentMillis = coercedMillis
-        onSeekToMillis(coercedMillis)
-    }
-
-    internal fun update(
-        playing: Boolean,
-        durationMillis: Long,
-        currentMillis: Long,
-        items: ImmutableList<PrezelPlayerItem>,
-    ) {
-        this.playing = playing
-        this.durationMillis = durationMillis.coerceAtLeast(0L)
-        if (!dragging) {
-            this.currentMillis = currentMillis.coercePlayerMillis(this.durationMillis)
-        } else {
-            this.currentMillis = this.currentMillis.coercePlayerMillis(this.durationMillis)
-        }
-        this.items = items
+        currentMillis = targetMillis
     }
 }
-
-private fun Long.coercePlayerMillis(durationMillis: Long): Long = coerceIn(0L, durationMillis.coerceAtLeast(0L))

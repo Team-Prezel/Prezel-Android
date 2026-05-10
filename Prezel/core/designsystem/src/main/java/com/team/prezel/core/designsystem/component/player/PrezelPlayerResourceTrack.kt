@@ -33,9 +33,8 @@ internal fun PrezelPlayerResourceTrack(
     onDragStarted: () -> Unit = {},
     onDragStopped: () -> Unit = {},
 ) {
-    val displayedDurationMillis = durationMillis.coerceAtLeast(0L)
-    val displayedCurrentMillis = if (idle) 0L else currentMillis.coercePlayerMillis(displayedDurationMillis)
-    val displayedProgress = if (idle) 0f else displayedCurrentMillis.toPlayerProgress(displayedDurationMillis)
+    val displayedCurrentMillis = if (idle) 0L else currentMillis
+    val displayedProgress = if (idle) 0f else displayedCurrentMillis.toPlayerProgress(durationMillis)
 
     Column(
         modifier = modifier.heightIn(min = 40.dp),
@@ -43,7 +42,7 @@ internal fun PrezelPlayerResourceTrack(
     ) {
         PrezelPlayerTimeline(
             progress = displayedProgress,
-            durationMillis = displayedDurationMillis,
+            durationMillis = durationMillis,
             items = items,
             contentDescription = contentDescription,
             showHandle = showHandle,
@@ -55,7 +54,7 @@ internal fun PrezelPlayerResourceTrack(
 
         PlayerTrackTimeLabels(
             currentMillis = displayedCurrentMillis,
-            durationMillis = displayedDurationMillis,
+            durationMillis = durationMillis,
         )
     }
 }
@@ -90,10 +89,8 @@ private fun Long.toPlayerProgress(durationMillis: Long): Float =
         (toFloat() / durationMillis.toFloat()).coerceIn(0f, 1f)
     }
 
-private fun Long.coercePlayerMillis(durationMillis: Long): Long = coerceIn(0L, durationMillis.coerceAtLeast(0L))
-
 private fun Long.formatPlayerTime(): String {
-    val totalSeconds = coerceAtLeast(0L) / 1_000L
+    val totalSeconds = this / 1_000L
     val minutes = totalSeconds / 60L
     val seconds = totalSeconds % 60L
     return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
