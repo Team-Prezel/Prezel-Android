@@ -78,8 +78,7 @@ internal class MediaRecordingAudioController @Inject constructor(
     }
 
     override fun stopRecording() {
-        val state = audioSessionState.value
-        val elapsedSeconds = when (state) {
+        val elapsedSeconds = when (val state = audioSessionState.value) {
             is AudioSessionState.Recording -> state.elapsedSeconds
             else -> return
         }
