@@ -3,9 +3,9 @@ package com.team.prezel.core.designsystem.theme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTextStyles
 import com.team.prezel.core.designsystem.foundation.typography.PrezelTypography
+import com.team.prezel.core.designsystem.preview.LargeDevicePreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
 import kotlinx.collections.immutable.ImmutableList
@@ -37,13 +37,7 @@ internal object PrezelTypographyScheme {
         )
 }
 
-@Preview(
-    showBackground = true,
-    device = "spec:width=850dp,height=600dp",
-)
-private annotation class TypographyPreview
-
-@TypographyPreview
+@LargeDevicePreview
 @Composable
 private fun PrezelTypographyTitlePreview() {
     val typography = PrezelTypographyScheme.Default()
@@ -61,7 +55,7 @@ private fun PrezelTypographyTitlePreview() {
     )
 }
 
-@TypographyPreview
+@LargeDevicePreview
 @Composable
 private fun PrezelTypographyBodyPreview() {
     val typography = PrezelTypographyScheme.Default()
@@ -82,7 +76,7 @@ private fun PrezelTypographyBodyPreview() {
     )
 }
 
-@TypographyPreview
+@LargeDevicePreview
 @Composable
 private fun PrezelTypographyCaptionPreview() {
     val typography = PrezelTypographyScheme.Default()

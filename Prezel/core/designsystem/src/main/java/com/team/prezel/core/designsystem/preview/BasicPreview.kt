@@ -9,3 +9,11 @@ import androidx.compose.ui.tooling.preview.Preview
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 annotation class BasicPreview
+
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    device = "spec:width=1080dp,height=1400dp",
+)
+annotation class LargeDevicePreview

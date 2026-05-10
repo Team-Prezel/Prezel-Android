@@ -28,6 +28,7 @@ kotlinxCollectionsImmutable = "0.4.0"
 kotlinxSerialization = "1.9.0"
 kakao = "2.23.2"
 lottie = "6.6.7"
+balloonCompose = "1.7.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -78,7 +79,9 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 kakao-user = { module = "com.kakao.sdk:v2-user", version.ref = "kakao" }
+
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
+balloon-compose = { module = "com.github.skydoves:balloon-compose", version.ref = "balloonCompose" }
 
 # Dependencies of the included build-logic
 android-gradleApiPlugin = { group = "com.android.tools.build", name = "gradle-api", version.ref = "agp" }

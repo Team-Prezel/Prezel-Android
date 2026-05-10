@@ -12,4 +12,6 @@ dependencies {
     implementation(libs.coil.kt.compose)
     implementation(libs.kotlinx.datetime)
     implementation(libs.timber)
+
+    implementation(libs.balloon.compose)
 }

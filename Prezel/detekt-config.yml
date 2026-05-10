@@ -16,7 +16,7 @@ style:
         ignoreAnnotated:
             - Preview
             - BasicPreview
-            - TypographyPreview
+            - LargeDevicePreview
 
 complexity:
     LongMethod:
@@ -24,6 +24,7 @@ complexity:
         ignoreAnnotated:
             - Preview
             - BasicPreview
+            - LargeDevicePreview
     NestedBlockDepth:
         threshold: 4
     LongParameterList:

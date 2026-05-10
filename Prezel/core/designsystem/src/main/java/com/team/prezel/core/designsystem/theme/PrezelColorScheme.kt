@@ -28,7 +28,6 @@ internal object PrezelColorScheme {
         bgRegular = ColorTokens.Common0,
         bgMedium = ColorTokens.CoolGray10,
         bgLarge = ColorTokens.CoolGray100,
-        bgScrim = ColorTokens.Common1000.copy(alpha = 0.32f),
         bgDisabled = ColorTokens.CoolGray50,
         textSmall = ColorTokens.CoolGray300,
         textRegular = ColorTokens.CoolGray500,
@@ -53,11 +52,11 @@ internal object PrezelColorScheme {
         accentPurpleSmall = ColorTokens.Purple10,
         accentPurpleRegular = ColorTokens.Purple500,
         accentTealSmall = ColorTokens.Teal10,
-        accentTealRegular = ColorTokens.Teal500,
-        accentMagentaSmall = ColorTokens.Magenta10,
-        accentMagentaRegular = ColorTokens.Magenta500,
+        accentTealRegular = ColorTokens.Teal600,
         solidWhite = ColorTokens.Common0,
         solidBlack = ColorTokens.Common1000,
+        chipContainerSecondaryFilledDefault = ColorTokens.CoolGray50,
+        scrimContainer = ColorTokens.Common1000.copy(alpha = 0.32f),
     )
 
     val Dark = PrezelColors(
@@ -67,7 +66,6 @@ internal object PrezelColorScheme {
         bgRegular = ColorTokens.CoolGray950,
         bgMedium = ColorTokens.CoolGray900,
         bgLarge = ColorTokens.CoolGray800,
-        bgScrim = ColorTokens.Common1000.copy(alpha = 0.32f),
         bgDisabled = ColorTokens.CoolGray700,
         textSmall = ColorTokens.CoolGray600,
         textRegular = ColorTokens.CoolGray400,
@@ -86,17 +84,17 @@ internal object PrezelColorScheme {
         feedbackGoodSmall = ColorTokens.Blue10,
         feedbackGoodRegular = ColorTokens.Blue500,
         feedbackBadSmall = ColorTokens.Coral10,
-        feedbackBadRegular = ColorTokens.Coral600,
+        feedbackBadRegular = ColorTokens.Coral500,
         feedbackWarningSmall = ColorTokens.Orange10,
         feedbackWarningRegular = ColorTokens.Orange500,
         accentPurpleSmall = ColorTokens.Purple10,
         accentPurpleRegular = ColorTokens.Purple500,
         accentTealSmall = ColorTokens.Teal10,
-        accentTealRegular = ColorTokens.Teal500,
-        accentMagentaSmall = ColorTokens.Magenta10,
-        accentMagentaRegular = ColorTokens.Magenta500,
+        accentTealRegular = ColorTokens.Teal600,
         solidWhite = ColorTokens.Common0,
         solidBlack = ColorTokens.Common1000,
+        chipContainerSecondaryFilledDefault = ColorTokens.CoolGray50,
+        scrimContainer = ColorTokens.Common1000.copy(alpha = 0.32f),
     )
 }
 
@@ -124,7 +122,6 @@ private fun PrezelColorSchemeBackgroundPreview() {
             "Regular" to PrezelColorScheme.Light.bgRegular,
             "Medium" to PrezelColorScheme.Light.bgMedium,
             "Large" to PrezelColorScheme.Light.bgLarge,
-            "Scrim" to PrezelColorScheme.Light.bgScrim,
             "Disabled" to PrezelColorScheme.Light.bgDisabled,
         ),
     )
@@ -204,8 +201,6 @@ private fun PrezelColorSchemeAccentPreview() {
             "PurpleRegular" to PrezelColorScheme.Light.accentPurpleRegular,
             "TealSmall" to PrezelColorScheme.Light.accentTealSmall,
             "TealRegular" to PrezelColorScheme.Light.accentTealRegular,
-            "MagentaSmall" to PrezelColorScheme.Light.accentMagentaSmall,
-            "MagentaRegular" to PrezelColorScheme.Light.accentMagentaRegular,
         ),
     )
 }
@@ -219,6 +214,19 @@ private fun PrezelColorSchemeSolidPreview() {
         items = persistentListOf(
             "White" to PrezelColorScheme.Light.solidWhite,
             "Black" to PrezelColorScheme.Light.solidBlack,
+        ),
+    )
+}
+
+@BasicPreview
+@Composable
+private fun PrezelColorSchemeComponentPreview() {
+    PrezelColorsPreviewSection(
+        title = "Component",
+        description = "컴포넌트를 위한 색상입니다.",
+        items = persistentListOf(
+            "Chip_Container_Secondary_Filled_Default" to PrezelColorScheme.Light.chipContainerSecondaryFilledDefault,
+            "Scrim_Container" to PrezelColorScheme.Light.scrimContainer,
         ),
     )
 }
