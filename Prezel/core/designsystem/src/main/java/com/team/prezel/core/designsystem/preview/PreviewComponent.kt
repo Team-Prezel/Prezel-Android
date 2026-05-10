@@ -1,16 +1,20 @@
 package com.team.prezel.core.designsystem.preview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -34,6 +39,28 @@ internal data class PreviewDefaults(
     val screenPadding: PaddingValues = PaddingValues(16.dp),
     val sectionSpacing: Dp = 24.dp,
     val itemSpacing: Dp = 12.dp,
+)
+
+@Immutable
+internal data class PreviewMatrixColumn(
+    val header: String,
+    val weight: Float = 1f,
+)
+
+@Immutable
+internal data class PreviewMatrixRow<T>(
+    val label: String,
+    val values: List<T>,
+    val labelWeight: Float = 1f,
+)
+
+@Immutable
+internal data class PreviewMatrixDefaults(
+    val titleSpacing: Dp = 12.dp,
+    val headerHorizontalPadding: Dp = 8.dp,
+    val headerVerticalPadding: Dp = 10.dp,
+    val cellHorizontalPadding: Dp = 8.dp,
+    val cellVerticalPadding: Dp = 14.dp,
 )
 
 /**
@@ -191,6 +218,184 @@ internal fun PreviewValueRow(
         Box(modifier = Modifier, contentAlignment = Alignment.CenterEnd) {
             preview()
         }
+    }
+}
+
+@Composable
+internal fun <T> PreviewMatrix(
+    title: String,
+    columns: List<PreviewMatrixColumn>,
+    rows: List<PreviewMatrixRow<T>>,
+    modifier: Modifier = Modifier,
+    leadingHeaderText: String = "Case",
+    leadingColumnWeight: Float = 1f,
+    defaults: PreviewMatrixDefaults = PreviewMatrixDefaults(),
+    headerCellContent: (@Composable (PreviewMatrixColumn) -> Unit)? = null,
+    rowLabelContent: (@Composable (PreviewMatrixRow<T>) -> Unit)? = null,
+    cellContent: @Composable (T) -> Unit,
+) {
+    rows.forEach { row ->
+        require(row.values.size == columns.size) {
+            "PreviewMatrix row '${row.label}' has ${row.values.size} values, expected ${columns.size}."
+        }
+    }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(defaults.titleSpacing),
+    ) {
+        Text(
+            text = title,
+            style = PrezelTheme.typography.body3Bold,
+            color = PrezelTheme.colors.textLarge,
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            PreviewMatrixHeaderRow(
+                leadingHeaderText = leadingHeaderText,
+                leadingColumnWeight = leadingColumnWeight,
+                columns = columns,
+                defaults = defaults,
+                headerCellContent = headerCellContent,
+            )
+
+            rows.forEach { row ->
+                PreviewMatrixRow(
+                    row = row,
+                    columns = columns,
+                    defaults = defaults,
+                    rowLabelContent = rowLabelContent,
+                    cellContent = cellContent,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreviewMatrixHeaderRow(
+    leadingHeaderText: String,
+    leadingColumnWeight: Float,
+    columns: List<PreviewMatrixColumn>,
+    defaults: PreviewMatrixDefaults,
+    headerCellContent: (@Composable (PreviewMatrixColumn) -> Unit)?,
+) {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+    ) {
+        PreviewMatrixHeaderCell(
+            modifier = Modifier.weight(leadingColumnWeight),
+            defaults = defaults,
+        ) {
+            Text(
+                text = leadingHeaderText,
+                style = PrezelTheme.typography.caption2Regular,
+                color = PrezelTheme.colors.textMedium,
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        columns.forEach { column ->
+            PreviewMatrixHeaderCell(
+                modifier = Modifier.weight(column.weight),
+                defaults = defaults,
+            ) {
+                if (headerCellContent == null) {
+                    Text(
+                        text = column.header,
+                        style = PrezelTheme.typography.caption2Regular,
+                        color = PrezelTheme.colors.textMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                } else {
+                    headerCellContent(column)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun <T> PreviewMatrixRow(
+    row: PreviewMatrixRow<T>,
+    columns: List<PreviewMatrixColumn>,
+    defaults: PreviewMatrixDefaults,
+    rowLabelContent: (@Composable (PreviewMatrixRow<T>) -> Unit)?,
+    cellContent: @Composable (T) -> Unit,
+) {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+    ) {
+        PreviewMatrixCell(
+            modifier = Modifier.weight(row.labelWeight),
+            defaults = defaults,
+        ) {
+            if (rowLabelContent == null) {
+                Text(
+                    text = row.label,
+                    style = PrezelTheme.typography.body3Medium,
+                    color = PrezelTheme.colors.textLarge,
+                    textAlign = TextAlign.Center,
+                )
+            } else {
+                rowLabelContent(row)
+            }
+        }
+
+        row.values.forEachIndexed { index, value ->
+            PreviewMatrixCell(
+                modifier = Modifier.weight(columns[index].weight),
+                defaults = defaults,
+            ) {
+                cellContent(value)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreviewMatrixHeaderCell(
+    modifier: Modifier = Modifier,
+    defaults: PreviewMatrixDefaults,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .border(width = PrezelTheme.stroke.V1, color = PrezelTheme.colors.borderRegular)
+            .background(PrezelTheme.colors.bgMedium)
+            .padding(
+                horizontal = defaults.headerHorizontalPadding,
+                vertical = defaults.headerVerticalPadding,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun PreviewMatrixCell(
+    modifier: Modifier = Modifier,
+    defaults: PreviewMatrixDefaults,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .border(width = PrezelTheme.stroke.V1, color = PrezelTheme.colors.borderRegular)
+            .padding(
+                horizontal = defaults.cellHorizontalPadding,
+                vertical = defaults.cellVerticalPadding,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        content()
     }
 }
 
