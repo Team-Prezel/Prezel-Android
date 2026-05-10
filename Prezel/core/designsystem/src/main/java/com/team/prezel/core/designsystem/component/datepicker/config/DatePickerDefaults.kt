@@ -50,6 +50,6 @@ internal object DatePickerDefaults {
             dayTextColor = PrezelTheme.colors.textMedium,
             pastDayTextColor = Color.Transparent,
             todayDayTextColor = PrezelTheme.colors.interactiveRegular,
-            holidayDayTextColor = PrezelTheme.colors.accentMagentaRegular,
+            holidayDayTextColor = PrezelTheme.colors.feedbackWarningRegular,
         )
 }
