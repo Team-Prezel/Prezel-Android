@@ -97,7 +97,7 @@ private fun BadgeImage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = PrezelTheme.colors.bgScrim),
+                    .background(color = PrezelTheme.colors.scrimContainer),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
