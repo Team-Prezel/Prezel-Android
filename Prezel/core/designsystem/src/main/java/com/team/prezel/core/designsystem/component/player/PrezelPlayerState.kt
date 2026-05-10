@@ -5,9 +5,11 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun rememberPrezelPlayerState(
@@ -16,7 +18,9 @@ fun rememberPrezelPlayerState(
     playing: Boolean = false,
     currentMillis: Long = 0L,
 ): PrezelPlayerState =
-    remember {
+    rememberSaveable(
+        saver = PrezelPlayerState.Saver,
+    ) {
         PrezelPlayerState(
             playing = playing,
             durationMillis = durationMillis,
@@ -100,5 +104,64 @@ class PrezelPlayerState internal constructor(
 
     private fun seekToMillis(targetMillis: Long) {
         currentMillis = targetMillis
+    }
+
+    companion object {
+        val Saver: Saver<PrezelPlayerState, Any> = Saver(
+            save = { state ->
+                listOf(
+                    state.playing,
+                    state.durationMillis,
+                    state.currentMillis,
+                    state.items.map { item -> item.toSaveable() },
+                )
+            },
+            restore = { restored ->
+                val values = restored as List<*>
+                PrezelPlayerState(
+                    playing = values[0] as Boolean,
+                    durationMillis = values[1] as Long,
+                    currentMillis = values[2] as Long,
+                    items = (values[3] as List<*>)
+                        .map { savedItem -> (savedItem as List<*>).toPrezelPlayerItem() }
+                        .toImmutableList(),
+                )
+            },
+        )
+
+        private fun PrezelPlayerItem.toSaveable(): List<Any> =
+            when (this) {
+                is PrezelPlayerItem.Segment -> listOf(
+                    PLAYER_ITEM_TYPE_SEGMENT,
+                    timeMillis,
+                )
+
+                is PrezelPlayerItem.Marker -> listOf(
+                    PLAYER_ITEM_TYPE_MARKER,
+                    timeMillis,
+                    markerType.name,
+                )
+            }
+
+        private fun List<*>.toPrezelPlayerItem(): PrezelPlayerItem {
+            val type = this[0] as String
+            val timeMillis = this[1] as Long
+
+            return when (type) {
+                PLAYER_ITEM_TYPE_SEGMENT -> PrezelPlayerItem.Segment(
+                    timeMillis = timeMillis,
+                )
+
+                PLAYER_ITEM_TYPE_MARKER -> PrezelPlayerItem.Marker(
+                    timeMillis = timeMillis,
+                    markerType = PrezelPlayerMarkerType.valueOf(this[2] as String),
+                )
+
+                else -> error("지원하지 않는 PrezelPlayerItem 타입입니다: $type")
+            }
+        }
+
+        private const val PLAYER_ITEM_TYPE_SEGMENT = "segment"
+        private const val PLAYER_ITEM_TYPE_MARKER = "marker"
     }
 }
