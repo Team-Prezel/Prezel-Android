@@ -164,6 +164,7 @@ private fun SpeedGraphChart(
     }
 }
 
+/** 현재 속도 값과 단위를 그래프 중앙에 표시합니다. */
 @Composable
 private fun SpmDisplay(userGauge: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -183,6 +184,7 @@ private fun SpmDisplay(userGauge: Int) {
     }
 }
 
+/** 기준 범위의 시작값과 끝값을 그래프 하단에 배치합니다. */
 @Composable
 private fun RangeBounds(
     lowerBound: Int,
@@ -205,6 +207,7 @@ private fun RangeBounds(
     }
 }
 
+/** 기준 범위 안의 값을 그래프 각도로 변환합니다. */
 private fun Int.toAngle(baseRange: IntRange): Float {
     if (baseRange.last <= baseRange.first) return START_ANGLE
 
@@ -212,8 +215,10 @@ private fun Int.toAngle(baseRange: IntRange): Float {
     return START_ANGLE + (FULL_CIRCLE_DEGREES * progress.coerceIn(0f, 1f))
 }
 
+/** 그래프 시작점부터 현재 값까지의 sweep 각도를 계산합니다. */
 private fun Int.sweepFromStart(baseRange: IntRange): Float = toAngle(baseRange) - START_ANGLE
 
+/** 기준 범위 안에서 겹치는 구간의 sweep 각도를 계산합니다. */
 private fun IntRange.sweepAngle(baseRange: IntRange): Float {
     if (isEmpty()) return 0f
     return max(
@@ -222,6 +227,7 @@ private fun IntRange.sweepAngle(baseRange: IntRange): Float {
     )
 }
 
+/** 두 범위가 겹치는 구간만 남깁니다. */
 private fun IntRange.intersect(other: IntRange): IntRange {
     val start = max(first, other.first)
     val endInclusive = minOf(last, other.last)
@@ -230,15 +236,33 @@ private fun IntRange.intersect(other: IntRange): IntRange {
 
 @BasicPreview
 @Composable
-private fun SpeedGraphPreview() {
+private fun SpeedGraphGoodPreview() {
     PrezelTheme {
-        Column(
+        SpeedGraph(
+            userGauge = 241,
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SpeedGraph(userGauge = 241)
-            SpeedGraph(userGauge = 190)
-            SpeedGraph(userGauge = 270)
-        }
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun SpeedGraphSlowPreview() {
+    PrezelTheme {
+        SpeedGraph(
+            userGauge = 190,
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun SpeedGraphFastPreview() {
+    PrezelTheme {
+        SpeedGraph(
+            userGauge = 270,
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }
