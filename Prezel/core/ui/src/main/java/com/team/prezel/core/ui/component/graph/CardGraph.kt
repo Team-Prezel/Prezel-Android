@@ -509,20 +509,26 @@ private object CardGraphMath {
 }
 
 private object CardGraphDrawers {
+    /**
+     * 카드 그래프의 가이드, 선, 마커를 순서대로 그린다.
+     *
+     * 배경성 요소를 먼저 그리고 데이터 요소를 마지막에 올려 시각적 우선순위를 유지한다.
+     */
     fun DrawScope.drawChart(
         chartState: CardGraphChartState,
         xAxisCenters: List<Float>,
         colors: CardGraphColors,
         dimensions: CardGraphDimensions,
     ) {
-        drawVerticalGuides(chartState.validXAxisCenters, colors.dash)
-        drawBaseline(chartState.baselineY, colors.baseline)
-        drawSelectionGuide(chartState, xAxisCenters, colors, dimensions)
-        drawSeries(chartState, colors, dimensions)
-        drawSinglePointMarkers(chartState, colors, dimensions)
-        drawSelectionMarkers(chartState, colors, dimensions)
+        drawVerticalGuides(validXAxisCenters = chartState.validXAxisCenters, color = colors.dash)
+        drawBaseline(baselineY = chartState.baselineY, color = colors.baseline)
+        drawSelectionGuide(chartState = chartState, xAxisCenters = xAxisCenters, colors = colors, dimensions = dimensions)
+        drawSeries(chartState = chartState, colors = colors, dimensions = dimensions)
+        drawSinglePointMarkers(chartState = chartState, colors = colors, dimensions = dimensions)
+        drawSelectionMarkers(chartState = chartState, colors = colors, dimensions = dimensions)
     }
 
+    /** x축 레이블 중심 좌표를 기준으로 세로 가이드를 그린다. */
     private fun DrawScope.drawVerticalGuides(
         validXAxisCenters: List<Float>,
         color: Color,
@@ -541,6 +547,7 @@ private object CardGraphDrawers {
         }
     }
 
+    /** 차트 영역의 하단 기준선과 x축 경계를 그린다. */
     private fun DrawScope.drawBaseline(
         baselineY: Float,
         color: Color,
@@ -553,6 +560,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 선택된 인덱스가 있을 때 해당 x축 위치의 세로 가이드를 그린다. */
     private fun DrawScope.drawSelectionGuide(
         chartState: CardGraphChartState,
         xAxisCenters: List<Float>,
@@ -571,6 +579,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 발화와 대본 일치율 시리즈 선을 각각 그린다. */
     private fun DrawScope.drawSeries(
         chartState: CardGraphChartState,
         colors: CardGraphColors,
@@ -588,6 +597,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 선택된 인덱스의 두 시리즈 포인트를 강조 마커로 그린다. */
     private fun DrawScope.drawSelectionMarkers(
         chartState: CardGraphChartState,
         colors: CardGraphColors,
@@ -629,6 +639,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 인접한 좌표들을 직선으로 이어 시리즈 선을 만든다. */
     private fun DrawScope.drawSeriesLine(
         points: List<Offset>,
         color: Color,
@@ -647,6 +658,7 @@ private object CardGraphDrawers {
         }
     }
 
+    /** 선택된 포인트 위에 halo와 중심점을 함께 그린다. */
     private fun DrawScope.drawSelectedMarker(
         points: List<Offset>,
         selectedIndex: Int,
@@ -668,6 +680,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 데이터가 1개뿐일 때 선택 상태 없이도 포인트가 보이도록 점을 그린다. */
     private fun DrawScope.drawMarkerIfSinglePoint(
         points: List<Offset>,
         color: Color,
@@ -682,6 +695,7 @@ private object CardGraphDrawers {
         )
     }
 
+    /** 선택된 x축 위치에 세로 가이드와 삼각형 포인터를 그린다. */
     private fun DrawScope.drawSelectedGuide(
         xAxisCenters: List<Float>,
         selectedIndex: Int,
