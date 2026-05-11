@@ -3,6 +3,7 @@ package com.team.prezel.core.ui.component.graph
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,23 +21,23 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlin.math.max
+import kotlin.math.min
 
 private const val DEFAULT_LOWER_BOUND = 180
 private const val DEFAULT_UPPER_BOUND = 280
-private const val GOOD_LOWER_BOUND = 210
-private const val GOOD_UPPER_BOUND = 260
+private const val DEFAULT_GOOD_LOWER_BOUND = 210
+private const val DEFAULT_GOOD_UPPER_BOUND = 260
 
 private const val FULL_CIRCLE_DEGREES = 270f
-private const val GAP_CENTER_ANGLE = 90f
+private const val START_ANGLE = 135f
 private const val GRAPH_STROKE_RATIO = 0.12f
+private const val GRAPH_LABEL_HORIZONTAL_PADDING_RATIO = 0.1875f
 private val GRAPH_SIZE = 160.dp
-private val GRAPH_DIAMETER = 152.dp
-private val GRAPH_LABEL_HORIZONTAL_PADDING = 30.dp
 
 data class SpeedGraphColors(
     val baseTrackColor: Color,
@@ -72,11 +73,11 @@ data class SpeedGraphColors(
 fun SpeedGraph(
     userGauge: Int,
     modifier: Modifier = Modifier,
-    goodRange: IntRange = IntRange(GOOD_LOWER_BOUND, GOOD_UPPER_BOUND),
+    goodRange: IntRange = IntRange(DEFAULT_GOOD_LOWER_BOUND, DEFAULT_GOOD_UPPER_BOUND),
     baseRange: IntRange = IntRange(DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND),
     colors: SpeedGraphColors = SpeedGraphColors.getDefault(),
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .size(GRAPH_SIZE)
             .padding(horizontal = PrezelTheme.spacing.V4)
@@ -93,6 +94,7 @@ fun SpeedGraph(
             lowerBound = baseRange.first,
             upperBound = baseRange.last,
             modifier = Modifier.align(Alignment.BottomCenter),
+            horizontalPadding = maxWidth * GRAPH_LABEL_HORIZONTAL_PADDING_RATIO,
         )
     }
 }
@@ -106,56 +108,54 @@ private fun SpeedGraphChart(
     modifier: Modifier = Modifier,
 ) {
     val hasValidBaseRange = baseRange.last > baseRange.first
-    val clampedGauge = userGauge.coerceIn(baseRange.first, baseRange.last)
     val clampedGoodRange = goodRange.intersect(baseRange)
-    val density = LocalDensity.current
-    val startAngle = calculateStartAngle()
-    val sweepAngle = FULL_CIRCLE_DEGREES
-    val graphWidthPx = with(density) { GRAPH_DIAMETER.toPx() }
-    val strokeWidthPx = (graphWidthPx / 2f) * GRAPH_STROKE_RATIO
-    val arcDiameter = graphWidthPx - strokeWidthPx
-    val arcTopLeft = Offset(
-        x = (graphWidthPx - arcDiameter) / 2f,
-        y = strokeWidthPx / 2f,
-    )
-    val arcSize = Size(width = arcDiameter, height = arcDiameter)
 
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            val graphWidthPx = min(size.width, size.height)
+            val strokeWidthPx = (graphWidthPx / 2f) * GRAPH_STROKE_RATIO
+            val arcDiameter = graphWidthPx - strokeWidthPx
+            val arcTopLeft = Offset(
+                x = (size.width - arcDiameter) / 2f,
+                y = (size.height - arcDiameter) / 2f,
+            )
+            val arcSize = Size(width = arcDiameter, height = arcDiameter)
+            val arcStroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+
             drawArc(
                 color = colors.baseTrackColor,
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
+                startAngle = START_ANGLE,
+                sweepAngle = FULL_CIRCLE_DEGREES,
                 useCenter = false,
                 topLeft = arcTopLeft,
                 size = arcSize,
-                style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+                style = arcStroke,
             )
 
             if (hasValidBaseRange && !clampedGoodRange.isEmpty()) {
                 drawArc(
                     color = colors.goodRangeColor,
-                    startAngle = clampedGoodRange.first.toAngle(baseRange, startAngle, sweepAngle),
+                    startAngle = clampedGoodRange.first.toAngle(baseRange),
                     sweepAngle = clampedGoodRange.sweepAngle(baseRange),
                     useCenter = false,
                     topLeft = arcTopLeft,
                     size = arcSize,
-                    style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+                    style = arcStroke,
                 )
             }
 
             if (hasValidBaseRange) {
                 drawArc(
                     color = if (userGauge in goodRange) colors.goodGaugeColor else colors.badGaugeColor,
-                    startAngle = startAngle,
-                    sweepAngle = clampedGauge.sweepFromStart(baseRange),
+                    startAngle = START_ANGLE,
+                    sweepAngle = userGauge.sweepFromStart(baseRange = baseRange),
                     useCenter = false,
                     topLeft = arcTopLeft,
                     size = arcSize,
-                    style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+                    style = arcStroke,
                 )
             }
         }
@@ -187,12 +187,13 @@ private fun SpmDisplay(userGauge: Int) {
 private fun RangeBounds(
     lowerBound: Int,
     upperBound: Int,
+    horizontalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = GRAPH_LABEL_HORIZONTAL_PADDING),
+            .padding(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ProvideTextStyle(
@@ -204,40 +205,21 @@ private fun RangeBounds(
     }
 }
 
-@BasicPreview
-@Composable
-private fun SpeedGraphPreview() {
-    PrezelTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SpeedGraph(userGauge = 190)
-            SpeedGraph(userGauge = 220)
-            SpeedGraph(userGauge = 270)
-        }
-    }
-}
-
-private fun Int.toAngle(
-    baseRange: IntRange,
-    startAngle: Float = calculateStartAngle(),
-    sweepAngle: Float = FULL_CIRCLE_DEGREES,
-): Float {
-    if (baseRange.last <= baseRange.first) return startAngle
+private fun Int.toAngle(baseRange: IntRange): Float {
+    if (baseRange.last <= baseRange.first) return START_ANGLE
 
     val progress = (this - baseRange.first).toFloat() / (baseRange.last - baseRange.first).toFloat()
-    return startAngle + (sweepAngle * progress.coerceIn(0f, 1f))
+    return START_ANGLE + (FULL_CIRCLE_DEGREES * progress.coerceIn(0f, 1f))
 }
 
-private fun Int.sweepFromStart(baseRange: IntRange): Float {
-    val startAngle = calculateStartAngle()
-    return toAngle(baseRange, startAngle = startAngle) - startAngle
-}
+private fun Int.sweepFromStart(baseRange: IntRange): Float = toAngle(baseRange) - START_ANGLE
 
 private fun IntRange.sweepAngle(baseRange: IntRange): Float {
     if (isEmpty()) return 0f
-    return max(last.toAngle(baseRange) - first.toAngle(baseRange), 0f)
+    return max(
+        last.toAngle(baseRange) - first.toAngle(baseRange),
+        0f,
+    )
 }
 
 private fun IntRange.intersect(other: IntRange): IntRange {
@@ -246,7 +228,17 @@ private fun IntRange.intersect(other: IntRange): IntRange {
     return if (start <= endInclusive) IntRange(start, endInclusive) else IntRange.EMPTY
 }
 
-private fun calculateStartAngle(): Float {
-    val gapSweep = 360f - FULL_CIRCLE_DEGREES
-    return GAP_CENTER_ANGLE + (gapSweep / 2f)
+@BasicPreview
+@Composable
+private fun SpeedGraphPreview() {
+    PrezelTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SpeedGraph(userGauge = 241)
+            SpeedGraph(userGauge = 190)
+            SpeedGraph(userGauge = 270)
+        }
+    }
 }
