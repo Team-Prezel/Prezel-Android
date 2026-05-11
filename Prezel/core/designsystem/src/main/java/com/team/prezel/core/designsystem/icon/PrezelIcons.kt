@@ -44,6 +44,8 @@ object PrezelIcons {
     val Rotate = R.drawable.core_designsystem_ic_rotate
     val Search = R.drawable.core_designsystem_ic_search
     val Setting = R.drawable.core_designsystem_ic_setting
+    val SkipBackward = R.drawable.core_designsystem_ic_backward
+    val SkipForward = R.drawable.core_designsystem_ic_forward
     val Stop = R.drawable.core_designsystem_ic_stop
     val Storage = R.drawable.core_designsystem_ic_storage
     val Trophy = R.drawable.core_designsystem_ic_trophy
