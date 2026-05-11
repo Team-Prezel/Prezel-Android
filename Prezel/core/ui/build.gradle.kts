@@ -10,4 +10,5 @@ dependencies {
     implementation(projects.coreDesignsystem)
     implementation(projects.coreModel)
     implementation(libs.lottie.compose)
+    implementation(libs.kotlinx.collections.immutable)
 }
