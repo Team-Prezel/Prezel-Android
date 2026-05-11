@@ -24,10 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
-import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipDefaults
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
@@ -154,7 +151,9 @@ private fun PracticeAnalysisMetricRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier.weight(1f).padding(start = 8.dp, top = 5.dp, bottom = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp, top = 5.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -178,23 +177,14 @@ private fun PracticeAnalysisMetricRow(
         Spacer(modifier = Modifier.width(PrezelTheme.spacing.V12))
 
         Row(
-            modifier = Modifier.weight(1f).padding(end = 8.dp, top = 5.dp, bottom = 5.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp, top = 5.dp, bottom = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             PracticeAnalysisMetricLabel(text = stringResource(R.string.feature_home_impl_practice_recording_analysis_speed))
-            PrezelChip(
-                text = stringResource(speed.labelResId),
-                modifier = Modifier,
-                config = PrezelChipDefaults.getDefault(
-                    iconOnly = false,
-                    type = PrezelChipType.FILLED,
-                    size = PrezelChipSize.REGULAR,
-                    textStyle = PrezelTheme.typography.caption1Medium,
-                    containerColor = PrezelTheme.colors.bgLarge,
-                    textColor = PrezelTheme.colors.textMedium,
-                ),
-            )
+            PrezelChip(text = stringResource(speed.labelResId))
         }
     }
 }
