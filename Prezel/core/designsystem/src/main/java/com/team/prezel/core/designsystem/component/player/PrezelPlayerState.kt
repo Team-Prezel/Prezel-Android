@@ -19,6 +19,8 @@ fun rememberPrezelPlayerState(
     currentMillis: Long = 0L,
 ): PrezelPlayerState =
     rememberSaveable(
+        durationMillis,
+        initialItems,
         saver = PrezelPlayerState.Saver,
     ) {
         PrezelPlayerState(
@@ -114,6 +116,7 @@ class PrezelPlayerState internal constructor(
 
     fun updateCurrentMillis(currentMillis: Long) {
         this.currentMillis = currentMillis.coerceIn(0L, durationMillis)
+        if (playbackEnded) pause()
     }
 
     fun startDrag() {

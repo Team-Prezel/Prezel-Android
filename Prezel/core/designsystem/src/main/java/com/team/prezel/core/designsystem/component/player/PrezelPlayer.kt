@@ -47,7 +47,7 @@ fun PrezelPlayer(
         onPlayPauseClick = state::togglePlaying,
         onPreviousClick = state::moveToPreviousItem,
         onNextClick = state::moveToNextItem,
-        onSeek = { progress -> state.seekToProgress(progress) },
+        onSeek = state::seekToProgress,
         modifier = modifier,
         idle = state.idle,
         showHandle = state.showHandle,
@@ -238,9 +238,6 @@ private fun PrezelPlayerPlaybackPreview() {
                 playerState.updateCurrentMillis(
                     currentMillis = (playerState.currentMillis + 1_000L).coerceAtMost(playerState.durationMillis),
                 )
-                if (playerState.currentMillis == playerState.durationMillis) {
-                    playerState.pause()
-                }
             }
         }
 
