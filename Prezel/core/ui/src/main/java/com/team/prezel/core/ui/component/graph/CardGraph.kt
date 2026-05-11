@@ -40,7 +40,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelVerticalDivider
@@ -48,9 +50,11 @@ import com.team.prezel.core.designsystem.component.chip.chip.ChipState
 import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.R
 import com.team.prezel.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 private const val SCROLL_THRESHOLD = 7
 private val X_AXIS_LABEL_WIDTH = 28.dp
@@ -62,17 +66,47 @@ private val CHART_SELECTED_INNER_DOT_SIZE = 6.dp
 private val CHART_SELECTED_OUTER_DOT_SIZE = 10.dp
 private val CHART_SELECTED_TRIANGLE_WIDTH = 6.dp
 private val CHART_SELECTED_TRIANGLE_HEIGHT = 6.dp
-private val CARD_GRAPH_PREVIEW_WIDTH = 320.dp
-private const val CARD_GRAPH_ASPECT_RATIO = 320 / 212f
+private const val CARD_GRAPH_ASPECT_RATIO = 1.5f
 
-data class CardGraphItem(
-    val speech: Float,
-    val scriptMatch: Float,
+private data class CardGraphUiState(
+    val enableScroll: Boolean,
+    val contentWidth: Dp,
+    val xAxisCenters: ImmutableList<Float>,
+    val selectedItemIndex: Int?,
+)
+
+private data class CardGraphColors(
+    val dash: Color,
+    val baseline: Color,
+    val speech: Color,
+    val scriptMatch: Color,
+    val selectedGuide: Color,
+)
+
+private data class CardGraphDimensions(
+    val lineStrokeWidthPx: Float,
+    val selectedGuideStrokeWidthPx: Float,
+    val innerDotRadiusPx: Float,
+    val outerDotRadiusPx: Float,
+    val selectedTriangleWidthPx: Float,
+    val selectedTriangleHeightPx: Float,
 )
 
 private data class CardGraphSeriesPoints(
     val speech: List<Offset>,
     val scriptMatch: List<Offset>,
+)
+
+private data class CardGraphChartState(
+    val baselineY: Float,
+    val seriesPoints: CardGraphSeriesPoints,
+    val validXAxisCenters: List<Float>,
+    val selectedItemIndex: Int?,
+)
+
+data class CardGraphItem(
+    val speech: Float,
+    val scriptMatch: Float,
 )
 
 @Composable
@@ -86,19 +120,14 @@ fun CardGraph(
 ) {
     require(items.isNotEmpty()) { "CardGraph items must not be empty." }
 
-    val enableScroll = items.size > SCROLL_THRESHOLD
-    val xAxisCenters = remember(items.size) {
-        mutableStateListOf<Float>().apply {
-            repeat(items.size) { add(Float.NaN) }
-        }
-    }
-    val resolvedSelectedItemIndex = selectedItemIndex.takeIf { index -> index != null && index in items.indices }
+    val xAxisCenters = rememberCardGraphXAxisCenters(itemCount = items.size)
 
     BoxWithConstraints {
-        val requireWidth = maxWidth
-        val contentWidth = requireWidth.toChartContentWidth(
-            itemCount = items.size,
-            enableScroll = enableScroll,
+        val uiState = CardGraphUiState(
+            enableScroll = items.shouldEnableHorizontalScroll(),
+            contentWidth = maxWidth.toChartContentWidth(itemCount = items.size),
+            xAxisCenters = xAxisCenters.toImmutableList(),
+            selectedItemIndex = items.resolveSelectedItemIndex(selectedItemIndex),
         )
 
         CardGraphContainer(
@@ -107,10 +136,10 @@ fun CardGraph(
         ) {
             CardGraphContent(
                 items = items,
-                xAxisCenters = xAxisCenters,
-                contentWidth = contentWidth,
-                enableScroll = enableScroll,
-                selectedItemIndex = resolvedSelectedItemIndex,
+                uiState = uiState,
+                onChangePosition = { index, center ->
+                    xAxisCenters[index] = center
+                },
                 onSelectItem = onSelectItem,
                 showDetail = showDetail,
             )
@@ -147,10 +176,8 @@ private fun CardGraphContainer(
 @Composable
 private fun CardGraphContent(
     items: ImmutableList<CardGraphItem>,
-    xAxisCenters: MutableList<Float>,
-    contentWidth: androidx.compose.ui.unit.Dp,
-    enableScroll: Boolean,
-    selectedItemIndex: Int?,
+    uiState: CardGraphUiState,
+    onChangePosition: (index: Int, center: Float) -> Unit,
     onSelectItem: (Int) -> Unit,
     showDetail: Boolean,
 ) {
@@ -159,24 +186,30 @@ private fun CardGraphContent(
             modifier = Modifier
                 .weight(1f, fill = false)
                 .then(
-                    if (enableScroll) Modifier.horizontalScroll(rememberScrollState()) else Modifier,
+                    if (uiState.enableScroll) {
+                        Modifier.horizontalScroll(
+                            state = rememberScrollState(),
+                            overscrollEffect = null,
+                        )
+                    } else {
+                        Modifier
+                    },
                 ),
         ) {
             LinearChart(
                 items = items,
-                xAxisCenters = xAxisCenters,
-                selectedItemIndex = selectedItemIndex,
+                uiState = uiState,
                 onSelectItem = onSelectItem,
                 modifier = Modifier
-                    .width(contentWidth)
+                    .width(uiState.contentWidth)
                     .weight(1f, fill = false),
             )
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
             XAxisRow(
                 size = items.size,
-                xAxisCenters = xAxisCenters,
                 onSelectItem = onSelectItem,
-                modifier = Modifier.width(contentWidth),
+                modifier = Modifier.width(uiState.contentWidth),
+                onChangePosition = onChangePosition,
             )
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
         }
@@ -184,7 +217,7 @@ private fun CardGraphContent(
         if (showDetail) {
             DetailContainer(
                 items = items,
-                selectedItemIndex = selectedItemIndex,
+                selectedItemIndex = uiState.selectedItemIndex,
             )
         }
     }
@@ -193,41 +226,30 @@ private fun CardGraphContent(
 @Composable
 private fun LinearChart(
     items: ImmutableList<CardGraphItem>,
-    xAxisCenters: List<Float>,
-    selectedItemIndex: Int?,
+    uiState: CardGraphUiState,
     onSelectItem: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val dashColor = PrezelTheme.colors.borderSmall
-    val underlineColor = PrezelTheme.colors.borderRegular
-    val speechColor = PrezelTheme.colors.feedbackGoodRegular
-    val scriptMatchColor = PrezelTheme.colors.feedbackWarningRegular
-    val selectedGuideColor = PrezelTheme.colors.borderMedium
-    val density = LocalDensity.current
-    val lineStrokeWidthPx = with(density) { CHART_LINE_STROKE_WIDTH.toPx() }
-    val selectedGuideStrokeWidthPx = with(density) { CHART_SELECTED_GUIDE_STROKE_WIDTH.toPx() }
-    val innerDotRadiusPx = with(density) { CHART_SELECTED_INNER_DOT_SIZE.toPx() / 2f }
-    val outerDotRadiusPx = with(density) { CHART_SELECTED_OUTER_DOT_SIZE.toPx() / 2f }
-    val selectedTriangleWidthPx = with(density) { CHART_SELECTED_TRIANGLE_WIDTH.toPx() }
-    val selectedTriangleHeightPx = with(density) { CHART_SELECTED_TRIANGLE_HEIGHT.toPx() }
+    val colors = cardGraphColors()
+    val dimensions = rememberCardGraphDimensions()
 
     Box(
-        modifier = modifier.pointerInput(xAxisCenters, items.size) {
+        modifier = modifier.pointerInput(uiState.xAxisCenters, items.size) {
             detectTapGestures { tapOffset ->
-                xAxisCenters.findClosestIndex(tapOffset.x)?.let(onSelectItem)
+                uiState.xAxisCenters.findClosestIndex(tapOffset.x)?.let(onSelectItem)
             }
         },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val baselineY = size.height - (CHART_BASELINE_STROKE_WIDTH / 2f)
-            val points = items.toSeriesPoints(
-                xAxisCenters = xAxisCenters,
-                chartHeight = baselineY,
+            val chartState = items.toChartState(
+                xAxisCenters = uiState.xAxisCenters,
+                chartHeight = size.height,
+                selectedItemIndex = uiState.selectedItemIndex,
             )
 
-            xAxisCenters.forEachValidCenter { centerX ->
+            chartState.validXAxisCenters.forEach { centerX ->
                 drawLine(
-                    color = dashColor,
+                    color = colors.dash,
                     start = Offset(x = centerX, y = 0f),
                     end = Offset(x = centerX, y = size.height),
                     strokeWidth = CHART_DASH_STROKE_WIDTH,
@@ -239,49 +261,49 @@ private fun LinearChart(
             }
 
             drawLine(
-                color = underlineColor,
-                start = Offset(x = 0f, y = baselineY),
-                end = Offset(x = size.width, y = baselineY),
+                color = colors.baseline,
+                start = Offset(x = 0f, y = chartState.baselineY),
+                end = Offset(x = size.width, y = chartState.baselineY),
                 strokeWidth = CHART_BASELINE_STROKE_WIDTH,
             )
 
-            if (selectedItemIndex != null) {
+            if (chartState.selectedItemIndex != null) {
                 drawSelectedGuide(
-                    xAxisCenters = xAxisCenters,
-                    selectedIndex = selectedItemIndex,
-                    color = selectedGuideColor,
-                    baselineY = baselineY,
-                    strokeWidth = selectedGuideStrokeWidthPx,
-                    triangleWidth = selectedTriangleWidthPx,
-                    triangleHeight = selectedTriangleHeightPx,
+                    xAxisCenters = uiState.xAxisCenters,
+                    selectedIndex = chartState.selectedItemIndex,
+                    color = colors.selectedGuide,
+                    baselineY = chartState.baselineY,
+                    strokeWidth = dimensions.selectedGuideStrokeWidthPx,
+                    triangleWidth = dimensions.selectedTriangleWidthPx,
+                    triangleHeight = dimensions.selectedTriangleHeightPx,
                 )
             }
 
             drawSeriesLine(
-                points = points.speech,
-                color = speechColor,
-                strokeWidth = lineStrokeWidthPx,
+                points = chartState.seriesPoints.speech,
+                color = colors.speech,
+                strokeWidth = dimensions.lineStrokeWidthPx,
             )
             drawSeriesLine(
-                points = points.scriptMatch,
-                color = scriptMatchColor,
-                strokeWidth = lineStrokeWidthPx,
+                points = chartState.seriesPoints.scriptMatch,
+                color = colors.scriptMatch,
+                strokeWidth = dimensions.lineStrokeWidthPx,
             )
 
-            if (selectedItemIndex != null) {
+            if (chartState.selectedItemIndex != null) {
                 drawSelectedMarker(
-                    points = points.speech,
-                    selectedIndex = selectedItemIndex,
-                    color = speechColor,
-                    outerRadius = outerDotRadiusPx,
-                    innerRadius = innerDotRadiusPx,
+                    points = chartState.seriesPoints.speech,
+                    selectedIndex = chartState.selectedItemIndex,
+                    color = colors.speech,
+                    outerRadius = dimensions.outerDotRadiusPx,
+                    innerRadius = dimensions.innerDotRadiusPx,
                 )
                 drawSelectedMarker(
-                    points = points.scriptMatch,
-                    selectedIndex = selectedItemIndex,
-                    color = scriptMatchColor,
-                    outerRadius = outerDotRadiusPx,
-                    innerRadius = innerDotRadiusPx,
+                    points = chartState.seriesPoints.scriptMatch,
+                    selectedIndex = chartState.selectedItemIndex,
+                    color = colors.scriptMatch,
+                    outerRadius = dimensions.outerDotRadiusPx,
+                    innerRadius = dimensions.innerDotRadiusPx,
                 )
             }
         }
@@ -291,9 +313,9 @@ private fun LinearChart(
 @Composable
 private fun XAxisRow(
     size: Int,
-    xAxisCenters: MutableList<Float>,
     onSelectItem: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onChangePosition: (index: Int, center: Float) -> Unit,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -301,14 +323,18 @@ private fun XAxisRow(
     ) {
         repeat(size) { index ->
             Text(
-                text = "${index + 1}차",
+                text = stringResource(
+                    id = R.string.core_ui_impl_card_graph_x_axis_label,
+                    index + 1,
+                ),
                 style = PrezelTheme.typography.caption2Regular,
                 color = PrezelTheme.colors.textSmall,
                 modifier = Modifier
                     .width(X_AXIS_LABEL_WIDTH)
                     .noRippleClickable { onSelectItem(index) }
                     .onGloballyPositioned { coordinates ->
-                        xAxisCenters[index] = coordinates.positionInParent().x + (coordinates.size.width / 2f)
+                        val center = coordinates.positionInParent().x + (coordinates.size.width / 2f)
+                        onChangePosition(index, center)
                     },
                 textAlign = TextAlign.Center,
             )
@@ -328,7 +354,7 @@ private fun DetailContainer(
             .height(IntrinsicSize.Min),
     ) {
         LegendItem(
-            label = "발화",
+            label = stringResource(R.string.core_ui_impl_card_graph_speech_label),
             color = PrezelTheme.colors.feedbackGoodRegular,
             valueText = items.toDetailValueText(
                 selectedItemIndex = selectedItemIndex,
@@ -342,7 +368,7 @@ private fun DetailContainer(
             modifier = Modifier.fillMaxHeight(),
         )
         LegendItem(
-            label = "대본 일치율",
+            label = stringResource(R.string.core_ui_impl_card_graph_script_match_label),
             color = PrezelTheme.colors.feedbackWarningRegular,
             valueText = items.toDetailValueText(
                 selectedItemIndex = selectedItemIndex,
@@ -400,8 +426,7 @@ private fun List<CardGraphItem>.toDetailValueText(
     return if (selectedItem != null) {
         selectedItem.toPercentText(valueSelector)
     } else {
-        val pointDiff = valueSelector(last()) - valueSelector(first())
-        pointDiff.toPercentPointText()
+        valueSelector(last()).minus(valueSelector(first())).toPercentPointText()
     }
 }
 
@@ -413,20 +438,70 @@ private fun Float.toPercentPointText(): String {
     return "${prefix}$value%p"
 }
 
-private fun androidx.compose.ui.unit.Dp.toChartContentWidth(
-    itemCount: Int,
-    enableScroll: Boolean,
-): androidx.compose.ui.unit.Dp =
-    if (enableScroll) {
+@Composable
+private fun cardGraphColors(): CardGraphColors =
+    CardGraphColors(
+        dash = PrezelTheme.colors.borderSmall,
+        baseline = PrezelTheme.colors.borderRegular,
+        speech = PrezelTheme.colors.feedbackGoodRegular,
+        scriptMatch = PrezelTheme.colors.feedbackWarningRegular,
+        selectedGuide = PrezelTheme.colors.borderMedium,
+    )
+
+@Composable
+private fun rememberCardGraphDimensions(): CardGraphDimensions {
+    val density = LocalDensity.current
+    return with(density) {
+        CardGraphDimensions(
+            lineStrokeWidthPx = CHART_LINE_STROKE_WIDTH.toPx(),
+            selectedGuideStrokeWidthPx = CHART_SELECTED_GUIDE_STROKE_WIDTH.toPx(),
+            innerDotRadiusPx = CHART_SELECTED_INNER_DOT_SIZE.toPx() / 2f,
+            outerDotRadiusPx = CHART_SELECTED_OUTER_DOT_SIZE.toPx() / 2f,
+            selectedTriangleWidthPx = CHART_SELECTED_TRIANGLE_WIDTH.toPx(),
+            selectedTriangleHeightPx = CHART_SELECTED_TRIANGLE_HEIGHT.toPx(),
+        )
+    }
+}
+
+@Composable
+private fun rememberCardGraphXAxisCenters(itemCount: Int) =
+    remember(itemCount) {
+        mutableStateListOf<Float>().apply {
+            repeat(itemCount) { add(Float.NaN) }
+        }
+    }
+
+private fun ImmutableList<CardGraphItem>.shouldEnableHorizontalScroll(): Boolean = size > SCROLL_THRESHOLD
+
+private fun List<CardGraphItem>.resolveSelectedItemIndex(selectedItemIndex: Int?): Int? =
+    selectedItemIndex.takeIf { index -> index != null && index in indices }
+
+private fun Dp.toChartContentWidth(itemCount: Int): Dp =
+    if (itemCount > SCROLL_THRESHOLD) {
         X_AXIS_LABEL_WIDTH + ((this - X_AXIS_LABEL_WIDTH) / (SCROLL_THRESHOLD - 1)) * (itemCount - 1)
     } else {
         this
     }
 
-private fun List<Float>.forEachValidCenter(action: (Float) -> Unit) {
-    forEach { centerX ->
-        centerX.takeUnless(Float::isNaN)?.let(action)
-    }
+private fun List<Float>.validCenters(): List<Float> = mapNotNull(Float::validCenterOrNull)
+
+private fun Float.validCenterOrNull(): Float? = takeUnless(Float::isNaN)
+
+private fun List<CardGraphItem>.toChartState(
+    xAxisCenters: List<Float>,
+    chartHeight: Float,
+    selectedItemIndex: Int?,
+): CardGraphChartState {
+    val baselineY = chartHeight - (CHART_BASELINE_STROKE_WIDTH / 2f)
+    return CardGraphChartState(
+        baselineY = baselineY,
+        seriesPoints = toSeriesPoints(
+            xAxisCenters = xAxisCenters,
+            chartHeight = baselineY,
+        ),
+        validXAxisCenters = xAxisCenters.validCenters(),
+        selectedItemIndex = selectedItemIndex,
+    )
 }
 
 private fun List<CardGraphItem>.toSeriesPoints(
@@ -454,7 +529,7 @@ private fun List<CardGraphItem>.mapSeriesPoints(
     mapIndexedNotNull { index, item ->
         xAxisCenters
             .getOrNull(index)
-            ?.takeUnless(Float::isNaN)
+            ?.validCenterOrNull()
             ?.let { centerX ->
                 Offset(
                     x = centerX,
@@ -535,7 +610,7 @@ private fun DrawScope.drawSelectedGuide(
 
 private fun List<Float>.findClosestIndex(targetX: Float): Int? =
     mapIndexedNotNull { index, centerX ->
-        centerX.takeUnless(Float::isNaN)?.let { index to kotlin.math.abs(it - targetX) }
+        centerX.validCenterOrNull()?.let { index to kotlin.math.abs(it - targetX) }
     }.minByOrNull { (_, distance) -> distance }
         ?.first
 
@@ -574,28 +649,7 @@ private val cardGraphPreviewItems = persistentListOf(
     ),
 )
 
-private val cardGraphCompactPreviewItems = persistentListOf(
-    CardGraphItem(
-        speech = 0.92f,
-        scriptMatch = 0.88f,
-    ),
-    CardGraphItem(
-        speech = 0.75f,
-        scriptMatch = 0.81f,
-    ),
-    CardGraphItem(
-        speech = 0.63f,
-        scriptMatch = 0.58f,
-    ),
-    CardGraphItem(
-        speech = 0.48f,
-        scriptMatch = 0.71f,
-    ),
-    CardGraphItem(
-        speech = 0.84f,
-        scriptMatch = 0.79f,
-    ),
-)
+private val cardGraphCompactPreviewItems = cardGraphPreviewItems.take(5).toImmutableList()
 
 @Composable
 private fun CardGraphPreviewContainer(
@@ -606,7 +660,7 @@ private fun CardGraphPreviewContainer(
 ) {
     Box(
         modifier = Modifier
-            .width(CARD_GRAPH_PREVIEW_WIDTH)
+            .fillMaxWidth()
             .padding(12.dp),
     ) {
         CardGraph(
@@ -686,7 +740,11 @@ private fun CardGraphInteractivePreview() {
         var showDetail by remember { mutableStateOf(true) }
         var useContainerStyle by remember { mutableStateOf(true) }
 
-        Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+        ) {
             Row(modifier = Modifier.padding(4.dp)) {
                 PrezelChip(
                     text = "Detail",
@@ -695,7 +753,7 @@ private fun CardGraphInteractivePreview() {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 PrezelChip(
-                    text = "Container",
+                    text = "Background",
                     state = if (useContainerStyle) ChipState.ACTIVE else ChipState.DEFAULT,
                     modifier = Modifier.noRippleClickable { useContainerStyle = !useContainerStyle },
                 )
