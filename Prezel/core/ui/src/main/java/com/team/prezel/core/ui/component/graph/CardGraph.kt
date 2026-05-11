@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelVerticalDivider
+import com.team.prezel.core.designsystem.component.chip.chip.ChipState
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
@@ -61,10 +63,16 @@ private val CHART_SELECTED_OUTER_DOT_SIZE = 10.dp
 private val CHART_SELECTED_TRIANGLE_WIDTH = 6.dp
 private val CHART_SELECTED_TRIANGLE_HEIGHT = 6.dp
 private val CARD_GRAPH_PREVIEW_WIDTH = 320.dp
+private const val CARD_GRAPH_ASPECT_RATIO = 320 / 212f
 
 data class CardGraphItem(
     val speech: Float,
     val scriptMatch: Float,
+)
+
+private data class CardGraphSeriesPoints(
+    val speech: List<Offset>,
+    val scriptMatch: List<Offset>,
 )
 
 @Composable
@@ -72,51 +80,108 @@ fun CardGraph(
     items: ImmutableList<CardGraphItem>,
     modifier: Modifier = Modifier,
     selectedItemIndex: Int? = null,
+    showDetail: Boolean = true,
+    useContainerStyle: Boolean = true,
     onSelectItem: (Int) -> Unit = {},
 ) {
-    require(items.isNotEmpty()) {}
+    require(items.isNotEmpty()) { "CardGraph items must not be empty." }
+
     val enableScroll = items.size > SCROLL_THRESHOLD
     val xAxisCenters = remember(items.size) {
         mutableStateListOf<Float>().apply {
             repeat(items.size) { add(Float.NaN) }
         }
     }
+    val resolvedSelectedItemIndex = selectedItemIndex.takeIf { index -> index != null && index in items.indices }
 
     BoxWithConstraints {
         val requireWidth = maxWidth
-        val contentWidth = if (enableScroll) {
-            X_AXIS_LABEL_WIDTH + ((requireWidth - X_AXIS_LABEL_WIDTH) / (SCROLL_THRESHOLD - 1)) * (items.size - 1)
-        } else {
-            requireWidth
+        val contentWidth = requireWidth.toChartContentWidth(
+            itemCount = items.size,
+            enableScroll = enableScroll,
+        )
+
+        CardGraphContainer(
+            modifier = modifier,
+            useContainerStyle = useContainerStyle,
+        ) {
+            CardGraphContent(
+                items = items,
+                xAxisCenters = xAxisCenters,
+                contentWidth = contentWidth,
+                enableScroll = enableScroll,
+                selectedItemIndex = resolvedSelectedItemIndex,
+                onSelectItem = onSelectItem,
+                showDetail = showDetail,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CardGraphContainer(
+    useContainerStyle: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val baseModifier = modifier
+        .fillMaxWidth()
+        .aspectRatio(CARD_GRAPH_ASPECT_RATIO)
+    val containerModifier = if (useContainerStyle) {
+        baseModifier
+            .clip(PrezelTheme.shapes.V8)
+            .background(color = PrezelTheme.colors.bgMedium)
+            .padding(
+                vertical = PrezelTheme.spacing.V12,
+                horizontal = PrezelTheme.spacing.V16,
+            )
+    } else {
+        baseModifier
+    }
+
+    Column(modifier = containerModifier) {
+        content()
+    }
+}
+
+@Composable
+private fun CardGraphContent(
+    items: ImmutableList<CardGraphItem>,
+    xAxisCenters: MutableList<Float>,
+    contentWidth: androidx.compose.ui.unit.Dp,
+    enableScroll: Boolean,
+    selectedItemIndex: Int?,
+    onSelectItem: (Int) -> Unit,
+    showDetail: Boolean,
+) {
+    Column {
+        Column(
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .then(
+                    if (enableScroll) Modifier.horizontalScroll(rememberScrollState()) else Modifier,
+                ),
+        ) {
+            LinearChart(
+                items = items,
+                xAxisCenters = xAxisCenters,
+                selectedItemIndex = selectedItemIndex,
+                onSelectItem = onSelectItem,
+                modifier = Modifier
+                    .width(contentWidth)
+                    .weight(1f, fill = false),
+            )
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
+            XAxisRow(
+                size = items.size,
+                xAxisCenters = xAxisCenters,
+                onSelectItem = onSelectItem,
+                modifier = Modifier.width(contentWidth),
+            )
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
         }
 
-        Column(modifier = modifier.cardGraph()) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .then(
-                        if (enableScroll) Modifier.horizontalScroll(rememberScrollState()) else Modifier,
-                    ),
-            ) {
-                LinearChart(
-                    items = items,
-                    xAxisCenters = xAxisCenters,
-                    selectedItemIndex = selectedItemIndex,
-                    onSelectItem = onSelectItem,
-                    modifier = Modifier
-                        .width(contentWidth)
-                        .weight(1f),
-                )
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
-                XAxisRow(
-                    size = items.size,
-                    xAxisCenters = xAxisCenters,
-                    onSelectItem = onSelectItem,
-                    modifier = Modifier.width(contentWidth),
-                )
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
-            }
-
+        if (showDetail) {
             DetailContainer(
                 items = items,
                 selectedItemIndex = selectedItemIndex,
@@ -124,18 +189,6 @@ fun CardGraph(
         }
     }
 }
-
-@Composable
-private fun Modifier.cardGraph(): Modifier =
-    this
-        .fillMaxWidth()
-        .aspectRatio(320 / 212f)
-        .clip(PrezelTheme.shapes.V8)
-        .background(color = PrezelTheme.colors.bgMedium)
-        .padding(
-            vertical = PrezelTheme.spacing.V12,
-            horizontal = PrezelTheme.spacing.V16,
-        )
 
 @Composable
 private fun LinearChart(
@@ -167,44 +220,22 @@ private fun LinearChart(
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val baselineY = size.height - (CHART_BASELINE_STROKE_WIDTH / 2f)
-            val chartHeight = baselineY
-            val speechOffsets = items.mapIndexedNotNull { index, item ->
-                xAxisCenters
-                    .getOrNull(index)
-                    ?.takeUnless(Float::isNaN)
-                    ?.let { centerX ->
-                        Offset(
-                            x = centerX,
-                            y = chartHeight - (item.speech.coerceIn(0f, 1f) * chartHeight),
-                        )
-                    }
-            }
-            val scriptMatchOffsets = items.mapIndexedNotNull { index, item ->
-                xAxisCenters
-                    .getOrNull(index)
-                    ?.takeUnless(Float::isNaN)
-                    ?.let { centerX ->
-                        Offset(
-                            x = centerX,
-                            y = chartHeight - (item.scriptMatch.coerceIn(0f, 1f) * chartHeight),
-                        )
-                    }
-            }
+            val points = items.toSeriesPoints(
+                xAxisCenters = xAxisCenters,
+                chartHeight = baselineY,
+            )
 
-            repeat(items.size) { index ->
-                val centerX = xAxisCenters.getOrNull(index)
-                if (centerX != null && !centerX.isNaN()) {
-                    drawLine(
-                        color = dashColor,
-                        start = Offset(x = centerX, y = 0f),
-                        end = Offset(x = centerX, y = size.height),
-                        strokeWidth = CHART_DASH_STROKE_WIDTH,
-                        cap = StrokeCap.Butt,
-                        pathEffect = PathEffect.dashPathEffect(
-                            intervals = floatArrayOf(1f, 2f),
-                        ),
-                    )
-                }
+            xAxisCenters.forEachValidCenter { centerX ->
+                drawLine(
+                    color = dashColor,
+                    start = Offset(x = centerX, y = 0f),
+                    end = Offset(x = centerX, y = size.height),
+                    strokeWidth = CHART_DASH_STROKE_WIDTH,
+                    cap = StrokeCap.Butt,
+                    pathEffect = PathEffect.dashPathEffect(
+                        intervals = floatArrayOf(1f, 2f),
+                    ),
+                )
             }
 
             drawLine(
@@ -227,26 +258,26 @@ private fun LinearChart(
             }
 
             drawSeriesLine(
-                points = speechOffsets,
+                points = points.speech,
                 color = speechColor,
                 strokeWidth = lineStrokeWidthPx,
             )
             drawSeriesLine(
-                points = scriptMatchOffsets,
+                points = points.scriptMatch,
                 color = scriptMatchColor,
                 strokeWidth = lineStrokeWidthPx,
             )
 
             if (selectedItemIndex != null) {
                 drawSelectedMarker(
-                    points = speechOffsets,
+                    points = points.speech,
                     selectedIndex = selectedItemIndex,
                     color = speechColor,
                     outerRadius = outerDotRadiusPx,
                     innerRadius = innerDotRadiusPx,
                 )
                 drawSelectedMarker(
-                    points = scriptMatchOffsets,
+                    points = points.scriptMatch,
                     selectedIndex = selectedItemIndex,
                     color = scriptMatchColor,
                     outerRadius = outerDotRadiusPx,
@@ -381,6 +412,56 @@ private fun Float.toPercentPointText(): String {
     val prefix = if (value > 0) "+" else ""
     return "${prefix}$value%p"
 }
+
+private fun androidx.compose.ui.unit.Dp.toChartContentWidth(
+    itemCount: Int,
+    enableScroll: Boolean,
+): androidx.compose.ui.unit.Dp =
+    if (enableScroll) {
+        X_AXIS_LABEL_WIDTH + ((this - X_AXIS_LABEL_WIDTH) / (SCROLL_THRESHOLD - 1)) * (itemCount - 1)
+    } else {
+        this
+    }
+
+private fun List<Float>.forEachValidCenter(action: (Float) -> Unit) {
+    forEach { centerX ->
+        centerX.takeUnless(Float::isNaN)?.let(action)
+    }
+}
+
+private fun List<CardGraphItem>.toSeriesPoints(
+    xAxisCenters: List<Float>,
+    chartHeight: Float,
+): CardGraphSeriesPoints =
+    CardGraphSeriesPoints(
+        speech = mapSeriesPoints(
+            xAxisCenters = xAxisCenters,
+            chartHeight = chartHeight,
+            valueSelector = CardGraphItem::speech,
+        ),
+        scriptMatch = mapSeriesPoints(
+            xAxisCenters = xAxisCenters,
+            chartHeight = chartHeight,
+            valueSelector = CardGraphItem::scriptMatch,
+        ),
+    )
+
+private fun List<CardGraphItem>.mapSeriesPoints(
+    xAxisCenters: List<Float>,
+    chartHeight: Float,
+    valueSelector: (CardGraphItem) -> Float,
+): List<Offset> =
+    mapIndexedNotNull { index, item ->
+        xAxisCenters
+            .getOrNull(index)
+            ?.takeUnless(Float::isNaN)
+            ?.let { centerX ->
+                Offset(
+                    x = centerX,
+                    y = chartHeight - (valueSelector(item).coerceIn(0f, 1f) * chartHeight),
+                )
+            }
+    }
 
 private fun DrawScope.drawSeriesLine(
     points: List<Offset>,
@@ -520,6 +601,8 @@ private val cardGraphCompactPreviewItems = persistentListOf(
 private fun CardGraphPreviewContainer(
     items: ImmutableList<CardGraphItem>,
     selectedItemIndex: Int? = null,
+    showDetail: Boolean = true,
+    useContainerStyle: Boolean = true,
 ) {
     Box(
         modifier = Modifier
@@ -529,6 +612,8 @@ private fun CardGraphPreviewContainer(
         CardGraph(
             items = items,
             selectedItemIndex = selectedItemIndex,
+            showDetail = showDetail,
+            useContainerStyle = useContainerStyle,
         )
     }
 }
@@ -573,18 +658,54 @@ private fun CardGraphScrollableSelectedPointPreview() {
 
 @BasicPreview
 @Composable
+private fun CardGraphWithoutDetailPreview() {
+    PrezelTheme {
+        CardGraphPreviewContainer(
+            items = cardGraphCompactPreviewItems,
+            showDetail = false,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun CardGraphWithoutContainerStylePreview() {
+    PrezelTheme {
+        CardGraphPreviewContainer(
+            items = cardGraphCompactPreviewItems,
+            useContainerStyle = false,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
 private fun CardGraphInteractivePreview() {
     PrezelTheme {
         var selectedItemIndex by remember { mutableStateOf<Int?>(2) }
+        var showDetail by remember { mutableStateOf(true) }
+        var useContainerStyle by remember { mutableStateOf(true) }
 
-        Box(
-            modifier = Modifier
-                .width(CARD_GRAPH_PREVIEW_WIDTH)
-                .padding(12.dp),
-        ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(4.dp)) {
+            Row(modifier = Modifier.padding(4.dp)) {
+                PrezelChip(
+                    text = "Detail",
+                    state = if (showDetail) ChipState.ACTIVE else ChipState.DEFAULT,
+                    modifier = Modifier.noRippleClickable { showDetail = !showDetail },
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                PrezelChip(
+                    text = "Container",
+                    state = if (useContainerStyle) ChipState.ACTIVE else ChipState.DEFAULT,
+                    modifier = Modifier.noRippleClickable { useContainerStyle = !useContainerStyle },
+                )
+            }
+
             CardGraph(
                 items = cardGraphPreviewItems,
                 selectedItemIndex = selectedItemIndex,
+                showDetail = showDetail,
+                useContainerStyle = useContainerStyle,
                 onSelectItem = { index ->
                     selectedItemIndex = if (selectedItemIndex == index) null else index
                 },
