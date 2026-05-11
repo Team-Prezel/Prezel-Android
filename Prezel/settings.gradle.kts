@@ -59,6 +59,8 @@ includeAuto(
     ":feature:setting:impl",
     ":feature:profile:api",
     ":feature:profile:impl",
+    ":feature:report:api",
+    ":feature:report:impl",
     ":feature:login:api",
     ":feature:login:impl",
     ":feature:terms:api",
