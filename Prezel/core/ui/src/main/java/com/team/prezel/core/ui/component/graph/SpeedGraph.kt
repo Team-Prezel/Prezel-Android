@@ -1,9 +1,7 @@
 package com.team.prezel.core.ui.component.graph
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -36,7 +34,7 @@ private const val DEFAULT_GOOD_UPPER_BOUND = 260
 private const val FULL_CIRCLE_DEGREES = 270f
 private const val START_ANGLE = 135f
 private const val GRAPH_STROKE_RATIO = 0.12f
-private const val GRAPH_LABEL_HORIZONTAL_PADDING_RATIO = 0.1875f
+private const val GRAPH_LABEL_CONTENT_WIDTH_RATIO = 0.625f
 private val GRAPH_SIZE = 160.dp
 
 data class SpeedGraphColors(
@@ -77,96 +75,108 @@ fun SpeedGraph(
     baseRange: IntRange = IntRange(DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND),
     colors: SpeedGraphColors = SpeedGraphColors.getDefault(),
 ) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .size(GRAPH_SIZE)
             .padding(horizontal = PrezelTheme.spacing.V4)
             .padding(top = PrezelTheme.spacing.V8),
     ) {
-        SpeedGraphChart(
+        SpeedGraphContent(
             userGauge = userGauge,
             goodRange = goodRange,
             baseRange = baseRange,
             colors = colors,
         )
 
-        RangeBounds(
+        RangeBoundLabels(
             lowerBound = baseRange.first,
             upperBound = baseRange.last,
             modifier = Modifier.align(Alignment.BottomCenter),
-            horizontalPadding = maxWidth * GRAPH_LABEL_HORIZONTAL_PADDING_RATIO,
         )
     }
 }
 
 @Composable
-private fun SpeedGraphChart(
+private fun SpeedGraphContent(
     userGauge: Int,
     goodRange: IntRange,
     baseRange: IntRange,
     colors: SpeedGraphColors,
     modifier: Modifier = Modifier,
 ) {
-    val hasValidBaseRange = baseRange.last > baseRange.first
-    val clampedGoodRange = goodRange.intersect(baseRange)
-
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val graphWidthPx = min(size.width, size.height)
-            val strokeWidthPx = (graphWidthPx / 2f) * GRAPH_STROKE_RATIO
-            val arcDiameter = graphWidthPx - strokeWidthPx
-            val arcTopLeft = Offset(
-                x = (size.width - arcDiameter) / 2f,
-                y = (size.height - arcDiameter) / 2f,
-            )
-            val arcSize = Size(width = arcDiameter, height = arcDiameter)
-            val arcStroke = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+        SpeedGaugeArc(
+            userGauge = userGauge,
+            goodRange = goodRange,
+            baseRange = baseRange,
+            colors = colors,
+        )
 
-            drawArc(
-                color = colors.baseTrackColor,
-                startAngle = START_ANGLE,
-                sweepAngle = FULL_CIRCLE_DEGREES,
-                useCenter = false,
-                topLeft = arcTopLeft,
-                size = arcSize,
-                style = arcStroke,
-            )
-
-            if (hasValidBaseRange && !clampedGoodRange.isEmpty()) {
-                drawArc(
-                    color = colors.goodRangeColor,
-                    startAngle = clampedGoodRange.first.toAngle(baseRange),
-                    sweepAngle = clampedGoodRange.sweepAngle(baseRange),
-                    useCenter = false,
-                    topLeft = arcTopLeft,
-                    size = arcSize,
-                    style = arcStroke,
-                )
-            }
-
-            if (hasValidBaseRange) {
-                drawArc(
-                    color = if (userGauge in goodRange) colors.goodGaugeColor else colors.badGaugeColor,
-                    startAngle = START_ANGLE,
-                    sweepAngle = userGauge.sweepFromStart(baseRange = baseRange),
-                    useCenter = false,
-                    topLeft = arcTopLeft,
-                    size = arcSize,
-                    style = arcStroke,
-                )
-            }
-        }
-
-        SpmDisplay(userGauge = userGauge)
+        SpeedValueLabel(userGauge = userGauge)
     }
 }
 
-/** 현재 속도 값과 단위를 그래프 중앙에 표시합니다. */
 @Composable
-private fun SpmDisplay(userGauge: Int) {
+private fun SpeedGaugeArc(
+    userGauge: Int,
+    goodRange: IntRange,
+    baseRange: IntRange,
+    colors: SpeedGraphColors,
+) {
+    val clampedGoodRange = goodRange.intersect(baseRange)
+    val goodRangeStartAngle = clampedGoodRange.first.toGraphAngle(baseRange)
+    val goodRangeSweepAngle = clampedGoodRange.graphSweepAngle(baseRange)
+    val userGaugeSweepAngle = userGauge.graphSweepAngleFromStart(baseRange)
+    val userGaugeColor = if (userGauge in goodRange) colors.goodGaugeColor else colors.badGaugeColor
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .drawWithCache {
+                val (arcTopLeft: Offset, arcSize: Size, arcStroke: Stroke) = size.calculateGraphArcMetrics()
+
+                onDrawBehind {
+                    drawArc(
+                        color = colors.baseTrackColor,
+                        startAngle = START_ANGLE,
+                        sweepAngle = FULL_CIRCLE_DEGREES,
+                        useCenter = false,
+                        topLeft = arcTopLeft,
+                        size = arcSize,
+                        style = arcStroke,
+                    )
+
+                    if (!clampedGoodRange.isEmpty()) {
+                        drawArc(
+                            color = colors.goodRangeColor,
+                            startAngle = goodRangeStartAngle,
+                            sweepAngle = goodRangeSweepAngle,
+                            useCenter = false,
+                            topLeft = arcTopLeft,
+                            size = arcSize,
+                            style = arcStroke,
+                        )
+                    }
+
+                    drawArc(
+                        color = userGaugeColor,
+                        startAngle = START_ANGLE,
+                        sweepAngle = userGaugeSweepAngle,
+                        useCenter = false,
+                        topLeft = arcTopLeft,
+                        size = arcSize,
+                        style = arcStroke,
+                    )
+                }
+            },
+    )
+}
+
+@Composable
+private fun SpeedValueLabel(userGauge: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = userGauge.toString(),
@@ -184,18 +194,14 @@ private fun SpmDisplay(userGauge: Int) {
     }
 }
 
-/** 기준 범위의 시작값과 끝값을 그래프 하단에 배치합니다. */
 @Composable
-private fun RangeBounds(
+private fun RangeBoundLabels(
     lowerBound: Int,
     upperBound: Int,
-    horizontalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding),
+        modifier = modifier.fillMaxWidth(GRAPH_LABEL_CONTENT_WIDTH_RATIO),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ProvideTextStyle(
@@ -207,27 +213,38 @@ private fun RangeBounds(
     }
 }
 
-/** 기준 범위 안의 값을 그래프 각도로 변환합니다. */
-private fun Int.toAngle(baseRange: IntRange): Float {
+private fun Size.calculateGraphArcMetrics(): Triple<Offset, Size, Stroke> {
+    val graphWidthPx = min(width, height)
+    val strokeWidthPx = (graphWidthPx / 2f) * GRAPH_STROKE_RATIO
+    val arcDiameter = graphWidthPx - strokeWidthPx
+
+    return Triple(
+        first = Offset(
+            x = (width - arcDiameter) / 2f,
+            y = (height - arcDiameter) / 2f,
+        ),
+        second = Size(width = arcDiameter, height = arcDiameter),
+        third = Stroke(width = strokeWidthPx, cap = StrokeCap.Round),
+    )
+}
+
+private fun Int.toGraphAngle(baseRange: IntRange): Float {
     if (baseRange.last <= baseRange.first) return START_ANGLE
 
     val progress = (this - baseRange.first).toFloat() / (baseRange.last - baseRange.first).toFloat()
     return START_ANGLE + (FULL_CIRCLE_DEGREES * progress.coerceIn(0f, 1f))
 }
 
-/** 그래프 시작점부터 현재 값까지의 sweep 각도를 계산합니다. */
-private fun Int.sweepFromStart(baseRange: IntRange): Float = toAngle(baseRange) - START_ANGLE
+private fun Int.graphSweepAngleFromStart(baseRange: IntRange): Float = toGraphAngle(baseRange) - START_ANGLE
 
-/** 기준 범위 안에서 겹치는 구간의 sweep 각도를 계산합니다. */
-private fun IntRange.sweepAngle(baseRange: IntRange): Float {
+private fun IntRange.graphSweepAngle(baseRange: IntRange): Float {
     if (isEmpty()) return 0f
     return max(
-        last.toAngle(baseRange) - first.toAngle(baseRange),
+        last.toGraphAngle(baseRange) - first.toGraphAngle(baseRange),
         0f,
     )
 }
 
-/** 두 범위가 겹치는 구간만 남깁니다. */
 private fun IntRange.intersect(other: IntRange): IntRange {
     val start = max(first, other.first)
     val endInclusive = minOf(last, other.last)
