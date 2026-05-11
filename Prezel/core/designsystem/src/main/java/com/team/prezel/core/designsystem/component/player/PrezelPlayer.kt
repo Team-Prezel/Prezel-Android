@@ -239,7 +239,7 @@ private fun PrezelPlayerPlaybackPreview() {
                     currentMillis = (playerState.currentMillis + 1_000L).coerceAtMost(playerState.durationMillis),
                 )
                 if (playerState.currentMillis == playerState.durationMillis) {
-                    playerState.updatePlaying(false)
+                    playerState.pause()
                 }
             }
         }

@@ -57,6 +57,9 @@ class PrezelPlayerState internal constructor(
     val showHandle: Boolean
         get() = dragging
 
+    private val playbackEnded: Boolean
+        get() = currentMillis >= durationMillis
+
     private val currentItemIndex: Int
         get() = if (items.isEmpty()) {
             -1
@@ -65,7 +68,10 @@ class PrezelPlayerState internal constructor(
         }
 
     val previousEnabled: Boolean
-        get() = currentItemIndex > 0
+        get() {
+            val currentItem = items.getOrNull(currentItemIndex) ?: return false
+            return currentItemIndex > 0 || currentMillis > currentItem.timeMillis
+        }
 
     val nextEnabled: Boolean
         get() = currentItemIndex >= 0 && currentItemIndex < items.lastIndex
@@ -75,23 +81,39 @@ class PrezelPlayerState internal constructor(
     }
 
     fun moveToPreviousItem() {
-        if (previousEnabled) seekToMillis(items[currentItemIndex - 1].timeMillis)
+        val currentItem = items.getOrNull(currentItemIndex) ?: return
+        val targetIndex = if (currentMillis > currentItem.timeMillis) {
+            currentItemIndex
+        } else {
+            currentItemIndex - 1
+        }
+
+        if (targetIndex in items.indices) seekToMillis(items[targetIndex].timeMillis)
     }
 
     fun moveToNextItem() {
         if (nextEnabled) seekToMillis(items[currentItemIndex + 1].timeMillis)
     }
 
-    fun updatePlaying(playing: Boolean) {
-        this.playing = playing
+    fun play() {
+        if (playbackEnded) seekToMillis(0L)
+        playing = true
+    }
+
+    fun pause() {
+        playing = false
     }
 
     fun togglePlaying() {
-        playing = !playing
+        if (playing) {
+            pause()
+        } else {
+            play()
+        }
     }
 
     fun updateCurrentMillis(currentMillis: Long) {
-        this.currentMillis = currentMillis
+        this.currentMillis = currentMillis.coerceIn(0L, durationMillis)
     }
 
     fun startDrag() {
@@ -103,7 +125,7 @@ class PrezelPlayerState internal constructor(
     }
 
     private fun seekToMillis(targetMillis: Long) {
-        currentMillis = targetMillis
+        currentMillis = targetMillis.coerceIn(0L, durationMillis)
     }
 
     companion object {
