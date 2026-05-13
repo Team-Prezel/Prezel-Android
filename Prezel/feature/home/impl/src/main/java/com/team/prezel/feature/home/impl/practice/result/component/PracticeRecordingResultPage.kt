@@ -27,47 +27,26 @@ import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.feature.home.impl.R
-
-private enum class PracticeAnalysisOverallResult(
-    @param:StringRes val contentDescriptionResId: Int,
-    @param:DrawableRes val cardResId: Int,
-) {
-    PERFECT(
-        contentDescriptionResId = R.string.feature_home_impl_practice_recording_analysis_card_perfect,
-        cardResId = R.drawable.feature_home_impl_card_perfect,
-    ),
-    GOOD(
-        contentDescriptionResId = R.string.feature_home_impl_practice_recording_analysis_card_good,
-        cardResId = R.drawable.feature_home_impl_card_good,
-    ),
-    TRY(
-        contentDescriptionResId = R.string.feature_home_impl_practice_recording_analysis_card_try,
-        cardResId = R.drawable.feature_home_impl_card_try,
-    ),
-}
 
 @Composable
 internal fun PracticeRecordingResultPage(
     pronunciationScore: Int,
     speed: PracticeRecordingSpeed,
+    overallEvaluation: PracticeRecordingOverallEvaluation,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val overallResult = rememberOverallResult(
-        pronunciationScore = pronunciationScore,
-        speed = speed,
-    )
-
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
         PracticeRecordingResultContent(
-            cardResId = overallResult.cardResId,
-            cardContentDescription = stringResource(overallResult.contentDescriptionResId),
+            cardResId = overallEvaluation.cardResId,
+            cardContentDescription = stringResource(overallEvaluation.contentDescriptionResId),
             pronunciationScore = pronunciationScore,
             speed = speed,
             modifier = Modifier.weight(1f),
@@ -128,18 +107,6 @@ private fun PracticeRecordingResultButtonArea(
     )
 }
 
-private fun rememberOverallResult(
-    pronunciationScore: Int,
-    speed: PracticeRecordingSpeed,
-): PracticeAnalysisOverallResult =
-    when {
-        pronunciationScore >= 95 && speed == PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.PERFECT
-        pronunciationScore >= 70 && speed == PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
-        pronunciationScore >= 95 && speed != PracticeRecordingSpeed.ADEQUATE -> PracticeAnalysisOverallResult.GOOD
-        pronunciationScore <= 60 -> PracticeAnalysisOverallResult.TRY
-        else -> PracticeAnalysisOverallResult.TRY
-    }
-
 @Composable
 private fun PracticeAnalysisMetricRow(
     pronunciationScore: Int,
@@ -197,6 +164,22 @@ private val PracticeRecordingSpeed.labelResId: Int
         PracticeRecordingSpeed.FAST -> R.string.feature_home_impl_practice_recording_analysis_speed_fast
     }
 
+private val PracticeRecordingOverallEvaluation.contentDescriptionResId: Int
+    @StringRes
+    get() = when (this) {
+        PracticeRecordingOverallEvaluation.PERFECT -> R.string.feature_home_impl_practice_recording_analysis_card_perfect
+        PracticeRecordingOverallEvaluation.GOOD -> R.string.feature_home_impl_practice_recording_analysis_card_good
+        PracticeRecordingOverallEvaluation.TRY -> R.string.feature_home_impl_practice_recording_analysis_card_try
+    }
+
+private val PracticeRecordingOverallEvaluation.cardResId: Int
+    @DrawableRes
+    get() = when (this) {
+        PracticeRecordingOverallEvaluation.PERFECT -> R.drawable.feature_home_impl_card_perfect
+        PracticeRecordingOverallEvaluation.GOOD -> R.drawable.feature_home_impl_card_good
+        PracticeRecordingOverallEvaluation.TRY -> R.drawable.feature_home_impl_card_try
+    }
+
 @Composable
 private fun PracticeAnalysisMetricLabel(
     text: String,
@@ -217,6 +200,7 @@ private fun PracticeRecordingResultPerfectPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 96,
             speed = PracticeRecordingSpeed.ADEQUATE,
+            overallEvaluation = PracticeRecordingOverallEvaluation.PERFECT,
             onComplete = {},
         )
     }
@@ -229,6 +213,7 @@ private fun PracticeRecordingResultGoodPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 90,
             speed = PracticeRecordingSpeed.ADEQUATE,
+            overallEvaluation = PracticeRecordingOverallEvaluation.GOOD,
             onComplete = {},
         )
     }
@@ -241,6 +226,7 @@ private fun PracticeRecordingResultTryPagePreview() {
         PracticeRecordingResultPage(
             pronunciationScore = 58,
             speed = PracticeRecordingSpeed.FAST,
+            overallEvaluation = PracticeRecordingOverallEvaluation.TRY,
             onComplete = {},
         )
     }

@@ -3,6 +3,7 @@ package com.team.prezel.core.data.repository
 import com.team.prezel.core.data.error.mapDomainFailure
 import com.team.prezel.core.domain.repository.practice.PracticeRepository
 import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult
+import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.core.model.practice.PracticeScript
 import com.team.prezel.core.network.datasource.PracticeRemoteDataSource
@@ -44,6 +45,7 @@ internal class PracticeRepositoryImpl @Inject constructor(
         PracticeRecordingAnalysisResult(
             pronunciationScore = accuracyScore.roundToInt(),
             speed = speedEvaluation.toPracticeRecordingSpeed(),
+            overallEvaluation = overallEvaluation.toPracticeRecordingOverallEvaluation(),
         )
 
     private fun String.toPracticeRecordingSpeed(): PracticeRecordingSpeed =
@@ -51,6 +53,14 @@ internal class PracticeRepositoryImpl @Inject constructor(
             contains("느려요") -> PracticeRecordingSpeed.SLOW
             contains("빨라요") -> PracticeRecordingSpeed.FAST
             else -> PracticeRecordingSpeed.ADEQUATE
+        }
+
+    private fun String.toPracticeRecordingOverallEvaluation(): PracticeRecordingOverallEvaluation =
+        when (this) {
+            "Perfect" -> PracticeRecordingOverallEvaluation.PERFECT
+            "Good" -> PracticeRecordingOverallEvaluation.GOOD
+            "Try" -> PracticeRecordingOverallEvaluation.TRY
+            else -> PracticeRecordingOverallEvaluation.TRY
         }
 
     private companion object {

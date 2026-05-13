@@ -1,6 +1,7 @@
 package com.team.prezel.core.data.repository.practice
 
 import com.team.prezel.core.data.repository.PracticeRepositoryImpl
+import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
 import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.core.network.datasource.PracticeRemoteDataSource
 import com.team.prezel.core.network.model.practice.AnalyzePracticeRecordingResponse
@@ -45,6 +46,7 @@ class PracticeRepositoryImplTest {
             assertEquals("간장 공장 공장장은 강 공장장이다.", remoteDataSource.analyzeReferenceText)
             assertEquals(86, result.pronunciationScore)
             assertEquals(PracticeRecordingSpeed.ADEQUATE, result.speed)
+            assertEquals(PracticeRecordingOverallEvaluation.GOOD, result.overallEvaluation)
         }
 
     private class FakePracticeRemoteDataSource(

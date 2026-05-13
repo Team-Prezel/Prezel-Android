@@ -19,6 +19,7 @@ internal fun PracticeRecordingResultScreen(
         is PracticeRecordingAnalysisStatus.Success -> PracticeRecordingResultPage(
             pronunciationScore = analysisStatus.result.pronunciationScore,
             speed = analysisStatus.result.speed,
+            overallEvaluation = analysisStatus.result.overallEvaluation,
             onComplete = onComplete,
             modifier = modifier,
         )

@@ -5,14 +5,12 @@ import com.team.prezel.core.audio.AudioSessionEffect
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.AnalyzePracticeRecordingUseCase
 import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
-import com.team.prezel.core.model.practice.PracticeRecordingAnalysisResult
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.home.impl.practice.contract.PracticeRecordingUiState
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisErrorType
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisStatus
-import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingAnalysisUiModel
 import com.team.prezel.feature.home.impl.practice.model.PracticeRecordingUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -101,7 +99,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
                 updateState {
                     copy(
                         analysisStatus = PracticeRecordingAnalysisStatus.Success(
-                            result = result.toUiModel(),
+                            result = result,
                         ),
                     )
                 }
@@ -146,9 +144,3 @@ private fun AudioSessionEffect.toUiMessage(): PracticeRecordingUiMessage =
         AudioSessionEffect.RecordingStopFailed -> PracticeRecordingUiMessage.RECORDING_STOP_FAILED
         AudioSessionEffect.PlaybackStartFailed -> PracticeRecordingUiMessage.PLAYBACK_START_FAILED
     }
-
-private fun PracticeRecordingAnalysisResult.toUiModel(): PracticeRecordingAnalysisUiModel =
-    PracticeRecordingAnalysisUiModel(
-        pronunciationScore = pronunciationScore,
-        speed = speed,
-    )
