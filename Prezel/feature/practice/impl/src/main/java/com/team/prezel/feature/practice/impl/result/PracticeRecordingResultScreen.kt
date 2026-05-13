@@ -2,34 +2,32 @@ package com.team.prezel.feature.practice.impl.result
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingAnalysisStatus
+import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
 import com.team.prezel.feature.practice.impl.result.component.PracticeRecordingAnalysisFailurePage
 import com.team.prezel.feature.practice.impl.result.component.PracticeRecordingAnalysisLoadingPage
 import com.team.prezel.feature.practice.impl.result.component.PracticeRecordingResultPage
 
 @Composable
 internal fun PracticeRecordingResultScreen(
-    analysisStatus: PracticeRecordingAnalysisStatus,
+    uiState: PracticeRecordingUiState.Analysis,
     onRetry: () -> Unit,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (analysisStatus) {
-        PracticeRecordingAnalysisStatus.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
-        is PracticeRecordingAnalysisStatus.Success -> PracticeRecordingResultPage(
-            pronunciationScore = analysisStatus.result.pronunciationScore,
-            speed = analysisStatus.result.speed,
-            overallEvaluation = analysisStatus.result.overallEvaluation,
+    when (uiState) {
+        is PracticeRecordingUiState.Analysis.Loading -> PracticeRecordingAnalysisLoadingPage(modifier = modifier)
+        is PracticeRecordingUiState.Analysis.Success -> PracticeRecordingResultPage(
+            pronunciationScore = uiState.result.pronunciationScore,
+            speed = uiState.result.speed,
+            overallEvaluation = uiState.result.overallEvaluation,
             onComplete = onComplete,
             modifier = modifier,
         )
 
-        is PracticeRecordingAnalysisStatus.Error -> PracticeRecordingAnalysisFailurePage(
-            errorType = analysisStatus.type,
+        is PracticeRecordingUiState.Analysis.Error -> PracticeRecordingAnalysisFailurePage(
+            errorType = uiState.type,
             onRetry = onRetry,
             modifier = modifier,
         )
-
-        PracticeRecordingAnalysisStatus.Ready -> Unit
     }
 }

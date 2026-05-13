@@ -151,48 +151,96 @@ internal class MediaRecordingAudioController @Inject constructor(
         startPositionSeconds: Int,
     ) {
         runCatching {
-            releasePlayer()
-
-            var pendingPlayer: MediaPlayer? = null
-            val newPlayer = runCatching {
-                val mediaPlayer = MediaPlayer()
-                pendingPlayer = mediaPlayer
-                mediaPlayer.apply {
-                    setDataSource(source.filePath)
-                    prepare()
-                    if (startPositionSeconds > 0) {
-                        seekTo(startPositionSeconds * MILLIS_PER_SECOND)
-                    }
-                    setOnCompletionListener {
-                        releasePlayer()
-                        _audioSessionState.value = AudioSessionState.ReadyToPlay(
-                            source = source,
-                            positionSeconds = durationSeconds,
-                            durationSeconds = durationSeconds,
-                        )
-                    }
-                    start()
-                }
-            }.getOrElse { throwable ->
-                pendingPlayer?.release()
-                throw throwable
-            }
-
-            player = newPlayer
-            _audioSessionState.value = AudioSessionState.Playing(
+            preparePlayback(
                 source = source,
-                positionSeconds = startPositionSeconds,
-                durationSeconds = durationSeconds.coerceAtLeast(newPlayer.duration.toSeconds()),
+                durationSeconds = durationSeconds,
+                startPositionSeconds = startPositionSeconds,
+            )
+        }.onSuccess { newPlayer ->
+            player = newPlayer
+            updatePlayingState(
+                source = source,
+                durationSeconds = durationSeconds,
+                startPositionSeconds = startPositionSeconds,
+                playerDurationMillis = newPlayer.duration,
             )
             startPlaybackTimer()
         }.onFailure {
-            releasePlayer()
-            _audioSessionState.value = AudioSessionState.ReadyToPlay(
+            handlePlaybackStartFailure(
                 source = source,
                 durationSeconds = durationSeconds,
             )
-            emitEffect(AudioSessionEffect.PlaybackStartFailed)
         }
+    }
+
+    private fun preparePlayback(
+        source: AudioSource,
+        durationSeconds: Int,
+        startPositionSeconds: Int,
+    ): MediaPlayer {
+        releasePlayer()
+
+        var pendingPlayer: MediaPlayer? = null
+        return runCatching {
+            MediaPlayer().also { pendingPlayer = it }.apply {
+                setDataSource(source.filePath)
+                prepare()
+                seekToStartPosition(startPositionSeconds)
+                setOnCompletionListener {
+                    handlePlaybackCompleted(
+                        source = source,
+                        durationSeconds = durationSeconds,
+                    )
+                }
+                start()
+            }
+        }.getOrElse { throwable ->
+            pendingPlayer?.release()
+            throw throwable
+        }
+    }
+
+    private fun MediaPlayer.seekToStartPosition(startPositionSeconds: Int) {
+        if (startPositionSeconds > 0) {
+            seekTo(startPositionSeconds * MILLIS_PER_SECOND)
+        }
+    }
+
+    private fun handlePlaybackCompleted(
+        source: AudioSource,
+        durationSeconds: Int,
+    ) {
+        releasePlayer()
+        _audioSessionState.value = AudioSessionState.ReadyToPlay(
+            source = source,
+            positionSeconds = durationSeconds,
+            durationSeconds = durationSeconds,
+        )
+    }
+
+    private fun updatePlayingState(
+        source: AudioSource,
+        durationSeconds: Int,
+        startPositionSeconds: Int,
+        playerDurationMillis: Int,
+    ) {
+        _audioSessionState.value = AudioSessionState.Playing(
+            source = source,
+            positionSeconds = startPositionSeconds,
+            durationSeconds = durationSeconds.coerceAtLeast(playerDurationMillis.toSeconds()),
+        )
+    }
+
+    private fun handlePlaybackStartFailure(
+        source: AudioSource,
+        durationSeconds: Int,
+    ) {
+        releasePlayer()
+        _audioSessionState.value = AudioSessionState.ReadyToPlay(
+            source = source,
+            durationSeconds = durationSeconds,
+        )
+        emitEffect(AudioSessionEffect.PlaybackStartFailed)
     }
 
     private fun startRecordingTimer() {

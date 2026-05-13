@@ -13,7 +13,6 @@ import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
 import com.team.prezel.feature.practice.impl.model.PracticeRecordingAnalysisErrorType
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,7 +23,11 @@ internal class PracticeRecordingViewModel @Inject constructor(
     private val audioController: RecordingAudioController,
     private val fetchPracticeScriptUseCase: FetchPracticeScriptUseCase,
     private val analyzePracticeRecordingUseCase: AnalyzePracticeRecordingUseCase,
-) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(PracticeRecordingUiState()) {
+) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(
+        PracticeRecordingUiState.Ready(),
+    ) {
+    private var practiceScript: String = ""
+
     init {
         collectAudioSessionState()
         collectAudioSessionEffect()
@@ -39,7 +42,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
             )
 
             PracticeRecordingUiIntent.StartRecording -> {
-                if (currentState.practiceScript.isBlank()) {
+                if (practiceScript.isBlank()) {
                     showMessage(PracticeRecordingUiMessage.FETCH_PRACTICE_SCRIPT_FAILED)
                     return
                 }
@@ -58,17 +61,15 @@ internal class PracticeRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             audioController.audioSessionState.collect { audioState ->
                 updateState {
-                    copy(
-                        recordingState = audioState,
-                        analysisStatus = if (
-                            audioState is AudioSessionState.Recording &&
-                            recordingState !is AudioSessionState.Recording
-                        ) {
-                            PracticeRecordingAnalysisStatus.Ready
-                        } else {
-                            analysisStatus
-                        },
-                    )
+                    when {
+                        audioState is AudioSessionState.Recording -> PracticeRecordingUiState.Ready(
+                            practiceScript = this@PracticeRecordingViewModel.practiceScript,
+                            recordingState = audioState,
+                        )
+
+                        this is PracticeRecordingUiState.Ready -> copy(recordingState = audioState)
+                        else -> this
+                    }
                 }
             }
         }
@@ -86,8 +87,9 @@ internal class PracticeRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             fetchPracticeScriptUseCase()
                 .onSuccess { script ->
+                    practiceScript = script.content
                     updateState {
-                        copy(practiceScript = script.content)
+                        (this as PracticeRecordingUiState.Ready).copy(practiceScript = script.content)
                     }
                 }.onFailure {
                     showMessage(PracticeRecordingUiMessage.FETCH_PRACTICE_SCRIPT_FAILED)
@@ -96,32 +98,30 @@ internal class PracticeRecordingViewModel @Inject constructor(
     }
 
     private fun startAnalysis() {
-        if (!currentState.analyzeEnabled) return
-        val filePath = currentState.recordingFilePath ?: return
+        val readyState = currentState as? PracticeRecordingUiState.Ready ?: return
+        if (!readyState.analyzeEnabled) return
+        val filePath = readyState.recordingFilePath ?: return
+        val referenceText = practiceScript
 
         audioController.stopPlayback()
         viewModelScope.launch {
             updateState {
-                copy(analysisStatus = PracticeRecordingAnalysisStatus.Loading)
+                PracticeRecordingUiState.Analysis.Loading
             }
 
             analyzePracticeRecordingUseCase(
                 recordingFilePath = filePath,
-                referenceText = currentState.practiceScript,
+                referenceText = referenceText,
             ).onSuccess { result ->
                 updateState {
-                    copy(
-                        analysisStatus = PracticeRecordingAnalysisStatus.Success(
-                            result = result,
-                        ),
+                    PracticeRecordingUiState.Analysis.Success(
+                        result = result,
                     )
                 }
             }.onFailure { throwable ->
                 updateState {
-                    copy(
-                        analysisStatus = PracticeRecordingAnalysisStatus.Error(
-                            type = throwable.toPracticeRecordingAnalysisErrorType(),
-                        ),
+                    PracticeRecordingUiState.Analysis.Error(
+                        type = throwable.toPracticeRecordingAnalysisErrorType(),
                     )
                 }
             }
@@ -131,7 +131,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
     private fun resetPracticeRecording() {
         audioController.reset()
         updateState {
-            copy(analysisStatus = PracticeRecordingAnalysisStatus.Ready)
+            PracticeRecordingUiState.Ready(practiceScript = practiceScript)
         }
     }
 

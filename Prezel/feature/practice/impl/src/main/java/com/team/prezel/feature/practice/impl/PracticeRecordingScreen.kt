@@ -25,7 +25,6 @@ import com.team.prezel.feature.practice.impl.component.PracticeRecordingTopAppBa
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingAnalysisStatus
 import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
 import com.team.prezel.feature.practice.impl.result.PracticeRecordingResultScreen
 
@@ -40,7 +39,7 @@ internal fun PracticeRecordingScreen(
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
     val onStartRecording = rememberRecordAudioPermissionControlClickHandler(
-        recordingState = uiState.recordingState,
+        recordingState = (uiState as? PracticeRecordingUiState.Ready)?.recordingState ?: AudioSessionState.Idle,
         onStartRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StartRecording) },
         onPermissionDenied = { viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionDenied) },
         onPermissionPermanentlyDenied = {
@@ -92,14 +91,14 @@ private fun PracticeRecordingScreen(
 ) {
     BackHandler(
         onBack = {
-            if (uiState.analysisStatus == PracticeRecordingAnalysisStatus.Ready) {
+            if (uiState is PracticeRecordingUiState.Ready) {
                 onBack()
             }
         },
     )
 
-    when (uiState.analysisStatus) {
-        PracticeRecordingAnalysisStatus.Ready -> PracticeRecordingReadyScreen(
+    when (uiState) {
+        is PracticeRecordingUiState.Ready -> PracticeRecordingReadyScreen(
             uiState = uiState,
             onStartRecording = onStartRecording,
             onStopRecording = onStopRecording,
@@ -110,8 +109,8 @@ private fun PracticeRecordingScreen(
             modifier = modifier,
         )
 
-        else -> PracticeRecordingResultScreen(
-            analysisStatus = uiState.analysisStatus,
+        is PracticeRecordingUiState.Analysis -> PracticeRecordingResultScreen(
+            uiState = uiState,
             onRetry = onRetryRecording,
             onComplete = navigateToHome,
             modifier = modifier,
@@ -121,7 +120,7 @@ private fun PracticeRecordingScreen(
 
 @Composable
 private fun PracticeRecordingReadyScreen(
-    uiState: PracticeRecordingUiState,
+    uiState: PracticeRecordingUiState.Ready,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     onStartPlayback: () -> Unit,
@@ -178,7 +177,7 @@ private val PracticeRecordingUiMessage.resId: Int
 @Composable
 private fun PracticeRecordingScreenIdlePreview() {
     PrezelTheme {
-        PracticeRecordingScreenPreviewContent(uiState = PracticeRecordingUiState())
+        PracticeRecordingScreenPreviewContent(uiState = PracticeRecordingUiState.Ready())
     }
 }
 
@@ -187,7 +186,7 @@ private fun PracticeRecordingScreenIdlePreview() {
 private fun PracticeRecordingScreenRecordingPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState(
+            uiState = PracticeRecordingUiState.Ready(
                 recordingState = AudioSessionState.Recording(
                     elapsedSeconds = 12,
                 ),
@@ -201,7 +200,7 @@ private fun PracticeRecordingScreenRecordingPreview() {
 private fun PracticeRecordingScreenRecordedPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState(
+            uiState = PracticeRecordingUiState.Ready(
                 recordingState = AudioSessionState.ReadyToPlay(
                     source = AudioSource.RecordedFile(filePath = ""),
                     durationSeconds = 32,
@@ -216,7 +215,7 @@ private fun PracticeRecordingScreenRecordedPreview() {
 private fun PracticeRecordingScreenPlayingPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState(
+            uiState = PracticeRecordingUiState.Ready(
                 recordingState = AudioSessionState.Playing(
                     source = AudioSource.RecordedFile(filePath = ""),
                     positionSeconds = 12,
@@ -228,7 +227,7 @@ private fun PracticeRecordingScreenPlayingPreview() {
 }
 
 @Composable
-private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiState) {
+private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiState.Ready) {
     PracticeRecordingScreen(
         uiState = uiState.copy(
             practiceScript = "내가 그린 기린 그림은 잘 그린 기린 그림이고,\n네가 그린 기린 그림은 잘못 그린 기린 그림이다.",
