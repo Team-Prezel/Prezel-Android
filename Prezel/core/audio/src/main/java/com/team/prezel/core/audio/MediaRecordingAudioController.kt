@@ -1,9 +1,6 @@
 package com.team.prezel.core.audio
 
 import android.content.Context
-import android.media.MediaPlayer
-import android.media.MediaRecorder
-import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
-import kotlin.math.max
 
 internal class MediaRecordingAudioController @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -34,44 +29,19 @@ internal class MediaRecordingAudioController @Inject constructor(
     private val _audioSessionEffect = Channel<AudioSessionEffect>(capacity = Channel.BUFFERED)
     override val audioSessionEffect: Flow<AudioSessionEffect> = _audioSessionEffect.receiveAsFlow()
 
-    private var recorder: MediaRecorder? = null
-    private var player: MediaPlayer? = null
-    private var currentAudioFile: File? = null
+    private val recorderSession = MediaRecorderSession(context = context)
+    private val playerSession = MediaPlayerSession()
     private var recordingTimerJob: Job? = null
     private var playbackTimerJob: Job? = null
 
     override fun startRecording() {
         runCatching {
             stopPlayback()
-            releaseRecorder()
-            deleteCurrentAudioFile()
-
-            val file = File.createTempFile("recording_", ".m4a", context.cacheDir)
-            var pendingRecorder: MediaRecorder? = null
-            val newRecorder = runCatching {
-                val recorder = createMediaRecorder(context = context)
-                pendingRecorder = recorder
-                recorder.apply {
-                    setAudioSource(MediaRecorder.AudioSource.MIC)
-                    setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                    setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                    setOutputFile(file.absolutePath)
-                    prepare()
-                    start()
-                }
-            }.getOrElse { throwable ->
-                pendingRecorder?.release()
-                file.delete()
-                throw throwable
-            }
-
-            recorder = newRecorder
-            currentAudioFile = file
+            recorderSession.start().getOrThrow()
             _audioSessionState.value = AudioSessionState.Recording(elapsedSeconds = 0)
             startRecordingTimer()
         }.onFailure {
-            releaseRecorder()
-            deleteCurrentAudioFile()
+            recorderSession.reset()
             _audioSessionState.value = AudioSessionState.Idle
             emitEffect(AudioSessionEffect.RecordingStartFailed)
         }
@@ -82,24 +52,19 @@ internal class MediaRecordingAudioController @Inject constructor(
             is AudioSessionState.Recording -> state.elapsedSeconds
             else -> return
         }
-        val file = currentAudioFile ?: return emitEffect(AudioSessionEffect.RecordingStopFailed)
 
         recordingTimerJob?.cancel()
-        runCatching {
-            recorder?.stop() ?: error("Recording is not active.")
-            max(elapsedSeconds, 0)
-        }.onSuccess { durationSeconds ->
-            releaseRecorder()
-            _audioSessionState.value = AudioSessionState.ReadyToPlay(
-                source = AudioSource.RecordedFile(filePath = file.absolutePath),
-                durationSeconds = durationSeconds,
-            )
-        }.onFailure {
-            releaseRecorder()
-            deleteCurrentAudioFile()
-            _audioSessionState.value = AudioSessionState.Idle
-            emitEffect(AudioSessionEffect.RecordingStopFailed)
-        }
+        recorderSession
+            .stop(elapsedSeconds = elapsedSeconds)
+            .onSuccess { recordedAudio ->
+                _audioSessionState.value = AudioSessionState.ReadyToPlay(
+                    source = recordedAudio.source,
+                    durationSeconds = recordedAudio.durationSeconds,
+                )
+            }.onFailure {
+                _audioSessionState.value = AudioSessionState.Idle
+                emitEffect(AudioSessionEffect.RecordingStopFailed)
+            }
     }
 
     override fun startPlayback() {
@@ -118,7 +83,9 @@ internal class MediaRecordingAudioController @Inject constructor(
         val readyState = when (val state = audioSessionState.value) {
             is AudioSessionState.Playing -> AudioSessionState.ReadyToPlay(
                 source = state.source,
-                positionSeconds = playbackPositionSeconds().coerceAtLeast(state.positionSeconds),
+                positionSeconds = playerSession
+                    .currentPositionSeconds()
+                    .coerceAtLeast(state.positionSeconds),
                 durationSeconds = state.durationSeconds,
             )
 
@@ -134,9 +101,8 @@ internal class MediaRecordingAudioController @Inject constructor(
     override fun reset() {
         recordingTimerJob?.cancel()
         playbackTimerJob?.cancel()
-        releaseRecorder()
+        recorderSession.reset()
         releasePlayer()
-        deleteCurrentAudioFile()
         _audioSessionState.value = AudioSessionState.Idle
     }
 
@@ -150,60 +116,29 @@ internal class MediaRecordingAudioController @Inject constructor(
         durationSeconds: Int,
         startPositionSeconds: Int,
     ) {
-        runCatching {
-            preparePlayback(
+        playerSession
+            .start(
                 source = source,
-                durationSeconds = durationSeconds,
                 startPositionSeconds = startPositionSeconds,
-            )
-        }.onSuccess { newPlayer ->
-            player = newPlayer
-            updatePlayingState(
-                source = source,
-                durationSeconds = durationSeconds,
-                startPositionSeconds = startPositionSeconds,
-                playerDurationMillis = newPlayer.duration,
-            )
-            startPlaybackTimer()
-        }.onFailure {
-            handlePlaybackStartFailure(
-                source = source,
-                durationSeconds = durationSeconds,
-            )
-        }
-    }
-
-    private fun preparePlayback(
-        source: AudioSource,
-        durationSeconds: Int,
-        startPositionSeconds: Int,
-    ): MediaPlayer {
-        releasePlayer()
-
-        var pendingPlayer: MediaPlayer? = null
-        return runCatching {
-            MediaPlayer().also { pendingPlayer = it }.apply {
-                setDataSource(source.filePath)
-                prepare()
-                seekToStartPosition(startPositionSeconds)
-                setOnCompletionListener {
+                onCompleted = {
                     handlePlaybackCompleted(
                         source = source,
                         durationSeconds = durationSeconds,
                     )
-                }
-                start()
+                },
+            ).onSuccess { playerDurationMillis ->
+                _audioSessionState.value = AudioSessionState.Playing(
+                    source = source,
+                    positionSeconds = startPositionSeconds,
+                    durationSeconds = durationSeconds.coerceAtLeast(playerDurationMillis.toSeconds()),
+                )
+                startPlaybackTimer()
+            }.onFailure {
+                handlePlaybackStartFailure(
+                    source = source,
+                    durationSeconds = durationSeconds,
+                )
             }
-        }.getOrElse { throwable ->
-            pendingPlayer?.release()
-            throw throwable
-        }
-    }
-
-    private fun MediaPlayer.seekToStartPosition(startPositionSeconds: Int) {
-        if (startPositionSeconds > 0) {
-            seekTo(startPositionSeconds * MILLIS_PER_SECOND)
-        }
     }
 
     private fun handlePlaybackCompleted(
@@ -215,19 +150,6 @@ internal class MediaRecordingAudioController @Inject constructor(
             source = source,
             positionSeconds = durationSeconds,
             durationSeconds = durationSeconds,
-        )
-    }
-
-    private fun updatePlayingState(
-        source: AudioSource,
-        durationSeconds: Int,
-        startPositionSeconds: Int,
-        playerDurationMillis: Int,
-    ) {
-        _audioSessionState.value = AudioSessionState.Playing(
-            source = source,
-            positionSeconds = startPositionSeconds,
-            durationSeconds = durationSeconds.coerceAtLeast(playerDurationMillis.toSeconds()),
         )
     }
 
@@ -263,9 +185,10 @@ internal class MediaRecordingAudioController @Inject constructor(
                 delay(PLAYBACK_TIMER_DELAY_MILLIS)
                 _audioSessionState.update { state ->
                     if (state !is AudioSessionState.Playing) return@update state
+
                     AudioSessionState.Playing(
                         source = state.source,
-                        positionSeconds = playbackPositionSeconds(),
+                        positionSeconds = playerSession.currentPositionSeconds(),
                         durationSeconds = state.durationSeconds,
                     )
                 }
@@ -273,23 +196,9 @@ internal class MediaRecordingAudioController @Inject constructor(
         }
     }
 
-    private fun releaseRecorder() {
-        recorder?.release()
-        recorder = null
-    }
-
     private fun releasePlayer() {
         playbackTimerJob?.cancel()
-        player?.runCatching { stop() }
-        player?.release()
-        player = null
-    }
-
-    private fun playbackPositionSeconds(): Int = player?.currentPosition?.toSeconds() ?: 0
-
-    private fun deleteCurrentAudioFile() {
-        currentAudioFile?.delete()
-        currentAudioFile = null
+        playerSession.release()
     }
 
     private fun emitEffect(effect: AudioSessionEffect) {
@@ -297,18 +206,7 @@ internal class MediaRecordingAudioController @Inject constructor(
     }
 
     private companion object {
-        const val MILLIS_PER_SECOND = 1_000
         const val RECORDING_TIMER_DELAY_MILLIS = 1_000L
         const val PLAYBACK_TIMER_DELAY_MILLIS = 250L
     }
 }
-
-@Suppress("DEPRECATION")
-private fun createMediaRecorder(context: Context): MediaRecorder =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        MediaRecorder(context)
-    } else {
-        MediaRecorder()
-    }
-
-private fun Int.toSeconds(): Int = this / 1_000
