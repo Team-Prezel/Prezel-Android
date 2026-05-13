@@ -237,7 +237,7 @@ internal class MediaRecordingAudioController @Inject constructor(
         player = null
     }
 
-    private fun playbackPositionSeconds(): Int = runCatching { player?.currentPosition?.toSeconds() }.getOrNull() ?: 0
+    private fun playbackPositionSeconds(): Int = player?.currentPosition?.toSeconds() ?: 0
 
     private fun deleteCurrentAudioFile() {
         currentAudioFile?.delete()

@@ -46,6 +46,8 @@ dependencies {
     implementation(projects.featureTermsImpl)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
+    implementation(projects.featurePracticeApi)
+    implementation(projects.featurePracticeImpl)
     implementation(projects.featureHistoryApi)
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)

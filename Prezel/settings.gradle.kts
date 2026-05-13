@@ -52,6 +52,8 @@ includeAuto(
     ":core:ui",
     ":feature:home:api",
     ":feature:home:impl",
+    ":feature:practice:api",
+    ":feature:practice:impl",
     ":feature:history:api",
     ":feature:history:impl",
     ":feature:my:api",

@@ -62,7 +62,7 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_ID_TOKEN,
         -> AppError.UNAUTHORIZED
 
-        ServerErrorCode.VOICE_RECOGNITION_FAILED,
-        ServerErrorCode.UNKNOWN,
-        -> AppError.UNKNOWN
+        ServerErrorCode.VOICE_RECOGNITION_FAILED -> AppError.VOICE_RECOGNITION_FAILED
+
+        ServerErrorCode.UNKNOWN -> AppError.UNKNOWN
     }

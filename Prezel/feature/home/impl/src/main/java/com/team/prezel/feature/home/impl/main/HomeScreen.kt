@@ -39,7 +39,7 @@ import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiState
 import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
-import com.team.prezel.feature.home.impl.navigation.PracticeRecordingNavKey
+import com.team.prezel.feature.practice.api.PracticeNavKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -74,7 +74,7 @@ internal fun HomeScreen(
         uiState = uiState,
         pagerState = pagerState,
         onClickAddPresentation = { },
-        onClickPracticeRecording = { navigator.navigate(PracticeRecordingNavKey) },
+        onClickPracticeRecording = { navigator.navigate(PracticeNavKey) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
         modifier = modifier,
