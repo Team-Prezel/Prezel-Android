@@ -19,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.preview.BasicPreview
@@ -139,39 +140,87 @@ private fun SpeedGaugeArc(
                 val (arcTopLeft: Offset, arcSize: Size, arcStroke: Stroke) = size.calculateGraphArcMetrics()
 
                 onDrawBehind {
-                    drawArc(
-                        color = colors.baseTrackColor,
-                        startAngle = START_ANGLE,
-                        sweepAngle = FULL_CIRCLE_DEGREES,
-                        useCenter = false,
-                        topLeft = arcTopLeft,
-                        size = arcSize,
-                        style = arcStroke,
+                    drawBaseTrack(
+                        trackColor = colors.baseTrackColor,
+                        arcTopLeft = arcTopLeft,
+                        arcSize = arcSize,
+                        arcStroke = arcStroke,
                     )
 
                     if (!clampedGoodRange.isEmpty()) {
-                        drawArc(
-                            color = colors.goodRangeColor,
-                            startAngle = goodRangeStartAngle,
-                            sweepAngle = goodRangeSweepAngle,
-                            useCenter = false,
-                            topLeft = arcTopLeft,
-                            size = arcSize,
-                            style = arcStroke,
+                        drawGoodRange(
+                            rangeColor = colors.goodRangeColor,
+                            goodRangeStartAngle = goodRangeStartAngle,
+                            goodRangeSweepAngle = goodRangeSweepAngle,
+                            arcTopLeft = arcTopLeft,
+                            arcSize = arcSize,
+                            arcStroke = arcStroke,
                         )
                     }
 
-                    drawArc(
-                        color = userGaugeColor,
-                        startAngle = START_ANGLE,
-                        sweepAngle = userGaugeSweepAngle,
-                        useCenter = false,
-                        topLeft = arcTopLeft,
-                        size = arcSize,
-                        style = arcStroke,
+                    drawUserGauge(
+                        userGaugeColor = userGaugeColor,
+                        userGaugeSweepAngle = userGaugeSweepAngle,
+                        arcTopLeft = arcTopLeft,
+                        arcSize = arcSize,
+                        arcStroke = arcStroke,
                     )
                 }
             },
+    )
+}
+
+private fun DrawScope.drawBaseTrack(
+    trackColor: Color,
+    arcTopLeft: Offset,
+    arcSize: Size,
+    arcStroke: Stroke,
+) {
+    drawArc(
+        color = trackColor,
+        startAngle = START_ANGLE,
+        sweepAngle = FULL_CIRCLE_DEGREES,
+        useCenter = false,
+        topLeft = arcTopLeft,
+        size = arcSize,
+        style = arcStroke,
+    )
+}
+
+private fun DrawScope.drawGoodRange(
+    rangeColor: Color,
+    goodRangeStartAngle: Float,
+    goodRangeSweepAngle: Float,
+    arcTopLeft: Offset,
+    arcSize: Size,
+    arcStroke: Stroke,
+) {
+    drawArc(
+        color = rangeColor,
+        startAngle = goodRangeStartAngle,
+        sweepAngle = goodRangeSweepAngle,
+        useCenter = false,
+        topLeft = arcTopLeft,
+        size = arcSize,
+        style = arcStroke,
+    )
+}
+
+private fun DrawScope.drawUserGauge(
+    userGaugeColor: Color,
+    userGaugeSweepAngle: Float,
+    arcTopLeft: Offset,
+    arcSize: Size,
+    arcStroke: Stroke,
+) {
+    drawArc(
+        color = userGaugeColor,
+        startAngle = START_ANGLE,
+        sweepAngle = userGaugeSweepAngle,
+        useCenter = false,
+        topLeft = arcTopLeft,
+        size = arcSize,
+        style = arcStroke,
     )
 }
 
