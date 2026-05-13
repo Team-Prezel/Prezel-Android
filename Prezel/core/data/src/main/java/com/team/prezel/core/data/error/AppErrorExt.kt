@@ -45,9 +45,11 @@ private fun ServerErrorCode.toDomainError(): AppError =
 
         ServerErrorCode.SERVER_ERROR,
         ServerErrorCode.FILE_UPLOAD_FAILED,
+        ServerErrorCode.VOICE_ANALYSIS_FAILED,
         -> AppError.SERVER_ERROR
 
         ServerErrorCode.TERMS_NOT_FOUND,
+        ServerErrorCode.SENTENCE_NOT_FOUND,
         -> AppError.NOT_FOUND
 
         ServerErrorCode.DUPLICATE_NICKNAME -> AppError.DUPLICATE
@@ -60,5 +62,7 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_ID_TOKEN,
         -> AppError.UNAUTHORIZED
 
-        ServerErrorCode.UNKNOWN -> AppError.UNKNOWN
+        ServerErrorCode.VOICE_RECOGNITION_FAILED,
+        ServerErrorCode.UNKNOWN,
+        -> AppError.UNKNOWN
     }

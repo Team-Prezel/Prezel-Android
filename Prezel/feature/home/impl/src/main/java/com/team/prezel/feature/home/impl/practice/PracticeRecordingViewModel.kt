@@ -94,24 +94,26 @@ internal class PracticeRecordingViewModel @Inject constructor(
 
             delay(ANALYSIS_LOADING_DELAY_MILLIS)
 
-            analyzePracticeRecordingUseCase(recordingFilePath = filePath)
-                .onSuccess { result ->
-                    updateState {
-                        copy(
-                            analysisStatus = PracticeRecordingAnalysisStatus.Success(
-                                result = result.toUiModel(),
-                            ),
-                        )
-                    }
-                }.onFailure {
-                    updateState {
-                        copy(
-                            analysisStatus = PracticeRecordingAnalysisStatus.Error(
-                                type = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
-                            ),
-                        )
-                    }
+            analyzePracticeRecordingUseCase(
+                recordingFilePath = filePath,
+                referenceText = currentState.practiceScript,
+            ).onSuccess { result ->
+                updateState {
+                    copy(
+                        analysisStatus = PracticeRecordingAnalysisStatus.Success(
+                            result = result.toUiModel(),
+                        ),
+                    )
                 }
+            }.onFailure {
+                updateState {
+                    copy(
+                        analysisStatus = PracticeRecordingAnalysisStatus.Error(
+                            type = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
+                        ),
+                    )
+                }
+            }
         }
     }
 

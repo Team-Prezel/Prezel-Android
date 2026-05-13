@@ -84,7 +84,7 @@ internal fun SharedTransitionScope.LoginScreen(
                         LoginUiMessage.LOGIN_CANCELLED -> R.string.feature_login_impl_kakao_cancelled
                         LoginUiMessage.LOGIN_FAILED_UNKNOWN -> R.string.feature_login_impl_login_failed
                     }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId), useRaisedPosition = false)
                 }
             }
         }
