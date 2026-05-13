@@ -11,4 +11,5 @@ dependencies {
     implementation(projects.coreModel)
     implementation(libs.lottie.compose)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.kotlinx.datetime)
 }
