@@ -23,24 +23,17 @@ internal class PracticeRecordingViewModel @Inject constructor(
     private val audioController: RecordingAudioController,
     private val fetchPracticeScriptUseCase: FetchPracticeScriptUseCase,
     private val analyzePracticeRecordingUseCase: AnalyzePracticeRecordingUseCase,
-) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(
-        PracticeRecordingUiState.Ready(),
-    ) {
+) : BaseViewModel<PracticeRecordingUiState, PracticeRecordingUiIntent, PracticeRecordingUiEffect>(PracticeRecordingUiState.Ready()) {
     private var practiceScript: String = ""
 
     init {
         collectAudioSessionState()
         collectAudioSessionEffect()
+        fetchPracticeScript()
     }
 
     override fun onIntent(intent: PracticeRecordingUiIntent) {
         when (intent) {
-            PracticeRecordingUiIntent.LoadPracticeScript -> fetchPracticeScript()
-            PracticeRecordingUiIntent.RecordAudioPermissionDenied -> showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED)
-            PracticeRecordingUiIntent.RecordAudioPermissionPermanentlyDenied -> showMessage(
-                PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED,
-            )
-
             PracticeRecordingUiIntent.StartRecording -> {
                 if (practiceScript.isBlank()) {
                     showMessage(PracticeRecordingUiMessage.FETCH_PRACTICE_SCRIPT_FAILED)
@@ -52,8 +45,8 @@ internal class PracticeRecordingViewModel @Inject constructor(
             PracticeRecordingUiIntent.StopRecording -> audioController.stopRecording()
             PracticeRecordingUiIntent.StartPlayback -> audioController.startPlayback()
             PracticeRecordingUiIntent.StopPlayback -> audioController.stopPlayback()
-            PracticeRecordingUiIntent.AnalyzeClicked -> startAnalysis()
-            PracticeRecordingUiIntent.RetryRecordingClicked -> resetPracticeRecording()
+            PracticeRecordingUiIntent.AnalyzeRecording -> startAnalysis()
+            PracticeRecordingUiIntent.ResetRecording -> resetPracticeRecording()
         }
     }
 

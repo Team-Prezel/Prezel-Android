@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -27,6 +28,7 @@ import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
 import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
 import com.team.prezel.feature.practice.impl.result.PracticeRecordingResultScreen
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun PracticeRecordingScreen(
@@ -38,18 +40,21 @@ internal fun PracticeRecordingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val showMessage: (PracticeRecordingUiMessage) -> Unit = { message ->
+        coroutineScope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showPrezelSnackbar(message = resources.getString(message.resId))
+        }
+    }
     val onStartRecording = rememberRecordAudioPermissionControlClickHandler(
         recordingState = (uiState as? PracticeRecordingUiState.Ready)?.recordingState ?: AudioSessionState.Idle,
         onStartRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StartRecording) },
-        onPermissionDenied = { viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionDenied) },
+        onPermissionDenied = { showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED) },
         onPermissionPermanentlyDenied = {
-            viewModel.onIntent(PracticeRecordingUiIntent.RecordAudioPermissionPermanentlyDenied)
+            showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED)
         },
     )
-
-    LaunchedEffect(Unit) {
-        viewModel.onIntent(PracticeRecordingUiIntent.LoadPracticeScript)
-    }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -68,8 +73,8 @@ internal fun PracticeRecordingScreen(
         onStopRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StopRecording) },
         onStartPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StartPlayback) },
         onStopPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StopPlayback) },
-        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeClicked) },
-        onRetryRecording = { viewModel.onIntent(PracticeRecordingUiIntent.RetryRecordingClicked) },
+        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeRecording) },
+        onRetryRecording = { viewModel.onIntent(PracticeRecordingUiIntent.ResetRecording) },
         onBack = onBack,
         navigateToHome = navigateToHome,
         modifier = modifier,
