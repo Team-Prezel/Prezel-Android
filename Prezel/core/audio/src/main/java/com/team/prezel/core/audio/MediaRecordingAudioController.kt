@@ -1,7 +1,5 @@
 package com.team.prezel.core.audio
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,7 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class MediaRecordingAudioController @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    private val recorderSession: AudioRecorderSession,
+    private val playerSession: AudioPlayerSession,
 ) : RecordingAudioController {
     private val controllerScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -29,8 +28,6 @@ internal class MediaRecordingAudioController @Inject constructor(
     private val _audioSessionEffect = Channel<AudioSessionEffect>(capacity = Channel.BUFFERED)
     override val audioSessionEffect: Flow<AudioSessionEffect> = _audioSessionEffect.receiveAsFlow()
 
-    private val recorderSession = MediaRecorderSession(context = context)
-    private val playerSession = MediaPlayerSession()
     private var recordingTimerJob: Job? = null
     private var playbackTimerJob: Job? = null
 

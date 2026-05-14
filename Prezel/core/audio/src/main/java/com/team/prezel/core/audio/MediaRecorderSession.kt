@@ -3,16 +3,18 @@ package com.team.prezel.core.audio
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import javax.inject.Inject
 import kotlin.math.max
 
-internal class MediaRecorderSession(
-    private val context: Context,
-) {
+internal class MediaRecorderSession @Inject constructor(
+    @param:ApplicationContext private val context: Context,
+) : AudioRecorderSession {
     private var recorder: MediaRecorder? = null
     private var currentAudioFile: File? = null
 
-    fun start(): Result<Unit> =
+    override fun start(): Result<Unit> =
         runCatching {
             reset()
 
@@ -39,7 +41,7 @@ internal class MediaRecorderSession(
             reset()
         }
 
-    fun stop(elapsedSeconds: Int): Result<RecordedAudio> =
+    override fun stop(elapsedSeconds: Int): Result<RecordedAudio> =
         runCatching {
             val file = currentAudioFile!!
             recorder!!.stop()
@@ -53,7 +55,7 @@ internal class MediaRecorderSession(
             reset()
         }
 
-    fun reset() {
+    override fun reset() {
         releaseRecorder()
         currentAudioFile?.delete()
         currentAudioFile = null

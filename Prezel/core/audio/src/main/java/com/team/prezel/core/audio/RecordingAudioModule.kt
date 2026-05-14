@@ -12,4 +12,12 @@ internal abstract class RecordingAudioModule {
     @Binds
     @ViewModelScoped
     abstract fun bindRecordingAudioController(impl: MediaRecordingAudioController): RecordingAudioController
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindAudioRecorderSession(impl: MediaRecorderSession): AudioRecorderSession
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindAudioPlayerSession(impl: MediaPlayerSession): AudioPlayerSession
 }

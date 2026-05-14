@@ -1,11 +1,12 @@
 package com.team.prezel.core.audio
 
 import android.media.MediaPlayer
+import javax.inject.Inject
 
-internal class MediaPlayerSession {
+internal class MediaPlayerSession @Inject constructor() : AudioPlayerSession {
     private var player: MediaPlayer? = null
 
-    fun start(
+    override fun start(
         source: AudioSource,
         startPositionSeconds: Int,
         onCompleted: () -> Unit,
@@ -33,9 +34,9 @@ internal class MediaPlayerSession {
             release()
         }
 
-    fun currentPositionSeconds(): Int = player?.currentPosition?.toSeconds() ?: 0
+    override fun currentPositionSeconds(): Int = player?.currentPosition?.toSeconds() ?: 0
 
-    fun release() {
+    override fun release() {
         player?.runCatching { stop() }
         player?.release()
         player = null
