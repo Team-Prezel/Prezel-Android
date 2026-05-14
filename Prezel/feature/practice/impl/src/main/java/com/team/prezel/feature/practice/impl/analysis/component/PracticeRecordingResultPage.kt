@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.result.component
+package com.team.prezel.feature.practice.impl.analysis.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

@@ -28,10 +28,7 @@ internal fun PracticeRecordingContent(
     currentSeconds: Int,
     totalSeconds: Int,
     recordingState: AudioSessionState,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onStartPlayback: () -> Unit,
-    onStopPlayback: () -> Unit,
+    onClickRecordingControl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -78,10 +75,7 @@ internal fun PracticeRecordingContent(
             currentSeconds = currentSeconds,
             totalSeconds = totalSeconds,
             audioSessionState = recordingState,
-            onStartRecording = onStartRecording,
-            onStopRecording = onStopRecording,
-            onStartPlayback = onStartPlayback,
-            onStopPlayback = onStopPlayback,
+            onClickRecordingControl = onClickRecordingControl,
         )
     }
 }
@@ -95,10 +89,7 @@ private fun PracticeRecordingContentReadyToRecordPreview() {
             currentSeconds = 0,
             totalSeconds = 0,
             recordingState = AudioSessionState.Idle,
-            onStartRecording = {},
-            onStopRecording = {},
-            onStartPlayback = {},
-            onStopPlayback = {},
+            onClickRecordingControl = {},
             modifier = Modifier.height(520.dp),
         )
     }
@@ -117,10 +108,7 @@ private fun PracticeRecordingContentReadyToPlayPreview() {
                 positionSeconds = 12,
                 durationSeconds = 45,
             ),
-            onStartRecording = {},
-            onStopRecording = {},
-            onStartPlayback = {},
-            onStopPlayback = {},
+            onClickRecordingControl = {},
             modifier = Modifier.height(520.dp),
         )
     }

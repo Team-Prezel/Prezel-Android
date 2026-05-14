@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -32,18 +33,10 @@ internal fun PracticeRecordingControl(
     currentSeconds: Int,
     totalSeconds: Int,
     audioSessionState: AudioSessionState,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onStartPlayback: () -> Unit,
-    onStopPlayback: () -> Unit,
+    onClickRecordingControl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val actions = audioSessionState.actions(
-        onStartRecording = onStartRecording,
-        onStopRecording = onStopRecording,
-        onStartPlayback = onStartPlayback,
-        onStopPlayback = onStopPlayback,
-    )
+    val action = audioSessionState.action()
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -60,24 +53,22 @@ internal fun PracticeRecordingControl(
             horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            actions.forEach { action ->
-                PrezelIconButton(
-                    iconResId = action.iconResId,
-                    modifier = Modifier.size(48.dp),
+            PrezelIconButton(
+                iconResId = action.iconResId,
+                modifier = Modifier.size(48.dp),
+                isRounded = true,
+                buttonDefault = PrezelButtonDefaults.getDefault(
+                    isIconOnly = true,
                     isRounded = true,
-                    buttonDefault = PrezelButtonDefaults.getDefault(
-                        isIconOnly = true,
-                        isRounded = true,
-                        type = ButtonType.FILLED,
-                        size = ButtonSize.REGULAR,
-                        hierarchy = ButtonHierarchy.SECONDARY,
-                        contentColor = action.iconColor(),
-                        backgroundColor = PrezelTheme.colors.bgLarge,
-                        iconSize = 20.dp,
-                    ),
-                    onClick = action.onClick,
-                )
-            }
+                    type = ButtonType.FILLED,
+                    size = ButtonSize.REGULAR,
+                    hierarchy = ButtonHierarchy.SECONDARY,
+                    contentColor = action.iconColor,
+                    backgroundColor = PrezelTheme.colors.bgLarge,
+                    iconSize = 20.dp,
+                ),
+                onClick = onClickRecordingControl,
+            )
         }
     }
 }
@@ -116,58 +107,35 @@ private fun PracticeRecordingTimeText(
 
 private data class PracticeRecordingControlAction(
     @param:DrawableRes val iconResId: Int,
-    val colorType: PracticeRecordingControlActionColorType,
-    val onClick: () -> Unit,
+    val iconColor: Color,
 )
 
-private enum class PracticeRecordingControlActionColorType {
-    RECORD,
-    REGULAR,
-}
-
-private fun AudioSessionState.actions(
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onStartPlayback: () -> Unit,
-    onStopPlayback: () -> Unit,
-): List<PracticeRecordingControlAction> =
+@Composable
+private fun AudioSessionState.action(): PracticeRecordingControlAction =
     when (this) {
-        AudioSessionState.Idle -> listOf(
+        AudioSessionState.Idle ->
             PracticeRecordingControlAction(
                 iconResId = PrezelIcons.Recording,
-                colorType = PracticeRecordingControlActionColorType.RECORD,
-                onClick = onStartRecording,
-            ),
-        )
+                iconColor = PrezelTheme.colors.feedbackBadRegular,
+            )
 
-        is AudioSessionState.Recording -> stopAction(onStop = onStopRecording)
+        is AudioSessionState.Recording -> stopAction()
 
-        is AudioSessionState.ReadyToPlay -> listOf(
+        is AudioSessionState.ReadyToPlay ->
             PracticeRecordingControlAction(
                 iconResId = PrezelIcons.Play,
-                colorType = PracticeRecordingControlActionColorType.REGULAR,
-                onClick = onStartPlayback,
-            ),
-        )
+                iconColor = PrezelTheme.colors.iconRegular,
+            )
 
-        is AudioSessionState.Playing -> stopAction(onStop = onStopPlayback)
+        is AudioSessionState.Playing -> stopAction()
     }
-
-private fun stopAction(onStop: () -> Unit): List<PracticeRecordingControlAction> =
-    listOf(
-        PracticeRecordingControlAction(
-            iconResId = PrezelIcons.Stop,
-            colorType = PracticeRecordingControlActionColorType.REGULAR,
-            onClick = onStop,
-        ),
-    )
 
 @Composable
-private fun PracticeRecordingControlAction.iconColor() =
-    when (colorType) {
-        PracticeRecordingControlActionColorType.RECORD -> PrezelTheme.colors.feedbackBadRegular
-        PracticeRecordingControlActionColorType.REGULAR -> PrezelTheme.colors.iconRegular
-    }
+private fun stopAction(): PracticeRecordingControlAction =
+    PracticeRecordingControlAction(
+        iconResId = PrezelIcons.Stop,
+        iconColor = PrezelTheme.colors.iconRegular,
+    )
 
 private fun Int.toTimerText(): String {
     val minutes = this / 60
@@ -189,20 +157,14 @@ private fun PracticeRecordingControlPreview() {
                 currentSeconds = 0,
                 totalSeconds = 0,
                 audioSessionState = AudioSessionState.Idle,
-                onStartRecording = {},
-                onStopRecording = {},
-                onStartPlayback = {},
-                onStopPlayback = {},
+                onClickRecordingControl = {},
             )
 
             PracticeRecordingControl(
                 currentSeconds = 8,
                 totalSeconds = 0,
                 audioSessionState = AudioSessionState.Recording(elapsedSeconds = 8),
-                onStartRecording = {},
-                onStopRecording = {},
-                onStartPlayback = {},
-                onStopPlayback = {},
+                onClickRecordingControl = {},
             )
 
             PracticeRecordingControl(
@@ -213,10 +175,7 @@ private fun PracticeRecordingControlPreview() {
                     positionSeconds = 16,
                     durationSeconds = 45,
                 ),
-                onStartRecording = {},
-                onStopRecording = {},
-                onStartPlayback = {},
-                onStopPlayback = {},
+                onClickRecordingControl = {},
             )
 
             PracticeRecordingControl(
@@ -227,10 +186,7 @@ private fun PracticeRecordingControlPreview() {
                     positionSeconds = 24,
                     durationSeconds = 45,
                 ),
-                onStartRecording = {},
-                onStopRecording = {},
-                onStartPlayback = {},
-                onStopPlayback = {},
+                onClickRecordingControl = {},
             )
         }
     }

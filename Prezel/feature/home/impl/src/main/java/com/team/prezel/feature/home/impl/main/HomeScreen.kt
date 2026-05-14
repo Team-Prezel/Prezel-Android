@@ -74,7 +74,7 @@ internal fun HomeScreen(
         uiState = uiState,
         pagerState = pagerState,
         onClickAddPresentation = { },
-        onClickPracticeRecording = { navigator.navigate(PracticeNavKey) },
+        onClickPracticeRecording = { navigator.navigate(PracticeNavKey.Recording) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
         modifier = modifier,

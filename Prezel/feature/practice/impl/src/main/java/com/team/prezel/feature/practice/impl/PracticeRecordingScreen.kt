@@ -27,13 +27,12 @@ import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiEffect
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
 import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
 import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
-import com.team.prezel.feature.practice.impl.result.PracticeRecordingResultScreen
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun PracticeRecordingScreen(
     onBack: () -> Unit,
-    navigateToHome: () -> Unit,
+    navigateToAnalysis: (recordingFilePath: String, referenceText: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PracticeRecordingViewModel = hiltViewModel(),
 ) {
@@ -47,9 +46,9 @@ internal fun PracticeRecordingScreen(
             snackbarHostState.showPrezelSnackbar(message = resources.getString(message.resId))
         }
     }
-    val onStartRecording = rememberRecordAudioPermissionControlClickHandler(
-        recordingState = (uiState as? PracticeRecordingUiState.Ready)?.recordingState ?: AudioSessionState.Idle,
-        onStartRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StartRecording) },
+    val onClickRecordingControl = rememberRecordAudioPermissionControlClickHandler(
+        recordingState = uiState.recordingState,
+        onClickRecordingControl = { viewModel.onIntent(PracticeRecordingUiIntent.ClickRecordingControl) },
         onPermissionDenied = { showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_DENIED) },
         onPermissionPermanentlyDenied = {
             showMessage(PracticeRecordingUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED)
@@ -69,14 +68,12 @@ internal fun PracticeRecordingScreen(
 
     PracticeRecordingScreen(
         uiState = uiState,
-        onStartRecording = onStartRecording,
-        onStopRecording = { viewModel.onIntent(PracticeRecordingUiIntent.StopRecording) },
-        onStartPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StartPlayback) },
-        onStopPlayback = { viewModel.onIntent(PracticeRecordingUiIntent.StopPlayback) },
-        onClickAnalyze = { viewModel.onIntent(PracticeRecordingUiIntent.AnalyzeRecording) },
-        onRetryRecording = { viewModel.onIntent(PracticeRecordingUiIntent.ResetRecording) },
+        onClickRecordingControl = onClickRecordingControl,
+        onClickAnalyze = {
+            val recordingFilePath = uiState.recordingFilePath ?: return@PracticeRecordingScreen
+            navigateToAnalysis(recordingFilePath, uiState.practiceScript)
+        },
         onBack = onBack,
-        navigateToHome = navigateToHome,
         modifier = modifier,
     )
 }
@@ -84,52 +81,28 @@ internal fun PracticeRecordingScreen(
 @Composable
 private fun PracticeRecordingScreen(
     uiState: PracticeRecordingUiState,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onStartPlayback: () -> Unit,
-    onStopPlayback: () -> Unit,
+    onClickRecordingControl: () -> Unit,
     onClickAnalyze: () -> Unit,
-    onRetryRecording: () -> Unit,
     onBack: () -> Unit,
-    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(
-        onBack = {
-            if (uiState is PracticeRecordingUiState.Ready) {
-                onBack()
-            }
-        },
+        onBack = onBack,
     )
 
-    when (uiState) {
-        is PracticeRecordingUiState.Ready -> PracticeRecordingReadyScreen(
-            uiState = uiState,
-            onStartRecording = onStartRecording,
-            onStopRecording = onStopRecording,
-            onStartPlayback = onStartPlayback,
-            onStopPlayback = onStopPlayback,
-            onClickAnalyze = onClickAnalyze,
-            onBack = onBack,
-            modifier = modifier,
-        )
-
-        is PracticeRecordingUiState.Analysis -> PracticeRecordingResultScreen(
-            uiState = uiState,
-            onRetry = onRetryRecording,
-            onComplete = navigateToHome,
-            modifier = modifier,
-        )
-    }
+    PracticeRecordingReadyScreen(
+        uiState = uiState,
+        onClickRecordingControl = onClickRecordingControl,
+        onClickAnalyze = onClickAnalyze,
+        onBack = onBack,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun PracticeRecordingReadyScreen(
-    uiState: PracticeRecordingUiState.Ready,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onStartPlayback: () -> Unit,
-    onStopPlayback: () -> Unit,
+    uiState: PracticeRecordingUiState,
+    onClickRecordingControl: () -> Unit,
     onClickAnalyze: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -146,10 +119,7 @@ private fun PracticeRecordingReadyScreen(
             currentSeconds = uiState.currentSeconds,
             totalSeconds = uiState.totalSeconds,
             recordingState = uiState.recordingState,
-            onStartRecording = onStartRecording,
-            onStopRecording = onStopRecording,
-            onStartPlayback = onStartPlayback,
-            onStopPlayback = onStopPlayback,
+            onClickRecordingControl = onClickRecordingControl,
             modifier = Modifier.weight(1f),
         )
 
@@ -182,7 +152,7 @@ private val PracticeRecordingUiMessage.resId: Int
 @Composable
 private fun PracticeRecordingScreenIdlePreview() {
     PrezelTheme {
-        PracticeRecordingScreenPreviewContent(uiState = PracticeRecordingUiState.Ready())
+        PracticeRecordingScreenPreviewContent(uiState = PracticeRecordingUiState())
     }
 }
 
@@ -191,7 +161,7 @@ private fun PracticeRecordingScreenIdlePreview() {
 private fun PracticeRecordingScreenRecordingPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState.Ready(
+            uiState = PracticeRecordingUiState(
                 recordingState = AudioSessionState.Recording(
                     elapsedSeconds = 12,
                 ),
@@ -205,7 +175,7 @@ private fun PracticeRecordingScreenRecordingPreview() {
 private fun PracticeRecordingScreenRecordedPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState.Ready(
+            uiState = PracticeRecordingUiState(
                 recordingState = AudioSessionState.ReadyToPlay(
                     source = AudioSource.RecordedFile(filePath = ""),
                     durationSeconds = 32,
@@ -220,7 +190,7 @@ private fun PracticeRecordingScreenRecordedPreview() {
 private fun PracticeRecordingScreenPlayingPreview() {
     PrezelTheme {
         PracticeRecordingScreenPreviewContent(
-            uiState = PracticeRecordingUiState.Ready(
+            uiState = PracticeRecordingUiState(
                 recordingState = AudioSessionState.Playing(
                     source = AudioSource.RecordedFile(filePath = ""),
                     positionSeconds = 12,
@@ -232,18 +202,13 @@ private fun PracticeRecordingScreenPlayingPreview() {
 }
 
 @Composable
-private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiState.Ready) {
+private fun PracticeRecordingScreenPreviewContent(uiState: PracticeRecordingUiState) {
     PracticeRecordingScreen(
         uiState = uiState.copy(
             practiceScript = "내가 그린 기린 그림은 잘 그린 기린 그림이고,\n네가 그린 기린 그림은 잘못 그린 기린 그림이다.",
         ),
-        onStartRecording = {},
-        onStopRecording = {},
-        onStartPlayback = {},
-        onStopPlayback = {},
+        onClickRecordingControl = {},
         onClickAnalyze = {},
-        onRetryRecording = {},
         onBack = {},
-        navigateToHome = {},
     )
 }

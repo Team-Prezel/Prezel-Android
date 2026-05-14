@@ -6,6 +6,7 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.practice.api.PracticeNavKey
 import com.team.prezel.feature.practice.impl.PracticeRecordingScreen
+import com.team.prezel.feature.practice.impl.analysis.PracticeRecordingAnalysisScreen
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,12 +14,30 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
-    entry<PracticeNavKey> {
+    entry<PracticeNavKey.Recording> {
         val navigator = LocalNavigator.current
 
         PracticeRecordingScreen(
             onBack = navigator::goBack,
-            navigateToHome = { navigator.replaceRoot(HomeNavKey) },
+            navigateToAnalysis = { recordingFilePath, referenceText ->
+                navigator.navigate(
+                    PracticeNavKey.Analysis(
+                        recordingFilePath = recordingFilePath,
+                        referenceText = referenceText,
+                    ),
+                )
+            },
+        )
+    }
+
+    entry<PracticeNavKey.Analysis> { key ->
+        val navigator = LocalNavigator.current
+
+        PracticeRecordingAnalysisScreen(
+            recordingFilePath = key.recordingFilePath,
+            referenceText = key.referenceText,
+            onRetry = { navigator.navigate(PracticeNavKey.Recording) },
+            onComplete = { navigator.replaceRoot(HomeNavKey) },
         )
     }
 }
