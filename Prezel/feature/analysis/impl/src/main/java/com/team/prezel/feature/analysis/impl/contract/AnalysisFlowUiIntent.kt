@@ -15,20 +15,8 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
         val date: String,
     ) : AnalysisFlowUiIntent
 
-    data class SelectCategory(
-        val category: Category,
-    ) : AnalysisFlowUiIntent
-
-    data class SelectPurpose(
-        val purpose: Purpose,
-    ) : AnalysisFlowUiIntent
-
-    data class SelectStyle(
-        val style: Style,
-    ) : AnalysisFlowUiIntent
-
-    data class SelectAudience(
-        val audience: Audience,
+    data class SelectSituationOption(
+        val option: AnalysisSituationOption,
     ) : AnalysisFlowUiIntent
 
     data class SelectScriptInputType(
@@ -49,7 +37,34 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
 
     data object Next : AnalysisFlowUiIntent
 
+    data class RetryFileUpload(
+        val uploadType: AnalysisUploadType,
+    ) : AnalysisFlowUiIntent
+
     data object SkipScript : AnalysisFlowUiIntent
 
     data object Back : AnalysisFlowUiIntent
+}
+
+internal enum class AnalysisUploadType {
+    SCRIPT,
+    AUDIO,
+}
+
+internal sealed interface AnalysisSituationOption {
+    data class CategoryOption(
+        val category: Category,
+    ) : AnalysisSituationOption
+
+    data class PurposeOption(
+        val purpose: Purpose,
+    ) : AnalysisSituationOption
+
+    data class StyleOption(
+        val style: Style,
+    ) : AnalysisSituationOption
+
+    data class AudienceOption(
+        val audience: Audience,
+    ) : AnalysisSituationOption
 }

@@ -2,8 +2,14 @@ package com.team.prezel.feature.analysis.impl
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,9 +51,11 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 
 private const val SCRIPT_MAX_LENGTH = 5_000
-private val SCRIPT_FILE_MIME_TYPES = arrayOf("application/pdf", "text/plain", "text/*", "application/octet-stream")
+private const val SCRIPT_UPLOAD_PROGRESS_DURATION_MILLIS = 800
+private val SCRIPT_FILE_MIME_TYPES = arrayOf("text/plain")
 private const val SCRIPT_INPUT_TAB_COUNT = 2
 
 @Composable
@@ -57,18 +68,50 @@ internal fun ScriptInputScreen(
     onSkip: () -> Unit,
     onBack: () -> Unit,
 ) {
+    var pendingScriptFileUri by remember { mutableStateOf<String?>(null) }
+    val uploadProgress by animateFloatAsState(
+        targetValue = if (pendingScriptFileUri != null) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = SCRIPT_UPLOAD_PROGRESS_DURATION_MILLIS,
+            easing = LinearEasing,
+        ),
+        label = "script-upload-progress",
+    )
+
     val scriptPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        onScriptFileSelected(uri?.toString())
+        uri?.toString()?.let { fileUri ->
+            pendingScriptFileUri = fileUri
+        }
+    }
+
+    LaunchedEffect(pendingScriptFileUri) {
+        val fileUri = pendingScriptFileUri ?: return@LaunchedEffect
+        delay(SCRIPT_UPLOAD_PROGRESS_DURATION_MILLIS.toLong())
+        onScriptFileSelected(fileUri)
+    }
+
+    LaunchedEffect(uiState.form.scriptFileUri, pendingScriptFileUri) {
+        if (pendingScriptFileUri != null && uiState.form.scriptFileUri == pendingScriptFileUri) {
+            pendingScriptFileUri = null
+        }
     }
 
     ScriptInputScreen(
         form = uiState.form,
+        pendingScriptFileUri = pendingScriptFileUri,
+        uploadProgress = uploadProgress,
         progress = uiState.progress,
         buttonEnabled = uiState.canMoveNext,
         onSelectInputType = onSelectInputType,
         onScriptChange = onScriptChange,
         onScriptFileUploadClick = { scriptPicker.launch(SCRIPT_FILE_MIME_TYPES) },
-        onScriptFileClear = { onScriptFileSelected(null) },
+        onScriptFileClear = {
+            if (pendingScriptFileUri != null) {
+                pendingScriptFileUri = null
+            } else {
+                onScriptFileSelected(null)
+            }
+        },
         onNext = onNext,
         onSkip = onSkip,
         onBack = onBack,
@@ -78,6 +121,8 @@ internal fun ScriptInputScreen(
 @Composable
 private fun ScriptInputScreen(
     form: AnalysisForm,
+    pendingScriptFileUri: String?,
+    uploadProgress: Float,
     progress: Float,
     buttonEnabled: Boolean,
     onSelectInputType: (ScriptInputType) -> Unit,
@@ -114,7 +159,8 @@ private fun ScriptInputScreen(
 
         when (form.scriptInputType) {
             ScriptInputType.FILE_UPLOAD -> ScriptUploadCard(
-                fileUri = form.scriptFileUri,
+                fileUri = pendingScriptFileUri ?: form.scriptFileUri,
+                uploadProgress = if (pendingScriptFileUri != null) uploadProgress else null,
                 onClick = onScriptFileUploadClick,
                 onClear = onScriptFileClear,
             )
@@ -176,20 +222,23 @@ private fun Int.toScriptInputType(): ScriptInputType =
 @Composable
 private fun ScriptUploadCard(
     fileUri: String?,
+    uploadProgress: Float?,
     onClick: () -> Unit,
     onClear: () -> Unit,
 ) {
     if (fileUri == null) {
         EmptyScriptUploadContent(onClick = onClick)
     } else {
-        UploadedScriptFileCard(fileUri = fileUri, onClear = onClear)
+        UploadedScriptFileCard(
+            fileUri = fileUri,
+            uploadProgress = uploadProgress,
+            onClear = onClear,
+        )
     }
 }
 
 @Composable
-private fun EmptyScriptUploadContent(
-    onClick: () -> Unit,
-) {
+private fun EmptyScriptUploadContent(onClick: () -> Unit) {
     StatusView(
         title = stringResource(R.string.feature_analysis_impl_script_file_placeholder),
         description = stringResource(R.string.feature_analysis_impl_script_file_format),
@@ -219,6 +268,7 @@ private fun EmptyScriptUploadContent(
 @Composable
 private fun UploadedScriptFileCard(
     fileUri: String,
+    uploadProgress: Float?,
     onClear: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -231,19 +281,28 @@ private fun UploadedScriptFileCard(
                 width = PrezelTheme.stroke.V1,
                 color = PrezelTheme.colors.borderRegular,
                 shape = PrezelTheme.shapes.V8,
-            )
-            .padding(
+            ).padding(
                 horizontal = PrezelTheme.spacing.V12,
                 vertical = PrezelTheme.spacing.V24,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = fileName,
-            modifier = Modifier.weight(1f).padding(start = PrezelTheme.spacing.V4),
-            color = PrezelTheme.colors.textMedium,
-            style = PrezelTheme.typography.body3Medium,
-        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = PrezelTheme.spacing.V4),
+        ) {
+            Text(
+                text = fileName,
+                color = PrezelTheme.colors.textMedium,
+                style = PrezelTheme.typography.body3Medium,
+            )
+
+            if (uploadProgress != null) {
+                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+                ScriptUploadProgress(progress = uploadProgress)
+            }
+        }
 
         PrezelTouchArea(
             extraTouchPadding = PaddingValues(PrezelTheme.spacing.V8),
@@ -260,6 +319,45 @@ private fun UploadedScriptFileCard(
     }
 }
 
+@Composable
+private fun ScriptUploadProgress(progress: Float) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
+    val progressPercent = (coercedProgress * 100).toInt()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(6.dp)
+                .background(
+                    color = PrezelTheme.colors.bgLarge,
+                    shape = PrezelTheme.shapes.V1000,
+                ),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(coercedProgress)
+                    .height(6.dp)
+                    .background(
+                        color = PrezelTheme.colors.interactiveRegular,
+                        shape = PrezelTheme.shapes.V1000,
+                    ),
+            )
+        }
+
+        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V16))
+
+        Text(
+            text = "%02d%%".format(progressPercent),
+            color = PrezelTheme.colors.textSmall,
+            style = PrezelTheme.typography.body2Regular,
+        )
+    }
+}
+
 @BasicPreview
 @Composable
 private fun ScriptInputUploadScreenPreview() {
@@ -269,6 +367,27 @@ private fun ScriptInputUploadScreenPreview() {
             onSelectInputType = {},
             onScriptChange = {},
             onScriptFileSelected = {},
+            onNext = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun ScriptInputUploadProgressScreenPreview() {
+    PrezelTheme {
+        ScriptInputScreen(
+            form = AnalysisForm(),
+            pendingScriptFileUri = "content://prezel/25-2 컨셉발표회 대본.txt",
+            uploadProgress = 0.5f,
+            progress = AnalysisFlowUiState(step = AnalysisFlowStep.SCRIPT_INPUT).progress,
+            buttonEnabled = false,
+            onSelectInputType = {},
+            onScriptChange = {},
+            onScriptFileUploadClick = {},
+            onScriptFileClear = {},
             onNext = {},
             onSkip = {},
             onBack = {},

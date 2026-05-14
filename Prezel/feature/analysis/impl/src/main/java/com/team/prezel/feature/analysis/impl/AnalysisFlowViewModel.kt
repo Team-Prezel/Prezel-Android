@@ -7,6 +7,9 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
+import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
+import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,17 +21,26 @@ internal class AnalysisFlowViewModel @Inject constructor() :
             when (intent) {
                 is AnalysisFlowUiIntent.UpdatePresentationTitle -> updateForm { copy(presentationTitle = intent.title) }
                 is AnalysisFlowUiIntent.UpdatePresentationDate -> updateForm { copy(presentationDate = intent.date) }
-                is AnalysisFlowUiIntent.SelectCategory -> updateForm { copy(category = intent.category) }
-                is AnalysisFlowUiIntent.SelectPurpose -> updateForm { copy(purpose = intent.purpose) }
-                is AnalysisFlowUiIntent.SelectStyle -> updateForm { copy(style = intent.style) }
-                is AnalysisFlowUiIntent.SelectAudience -> updateForm { copy(audience = intent.audience) }
+                is AnalysisFlowUiIntent.SelectSituationOption -> selectSituationOption(intent.option)
                 is AnalysisFlowUiIntent.SelectScriptInputType -> updateForm { copy(scriptInputType = intent.inputType) }
                 is AnalysisFlowUiIntent.UpdateScript -> updateForm { copy(script = intent.script) }
                 is AnalysisFlowUiIntent.SelectScriptFile -> updateForm { copy(scriptFileUri = intent.fileUri) }
                 is AnalysisFlowUiIntent.SelectAudioFile -> updateForm { copy(audioFileUri = intent.fileUri) }
+                is AnalysisFlowUiIntent.RetryFileUpload -> retryFileUpload(intent.uploadType)
                 AnalysisFlowUiIntent.Next -> moveNext()
                 AnalysisFlowUiIntent.SkipScript -> skipScript()
                 AnalysisFlowUiIntent.Back -> moveBack()
+            }
+        }
+
+        private fun selectSituationOption(option: AnalysisSituationOption) {
+            updateForm {
+                when (option) {
+                    is AnalysisSituationOption.CategoryOption -> copy(category = option.category)
+                    is AnalysisSituationOption.PurposeOption -> copy(purpose = option.purpose)
+                    is AnalysisSituationOption.StyleOption -> copy(style = option.style)
+                    is AnalysisSituationOption.AudienceOption -> copy(audience = option.audience)
+                }
             }
         }
 
@@ -42,8 +54,39 @@ internal class AnalysisFlowViewModel @Inject constructor() :
                         AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.SCRIPT_INPUT
                         AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.AUDIO_UPLOAD
                         AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.ANALYZING
-                        AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.ANALYZING
+                        AnalysisFlowStep.ANALYZING,
+                        AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+                        AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
+                        -> AnalysisFlowStep.ANALYZING
                     },
+                )
+            }
+        }
+
+        private fun retryFileUpload(uploadType: AnalysisUploadType) {
+            when (uploadType) {
+                AnalysisUploadType.SCRIPT -> retryScriptFileUpload()
+                AnalysisUploadType.AUDIO -> retryAudioUpload()
+            }
+        }
+
+        private fun retryAudioUpload() {
+            updateState {
+                copy(
+                    step = AnalysisFlowStep.AUDIO_UPLOAD,
+                    form = form.copy(audioFileUri = null),
+                )
+            }
+        }
+
+        private fun retryScriptFileUpload() {
+            updateState {
+                copy(
+                    step = AnalysisFlowStep.SCRIPT_INPUT,
+                    form = form.copy(
+                        scriptInputType = ScriptInputType.FILE_UPLOAD,
+                        scriptFileUri = null,
+                    ),
                 )
             }
         }
@@ -61,6 +104,8 @@ internal class AnalysisFlowViewModel @Inject constructor() :
                 AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.PRESENTATION_SITUATION
                 AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
                 AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
+                AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
+                AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
             }
 
             if (previousStep == null) {

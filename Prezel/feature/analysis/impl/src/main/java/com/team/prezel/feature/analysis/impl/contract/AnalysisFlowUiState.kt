@@ -17,10 +17,13 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.PRESENTATION_SCHEDULE -> 0.25f
             AnalysisFlowStep.PRESENTATION_SITUATION,
             AnalysisFlowStep.SCRIPT_INPUT,
+            AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> 0.5f
 
             AnalysisFlowStep.AUDIO_UPLOAD -> 0.75f
-            AnalysisFlowStep.ANALYZING -> 1f
+            AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+            -> 1f
         }
 
     val canMoveNext: Boolean
@@ -37,7 +40,10 @@ internal data class AnalysisFlowUiState(
             }
 
             AnalysisFlowStep.AUDIO_UPLOAD -> form.audioFileUri != null
-            AnalysisFlowStep.ANALYZING -> false
+            AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+            AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
+            -> false
         }
 }
 
@@ -66,4 +72,6 @@ internal enum class AnalysisFlowStep {
     SCRIPT_INPUT,
     AUDIO_UPLOAD,
     ANALYZING,
+    FILE_RECOGNITION_FAILED,
+    SCRIPT_FILE_RECOGNITION_FAILED,
 }

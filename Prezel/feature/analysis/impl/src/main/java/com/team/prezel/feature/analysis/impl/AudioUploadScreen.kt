@@ -2,6 +2,9 @@ package com.team.prezel.feature.analysis.impl
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +22,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,9 +51,11 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 
-private const val AUDIO_FILE_MIME_TYPE = "audio/*"
-private const val AUDIO_PREVIEW_FILE_URI = "content://prezel/sample.wav"
+private const val AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS = 800
+private val AUDIO_FILE_MIME_TYPES = arrayOf("audio/m4a", "audio/x-m4a", "audio/mp4", "video/mp4", "audio/mpeg")
+private const val AUDIO_PREVIEW_FILE_URI = "content://prezel/sample.m4a"
 private const val AUDIO_UPLOAD_TAB_COUNT = 1
 private const val UPLOADED_AUDIO_PROGRESS = 0f
 
@@ -57,16 +66,48 @@ internal fun AudioUploadScreen(
     onAnalyze: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        onAudioFileSelected(uri?.toString())
+    var pendingAudioFileUri by remember { mutableStateOf<String?>(null) }
+    val uploadProgress by animateFloatAsState(
+        targetValue = if (pendingAudioFileUri != null) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS,
+            easing = LinearEasing,
+        ),
+        label = "audio-upload-progress",
+    )
+
+    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.toString()?.let { fileUri ->
+            pendingAudioFileUri = fileUri
+        }
+    }
+
+    LaunchedEffect(pendingAudioFileUri) {
+        val fileUri = pendingAudioFileUri ?: return@LaunchedEffect
+        delay(AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS.toLong())
+        onAudioFileSelected(fileUri)
+    }
+
+    LaunchedEffect(uiState.form.audioFileUri, pendingAudioFileUri) {
+        if (pendingAudioFileUri != null && uiState.form.audioFileUri == pendingAudioFileUri) {
+            pendingAudioFileUri = null
+        }
     }
 
     AudioUploadScreen(
         form = uiState.form,
+        pendingAudioFileUri = pendingAudioFileUri,
+        uploadProgress = uploadProgress,
         progress = uiState.progress,
         buttonEnabled = uiState.canMoveNext,
-        onAudioFileUploadClick = { audioPicker.launch(AUDIO_FILE_MIME_TYPE) },
-        onAudioFileClear = { onAudioFileSelected(null) },
+        onAudioFileUploadClick = { audioPicker.launch(AUDIO_FILE_MIME_TYPES) },
+        onAudioFileClear = {
+            if (pendingAudioFileUri != null) {
+                pendingAudioFileUri = null
+            } else {
+                onAudioFileSelected(null)
+            }
+        },
         onAnalyze = onAnalyze,
         onBack = onBack,
     )
@@ -75,6 +116,8 @@ internal fun AudioUploadScreen(
 @Composable
 private fun AudioUploadScreen(
     form: AnalysisForm,
+    pendingAudioFileUri: String?,
+    uploadProgress: Float,
     progress: Float,
     buttonEnabled: Boolean,
     onAudioFileUploadClick: () -> Unit,
@@ -108,7 +151,8 @@ private fun AudioUploadScreen(
         )
 
         AudioUploadContent(
-            fileUri = form.audioFileUri,
+            fileUri = pendingAudioFileUri ?: form.audioFileUri,
+            uploadProgress = if (pendingAudioFileUri != null) uploadProgress else null,
             onUploadClick = onAudioFileUploadClick,
             onClear = onAudioFileClear,
         )
@@ -118,6 +162,7 @@ private fun AudioUploadScreen(
 @Composable
 private fun AudioUploadContent(
     fileUri: String?,
+    uploadProgress: Float?,
     onUploadClick: () -> Unit,
     onClear: () -> Unit,
 ) {
@@ -129,6 +174,7 @@ private fun AudioUploadContent(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
         UploadedAudioFileCard(
             fileName = remember(context, fileUri) { fileUri.toFileName(context) },
+            uploadProgress = uploadProgress,
             onClear = onClear,
         )
     }
@@ -165,6 +211,7 @@ private fun AudioUploadEmptyContent(onUploadClick: () -> Unit) {
 @Composable
 private fun UploadedAudioFileCard(
     fileName: String,
+    uploadProgress: Float?,
     onClear: () -> Unit,
 ) {
     Row(
@@ -175,13 +222,16 @@ private fun UploadedAudioFileCard(
                 color = PrezelTheme.colors.borderSmall,
                 shape = PrezelTheme.shapes.V8,
             ).padding(
-                horizontal = PrezelTheme.spacing.V16,
-                vertical = PrezelTheme.spacing.V16,
+                start = PrezelTheme.spacing.V16,
+                end = PrezelTheme.spacing.V12,
+                top = PrezelTheme.spacing.V16,
+                bottom = PrezelTheme.spacing.V16,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UploadedAudioFileInfo(
             fileName = fileName,
+            uploadProgress = uploadProgress,
             modifier = Modifier.weight(1f),
         )
 
@@ -204,6 +254,7 @@ private fun UploadedAudioFileCard(
 @Composable
 private fun UploadedAudioFileInfo(
     fileName: String,
+    uploadProgress: Float?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -211,7 +262,11 @@ private fun UploadedAudioFileInfo(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
-        AudioFileProgressRow()
+        if (uploadProgress == null) {
+            AudioFileProgressRow()
+        } else {
+            AudioUploadProgressRow(progress = uploadProgress)
+        }
     }
 }
 
@@ -257,9 +312,35 @@ private fun AudioFileProgressRow() {
 }
 
 @Composable
+private fun AudioUploadProgressRow(progress: Float) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
+    val progressPercent = (coercedProgress * 100).toInt()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AudioProgressTrack(
+            progress = coercedProgress,
+            showThumb = false,
+            modifier = Modifier.weight(1f),
+        )
+
+        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V16))
+
+        Text(
+            text = "%02d%%".format(progressPercent),
+            color = PrezelTheme.colors.textSmall,
+            style = PrezelTheme.typography.body2Regular,
+        )
+    }
+}
+
+@Composable
 private fun AudioProgressTrack(
     progress: Float,
     modifier: Modifier = Modifier,
+    showThumb: Boolean = true,
 ) {
     Box(
         modifier = modifier.height(16.dp),
@@ -279,12 +360,14 @@ private fun AudioProgressTrack(
                 .clip(CircleShape)
                 .background(PrezelTheme.colors.interactiveRegular),
         )
-        Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(PrezelTheme.colors.interactiveRegular),
-        )
+        if (showThumb) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(PrezelTheme.colors.interactiveRegular),
+            )
+        }
     }
 }
 
@@ -295,6 +378,24 @@ private fun AudioUploadScreenPreview() {
         AudioUploadScreen(
             uiState = AnalysisFlowUiState(step = AnalysisFlowStep.AUDIO_UPLOAD),
             onAudioFileSelected = {},
+            onAnalyze = {},
+            onBack = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun AudioUploadScreenProgressPreview() {
+    PrezelTheme {
+        AudioUploadScreen(
+            form = AnalysisForm(),
+            pendingAudioFileUri = AUDIO_PREVIEW_FILE_URI,
+            uploadProgress = 0.5f,
+            progress = AnalysisFlowUiState(step = AnalysisFlowStep.AUDIO_UPLOAD).progress,
+            buttonEnabled = false,
+            onAudioFileUploadClick = {},
+            onAudioFileClear = {},
             onAnalyze = {},
             onBack = {},
         )

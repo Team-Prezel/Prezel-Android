@@ -57,13 +57,12 @@ private fun PresentationScheduleScreen(
     onBack: () -> Unit,
 ) {
     val showDatePicker = rememberSaveable { mutableStateOf(false) }
-    val dateFieldInteractionSource = remember { MutableInteractionSource() }
     val datePickerTitle = stringResource(R.string.feature_analysis_impl_presentation_date_label)
 
     if (showDatePicker.value) {
-        PrezelDatePicker(
+        PresentationDatePicker(
             title = datePickerTitle,
-            initialSelectedDate = form.presentationDate.toLocalDateOrNull(),
+            selectedDateText = form.presentationDate,
             onClose = { showDatePicker.value = false },
             onConfirm = { selectedDate ->
                 onDateChange(selectedDate.toPresentationDateText())
@@ -97,39 +96,67 @@ private fun PresentationScheduleScreen(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(R.string.feature_analysis_impl_presentation_date_label),
-                style = PrezelTheme.typography.body3Medium,
-                color = PrezelTheme.colors.textMedium,
-                maxLines = 1,
+        PresentationDateField(
+            dateText = form.presentationDate,
+            datePickerTitle = datePickerTitle,
+            onClick = { showDatePicker.value = true },
+        )
+    }
+}
+
+@Composable
+private fun PresentationDatePicker(
+    title: String,
+    selectedDateText: String,
+    onClose: () -> Unit,
+    onConfirm: (LocalDate) -> Unit,
+) {
+    PrezelDatePicker(
+        title = title,
+        initialSelectedDate = selectedDateText.toLocalDateOrNull(),
+        onClose = onClose,
+        onConfirm = onConfirm,
+    )
+}
+
+@Composable
+private fun PresentationDateField(
+    dateText: String,
+    datePickerTitle: String,
+    onClick: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.feature_analysis_impl_presentation_date_label),
+            style = PrezelTheme.typography.body3Medium,
+            color = PrezelTheme.colors.textMedium,
+            maxLines = 1,
+        )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            PrezelTextField(
+                value = dateText,
+                onValueChange = {},
+                placeholder = stringResource(R.string.feature_analysis_impl_presentation_date_placeholder),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(PrezelIcons.Calendar),
+                        contentDescription = datePickerTitle,
+                    )
+                },
             )
 
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
-
-            Box(modifier = Modifier.fillMaxWidth()) {
-                PrezelTextField(
-                    value = form.presentationDate,
-                    onValueChange = {},
-                    placeholder = stringResource(R.string.feature_analysis_impl_presentation_date_placeholder),
-                    trailingIcon = {
-                        Icon(
-                            painter = painterResource(PrezelIcons.Calendar),
-                            contentDescription = datePickerTitle,
-                        )
-                    },
-                )
-
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { showDatePicker.value = true },
-                        ),
-                )
-            }
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick,
+                    ),
+            )
         }
     }
 }

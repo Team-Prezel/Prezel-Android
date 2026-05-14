@@ -42,8 +42,8 @@ internal fun EntryProviderScope<NavKey>.featureLoginEntryBuilder(authManager: Au
 object FeatureLoginModule {
     @IntoSet
     @Provides
-    fun provideFeatureLoginEntryBuilder(): EntryProviderScope<NavKey>.() -> Unit =
+    fun provideFeatureLoginEntryBuilder(authManager: AuthManager): EntryProviderScope<NavKey>.() -> Unit =
         {
-            featureLoginEntryBuilder()
+            featureLoginEntryBuilder(authManager = authManager)
         }
 }

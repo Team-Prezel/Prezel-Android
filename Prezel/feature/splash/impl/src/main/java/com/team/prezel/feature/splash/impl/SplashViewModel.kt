@@ -23,6 +23,9 @@ internal class SplashViewModel @Inject constructor(
     }
 
     private fun checkLoginStatus() {
+        viewModelScope.launch { sendEffect(SplashUiEffect.NavigateToHome) }
+        return
+
         updateState { copy(isLoading = true) }
 
         viewModelScope

@@ -24,6 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
+import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -123,19 +126,31 @@ private fun AnalysisStepButtonArea(
     subButtonText: String?,
     onSubButtonClick: (() -> Unit)?,
 ) {
-    PrezelButtonArea {
-        MainButton(
-            label = buttonText,
-            enabled = buttonEnabled,
-            onClick = onButtonClick,
-        )
-        if (subButtonText != null && onSubButtonClick != null) {
-            SubButton(
-                label = subButtonText,
-                onClick = onSubButtonClick,
+    PrezelButtonArea(
+        mainButton = { modifier ->
+            PrezelButton(
+                modifier = modifier,
+                text = buttonText,
+                enabled = buttonEnabled,
+                onClick = onButtonClick,
+                type = ButtonType.FILLED,
+                hierarchy = ButtonHierarchy.PRIMARY,
             )
-        }
-    }
+        },
+        subButton = if (subButtonText != null && onSubButtonClick != null) {
+            { modifier ->
+                PrezelButton(
+                    modifier = modifier,
+                    text = subButtonText,
+                    onClick = onSubButtonClick,
+                    type = ButtonType.FILLED,
+                    hierarchy = ButtonHierarchy.SECONDARY,
+                )
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @Composable

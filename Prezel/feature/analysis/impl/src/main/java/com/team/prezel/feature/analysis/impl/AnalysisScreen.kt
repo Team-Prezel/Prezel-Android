@@ -8,6 +8,8 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
+import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 
 @Composable
 internal fun AnalysisScreen(
@@ -49,10 +51,10 @@ private fun AnalysisScreen(
 
         AnalysisFlowStep.PRESENTATION_SITUATION -> PresentationSituationScreen(
             uiState = uiState,
-            onSelectCategory = { onIntent(AnalysisFlowUiIntent.SelectCategory(it)) },
-            onSelectPurpose = { onIntent(AnalysisFlowUiIntent.SelectPurpose(it)) },
-            onSelectStyle = { onIntent(AnalysisFlowUiIntent.SelectStyle(it)) },
-            onSelectAudience = { onIntent(AnalysisFlowUiIntent.SelectAudience(it)) },
+            onSelectCategory = { onIntent(it.toSituationIntent()) },
+            onSelectPurpose = { onIntent(it.toSituationIntent()) },
+            onSelectStyle = { onIntent(it.toSituationIntent()) },
+            onSelectAudience = { onIntent(it.toSituationIntent()) },
             onNext = { onIntent(AnalysisFlowUiIntent.Next) },
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
@@ -78,5 +80,25 @@ private fun AnalysisScreen(
             onFinished = onFinished,
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
+
+        AnalysisFlowStep.FILE_RECOGNITION_FAILED -> FileRecognitionFailedScreen(
+            onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.AUDIO)) },
+        )
+
+        AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> ScriptFileRecognitionFailedScreen(
+            onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.SCRIPT)) },
+        )
     }
 }
+
+private fun com.team.prezel.core.model.presentation.Category.toSituationIntent(): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.CategoryOption(this))
+
+private fun com.team.prezel.core.model.presentation.Purpose.toSituationIntent(): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.PurposeOption(this))
+
+private fun com.team.prezel.core.model.presentation.Style.toSituationIntent(): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.StyleOption(this))
+
+private fun com.team.prezel.core.model.presentation.Audience.toSituationIntent(): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.AudienceOption(this))

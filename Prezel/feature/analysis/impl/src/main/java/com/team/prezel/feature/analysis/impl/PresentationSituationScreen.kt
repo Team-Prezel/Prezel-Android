@@ -21,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelAccordion
 import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
-import com.team.prezel.core.designsystem.component.chip.PrezelChip
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipInteraction
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipSize
-import com.team.prezel.core.designsystem.component.chip.config.PrezelChipType
+import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
+import com.team.prezel.core.designsystem.component.chip.chip.ChipState
+import com.team.prezel.core.designsystem.component.chip.chip.ChipType
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -75,11 +75,6 @@ private fun PresentationSituationScreen(
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val categoryOptions = categoryOptions()
-    val purposeOptions = purposeOptions()
-    val styleOptions = styleOptions()
-    val audienceOptions = audienceOptions()
-
     AnalysisStepLayout(
         title = stringResource(R.string.feature_analysis_impl_situation_title),
         progress = progress,
@@ -95,39 +90,61 @@ private fun PresentationSituationScreen(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        SituationAccordion(
-            title = stringResource(R.string.feature_analysis_impl_situation_category_label),
-        ) {
-            CategoryOptionGrid(
-                selectedValue = form.category,
-                options = categoryOptions,
-                onSelect = onSelectCategory,
-            )
-        }
-        SituationAccordion(
-            title = stringResource(R.string.feature_analysis_impl_situation_purpose_label),
-        ) {
-            ChipOptionsContent(
-                options = purposeOptions.toChipContentOptions(form.purpose),
-                onSelect = { index -> onSelectPurpose(purposeOptions[index].value) },
-            )
-        }
-        SituationAccordion(
-            title = stringResource(R.string.feature_analysis_impl_situation_style_label),
-        ) {
-            ChipOptionsContent(
-                options = styleOptions.toChipContentOptions(form.style),
-                onSelect = { index -> onSelectStyle(styleOptions[index].value) },
-            )
-        }
-        SituationAccordion(
-            title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
-        ) {
-            ChipOptionsContent(
-                options = audienceOptions.toChipContentOptions(form.audience),
-                onSelect = { index -> onSelectAudience(audienceOptions[index].value) },
-            )
-        }
+        SituationAccordions(
+            form = form,
+            onSelectCategory = onSelectCategory,
+            onSelectPurpose = onSelectPurpose,
+            onSelectStyle = onSelectStyle,
+            onSelectAudience = onSelectAudience,
+        )
+    }
+}
+
+@Composable
+private fun SituationAccordions(
+    form: AnalysisForm,
+    onSelectCategory: (Category) -> Unit,
+    onSelectPurpose: (Purpose) -> Unit,
+    onSelectStyle: (Style) -> Unit,
+    onSelectAudience: (Audience) -> Unit,
+) {
+    val categoryOptions = categoryOptions()
+    val purposeOptions = purposeOptions()
+    val styleOptions = styleOptions()
+    val audienceOptions = audienceOptions()
+
+    SituationAccordion(
+        title = stringResource(R.string.feature_analysis_impl_situation_category_label),
+    ) {
+        CategoryOptionGrid(
+            selectedValue = form.category,
+            options = categoryOptions,
+            onSelect = onSelectCategory,
+        )
+    }
+    SituationAccordion(
+        title = stringResource(R.string.feature_analysis_impl_situation_purpose_label),
+    ) {
+        ChipOptionsContent(
+            options = purposeOptions.toChipContentOptions(form.purpose),
+            onSelect = { index -> onSelectPurpose(purposeOptions[index].value) },
+        )
+    }
+    SituationAccordion(
+        title = stringResource(R.string.feature_analysis_impl_situation_style_label),
+    ) {
+        ChipOptionsContent(
+            options = styleOptions.toChipContentOptions(form.style),
+            onSelect = { index -> onSelectStyle(styleOptions[index].value) },
+        )
+    }
+    SituationAccordion(
+        title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
+    ) {
+        ChipOptionsContent(
+            options = audienceOptions.toChipContentOptions(form.audience),
+            onSelect = { index -> onSelectAudience(audienceOptions[index].value) },
+        )
     }
 }
 
@@ -266,9 +283,9 @@ private fun SituationChip(
         PrezelChip(
             text = text,
             iconResId = if (selected) PrezelIcons.Check else null,
-            type = PrezelChipType.OUTLINED,
-            size = PrezelChipSize.REGULAR,
-            interaction = if (selected) PrezelChipInteraction.ACTIVE else PrezelChipInteraction.DEFAULT,
+            type = ChipType.OUTLINED,
+            size = ChipSize.REGULAR,
+            state = if (selected) ChipState.ACTIVE else ChipState.DEFAULT,
         )
     }
 }
