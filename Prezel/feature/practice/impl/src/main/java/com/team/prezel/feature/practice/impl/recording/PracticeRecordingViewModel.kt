@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl
+package com.team.prezel.feature.practice.impl.recording
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.audio.AudioSessionEffect
@@ -6,10 +6,10 @@ import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.FetchPracticeScriptUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiEffect
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiEffect
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiIntent
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiState
+import com.team.prezel.feature.practice.impl.recording.model.PracticeRecordingUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -69,9 +69,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             fetchPracticeScriptUseCase()
                 .onSuccess { script ->
-                    updateState {
-                        copy(practiceScript = script.content)
-                    }
+                    updateState { copy(practiceScript = script.content) }
                 }.onFailure {
                     showMessage(PracticeRecordingUiMessage.FETCH_PRACTICE_SCRIPT_FAILED)
                 }

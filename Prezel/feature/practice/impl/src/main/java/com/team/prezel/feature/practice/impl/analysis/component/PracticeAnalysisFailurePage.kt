@@ -17,12 +17,12 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.practice.impl.R
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingAnalysisErrorType
+import com.team.prezel.feature.practice.impl.analysis.model.PracticeAnalysisErrorType
 import com.team.prezel.core.ui.R as CoreUiR
 
 @Composable
-internal fun PracticeRecordingAnalysisFailurePage(
-    errorType: PracticeRecordingAnalysisErrorType,
+internal fun PracticeAnalysisFailurePage(
+    errorType: PracticeAnalysisErrorType,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -51,19 +51,19 @@ internal fun PracticeRecordingAnalysisFailurePage(
     )
 }
 
-private val PracticeRecordingAnalysisErrorType.drawableResId: Int
+private val PracticeAnalysisErrorType.drawableResId: Int
     @DrawableRes
     get() = when (this) {
-        PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED -> CoreUiR.drawable.core_ui_error_analyze
-        PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED -> CoreUiR.drawable.core_ui_error_voice
+        PracticeAnalysisErrorType.ANALYSIS_FAILED -> CoreUiR.drawable.core_ui_error_analyze
+        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> CoreUiR.drawable.core_ui_error_voice
     }
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisAnalyzeFailurePagePreview() {
+private fun PracticeAnalysisAnalyzeFailurePagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisFailurePage(
-            errorType = PracticeRecordingAnalysisErrorType.ANALYSIS_FAILED,
+        PracticeAnalysisFailurePage(
+            errorType = PracticeAnalysisErrorType.ANALYSIS_FAILED,
             onRetry = {},
         )
     }
@@ -71,10 +71,10 @@ private fun PracticeRecordingAnalysisAnalyzeFailurePagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisVoiceFailurePagePreview() {
+private fun PracticeAnalysisVoiceFailurePagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisFailurePage(
-            errorType = PracticeRecordingAnalysisErrorType.VOICE_RECOGNITION_FAILED,
+        PracticeAnalysisFailurePage(
+            errorType = PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED,
             onRetry = {},
         )
     }

@@ -13,7 +13,7 @@ import com.team.prezel.feature.practice.impl.R
 import com.team.prezel.core.ui.R as CoreUiR
 
 @Composable
-internal fun PracticeRecordingAnalysisLoadingPage(modifier: Modifier = Modifier) {
+internal fun PracticeAnalysisLoadingPage(modifier: Modifier = Modifier) {
     StatusView(
         title = stringResource(R.string.feature_practice_impl_practice_recording_analysis_loading_title),
         description = stringResource(R.string.feature_practice_impl_practice_recording_analysis_loading_description),
@@ -29,8 +29,8 @@ internal fun PracticeRecordingAnalysisLoadingPage(modifier: Modifier = Modifier)
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingAnalysisLoadingPagePreview() {
+private fun PracticeRecordingPracticeAnalysisLoadingPagePreview() {
     PrezelTheme {
-        PracticeRecordingAnalysisLoadingPage()
+        PracticeAnalysisLoadingPage()
     }
 }

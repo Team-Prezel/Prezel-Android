@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.contract
+package com.team.prezel.feature.practice.impl.recording.contract
 
 import com.team.prezel.core.ui.base.UiIntent
 

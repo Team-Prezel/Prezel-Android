@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.contract
+package com.team.prezel.feature.practice.impl.recording.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.audio.AudioSessionState

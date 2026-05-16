@@ -1,7 +1,7 @@
-package com.team.prezel.feature.practice.impl.contract
+package com.team.prezel.feature.practice.impl.recording.contract
 
 import com.team.prezel.core.ui.base.UiEffect
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
+import com.team.prezel.feature.practice.impl.recording.model.PracticeRecordingUiMessage
 
 internal sealed interface PracticeRecordingUiEffect : UiEffect {
     data class ShowMessage(

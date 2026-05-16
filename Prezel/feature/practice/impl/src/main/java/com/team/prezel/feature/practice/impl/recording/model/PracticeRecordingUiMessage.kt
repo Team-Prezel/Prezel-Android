@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.model
+package com.team.prezel.feature.practice.impl.recording.model
 
 internal enum class PracticeRecordingUiMessage {
     FETCH_PRACTICE_SCRIPT_FAILED,

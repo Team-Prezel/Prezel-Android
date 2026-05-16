@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl
+package com.team.prezel.feature.practice.impl.recording
 
 import android.Manifest
 import androidx.compose.runtime.Composable

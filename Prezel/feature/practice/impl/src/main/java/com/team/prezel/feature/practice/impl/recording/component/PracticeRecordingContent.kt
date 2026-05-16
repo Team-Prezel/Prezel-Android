@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.component
+package com.team.prezel.feature.practice.impl.recording.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

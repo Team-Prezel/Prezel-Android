@@ -1,6 +1,5 @@
-package com.team.prezel.feature.practice.impl
+package com.team.prezel.feature.practice.impl.recording
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,12 +20,13 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
-import com.team.prezel.feature.practice.impl.component.PracticeRecordingContent
-import com.team.prezel.feature.practice.impl.component.PracticeRecordingTopAppBar
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiEffect
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiIntent
-import com.team.prezel.feature.practice.impl.contract.PracticeRecordingUiState
-import com.team.prezel.feature.practice.impl.model.PracticeRecordingUiMessage
+import com.team.prezel.feature.practice.impl.R
+import com.team.prezel.feature.practice.impl.recording.component.PracticeRecordingContent
+import com.team.prezel.feature.practice.impl.recording.component.PracticeRecordingTopAppBar
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiEffect
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiIntent
+import com.team.prezel.feature.practice.impl.recording.contract.PracticeRecordingUiState
+import com.team.prezel.feature.practice.impl.recording.model.PracticeRecordingUiMessage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,27 +80,6 @@ internal fun PracticeRecordingScreen(
 
 @Composable
 private fun PracticeRecordingScreen(
-    uiState: PracticeRecordingUiState,
-    onClickRecordingControl: () -> Unit,
-    onClickAnalyze: () -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    BackHandler(
-        onBack = onBack,
-    )
-
-    PracticeRecordingReadyScreen(
-        uiState = uiState,
-        onClickRecordingControl = onClickRecordingControl,
-        onClickAnalyze = onClickAnalyze,
-        onBack = onBack,
-        modifier = modifier,
-    )
-}
-
-@Composable
-private fun PracticeRecordingReadyScreen(
     uiState: PracticeRecordingUiState,
     onClickRecordingControl: () -> Unit,
     onClickAnalyze: () -> Unit,

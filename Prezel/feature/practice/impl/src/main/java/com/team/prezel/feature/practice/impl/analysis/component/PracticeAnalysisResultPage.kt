@@ -32,7 +32,7 @@ import com.team.prezel.core.model.practice.PracticeRecordingSpeed
 import com.team.prezel.feature.practice.impl.R
 
 @Composable
-internal fun PracticeRecordingResultPage(
+internal fun PracticeAnalysisResultPage(
     pronunciationScore: Int,
     speed: PracticeRecordingSpeed,
     overallEvaluation: PracticeRecordingOverallEvaluation,
@@ -195,9 +195,9 @@ private fun PracticeAnalysisMetricLabel(
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingResultPerfectPagePreview() {
+private fun PracticeAnalysisResultPerfectPagePreview() {
     PrezelTheme {
-        PracticeRecordingResultPage(
+        PracticeAnalysisResultPage(
             pronunciationScore = 96,
             speed = PracticeRecordingSpeed.ADEQUATE,
             overallEvaluation = PracticeRecordingOverallEvaluation.PERFECT,
@@ -208,9 +208,9 @@ private fun PracticeRecordingResultPerfectPagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingResultGoodPagePreview() {
+private fun PracticeAnalysisResultGoodPagePreview() {
     PrezelTheme {
-        PracticeRecordingResultPage(
+        PracticeAnalysisResultPage(
             pronunciationScore = 90,
             speed = PracticeRecordingSpeed.ADEQUATE,
             overallEvaluation = PracticeRecordingOverallEvaluation.GOOD,
@@ -221,9 +221,9 @@ private fun PracticeRecordingResultGoodPagePreview() {
 
 @BasicPreview
 @Composable
-private fun PracticeRecordingResultTryPagePreview() {
+private fun PracticeAnalysisResultTryPagePreview() {
     PrezelTheme {
-        PracticeRecordingResultPage(
+        PracticeAnalysisResultPage(
             pronunciationScore = 58,
             speed = PracticeRecordingSpeed.FAST,
             overallEvaluation = PracticeRecordingOverallEvaluation.TRY,
