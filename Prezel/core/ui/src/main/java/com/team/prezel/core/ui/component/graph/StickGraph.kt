@@ -120,6 +120,8 @@ private fun ImmutableList<StickData>.aggregateByItemType(): ImmutableList<StickD
         }.toImmutableList()
 
 private fun Int.toStickHeight(maxCount: Int): Dp {
+    if (maxCount <= 0) return 0.dp
+
     val heightRatio = this.toFloat() / maxCount
     return (heightRatio * STICK_GRAPH_MAX_HEIGHT).dp
 }
