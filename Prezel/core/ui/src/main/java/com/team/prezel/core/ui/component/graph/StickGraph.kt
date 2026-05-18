@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -70,20 +69,26 @@ private fun StickGraphItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
     ) {
-        ProvideTextStyle(PrezelTheme.typography.body3Medium.copy(color = PrezelTheme.colors.textRegular)) {
-            Text(text = bar.count.toString())
+        Text(
+            text = bar.count.toString(),
+            style = PrezelTheme.typography.body3Medium,
+            color = PrezelTheme.colors.textRegular,
+        )
 
-            Box(
-                modifier = modifier
-                    .size(
-                        width = STICK_GRAPH_ITEM_WIDTH,
-                        height = bar.height,
-                    ).clip(PrezelTheme.shapes.V4)
-                    .background(color = bar.color),
-            )
+        Box(
+            modifier = modifier
+                .size(
+                    width = STICK_GRAPH_ITEM_WIDTH,
+                    height = bar.height,
+                ).clip(PrezelTheme.shapes.V4)
+                .background(color = bar.color),
+        )
 
-            Text(text = bar.label)
-        }
+        Text(
+            text = bar.label,
+            style = PrezelTheme.typography.body3Regular,
+            color = PrezelTheme.colors.textRegular,
+        )
     }
 }
 
