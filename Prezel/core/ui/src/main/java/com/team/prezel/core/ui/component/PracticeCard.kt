@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -36,6 +37,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.designsystem.util.drawDashBorder
+import com.team.prezel.core.ui.R
 import com.team.prezel.core.ui.util.noRippleClickable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -112,7 +114,7 @@ fun PracticeCard(
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
             PrezelTextButton(
-                text = "연습하기",
+                text = stringResource(R.string.core_ui_impl_practice_card_action),
                 type = ButtonType.FILLED,
                 size = ButtonSize.SMALL,
                 hierarchy = ButtonHierarchy.SECONDARY,
@@ -170,14 +172,14 @@ private fun PaginationRow(
         if (showChevron) {
             Icon(
                 painter = painterResource(PrezelIcons.ChevronLeft),
-                contentDescription = "이전 페이지",
+                contentDescription = stringResource(R.string.core_ui_impl_practice_card_prev_page),
                 tint = chevronIconTintColor(enabled = hasPreviousPage),
                 modifier = Modifier.noRippleClickable(onClickLeft),
             )
         }
 
         Text(
-            text = "연습한 횟수",
+            text = stringResource(R.string.core_ui_impl_practice_card_count_label),
             style = PrezelTheme.typography.body3Medium,
             color = PrezelTheme.colors.textMedium,
         )
@@ -185,7 +187,7 @@ private fun PaginationRow(
         if (showChevron) {
             Icon(
                 painter = painterResource(PrezelIcons.ChevronRight),
-                contentDescription = "다음 페이지",
+                contentDescription = stringResource(R.string.core_ui_impl_practice_card_next_page),
                 tint = chevronIconTintColor(enabled = hasNextPage),
                 modifier = Modifier.noRippleClickable(onClickRight),
             )
@@ -290,7 +292,7 @@ private fun PracticeStamp(
         ) {
             Icon(
                 painter = painterResource(PrezelIcons.Check),
-                contentDescription = "",
+                contentDescription = null,
                 tint = type.tintColor(),
             )
         }
