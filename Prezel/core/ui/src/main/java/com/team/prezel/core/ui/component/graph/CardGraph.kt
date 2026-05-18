@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,10 +70,11 @@ private val CHART_SELECTED_TRIANGLE_WIDTH = 6.dp
 private val CHART_SELECTED_TRIANGLE_HEIGHT = 6.dp
 private const val CARD_GRAPH_ASPECT_RATIO = 1.5f
 
+@Immutable
 private data class CardGraphUiState(
     val enableScroll: Boolean,
     val contentWidth: Dp,
-    val xAxisCenters: ImmutableList<Float>,
+    val xAxisCenters: List<Float>,
     val selectedItemIndex: Int?,
 )
 
@@ -127,7 +129,7 @@ fun CardGraph(
         val uiState = CardGraphUiState(
             enableScroll = items.shouldEnableHorizontalScroll(),
             contentWidth = maxWidth.toChartContentWidth(itemCount = items.size),
-            xAxisCenters = xAxisCenters.toImmutableList(),
+            xAxisCenters = xAxisCenters,
             selectedItemIndex = items.resolveSelectedItemIndex(selectedItemIndex),
         )
 
@@ -233,7 +235,7 @@ private fun LinearChart(
     val dimensions = rememberCardGraphDimensions()
 
     Box(
-        modifier = modifier.pointerInput(uiState.xAxisCenters, items.size) {
+        modifier = modifier.pointerInput(items.size) {
             detectTapGestures { tapOffset ->
                 with(CardGraphMath) {
                     uiState.xAxisCenters.findClosestIndex(tapOffset.x)?.let(onSelectItem)
