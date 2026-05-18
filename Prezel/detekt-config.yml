@@ -42,6 +42,8 @@ complexity:
         thresholdInEnums: 10
         ignoreAnnotatedFunctions:
             - Preview
+            - BasicPreview
+            - LargeDevicePreview
 
 naming:
     FunctionNaming:

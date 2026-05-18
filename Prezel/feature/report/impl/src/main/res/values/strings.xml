@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_report_impl_loading">리포트 화면을 준비하고 있어요.</string>
+    <string name="feature_report_impl_title">리포트 화면</string>
+</resources>
