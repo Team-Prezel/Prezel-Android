@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.R
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 
 private const val STICK_GRAPH_MAX_HEIGHT = 160
 private val STICK_GRAPH_ITEM_WIDTH = 52.dp
@@ -31,12 +31,6 @@ enum class StickGraphItemType {
     SPELLING,
     GRAMMAR,
 }
-
-@Immutable
-data class StickData(
-    val count: Int,
-    val itemType: StickGraphItemType,
-)
 
 @Immutable
 private data class StickGraphBar(
@@ -48,7 +42,7 @@ private data class StickGraphBar(
 
 @Composable
 fun StickGraph(
-    data: ImmutableList<StickData>,
+    data: ImmutableMap<StickGraphItemType, Int>,
     modifier: Modifier = Modifier,
 ) {
     require(data.size == StickGraphItemType.entries.size) {
@@ -94,30 +88,20 @@ private fun StickGraphItem(
 }
 
 @Composable
-private fun ImmutableList<StickData>.toStickGraphBars(): ImmutableList<StickGraphBar> {
-    val aggregatedData = aggregateByItemType()
-    val maxCount = aggregatedData.maxOf(StickData::count)
+private fun ImmutableMap<StickGraphItemType, Int>.toStickGraphBars(): List<StickGraphBar> {
+    val maxCount = values.maxOrNull() ?: 0
 
-    return aggregatedData
-        .map { data ->
-            StickGraphBar(
-                count = data.count,
-                height = data.count.toStickHeight(maxCount = maxCount),
-                color = data.itemType.itemColor(),
-                label = data.itemType.itemLabel(),
-            )
-        }.toImmutableList()
+    return StickGraphItemType.entries.map { itemType ->
+        val count = getValue(itemType)
+
+        StickGraphBar(
+            count = count,
+            height = count.toStickHeight(maxCount = maxCount),
+            color = itemType.itemColor(),
+            label = itemType.itemLabel(),
+        )
+    }
 }
-
-private fun ImmutableList<StickData>.aggregateByItemType(): ImmutableList<StickData> =
-    this
-        .groupBy { stickItem -> stickItem.itemType }
-        .map { (itemType, items) ->
-            StickData(
-                count = items.sumOf { item -> item.count },
-                itemType = itemType,
-            )
-        }.toImmutableList()
 
 private fun Int.toStickHeight(maxCount: Int): Dp {
     if (maxCount <= 0) return 0.dp
@@ -135,12 +119,14 @@ private fun StickGraphItemType.itemColor(): Color =
 
 @Composable
 private fun StickGraphItemType.itemLabel(): String =
-    when (this) {
-        StickGraphItemType.SPELLING -> R.string.core_ui_impl_stick_graph_spelling_label
-        StickGraphItemType.GRAMMAR -> R.string.core_ui_impl_stick_graph_grammar_label
-    }.let { resId -> stringResource(resId) }
+    stringResource(
+        when (this) {
+            StickGraphItemType.SPELLING -> R.string.core_ui_impl_stick_graph_spelling_label
+            StickGraphItemType.GRAMMAR -> R.string.core_ui_impl_stick_graph_grammar_label
+        },
+    )
 
-@Preview(showBackground = true)
+@BasicPreview
 @Composable
 private fun StickGraphPreview() {
     PrezelTheme {
@@ -148,10 +134,10 @@ private fun StickGraphPreview() {
             modifier = Modifier.padding(12.dp),
         ) {
             StickGraph(
-                data = listOf(
-                    StickData(count = 2, itemType = StickGraphItemType.SPELLING),
-                    StickData(count = 1, itemType = StickGraphItemType.GRAMMAR),
-                ).toImmutableList(),
+                data = persistentMapOf(
+                    StickGraphItemType.SPELLING to 2,
+                    StickGraphItemType.GRAMMAR to 1,
+                ),
             )
         }
     }
