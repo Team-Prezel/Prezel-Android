@@ -2,6 +2,8 @@ package com.team.prezel.core.network.di
 
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.datasource.AuthRemoteDataSourceImpl
+import com.team.prezel.core.network.datasource.PracticeRemoteDataSource
+import com.team.prezel.core.network.datasource.PracticeRemoteDataSourceImpl
 import com.team.prezel.core.network.datasource.TermsRemoteDataSource
 import com.team.prezel.core.network.datasource.TermsRemoteDataSourceImpl
 import com.team.prezel.core.network.datasource.UserRemoteDataSource
@@ -22,6 +24,10 @@ internal abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindUserRemoteDataSource(impl: UserRemoteDataSourceImpl): UserRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindPracticeRemoteDataSource(impl: PracticeRemoteDataSourceImpl): PracticeRemoteDataSource
 
     @Binds
     @Singleton

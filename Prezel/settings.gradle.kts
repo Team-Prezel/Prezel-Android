@@ -39,6 +39,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 includeAuto(
     ":app",
+    ":core:audio",
     ":core:auth",
     ":core:common",
     ":core:data",
@@ -51,6 +52,8 @@ includeAuto(
     ":core:ui",
     ":feature:home:api",
     ":feature:home:impl",
+    ":feature:practice:api",
+    ":feature:practice:impl",
     ":feature:analysis:api",
     ":feature:analysis:impl",
     ":feature:history:api",
@@ -61,6 +64,8 @@ includeAuto(
     ":feature:setting:impl",
     ":feature:profile:api",
     ":feature:profile:impl",
+    ":feature:report:api",
+    ":feature:report:impl",
     ":feature:login:api",
     ":feature:login:impl",
     ":feature:terms:api",

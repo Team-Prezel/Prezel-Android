@@ -20,6 +20,8 @@
     <string name="feature_home_impl_category_education">학술·교육</string>
     <string name="feature_home_impl_category_report">업무·보고</string>
 
+    <string name="feature_home_impl_practice_recording_action">연습하기</string>
+
     <!-- Message  -->
     <string name="feature_home_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>
 </resources>

@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.home.api.HomeNavKey
-import com.team.prezel.feature.home.impl.HomeScreen
+import com.team.prezel.feature.home.impl.main.HomeScreen
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

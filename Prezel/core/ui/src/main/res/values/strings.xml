@@ -7,4 +7,19 @@
     <string name="core_ui_impl_badge_retrospect_completed">끝까지 해냄</string>
     <string name="core_ui_impl_badge_perfect_score">컨디션 최고</string>
     <string name="core_ui_impl_badge_ten_analysis">감 잡았다</string>
+
+    <!--  Stick Graph  -->
+    <string name="core_ui_impl_stick_graph_spelling_label">맞춤법</string>
+    <string name="core_ui_impl_stick_graph_grammar_label">주술호응</string>
+
+    <!--  Card Graph  -->
+    <string name="core_ui_impl_card_graph_x_axis_label">%1$d차</string>
+    <string name="core_ui_impl_card_graph_speech_label">발화</string>
+    <string name="core_ui_impl_card_graph_script_match_label">대본 일치율</string>
+
+    <!-- Practice Card -->
+    <string name="core_ui_impl_practice_card_action">연습하기</string>
+    <string name="core_ui_impl_practice_card_prev_page">이전 페이지</string>
+    <string name="core_ui_impl_practice_card_next_page">다음 페이지</string>
+    <string name="core_ui_impl_practice_card_count_label">연습한 횟수</string>
 </resources>

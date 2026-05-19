@@ -42,8 +42,6 @@ dependencies {
     implementation(projects.featureSplashImpl)
     implementation(projects.featureLoginApi)
     implementation(projects.featureLoginImpl)
-    implementation(projects.featureTermsApi)
-    implementation(projects.featureTermsImpl)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
     implementation(projects.featureAnalysisApi)
@@ -52,7 +50,9 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
     implementation(projects.featureMyImpl)
-    implementation(projects.featureSettingApi)
+
+    implementation(projects.featureTermsImpl)
+    implementation(projects.featurePracticeImpl)
     implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
 

@@ -6,6 +6,7 @@ enum class AppError {
     SERVER_ERROR,
     NOT_FOUND,
     DUPLICATE,
+    VOICE_RECOGNITION_FAILED,
     NETWORK,
     UNKNOWN,
 }
