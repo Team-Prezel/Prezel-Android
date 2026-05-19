@@ -30,5 +30,5 @@
     <string name="core_ui_file_uploader_progress_desc">파일 업로더 진행률</string>
     <string name="core_ui_file_uploader_seek_desc">파일 업로더 재생 위치</string>
     <string name="core_ui_file_uploader_progress_percent">%1$02d%%</string>
-    <string name="core_ui_file_uploader_time_range">%1$s/%2$s</string>
+    <string name="core_ui_file_uploader_time_separator">/</string>
 </resources>

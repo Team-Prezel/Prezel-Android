@@ -40,7 +40,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.feedback.progress.PrezelProgressBar
@@ -79,9 +82,7 @@ fun FileUploader(
     onSeek: (Float) -> Unit = {},
 ) {
     val coercedProgress = progress.coerceIn(0f, 1f)
-    val showLoadingProgress = state == FileUploaderState.LOADING
-    val showAudioControl = type == FileUploaderType.AUDIO &&
-        (state == FileUploaderState.PAUSED || state == FileUploaderState.PLAYING)
+    val playing = state == FileUploaderState.PLAYING
 
     Row(
         modifier = modifier
@@ -100,33 +101,66 @@ fun FileUploader(
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
+        FileUploaderContent(
+            fileName = fileName,
+            type = type,
+            state = state,
+            progress = coercedProgress,
+            currentTimeText = currentTimeText,
+            durationTimeText = durationTimeText,
+            playing = playing,
+            onPlayClick = onPlayClick,
+            onPauseClick = onPauseClick,
+            onSeek = onSeek,
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
-        ) {
-            if (showAudioControl) {
-                AudioFileHeader(
-                    fileName = fileName,
-                    playing = state == FileUploaderState.PLAYING,
-                    onPlayClick = onPlayClick,
-                    onPauseClick = onPauseClick,
-                )
-                AudioProgressRow(
-                    currentTimeText = currentTimeText,
-                    durationTimeText = durationTimeText,
-                    progress = coercedProgress,
-                    onSeek = onSeek,
-                )
-            } else {
-                FileNameText(fileName = fileName)
-
-                if (showLoadingProgress) {
-                    UploadProgressRow(progress = coercedProgress)
-                }
-            }
-        }
+        )
 
         CancelButton(onClick = onCancelClick)
+    }
+}
+
+@Composable
+private fun FileUploaderContent(
+    fileName: String,
+    type: FileUploaderType,
+    state: FileUploaderState,
+    progress: Float,
+    currentTimeText: String,
+    durationTimeText: String,
+    playing: Boolean,
+    onPlayClick: () -> Unit,
+    onPauseClick: () -> Unit,
+    onSeek: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val showAudioControl = type == FileUploaderType.AUDIO &&
+        (state == FileUploaderState.PAUSED || state == FileUploaderState.PLAYING)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+    ) {
+        if (showAudioControl) {
+            AudioFileHeader(
+                fileName = fileName,
+                playing = playing,
+                onPlayClick = onPlayClick,
+                onPauseClick = onPauseClick,
+            )
+            AudioProgressRow(
+                currentTimeText = currentTimeText,
+                durationTimeText = durationTimeText,
+                progress = progress,
+                playing = playing,
+                onSeek = onSeek,
+            )
+        } else {
+            FileNameText(fileName = fileName)
+
+            if (state == FileUploaderState.LOADING) {
+                UploadProgressRow(progress = progress)
+            }
+        }
     }
 }
 
@@ -213,6 +247,7 @@ private fun AudioProgressRow(
     currentTimeText: String,
     durationTimeText: String,
     progress: Float,
+    playing: Boolean,
     onSeek: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -221,14 +256,10 @@ private fun AudioProgressRow(
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = stringResource(
-                id = R.string.core_ui_file_uploader_time_range,
-                currentTimeText,
-                durationTimeText,
-            ),
-            style = PrezelTheme.typography.caption2Regular,
-            color = PrezelTheme.colors.textSmall,
+        AudioTimeText(
+            currentTimeText = currentTimeText,
+            durationTimeText = durationTimeText,
+            playing = playing,
         )
 
         AudioSeekBar(
@@ -237,6 +268,32 @@ private fun AudioProgressRow(
             modifier = Modifier.weight(1f),
         )
     }
+}
+
+@Composable
+private fun AudioTimeText(
+    currentTimeText: String,
+    durationTimeText: String,
+    playing: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = if (playing) PrezelTheme.colors.interactiveRegular else PrezelTheme.colors.textSmall,
+                ),
+            ) {
+                append(currentTimeText)
+            }
+            withStyle(style = SpanStyle(color = PrezelTheme.colors.textSmall)) {
+                append(stringResource(R.string.core_ui_file_uploader_time_separator))
+                append(durationTimeText)
+            }
+        },
+        modifier = modifier,
+        style = PrezelTheme.typography.caption2Regular,
+    )
 }
 
 @Composable
@@ -368,7 +425,9 @@ private fun FileUploaderPreview() {
                 fileName = "title.mp3",
                 type = FileUploaderType.AUDIO,
                 state = FileUploaderState.PLAYING,
-                progress = 0.64f,
+                progress = 0.275f,
+                currentTimeText = "00:11",
+                durationTimeText = "00:40",
                 modifier = Modifier.width(420.dp),
             )
         }
