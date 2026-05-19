@@ -3,7 +3,6 @@ package com.team.prezel.core.ui.component
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -51,18 +52,32 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.R
+import com.team.prezel.core.ui.util.noRippleClickable
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Immutable
-enum class FileUploaderType {
-    SCRIPT,
-    AUDIO,
+sealed interface FileUploaderState {
+    @Immutable
+    data class Script(
+        val status: ScriptStatus,
+    ) : FileUploaderState
+
+    @Immutable
+    data class Audio(
+        val status: AudioStatus,
+    ) : FileUploaderState
 }
 
 @Immutable
-enum class FileUploaderState {
+enum class ScriptStatus {
     LOADING,
     UPLOADED,
+}
+
+@Immutable
+enum class AudioStatus {
+    LOADING,
     PAUSED,
     PLAYING,
 }
@@ -70,7 +85,6 @@ enum class FileUploaderState {
 @Composable
 fun FileUploader(
     fileName: String,
-    type: FileUploaderType,
     state: FileUploaderState,
     modifier: Modifier = Modifier,
     @FloatRange(from = 0.0, to = 1.0) progress: Float = 0f,
@@ -82,7 +96,12 @@ fun FileUploader(
     onSeek: (Float) -> Unit = {},
 ) {
     val coercedProgress = progress.coerceIn(0f, 1f)
-    val playing = state == FileUploaderState.PLAYING
+    val playing = state is FileUploaderState.Audio && state.status == AudioStatus.PLAYING
+    val showAudioControl = state is FileUploaderState.Audio && state.status != AudioStatus.LOADING
+    val isLoading = when (state) {
+        is FileUploaderState.Script -> state.status == ScriptStatus.LOADING
+        is FileUploaderState.Audio -> state.status == AudioStatus.LOADING
+    }
 
     Row(
         modifier = modifier
@@ -103,11 +122,11 @@ fun FileUploader(
     ) {
         FileUploaderContent(
             fileName = fileName,
-            type = type,
-            state = state,
             progress = coercedProgress,
             currentTimeText = currentTimeText,
             durationTimeText = durationTimeText,
+            showAudioControl = showAudioControl,
+            isLoading = isLoading,
             playing = playing,
             onPlayClick = onPlayClick,
             onPauseClick = onPauseClick,
@@ -122,20 +141,17 @@ fun FileUploader(
 @Composable
 private fun FileUploaderContent(
     fileName: String,
-    type: FileUploaderType,
-    state: FileUploaderState,
     progress: Float,
     currentTimeText: String,
     durationTimeText: String,
+    showAudioControl: Boolean,
+    isLoading: Boolean,
     playing: Boolean,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     onSeek: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showAudioControl = type == FileUploaderType.AUDIO &&
-        (state == FileUploaderState.PAUSED || state == FileUploaderState.PLAYING)
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
@@ -157,7 +173,7 @@ private fun FileUploaderContent(
         } else {
             FileNameText(fileName = fileName)
 
-            if (state == FileUploaderState.LOADING) {
+            if (isLoading) {
                 UploadProgressRow(progress = progress)
             }
         }
@@ -236,7 +252,7 @@ private fun AudioFileHeader(
             tint = PrezelTheme.colors.iconRegular,
             modifier = Modifier
                 .size(20.dp)
-                .clickable(onClick = if (playing) onPauseClick else onPlayClick),
+                .noRippleClickable(onClick = if (playing) onPauseClick else onPlayClick),
         )
         FileNameText(fileName = fileName)
     }
@@ -361,12 +377,15 @@ private fun AudioSeekTrack(progress: Float) {
 
 @Composable
 private fun BoxWithConstraintsScope.AudioSeekHandle(progress: Float) {
+    val handleSize = 12.dp
+
     Box(
         modifier = Modifier
             .offset {
-                val handleX = ((maxWidth.toPx() - 14.dp.toPx()) * progress).roundToInt()
+                val handleRadiusPx = handleSize.toPx() / 2
+                val handleX = ((maxWidth.toPx() * progress) - handleRadiusPx).roundToInt()
                 IntOffset(x = handleX, y = 0)
-            }.size(12.dp)
+            }.size(handleSize)
             .clip(PrezelTheme.shapes.V1000)
             .background(PrezelTheme.colors.interactiveRegular),
     )
@@ -380,7 +399,7 @@ private fun CancelButton(
     Box(
         modifier = modifier
             .clip(PrezelTheme.shapes.V1000)
-            .clickable(onClick = onClick),
+            .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -404,27 +423,23 @@ private fun FileUploaderPreview() {
         ) {
             FileUploader(
                 fileName = "title.txt",
-                type = FileUploaderType.SCRIPT,
-                state = FileUploaderState.LOADING,
+                state = FileUploaderState.Script(ScriptStatus.LOADING),
                 progress = 0.42f,
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.txt",
-                type = FileUploaderType.SCRIPT,
-                state = FileUploaderState.UPLOADED,
+                state = FileUploaderState.Script(ScriptStatus.UPLOADED),
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.mp3",
-                type = FileUploaderType.AUDIO,
-                state = FileUploaderState.PAUSED,
+                state = FileUploaderState.Audio(AudioStatus.PAUSED),
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.mp3",
-                type = FileUploaderType.AUDIO,
-                state = FileUploaderState.PLAYING,
+                state = FileUploaderState.Audio(AudioStatus.PLAYING),
                 progress = 0.275f,
                 currentTimeText = "00:11",
                 durationTimeText = "00:40",
@@ -432,4 +447,50 @@ private fun FileUploaderPreview() {
             )
         }
     }
+}
+
+@BasicPreview
+@Composable
+private fun FileUploaderInteractivePreview() {
+    var playing by remember { mutableStateOf(false) }
+    var elapsedSeconds by remember { mutableIntStateOf(0) }
+    val durationSeconds = 40
+
+    LaunchedEffect(playing) {
+        while (playing && elapsedSeconds < durationSeconds) {
+            delay(1_000L)
+            elapsedSeconds = (elapsedSeconds + 1).coerceAtMost(durationSeconds)
+        }
+
+        if (elapsedSeconds == durationSeconds) {
+            playing = false
+        }
+    }
+
+    PrezelTheme {
+        Box(modifier = Modifier.padding(PrezelTheme.spacing.V16)) {
+            FileUploader(
+                fileName = "title.mp3",
+                state = FileUploaderState.Audio(
+                    status = if (playing) AudioStatus.PLAYING else AudioStatus.PAUSED,
+                ),
+                progress = elapsedSeconds.toFloat() / durationSeconds,
+                currentTimeText = elapsedSeconds.toPreviewTimeText(),
+                durationTimeText = durationSeconds.toPreviewTimeText(),
+                onPlayClick = { playing = true },
+                onPauseClick = { playing = false },
+                onSeek = { seekProgress ->
+                    elapsedSeconds = (durationSeconds * seekProgress).roundToInt()
+                },
+                modifier = Modifier.width(420.dp),
+            )
+        }
+    }
+}
+
+private fun Int.toPreviewTimeText(): String {
+    val minutes = this / 60
+    val seconds = this % 60
+
+    return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 }
