@@ -59,27 +59,25 @@ import kotlin.math.roundToInt
 @Immutable
 sealed interface FileUploaderState {
     @Immutable
-    data class Script(
-        val status: ScriptStatus,
-    ) : FileUploaderState
+    sealed interface Script : FileUploaderState {
+        @Immutable
+        data object Loading : Script
+
+        @Immutable
+        data object Uploaded : Script
+    }
 
     @Immutable
-    data class Audio(
-        val status: AudioStatus,
-    ) : FileUploaderState
-}
+    sealed interface Audio : FileUploaderState {
+        @Immutable
+        data object Loading : Audio
 
-@Immutable
-enum class ScriptStatus {
-    LOADING,
-    UPLOADED,
-}
+        @Immutable
+        data object Paused : Audio
 
-@Immutable
-enum class AudioStatus {
-    LOADING,
-    PAUSED,
-    PLAYING,
+        @Immutable
+        data object Playing : Audio
+    }
 }
 
 @Composable
@@ -96,11 +94,14 @@ fun FileUploader(
     onSeek: (Float) -> Unit = {},
 ) {
     val coercedProgress = progress.coerceIn(0f, 1f)
-    val playing = state is FileUploaderState.Audio && state.status == AudioStatus.PLAYING
-    val showAudioControl = state is FileUploaderState.Audio && state.status != AudioStatus.LOADING
+    val playing = state is FileUploaderState.Audio.Playing
+    val showAudioControl = state is FileUploaderState.Audio && state !is FileUploaderState.Audio.Loading
     val isLoading = when (state) {
-        is FileUploaderState.Script -> state.status == ScriptStatus.LOADING
-        is FileUploaderState.Audio -> state.status == AudioStatus.LOADING
+        FileUploaderState.Script.Loading,
+        FileUploaderState.Audio.Loading -> true
+        FileUploaderState.Script.Uploaded,
+        FileUploaderState.Audio.Paused,
+        FileUploaderState.Audio.Playing -> false
     }
 
     Row(
@@ -423,23 +424,23 @@ private fun FileUploaderPreview() {
         ) {
             FileUploader(
                 fileName = "title.txt",
-                state = FileUploaderState.Script(ScriptStatus.LOADING),
+                state = FileUploaderState.Script.Loading,
                 progress = 0.42f,
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.txt",
-                state = FileUploaderState.Script(ScriptStatus.UPLOADED),
+                state = FileUploaderState.Script.Uploaded,
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.mp3",
-                state = FileUploaderState.Audio(AudioStatus.PAUSED),
+                state = FileUploaderState.Audio.Paused,
                 modifier = Modifier.width(420.dp),
             )
             FileUploader(
                 fileName = "title.mp3",
-                state = FileUploaderState.Audio(AudioStatus.PLAYING),
+                state = FileUploaderState.Audio.Playing,
                 progress = 0.275f,
                 currentTimeText = "00:11",
                 durationTimeText = "00:40",
@@ -471,9 +472,11 @@ private fun FileUploaderInteractivePreview() {
         Box(modifier = Modifier.padding(PrezelTheme.spacing.V16)) {
             FileUploader(
                 fileName = "title.mp3",
-                state = FileUploaderState.Audio(
-                    status = if (playing) AudioStatus.PLAYING else AudioStatus.PAUSED,
-                ),
+                state = if (playing) {
+                    FileUploaderState.Audio.Playing
+                } else {
+                    FileUploaderState.Audio.Paused
+                },
                 progress = elapsedSeconds.toFloat() / durationSeconds,
                 currentTimeText = elapsedSeconds.toPreviewTimeText(),
                 durationTimeText = durationSeconds.toPreviewTimeText(),
