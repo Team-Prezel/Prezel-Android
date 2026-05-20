@@ -98,10 +98,12 @@ fun FileUploader(
     val showAudioControl = state is FileUploaderState.Audio && state !is FileUploaderState.Audio.Loading
     val isLoading = when (state) {
         FileUploaderState.Script.Loading,
-        FileUploaderState.Audio.Loading -> true
+        FileUploaderState.Audio.Loading,
+        -> true
         FileUploaderState.Script.Uploaded,
         FileUploaderState.Audio.Paused,
-        FileUploaderState.Audio.Playing -> false
+        FileUploaderState.Audio.Playing,
+        -> false
     }
 
     Row(
@@ -412,7 +414,7 @@ private fun CancelButton(
     }
 }
 
-private fun Float.toPercentValue(): Int = (coerceIn(0f, 1f) * 100).roundToInt()
+private fun Float.toPercentValue(): Int = (coerceIn(0f, 1f) * 100).toInt()
 
 @BasicPreview
 @Composable
