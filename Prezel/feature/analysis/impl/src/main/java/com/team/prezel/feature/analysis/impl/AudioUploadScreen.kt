@@ -1,35 +1,28 @@
 package com.team.prezel.feature.analysis.impl
 
+import android.content.Context
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,12 +30,13 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
-import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.component.FileUploader
+import com.team.prezel.core.ui.component.FileUploaderState
 import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
@@ -52,12 +46,13 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
 private const val AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS = 800
+private const val AUDIO_PLAYBACK_PROGRESS_INTERVAL_MILLIS = 250L
 private val AUDIO_FILE_MIME_TYPES = arrayOf("audio/m4a", "audio/x-m4a", "audio/mp4", "video/mp4", "audio/mpeg")
 private const val AUDIO_PREVIEW_FILE_URI = "content://prezel/sample.m4a"
 private const val AUDIO_UPLOAD_TAB_COUNT = 1
-private const val UPLOADED_AUDIO_PROGRESS = 0f
 
 @Composable
 internal fun AudioUploadScreen(
@@ -170,14 +165,153 @@ private fun AudioUploadContent(
         AudioUploadEmptyContent(onUploadClick = onUploadClick)
     } else {
         val context = LocalContext.current
+        val playbackState = rememberAudioUploadPlaybackState(
+            fileUri = fileUri,
+            enabled = uploadProgress == null,
+        )
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-        UploadedAudioFileCard(
+        FileUploader(
             fileName = remember(context, fileUri) { fileUri.toFileName(context) },
-            uploadProgress = uploadProgress,
-            onClear = onClear,
+            state = when {
+                uploadProgress != null -> FileUploaderState.Audio.Loading
+                playbackState.playing -> FileUploaderState.Audio.Playing
+                else -> FileUploaderState.Audio.Paused
+            },
+            progress = uploadProgress ?: audioPlaybackProgress(
+                currentPositionMillis = playbackState.currentPositionMillis,
+                durationMillis = playbackState.durationMillis,
+            ),
+            currentTimeText = playbackState.currentPositionMillis.toAudioPlaybackTimeText(),
+            durationTimeText = playbackState.durationMillis.toAudioPlaybackTimeText(),
+            onCancelClick = onClear,
+            onPlayClick = playbackState::play,
+            onPauseClick = playbackState::pause,
+            onSeek = playbackState::seekToProgress,
         )
     }
+}
+
+@Composable
+private fun rememberAudioUploadPlaybackState(
+    fileUri: String,
+    enabled: Boolean,
+): AudioUploadPlaybackState {
+    val context = LocalContext.current
+    val state = remember(context, fileUri) {
+        AudioUploadPlaybackState(
+            context = context.applicationContext,
+            fileUri = fileUri,
+        )
+    }
+
+    LaunchedEffect(state.playing) {
+        while (state.playing) {
+            delay(AUDIO_PLAYBACK_PROGRESS_INTERVAL_MILLIS)
+            state.syncPosition()
+        }
+    }
+
+    LaunchedEffect(enabled) {
+        if (!enabled) state.release()
+    }
+
+    DisposableEffect(state) {
+        onDispose {
+            state.release()
+        }
+    }
+
+    return state
+}
+
+private class AudioUploadPlaybackState(
+    private val context: Context,
+    private val fileUri: String,
+) {
+    private var player: MediaPlayer? = null
+
+    var playing by mutableStateOf(false)
+        private set
+
+    var currentPositionMillis by mutableIntStateOf(0)
+        private set
+
+    var durationMillis by mutableIntStateOf(0)
+        private set
+
+    fun play() {
+        val mediaPlayer = player ?: preparePlayer() ?: return
+        runCatching {
+            mediaPlayer.start()
+            playing = true
+            syncPosition()
+        }.onFailure {
+            release()
+        }
+    }
+
+    fun pause() {
+        player?.runCatching {
+            if (isPlaying) pause()
+        }
+        syncPosition()
+        playing = false
+    }
+
+    fun seekToProgress(progress: Float) {
+        val mediaPlayer = player ?: preparePlayer() ?: return
+        val targetPositionMillis = (durationMillis * progress.coerceIn(0f, 1f)).roundToInt()
+
+        runCatching {
+            mediaPlayer.seekTo(targetPositionMillis)
+            currentPositionMillis = targetPositionMillis
+        }.onFailure {
+            release()
+        }
+    }
+
+    fun syncPosition() {
+        val mediaPlayer = player ?: return
+        currentPositionMillis = mediaPlayer.currentPosition.coerceAtLeast(0)
+        durationMillis = mediaPlayer.duration.coerceAtLeast(0)
+    }
+
+    fun release() {
+        player?.release()
+        player = null
+        playing = false
+        currentPositionMillis = 0
+        durationMillis = 0
+    }
+
+    private fun preparePlayer(): MediaPlayer? =
+        runCatching {
+            MediaPlayer.create(context, Uri.parse(fileUri))?.apply {
+                durationMillis = duration.coerceAtLeast(0)
+                setOnCompletionListener {
+                    currentPositionMillis = durationMillis
+                    playing = false
+                }
+            }
+        }.getOrNull()
+            ?.also { player = it }
+}
+
+internal fun Int.toAudioPlaybackTimeText(): String {
+    val totalSeconds = coerceAtLeast(0) / 1_000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+
+    return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+}
+
+internal fun audioPlaybackProgress(
+    currentPositionMillis: Int,
+    durationMillis: Int,
+): Float {
+    if (durationMillis <= 0) return 0f
+    return (currentPositionMillis.toFloat() / durationMillis).coerceIn(0f, 1f)
 }
 
 @Composable
@@ -206,169 +340,6 @@ private fun AudioUploadEmptyContent(onUploadClick: () -> Unit) {
             )
         },
     )
-}
-
-@Composable
-private fun UploadedAudioFileCard(
-    fileName: String,
-    uploadProgress: Float?,
-    onClear: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = PrezelTheme.stroke.V1,
-                color = PrezelTheme.colors.borderSmall,
-                shape = PrezelTheme.shapes.V8,
-            ).padding(
-                start = PrezelTheme.spacing.V16,
-                end = PrezelTheme.spacing.V12,
-                top = PrezelTheme.spacing.V16,
-                bottom = PrezelTheme.spacing.V16,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        UploadedAudioFileInfo(
-            fileName = fileName,
-            uploadProgress = uploadProgress,
-            modifier = Modifier.weight(1f),
-        )
-
-        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V12))
-
-        PrezelTouchArea(
-            extraTouchPadding = PaddingValues(PrezelTheme.spacing.V8),
-            onClick = onClear,
-        ) {
-            Icon(
-                painter = painterResource(PrezelIcons.CancelCircleFilled),
-                contentDescription = stringResource(R.string.feature_analysis_impl_audio_file_remove),
-                modifier = Modifier.size(24.dp),
-                tint = PrezelTheme.colors.iconRegular,
-            )
-        }
-    }
-}
-
-@Composable
-private fun UploadedAudioFileInfo(
-    fileName: String,
-    uploadProgress: Float?,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        AudioFileTitleRow(fileName = fileName)
-
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
-
-        if (uploadProgress == null) {
-            AudioFileProgressRow()
-        } else {
-            AudioUploadProgressRow(progress = uploadProgress)
-        }
-    }
-}
-
-@Composable
-private fun AudioFileTitleRow(fileName: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(PrezelIcons.Play),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = PrezelTheme.colors.iconRegular,
-        )
-        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V8))
-        Text(
-            text = fileName,
-            modifier = Modifier.weight(1f),
-            color = PrezelTheme.colors.textMedium,
-            style = PrezelTheme.typography.body3Medium,
-        )
-    }
-}
-
-@Composable
-private fun AudioFileProgressRow() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.feature_analysis_impl_audio_file_duration_placeholder),
-            color = PrezelTheme.colors.textSmall,
-            style = PrezelTheme.typography.caption2Regular,
-        )
-        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V8))
-        AudioProgressTrack(
-            progress = UPLOADED_AUDIO_PROGRESS,
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun AudioUploadProgressRow(progress: Float) {
-    val coercedProgress = progress.coerceIn(0f, 1f)
-    val progressPercent = (coercedProgress * 100).toInt()
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AudioProgressTrack(
-            progress = coercedProgress,
-            showThumb = false,
-            modifier = Modifier.weight(1f),
-        )
-
-        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V16))
-
-        Text(
-            text = "%02d%%".format(progressPercent),
-            color = PrezelTheme.colors.textSmall,
-            style = PrezelTheme.typography.body2Regular,
-        )
-    }
-}
-
-@Composable
-private fun AudioProgressTrack(
-    progress: Float,
-    modifier: Modifier = Modifier,
-    showThumb: Boolean = true,
-) {
-    Box(
-        modifier = modifier.height(16.dp),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-                .clip(CircleShape)
-                .background(PrezelTheme.colors.bgDisabled),
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress.coerceIn(0f, 1f))
-                .height(6.dp)
-                .clip(CircleShape)
-                .background(PrezelTheme.colors.interactiveRegular),
-        )
-        if (showThumb) {
-            Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(PrezelTheme.colors.interactiveRegular),
-            )
-        }
-    }
 }
 
 @BasicPreview

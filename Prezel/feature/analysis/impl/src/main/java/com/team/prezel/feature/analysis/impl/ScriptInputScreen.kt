@@ -6,27 +6,17 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,13 +25,14 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
-import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.component.FileUploader
+import com.team.prezel.core.ui.component.FileUploaderState
 import com.team.prezel.core.ui.component.StatusView
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
@@ -274,88 +265,16 @@ private fun UploadedScriptFileCard(
     val context = LocalContext.current
     val fileName = remember(context, fileUri) { fileUri.toFileName(context) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = PrezelTheme.stroke.V1,
-                color = PrezelTheme.colors.borderRegular,
-                shape = PrezelTheme.shapes.V8,
-            ).padding(
-                horizontal = PrezelTheme.spacing.V12,
-                vertical = PrezelTheme.spacing.V24,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = PrezelTheme.spacing.V4),
-        ) {
-            Text(
-                text = fileName,
-                color = PrezelTheme.colors.textMedium,
-                style = PrezelTheme.typography.body3Medium,
-            )
-
-            if (uploadProgress != null) {
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-                ScriptUploadProgress(progress = uploadProgress)
-            }
-        }
-
-        PrezelTouchArea(
-            extraTouchPadding = PaddingValues(PrezelTheme.spacing.V8),
-            isUseRipple = false,
-            onClick = onClear,
-        ) {
-            Icon(
-                painter = painterResource(PrezelIcons.CancelCircleFilled),
-                contentDescription = stringResource(R.string.feature_analysis_impl_script_file_remove),
-                modifier = Modifier.size(24.dp),
-                tint = PrezelTheme.colors.iconRegular,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ScriptUploadProgress(progress: Float) {
-    val coercedProgress = progress.coerceIn(0f, 1f)
-    val progressPercent = (coercedProgress * 100).toInt()
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(6.dp)
-                .background(
-                    color = PrezelTheme.colors.bgLarge,
-                    shape = PrezelTheme.shapes.V1000,
-                ),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(coercedProgress)
-                    .height(6.dp)
-                    .background(
-                        color = PrezelTheme.colors.interactiveRegular,
-                        shape = PrezelTheme.shapes.V1000,
-                    ),
-            )
-        }
-
-        Spacer(modifier = Modifier.size(PrezelTheme.spacing.V16))
-
-        Text(
-            text = "%02d%%".format(progressPercent),
-            color = PrezelTheme.colors.textSmall,
-            style = PrezelTheme.typography.body2Regular,
-        )
-    }
+    FileUploader(
+        fileName = fileName,
+        state = if (uploadProgress == null) {
+            FileUploaderState.Script.Uploaded
+        } else {
+            FileUploaderState.Script.Loading
+        },
+        progress = uploadProgress ?: 0f,
+        onCancelClick = onClear,
+    )
 }
 
 @BasicPreview

@@ -13,7 +13,6 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 
 @Composable
 internal fun AnalysisScreen(
-    onFinished: () -> Unit,
     onBack: () -> Unit,
     viewModel: AnalysisFlowViewModel = hiltViewModel(),
 ) {
@@ -30,7 +29,6 @@ internal fun AnalysisScreen(
     AnalysisScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
-        onFinished = onFinished,
     )
 }
 
@@ -38,7 +36,6 @@ internal fun AnalysisScreen(
 private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
-    onFinished: () -> Unit,
 ) {
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE -> PresentationScheduleScreen(
@@ -76,10 +73,11 @@ private fun AnalysisScreen(
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
 
-        AnalysisFlowStep.ANALYZING -> AnalyzingScreen(
-            onFinished = onFinished,
-            onBack = { onIntent(AnalysisFlowUiIntent.Back) },
+        AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen(
+            onFinished = { onIntent(AnalysisFlowUiIntent.Next) },
         )
+
+        AnalysisFlowStep.REPORT -> AnalysisReportScreen()
 
         AnalysisFlowStep.FILE_RECOGNITION_FAILED -> FileRecognitionFailedScreen(
             onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.AUDIO)) },

@@ -18,7 +18,6 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
         val navigateToHome = { navigator.replaceRoot(HomeNavKey) }
 
         AnalysisScreen(
-            onFinished = navigateToHome,
             onBack = navigateToHome,
         )
     }

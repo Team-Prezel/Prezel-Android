@@ -54,10 +54,11 @@ internal class AnalysisFlowViewModel @Inject constructor() :
                         AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.SCRIPT_INPUT
                         AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.AUDIO_UPLOAD
                         AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.ANALYZING
-                        AnalysisFlowStep.ANALYZING,
+                        AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.REPORT
+                        AnalysisFlowStep.REPORT,
                         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
                         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
-                        -> AnalysisFlowStep.ANALYZING
+                        -> AnalysisFlowStep.REPORT
                     },
                 )
             }
@@ -104,6 +105,7 @@ internal class AnalysisFlowViewModel @Inject constructor() :
                 AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.PRESENTATION_SITUATION
                 AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
                 AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
+                AnalysisFlowStep.REPORT -> AnalysisFlowStep.AUDIO_UPLOAD
                 AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
                 AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
             }

@@ -22,6 +22,7 @@ internal data class AnalysisFlowUiState(
 
             AnalysisFlowStep.AUDIO_UPLOAD -> 0.75f
             AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             -> 1f
         }
@@ -41,6 +42,7 @@ internal data class AnalysisFlowUiState(
 
             AnalysisFlowStep.AUDIO_UPLOAD -> form.audioFileUri != null
             AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> false
@@ -72,6 +74,7 @@ internal enum class AnalysisFlowStep {
     SCRIPT_INPUT,
     AUDIO_UPLOAD,
     ANALYZING,
+    REPORT,
     FILE_RECOGNITION_FAILED,
     SCRIPT_FILE_RECOGNITION_FAILED,
 }

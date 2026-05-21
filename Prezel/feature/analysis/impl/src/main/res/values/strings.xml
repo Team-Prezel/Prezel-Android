@@ -53,7 +53,6 @@
     <string name="feature_analysis_impl_audio_description">분석을 위해 음성 파일이 필요해요.</string>
     <string name="feature_analysis_impl_audio_file_placeholder">음성 파일을 업로드하세요</string>
     <string name="feature_analysis_impl_audio_file_format">제공하는 파일 형식 : m4a, mp4, mp3</string>
-    <string name="feature_analysis_impl_audio_file_duration_placeholder">00:00/00:00</string>
     <string name="feature_analysis_impl_audio_file_remove">음성 파일 삭제</string>
     <string name="feature_analysis_impl_audio_upload_button">파일 추가하기</string>
 
@@ -61,6 +60,7 @@
     <string name="feature_analysis_impl_direct_input_title">직접 입력</string>
     <string name="feature_analysis_impl_analyzing_title">분석 중</string>
     <string name="feature_analysis_impl_analyzing_headline">발표 음성을 분석하고 있어요</string>
+    <string name="feature_analysis_impl_report_placeholder">분석 리포트 화면</string>
     <string name="feature_analysis_impl_file_recognition_failed_title">분석할 수 있는 음성 파일을 찾지 못했어요.</string>
     <string name="feature_analysis_impl_file_recognition_failed_description">다른 음성 파일로 다시 시도해 주세요.</string>
     <string name="feature_analysis_impl_script_file_recognition_failed_title">분석할 수 있는 텍스트 파일을 찾지 못했어요.</string>
