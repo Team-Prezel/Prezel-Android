@@ -41,16 +41,19 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_REQUEST,
         ServerErrorCode.REQUIRED_TERMS_DISAGREED,
         ServerErrorCode.FILE_UPLOAD_FAILED,
-        -> AppError.INVALID_REQUEST
+            -> AppError.INVALID_REQUEST
 
         ServerErrorCode.FILE_IS_EMPTY -> AppError.SCRIPT_FILE_RECOGNITION_FAILED
 
         ServerErrorCode.SERVER_ERROR,
         ServerErrorCode.SENTENCE_NOT_FOUND,
         ServerErrorCode.VOICE_ANALYSIS_FAILED,
-        -> AppError.SERVER_ERROR
+            -> AppError.SERVER_ERROR
 
-        ServerErrorCode.TERMS_NOT_FOUND -> AppError.NOT_FOUND
+        ServerErrorCode.TERMS_NOT_FOUND,
+        ServerErrorCode.PRESENTATION_NOT_FOUND,
+        ServerErrorCode.ANALYSIS_RESULT_NOT_FOUND,
+            -> AppError.NOT_FOUND
 
         ServerErrorCode.DUPLICATE_NICKNAME -> AppError.DUPLICATE
 
@@ -60,7 +63,7 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.TOKEN_STOLEN,
         ServerErrorCode.USER_NOT_FOUND,
         ServerErrorCode.INVALID_ID_TOKEN,
-        -> AppError.UNAUTHORIZED
+            -> AppError.UNAUTHORIZED
 
         ServerErrorCode.VOICE_RECOGNITION_FAILED -> AppError.VOICE_RECOGNITION_FAILED
 

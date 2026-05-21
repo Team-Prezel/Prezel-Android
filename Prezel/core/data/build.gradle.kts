@@ -5,7 +5,6 @@ plugins {
 
 android {
     namespace = "com.team.prezel.core.data"
-    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
@@ -16,4 +15,5 @@ dependencies {
     implementation(projects.coreNetwork)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.datetime)
 }
