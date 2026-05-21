@@ -7,8 +7,8 @@ import com.team.prezel.core.network.model.presentation.PresentationWordDetailRes
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
-import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.Path
 import io.ktor.client.request.forms.MultiPartFormDataContent
 
 interface PresentationService {

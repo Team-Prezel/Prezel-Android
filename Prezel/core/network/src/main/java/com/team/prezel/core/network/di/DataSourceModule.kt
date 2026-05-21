@@ -2,10 +2,10 @@ package com.team.prezel.core.network.di
 
 import com.team.prezel.core.network.datasource.AuthRemoteDataSource
 import com.team.prezel.core.network.datasource.AuthRemoteDataSourceImpl
-import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
-import com.team.prezel.core.network.datasource.PresentationRemoteDataSourceImpl
 import com.team.prezel.core.network.datasource.PracticeRemoteDataSource
 import com.team.prezel.core.network.datasource.PracticeRemoteDataSourceImpl
+import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
+import com.team.prezel.core.network.datasource.PresentationRemoteDataSourceImpl
 import com.team.prezel.core.network.datasource.TermsRemoteDataSource
 import com.team.prezel.core.network.datasource.TermsRemoteDataSourceImpl
 import com.team.prezel.core.network.datasource.UserRemoteDataSource

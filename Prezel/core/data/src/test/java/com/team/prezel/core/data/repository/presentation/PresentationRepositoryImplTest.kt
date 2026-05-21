@@ -19,13 +19,13 @@ import com.team.prezel.core.network.model.presentation.PresentationScriptDetailR
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordAnalysisResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
-import kotlinx.datetime.LocalDateTime
 import kotlinx.coroutines.runBlocking
-import kotlin.time.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.time.Instant
 
 class PresentationRepositoryImplTest {
     @Test
@@ -72,7 +72,7 @@ class PresentationRepositoryImplTest {
     fun `타임존 없는 분석 시각도 파싱한다`() =
         runBlocking {
             val repository = PresentationRepositoryImpl(
-                    presentationRemoteDataSource = FakePresentationRemoteDataSource(
+                presentationRemoteDataSource = FakePresentationRemoteDataSource(
                     summaryResponse = FakePresentationRemoteDataSource.summaryResponse(
                         analysisDate = "2026-05-21T23:29:46.974216441",
                     ),
@@ -234,47 +234,45 @@ class PresentationRepositoryImplTest {
         override suspend fun deleteAnalysis(analysisResultId: Long) = Unit
 
         companion object {
-            fun summaryResponse(
-                analysisDate: String = "2026-05-20T01:02:03Z",
-            ): PresentationSummaryResponse =
+            fun summaryResponse(analysisDate: String = "2026-05-20T01:02:03Z"): PresentationSummaryResponse =
                 PresentationSummaryResponse(
-                presentationId = 11L,
-                analysisResultId = 22L,
-                name = "서비스 제안 발표",
-                type = "WORK",
-                purpose = "UNDERSTANDING",
-                style = "CASUAL",
-                audience = "TEAMMATE",
-                analysisDate = analysisDate,
-                durationSeconds = 183,
-                formattedDuration = "03:03",
-                spm = 210,
-                speedEval = "적당해요",
-                summaryFeedback = "핵심이 잘 전달됐어요.",
-                accuracyScore = 91.2,
-                scriptMatchRate = 88.4,
-                spellErrorCount = 1,
-                grammarErrorCount = 2,
-                totalErrorCount = 3,
-                growthGraph = listOf(
-                    PresentationGrowthResponse(
-                        attempt = 1,
-                        accuracyScore = 70.0,
-                        scriptMatchRate = 62.0,
+                    presentationId = 11L,
+                    analysisResultId = 22L,
+                    name = "서비스 제안 발표",
+                    type = "WORK",
+                    purpose = "UNDERSTANDING",
+                    style = "CASUAL",
+                    audience = "TEAMMATE",
+                    analysisDate = analysisDate,
+                    durationSeconds = 183,
+                    formattedDuration = "03:03",
+                    spm = 210,
+                    speedEval = "적당해요",
+                    summaryFeedback = "핵심이 잘 전달됐어요.",
+                    accuracyScore = 91.2,
+                    scriptMatchRate = 88.4,
+                    spellErrorCount = 1,
+                    grammarErrorCount = 2,
+                    totalErrorCount = 3,
+                    growthGraph = listOf(
+                        PresentationGrowthResponse(
+                            attempt = 1,
+                            accuracyScore = 70.0,
+                            scriptMatchRate = 62.0,
+                        ),
+                        PresentationGrowthResponse(
+                            attempt = 2,
+                            accuracyScore = 91.2,
+                            scriptMatchRate = 88.4,
+                        ),
                     ),
-                    PresentationGrowthResponse(
-                        attempt = 2,
-                        accuracyScore = 91.2,
-                        scriptMatchRate = 88.4,
+                    expectedQuestions = listOf(
+                        PresentationExpectedQuestionResponse(
+                            question = "왜 이 전략이 필요한가요?",
+                            answer = "시장 진입 속도를 높이기 위해서입니다.",
+                        ),
                     ),
-                ),
-                expectedQuestions = listOf(
-                    PresentationExpectedQuestionResponse(
-                        question = "왜 이 전략이 필요한가요?",
-                        answer = "시장 진입 속도를 높이기 위해서입니다.",
-                    ),
-                ),
-            )
+                )
         }
     }
 }

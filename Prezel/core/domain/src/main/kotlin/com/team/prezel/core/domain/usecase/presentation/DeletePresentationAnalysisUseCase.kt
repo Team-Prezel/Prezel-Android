@@ -6,6 +6,5 @@ import javax.inject.Inject
 class DeletePresentationAnalysisUseCase @Inject constructor(
     private val presentationRepository: PresentationRepository,
 ) {
-    suspend operator fun invoke(analysisResultId: Long): Result<Unit> =
-        presentationRepository.deleteAnalysis(analysisResultId = analysisResultId)
+    suspend operator fun invoke(analysisResultId: Long): Result<Unit> = presentationRepository.deleteAnalysis(analysisResultId = analysisResultId)
 }
