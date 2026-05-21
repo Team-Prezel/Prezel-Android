@@ -7,5 +7,11 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreModel)
+    implementation(projects.coreUi)
     implementation(projects.featureReportApi)
+    implementation(projects.featureHomeApi)
+
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.collections.immutable)
 }

@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_report_impl_loading">리포트 화면을 준비하고 있어요.</string>
-    <string name="feature_report_impl_title">리포트 화면</string>
+    <string name="feature_report_impl_save">저장</string>
+    <string name="feature_report_impl_delete">리포트 삭제</string>
+    <string name="feature_report_impl_back">뒤로가기</string>
+    <string name="feature_report_impl_section_summary_feedback">요약 피드백</string>
+    <string name="feature_report_impl_section_accuracy">정확도</string>
+    <string name="feature_report_impl_section_growth_graph">성장 그래프</string>
+    <string name="feature_report_impl_section_script_analysis">대본 분석</string>
+    <string name="feature_report_impl_section_expected_questions">예상 질문</string>
+    <string name="feature_report_impl_section_self_feedback">셀프 피드백</string>
+    <string name="feature_report_impl_section_practice_history">연습 기록</string>
+    <string name="feature_report_impl_category_persuasion">설득·제안</string>
+    <string name="feature_report_impl_category_event">행사·공개</string>
+    <string name="feature_report_impl_category_education">학술·교육</string>
+    <string name="feature_report_impl_category_report">업무·보고</string>
+    <string name="feature_report_impl_purpose_content_delivery">내용 전달</string>
+    <string name="feature_report_impl_purpose_improve_understanding">이해 증진</string>
+    <string name="feature_report_impl_purpose_build_empathy">공감 형성</string>
+    <string name="feature_report_impl_style_professional">전문적</string>
+    <string name="feature_report_impl_style_friendly">친근함</string>
+    <string name="feature_report_impl_style_calm">차분함</string>
+    <string name="feature_report_impl_style_comfortable">편안함</string>
+    <string name="feature_report_impl_audience_general">일반 청중</string>
+    <string name="feature_report_impl_audience_expert">전문가</string>
+    <string name="feature_report_impl_audience_teammates">팀원</string>
+    <string name="feature_report_impl_label_contents_info">세부정보</string>
+    <string name="feature_report_impl_label_analyzed_date">분석일</string>
+    <string name="feature_report_impl_label_presentation_time">발표 시간</string>
+    <string name="feature_report_impl_label_speed">속도</string>
+    <string name="feature_report_impl_label_speech">발화</string>
+    <string name="feature_report_impl_label_script_match">대본 일치율</string>
+    <string name="feature_report_impl_label_total_errors">총 오류 수</string>
+    <string name="feature_report_impl_empty_growth_graph">대본을 입력하고 실제 발화를 비교해\n발음과 대본 일치율을 분석해보세요.</string>
+    <string name="feature_report_impl_empty_questions">대본을 입력하고 예상 질문을 받아보세요.</string>
+    <string name="feature_report_impl_empty_practice_history">연습 기록이 아직 없어요.</string>
 </resources>
