@@ -22,4 +22,13 @@
     <string name="core_ui_impl_practice_card_prev_page">이전 페이지</string>
     <string name="core_ui_impl_practice_card_next_page">다음 페이지</string>
     <string name="core_ui_impl_practice_card_count_label">연습한 횟수</string>
+
+    <!-- File Uploader -->
+    <string name="core_ui_file_uploader_cancel_desc">파일 업로더 취소</string>
+    <string name="core_ui_file_uploader_play_desc">파일 업로더 재생</string>
+    <string name="core_ui_file_uploader_pause_desc">파일 업로더 일시정지</string>
+    <string name="core_ui_file_uploader_progress_desc">파일 업로더 진행률</string>
+    <string name="core_ui_file_uploader_seek_desc">파일 업로더 재생 위치</string>
+    <string name="core_ui_file_uploader_progress_percent">%1$02d%%</string>
+    <string name="core_ui_file_uploader_time_separator">/</string>
 </resources>
