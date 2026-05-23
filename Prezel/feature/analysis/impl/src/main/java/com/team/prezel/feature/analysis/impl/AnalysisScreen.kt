@@ -80,9 +80,7 @@ private fun AnalysisScreen(
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
 
-        AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen(
-            onFinished = { onIntent(AnalysisFlowUiIntent.Next) },
-        )
+        AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen()
 
         AnalysisFlowStep.REPORT -> AnalysisReportScreen()
 

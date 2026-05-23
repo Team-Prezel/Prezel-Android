@@ -3,6 +3,7 @@ package com.team.prezel.feature.analysis.impl.contract
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiState
@@ -11,6 +12,7 @@ import com.team.prezel.core.ui.base.UiState
 internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
     val form: AnalysisForm = AnalysisForm(),
+    val analysisResult: PresentationRecordingAnalysisResult? = null,
 ) : UiState {
     val progress: Float
         get() = when (step) {

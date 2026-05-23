@@ -18,12 +18,14 @@ private const val ANALYSIS_LOADING_DURATION_MILLIS = 2_000L
 
 @Composable
 internal fun AnalysisLoadingScreen(
-    onFinished: () -> Unit,
     modifier: Modifier = Modifier,
+    onFinished: (() -> Unit)? = null,
 ) {
-    LaunchedEffect(Unit) {
-        delay(ANALYSIS_LOADING_DURATION_MILLIS)
-        onFinished()
+    if (onFinished != null) {
+        LaunchedEffect(Unit) {
+            delay(ANALYSIS_LOADING_DURATION_MILLIS)
+            onFinished()
+        }
     }
 
     StatusView(
@@ -43,6 +45,6 @@ internal fun AnalysisLoadingScreen(
 @Composable
 private fun AnalysisLoadingScreenPreview() {
     PrezelTheme {
-        AnalysisLoadingScreen(onFinished = {})
+        AnalysisLoadingScreen()
     }
 }
