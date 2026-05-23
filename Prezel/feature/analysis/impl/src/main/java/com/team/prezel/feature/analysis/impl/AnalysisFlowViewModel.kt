@@ -5,6 +5,11 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
+import com.team.prezel.core.model.presentation.Audience
+import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
@@ -79,57 +84,69 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private fun analyzePresentation() {
-        val form = currentState.form
-        val category = form.category ?: return
-        val purpose = form.purpose ?: return
-        val style = form.style ?: return
-        val audience = form.audience ?: return
-        val audioFileUri = form.audioFileUri ?: return
+        val request = currentState.form.toPresentationAnalysisRequestOrNull() ?: return
 
         updateState { copy(step = AnalysisFlowStep.ANALYZING) }
 
         viewModelScope.launch {
-            val result = runCatching {
-                val audioFile = context.copyUriToAnalysisCache(
-                    uriString = audioFileUri,
-                    prefix = "audio",
-                )
-                val scriptFile = if (form.scriptInputType == ScriptInputType.FILE_UPLOAD) {
-                    form.scriptFileUri?.let { scriptFileUri ->
-                        context.copyUriToAnalysisCache(
-                            uriString = scriptFileUri,
-                            prefix = "script",
-                        )
-                    }
-                } else {
-                    null
-                }
+            request
+                .analyzePresentationRecording()
+                .onSuccess(::handleAnalysisSuccess)
+                .onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
+        }
+    }
 
-                analyzePresentationRecordingUseCase(
-                    name = form.presentationTitle.trim(),
-                    date = form.presentationDate.toRequestDate(),
-                    category = category,
-                    purpose = purpose,
-                    style = style,
-                    audience = audience,
-                    script = form.script.takeIf(String::isNotBlank),
-                    scriptFilePath = scriptFile?.absolutePath,
-                    audioFilePath = audioFile.absolutePath,
-                ).getOrThrow()
+    private suspend fun PresentationAnalysisRequest.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
+        runCatching {
+            val audioFile = context.copyUriToAnalysisCache(
+                uriString = audioFileUri,
+                prefix = "audio",
+            )
+            val scriptFile = scriptFileUri?.let { uri ->
+                context.copyUriToAnalysisCache(
+                    uriString = uri,
+                    prefix = "script",
+                )
             }
 
-            updateState {
-                result.fold(
-                    onSuccess = { analysisResult ->
-                        copy(
-                            step = AnalysisFlowStep.REPORT,
-                            analysisResult = analysisResult,
-                        )
-                    },
-                    onFailure = {
-                        copy(step = AnalysisFlowStep.FILE_RECOGNITION_FAILED)
-                    },
-                )
+            analyzePresentationRecordingUseCase(
+                name = name,
+                date = date.toRequestDate(),
+                category = category,
+                purpose = purpose,
+                style = style,
+                audience = audience,
+                script = script,
+                scriptFilePath = scriptFile?.absolutePath,
+                audioFilePath = audioFile.absolutePath,
+            ).getOrThrow()
+        }
+
+    private fun handleAnalysisSuccess(analysisResult: PresentationRecordingAnalysisResult) {
+        updateState {
+            copy(
+                step = AnalysisFlowStep.REPORT,
+                analysisResult = analysisResult,
+            )
+        }
+    }
+
+    private fun handleAnalysisFailure(action: AnalysisFailureAction) {
+        when (action) {
+            is AnalysisFailureAction.RetryFileUpload -> {
+                updateState {
+                    copy(
+                        step = when (action.uploadType) {
+                            AnalysisUploadType.AUDIO -> AnalysisFlowStep.FILE_RECOGNITION_FAILED
+                            AnalysisUploadType.SCRIPT -> AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED
+                        },
+                    )
+                }
+            }
+
+            is AnalysisFailureAction.ShowMessage -> {
+                viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.ShowMessage(action.message)) }
+                updateState { copy(step = AnalysisFlowStep.AUDIO_UPLOAD) }
             }
         }
     }
@@ -222,6 +239,38 @@ private fun Context.copyUriToAnalysisCache(
     }
 
     return target
+}
+
+private data class PresentationAnalysisRequest(
+    val name: String,
+    val date: String,
+    val category: Category,
+    val purpose: Purpose,
+    val style: Style,
+    val audience: Audience,
+    val script: String?,
+    val scriptFileUri: String?,
+    val audioFileUri: String,
+)
+
+private fun AnalysisForm.toPresentationAnalysisRequestOrNull(): PresentationAnalysisRequest? {
+    val category = category ?: return null
+    val purpose = purpose ?: return null
+    val style = style ?: return null
+    val audience = audience ?: return null
+    val audioFileUri = audioFileUri ?: return null
+
+    return PresentationAnalysisRequest(
+        name = presentationTitle.trim(),
+        date = presentationDate,
+        category = category,
+        purpose = purpose,
+        style = style,
+        audience = audience,
+        script = script.takeIf(String::isNotBlank),
+        scriptFileUri = scriptFileUri.takeIf { scriptInputType == ScriptInputType.FILE_UPLOAD },
+        audioFileUri = audioFileUri,
+    )
 }
 
 private fun String.toRequestDate(): String =

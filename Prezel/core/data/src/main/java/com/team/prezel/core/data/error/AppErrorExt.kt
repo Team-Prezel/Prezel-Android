@@ -41,16 +41,15 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_REQUEST,
         ServerErrorCode.REQUIRED_TERMS_DISAGREED,
         ServerErrorCode.FILE_IS_EMPTY,
+        ServerErrorCode.FILE_UPLOAD_FAILED,
         -> AppError.INVALID_REQUEST
 
         ServerErrorCode.SERVER_ERROR,
-        ServerErrorCode.FILE_UPLOAD_FAILED,
+        ServerErrorCode.SENTENCE_NOT_FOUND,
         ServerErrorCode.VOICE_ANALYSIS_FAILED,
         -> AppError.SERVER_ERROR
 
-        ServerErrorCode.TERMS_NOT_FOUND,
-        ServerErrorCode.SENTENCE_NOT_FOUND,
-        -> AppError.NOT_FOUND
+        ServerErrorCode.TERMS_NOT_FOUND -> AppError.NOT_FOUND
 
         ServerErrorCode.DUPLICATE_NICKNAME -> AppError.DUPLICATE
 

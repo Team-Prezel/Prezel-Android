@@ -65,6 +65,10 @@
     <string name="feature_analysis_impl_file_recognition_failed_description">다른 음성 파일로 다시 시도해 주세요.</string>
     <string name="feature_analysis_impl_script_file_recognition_failed_title">분석할 수 있는 텍스트 파일을 찾지 못했어요.</string>
     <string name="feature_analysis_impl_script_file_recognition_failed_description">다른 텍스트 파일로 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_error_auth_expired">로그인이 만료되었어요. 다시 로그인해 주세요.</string>
+    <string name="feature_analysis_impl_error_analysis_failed">분석 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_error_network_failed">네트워크 연결을 확인해 주세요.</string>
+    <string name="feature_analysis_impl_error_unknown_failed">알 수 없는 오류가 발생했어요.</string>
     <string name="feature_analysis_impl_back">뒤로가기</string>
     <string name="feature_analysis_impl_next">다음</string>
     <string name="feature_analysis_impl_skip">건너뛰기</string>
