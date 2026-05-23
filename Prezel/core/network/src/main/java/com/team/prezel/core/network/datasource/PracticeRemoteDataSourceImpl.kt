@@ -58,7 +58,9 @@ internal class PracticeRemoteDataSourceImpl @Inject constructor(
         audioFilePath: String,
     ): PresentationRecordingAnalysisResponse {
         val audioFile = File(audioFilePath)
-        val scriptFile = scriptFilePath?.let(::File)
+        val scriptFile = scriptFilePath
+            ?.takeIf(String::isNotBlank)
+            ?.let(::File)
         val multipart = MultiPartFormDataContent(
             formData {
                 append("name", name)

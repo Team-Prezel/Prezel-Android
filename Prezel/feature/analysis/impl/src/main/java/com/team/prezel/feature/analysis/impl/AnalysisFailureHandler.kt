@@ -23,6 +23,8 @@ internal fun Throwable.toAnalysisFailureAction(): AnalysisFailureAction {
         AppError.VOICE_RECOGNITION_FAILED,
         -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.AUDIO)
 
+        AppError.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.SCRIPT)
+
         AppError.UNAUTHORIZED -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.AUTH_EXPIRED)
         AppError.SERVER_ERROR -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.ANALYSIS_FAILED)
         AppError.NETWORK -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.NETWORK_FAILED)

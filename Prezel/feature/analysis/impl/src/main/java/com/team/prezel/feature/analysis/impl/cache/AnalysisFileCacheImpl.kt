@@ -38,13 +38,16 @@ internal class AnalysisFileCacheImpl @Inject constructor(
                 ?.takeIf(String::isNotBlank)
             ?: DEFAULT_EXTENSION
         val target = File.createTempFile(prefix, ".$extension", context.cacheDir)
-
-        context.contentResolver.openInputStream(uri).use { input ->
-            requireNotNull(input) { "Cannot open uri: $uriString" }
-            target.outputStream().use { output -> input.copyTo(output) }
+        return runCatching {
+            context.contentResolver.openInputStream(uri).use { input ->
+                requireNotNull(input) { "Cannot open uri: $uriString" }
+                target.outputStream().use { output -> input.copyTo(output) }
+            }
+            target
+        }.getOrElse { throwable ->
+            target.delete()
+            throw throwable
         }
-
-        return target
     }
 
     private companion object {

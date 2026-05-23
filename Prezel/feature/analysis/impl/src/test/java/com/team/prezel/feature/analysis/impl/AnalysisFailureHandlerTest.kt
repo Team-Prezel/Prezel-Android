@@ -22,6 +22,19 @@ class AnalysisFailureHandlerTest {
     }
 
     @Test
+    fun `스크립트 파일 인식 실패는 스크립트 파일 재업로드 화면으로 처리한다`() {
+        val action = AppException(
+            error = AppError.SCRIPT_FILE_RECOGNITION_FAILED,
+            message = "분석할 수 있는 텍스트 파일을 찾지 못했습니다.",
+        ).toAnalysisFailureAction()
+
+        assertEquals(
+            AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.SCRIPT),
+            action,
+        )
+    }
+
+    @Test
     fun `인증 에러는 인증 만료 메시지로 처리한다`() {
         val action = AppException(
             error = AppError.UNAUTHORIZED,

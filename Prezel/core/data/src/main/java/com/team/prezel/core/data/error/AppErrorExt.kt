@@ -40,9 +40,10 @@ private fun ServerErrorCode.toDomainError(): AppError =
     when (this) {
         ServerErrorCode.INVALID_REQUEST,
         ServerErrorCode.REQUIRED_TERMS_DISAGREED,
-        ServerErrorCode.FILE_IS_EMPTY,
         ServerErrorCode.FILE_UPLOAD_FAILED,
         -> AppError.INVALID_REQUEST
+
+        ServerErrorCode.FILE_IS_EMPTY -> AppError.SCRIPT_FILE_RECOGNITION_FAILED
 
         ServerErrorCode.SERVER_ERROR,
         ServerErrorCode.SENTENCE_NOT_FOUND,

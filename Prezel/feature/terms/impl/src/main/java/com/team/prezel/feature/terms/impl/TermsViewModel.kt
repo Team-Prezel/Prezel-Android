@@ -91,6 +91,7 @@ internal class TermsViewModel @Inject constructor(
             AppError.NOT_FOUND,
             AppError.DUPLICATE,
             AppError.VOICE_RECOGNITION_FAILED,
+            AppError.SCRIPT_FILE_RECOGNITION_FAILED,
             AppError.UNKNOWN,
             null,
             -> TermsUiMessage.AGREE_TERMS_FAILED_UNKNOWN
