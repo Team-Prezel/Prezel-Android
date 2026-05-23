@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.situation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -10,6 +10,7 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.feature.analysis.impl.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -101,22 +102,22 @@ private val Category.iconResId: Int
 
 private val Purpose.titleResId: Int
     @StringRes get() = when (this) {
-        Purpose.CONTENT_DELIVERY -> R.string.feature_analysis_impl_situation_purpose_information
-        Purpose.IMPROVE_UNDERSTANDING -> R.string.feature_analysis_impl_situation_purpose_understanding
-        Purpose.BUILD_EMPATHY -> R.string.feature_analysis_impl_situation_purpose_empathy
+        Purpose.CONTENT_DELIVERY -> R.string.feature_analysis_impl_situation_purpose_content_delivery
+        Purpose.IMPROVE_UNDERSTANDING -> R.string.feature_analysis_impl_situation_purpose_improve_understanding
+        Purpose.BUILD_EMPATHY -> R.string.feature_analysis_impl_situation_purpose_build_empathy
     }
 
 private val Style.titleResId: Int
     @StringRes get() = when (this) {
         Style.PROFESSIONAL -> R.string.feature_analysis_impl_situation_style_professional
         Style.FRIENDLY -> R.string.feature_analysis_impl_situation_style_friendly
-        Style.CALM -> R.string.feature_analysis_impl_situation_style_formal
-        Style.COMFORTABLE -> R.string.feature_analysis_impl_situation_style_casual
+        Style.CALM -> R.string.feature_analysis_impl_situation_style_calm
+        Style.COMFORTABLE -> R.string.feature_analysis_impl_situation_style_comfortable
     }
 
 private val Audience.titleResId: Int
     @StringRes get() = when (this) {
-        Audience.GENERAL_AUDIENCE -> R.string.feature_analysis_impl_situation_audience_public
-        Audience.EXPERT -> R.string.feature_analysis_impl_situation_audience_teacher
+        Audience.GENERAL_AUDIENCE -> R.string.feature_analysis_impl_situation_audience_general
+        Audience.EXPERT -> R.string.feature_analysis_impl_situation_audience_expert
         Audience.TEAMMATES -> R.string.feature_analysis_impl_situation_audience_team
     }

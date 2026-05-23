@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.result
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +16,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.StatusView
+import com.team.prezel.feature.analysis.impl.R
 
 @Composable
 internal fun FileRecognitionFailedScreen(onRetry: () -> Unit) {

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.situation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +35,7 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
@@ -115,6 +119,7 @@ private fun SituationAccordions(
 
     SituationAccordion(
         title = stringResource(R.string.feature_analysis_impl_situation_category_label),
+        selectedText = categoryOptions.firstOrNull { it.value == form.category }?.title,
     ) {
         CategoryOptionGrid(
             selectedValue = form.category,
@@ -124,6 +129,7 @@ private fun SituationAccordions(
     }
     SituationAccordion(
         title = stringResource(R.string.feature_analysis_impl_situation_purpose_label),
+        selectedText = purposeOptions.firstOrNull { it.value == form.purpose }?.text,
     ) {
         ChipOptionsContent(
             options = purposeOptions.toChipContentOptions(form.purpose),
@@ -132,6 +138,7 @@ private fun SituationAccordions(
     }
     SituationAccordion(
         title = stringResource(R.string.feature_analysis_impl_situation_style_label),
+        selectedText = styleOptions.firstOrNull { it.value == form.style }?.text,
     ) {
         ChipOptionsContent(
             options = styleOptions.toChipContentOptions(form.style),
@@ -140,6 +147,7 @@ private fun SituationAccordions(
     }
     SituationAccordion(
         title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
+        selectedText = audienceOptions.firstOrNull { it.value == form.audience }?.text,
     ) {
         ChipOptionsContent(
             options = audienceOptions.toChipContentOptions(form.audience),
@@ -151,13 +159,27 @@ private fun SituationAccordions(
 @Composable
 private fun SituationAccordion(
     title: String,
+    selectedText: String?,
     content: @Composable () -> Unit,
 ) {
-    PrezelAccordion(
-        title = title,
-        showDivider = true,
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalContentColor provides PrezelTheme.colors.textLarge,
+    ) {
+        PrezelAccordion(
+            title = title,
+            showDivider = true,
+            trailingContent = selectedText?.let { text ->
+                {
+                    Text(
+                        text = text,
+                        color = PrezelTheme.colors.interactiveRegular,
+                        style = PrezelTheme.typography.body2Bold,
+                    )
+                }
+            },
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -215,23 +237,25 @@ private fun CategoryOptionCard(
                     shape = PrezelTheme.shapes.V8,
                 ).padding(PrezelTheme.spacing.V12),
         ) {
-            Icon(
-                painter = painterResource(option.iconResId),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = iconColor,
-            )
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
             Text(
                 text = option.title,
                 color = PrezelTheme.colors.textLarge,
-                style = PrezelTheme.typography.body2Medium,
+                style = PrezelTheme.typography.body2Bold,
             )
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
             Text(
                 text = option.description,
                 color = PrezelTheme.colors.textRegular,
                 style = PrezelTheme.typography.caption2Regular,
+            )
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
+            Icon(
+                painter = painterResource(option.iconResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .size(64.dp),
+                tint = iconColor,
             )
         }
     }

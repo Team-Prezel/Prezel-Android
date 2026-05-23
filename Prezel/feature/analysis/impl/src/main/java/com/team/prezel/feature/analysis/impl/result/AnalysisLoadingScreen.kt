@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.result
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -10,6 +10,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.PrezelLottie
 import com.team.prezel.core.ui.component.StatusView
+import com.team.prezel.feature.analysis.impl.R
 import kotlinx.coroutines.delay
 import com.team.prezel.core.ui.R as CoreUiR
 

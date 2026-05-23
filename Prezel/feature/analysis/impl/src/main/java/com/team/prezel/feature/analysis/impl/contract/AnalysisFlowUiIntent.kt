@@ -44,6 +44,16 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
     data object SkipScript : AnalysisFlowUiIntent
 
     data object Back : AnalysisFlowUiIntent
+
+    companion object {
+        fun selectSituationOption(category: Category): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.CategoryOption(category))
+
+        fun selectSituationOption(purpose: Purpose): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.PurposeOption(purpose))
+
+        fun selectSituationOption(style: Style): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.StyleOption(style))
+
+        fun selectSituationOption(audience: Audience): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.AudienceOption(audience))
+    }
 }
 
 internal enum class AnalysisUploadType {

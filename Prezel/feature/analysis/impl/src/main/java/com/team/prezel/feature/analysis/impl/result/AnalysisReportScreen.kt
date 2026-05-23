@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.result
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.analysis.impl.R
 
 @Composable
 internal fun AnalysisReportScreen(modifier: Modifier = Modifier) {

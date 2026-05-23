@@ -127,6 +127,7 @@ private fun AnalysisStepButtonArea(
     onSubButtonClick: (() -> Unit)?,
 ) {
     PrezelButtonArea(
+        showBackground = true,
         mainButton = { modifier ->
             PrezelButton(
                 modifier = modifier,
@@ -161,7 +162,7 @@ internal fun AnalysisStepTitle(
     Text(
         text = title,
         color = PrezelTheme.colors.textLarge,
-        style = PrezelTheme.typography.title2Medium,
+        style = PrezelTheme.typography.title2Bold,
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
     Text(

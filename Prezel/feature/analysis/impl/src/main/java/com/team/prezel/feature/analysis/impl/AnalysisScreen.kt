@@ -4,12 +4,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.feature.analysis.impl.audio.AudioUploadScreen
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
-import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
+import com.team.prezel.feature.analysis.impl.result.AnalysisLoadingScreen
+import com.team.prezel.feature.analysis.impl.result.AnalysisReportScreen
+import com.team.prezel.feature.analysis.impl.result.FileRecognitionFailedScreen
+import com.team.prezel.feature.analysis.impl.result.ScriptFileRecognitionFailedScreen
+import com.team.prezel.feature.analysis.impl.schedule.PresentationScheduleScreen
+import com.team.prezel.feature.analysis.impl.script.ScriptInputScreen
+import com.team.prezel.feature.analysis.impl.situation.PresentationSituationScreen
 
 @Composable
 internal fun AnalysisScreen(
@@ -48,10 +55,10 @@ private fun AnalysisScreen(
 
         AnalysisFlowStep.PRESENTATION_SITUATION -> PresentationSituationScreen(
             uiState = uiState,
-            onSelectCategory = { onIntent(it.toSituationIntent()) },
-            onSelectPurpose = { onIntent(it.toSituationIntent()) },
-            onSelectStyle = { onIntent(it.toSituationIntent()) },
-            onSelectAudience = { onIntent(it.toSituationIntent()) },
+            onSelectCategory = { onIntent(AnalysisFlowUiIntent.selectSituationOption(it)) },
+            onSelectPurpose = { onIntent(AnalysisFlowUiIntent.selectSituationOption(it)) },
+            onSelectStyle = { onIntent(AnalysisFlowUiIntent.selectSituationOption(it)) },
+            onSelectAudience = { onIntent(AnalysisFlowUiIntent.selectSituationOption(it)) },
             onNext = { onIntent(AnalysisFlowUiIntent.Next) },
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
@@ -88,15 +95,3 @@ private fun AnalysisScreen(
         )
     }
 }
-
-private fun com.team.prezel.core.model.presentation.Category.toSituationIntent(): AnalysisFlowUiIntent =
-    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.CategoryOption(this))
-
-private fun com.team.prezel.core.model.presentation.Purpose.toSituationIntent(): AnalysisFlowUiIntent =
-    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.PurposeOption(this))
-
-private fun com.team.prezel.core.model.presentation.Style.toSituationIntent(): AnalysisFlowUiIntent =
-    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.StyleOption(this))
-
-private fun com.team.prezel.core.model.presentation.Audience.toSituationIntent(): AnalysisFlowUiIntent =
-    AnalysisFlowUiIntent.SelectSituationOption(AnalysisSituationOption.AudienceOption(this))

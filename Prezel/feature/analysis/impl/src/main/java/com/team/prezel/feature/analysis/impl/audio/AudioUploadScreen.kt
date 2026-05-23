@@ -1,8 +1,7 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.audio
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
@@ -27,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
@@ -38,6 +38,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.FileUploader
 import com.team.prezel.core.ui.component.FileUploaderState
 import com.team.prezel.core.ui.component.StatusView
+import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
 import com.team.prezel.feature.analysis.impl.component.toFileName
@@ -50,7 +51,11 @@ import kotlin.math.roundToInt
 
 private const val AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS = 800
 private const val AUDIO_PLAYBACK_PROGRESS_INTERVAL_MILLIS = 250L
-private val AUDIO_FILE_MIME_TYPES = arrayOf("audio/m4a", "audio/x-m4a", "audio/mp4", "video/mp4", "audio/mpeg")
+private val AUDIO_FILE_MIME_TYPES = arrayOf(
+    "audio/mpeg", // mp3
+    "audio/mp4", // mp4, m4a
+    "audio/x-m4a", // m4a
+)
 private const val AUDIO_PREVIEW_FILE_URI = "content://prezel/sample.m4a"
 private const val AUDIO_UPLOAD_TAB_COUNT = 1
 
@@ -287,7 +292,7 @@ private class AudioUploadPlaybackState(
 
     private fun preparePlayer(): MediaPlayer? =
         runCatching {
-            MediaPlayer.create(context, Uri.parse(fileUri))?.apply {
+            MediaPlayer.create(context, fileUri.toUri())?.apply {
                 durationMillis = duration.coerceAtLeast(0)
                 setOnCompletionListener {
                     currentPositionMillis = durationMillis

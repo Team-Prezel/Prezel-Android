@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.schedule
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,6 +21,7 @@ import com.team.prezel.core.designsystem.component.textfield.PrezelTextField
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.analysis.impl
+package com.team.prezel.feature.analysis.impl.script
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +34,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.FileUploader
 import com.team.prezel.core.ui.component.FileUploaderState
 import com.team.prezel.core.ui.component.StatusView
+import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepLayout
 import com.team.prezel.feature.analysis.impl.component.AnalysisStepTitle
 import com.team.prezel.feature.analysis.impl.component.toFileName
