@@ -1,8 +1,5 @@
 package com.team.prezel.feature.analysis.impl
 
-import android.content.Context
-import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
 import com.team.prezel.core.model.presentation.Audience
@@ -11,6 +8,7 @@ import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResu
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
+import com.team.prezel.feature.analysis.impl.cache.AnalysisFileCache
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
@@ -20,16 +18,14 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 internal class AnalysisFlowViewModel @Inject constructor(
     private val analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
-    @param:ApplicationContext private val context: Context,
+    private val analysisFileCache: AnalysisFileCache,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
     override fun onIntent(intent: AnalysisFlowUiIntent) {
         when (intent) {
@@ -84,26 +80,26 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private fun analyzePresentation() {
-        val request = currentState.form.toPresentationAnalysisRequestOrNull() ?: return
+        val submission = currentState.form.toPresentationAnalysisSubmissionOrNull() ?: return
 
         updateState { copy(step = AnalysisFlowStep.ANALYZING) }
 
         viewModelScope.launch {
-            request
+            submission
                 .analyzePresentationRecording()
                 .onSuccess(::handleAnalysisSuccess)
                 .onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
         }
     }
 
-    private suspend fun PresentationAnalysisRequest.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
+    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
         runCatching {
-            val audioFile = context.copyUriToAnalysisCache(
+            val audioFile = analysisFileCache.copyUriToCache(
                 uriString = audioFileUri,
                 prefix = "audio",
             )
             val scriptFile = scriptFileUri?.let { uri ->
-                context.copyUriToAnalysisCache(
+                analysisFileCache.copyUriToCache(
                     uriString = uri,
                     prefix = "script",
                 )
@@ -209,39 +205,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 }
 
-private fun Context.copyUriToAnalysisCache(
-    uriString: String,
-    prefix: String,
-): File {
-    val uri = Uri.parse(uriString)
-    val displayName = contentResolver
-        .query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-        ?.use { cursor ->
-            val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (displayNameIndex != -1 && cursor.moveToFirst()) {
-                cursor.getString(displayNameIndex)
-            } else {
-                null
-            }
-        }
-    val extension = displayName
-        ?.substringAfterLast('.', missingDelimiterValue = "")
-        ?.takeIf(String::isNotBlank)
-        ?: uri.lastPathSegment
-            ?.substringAfterLast('.', missingDelimiterValue = "")
-            ?.takeIf(String::isNotBlank)
-        ?: "tmp"
-    val target = File.createTempFile(prefix, ".$extension", cacheDir)
-
-    contentResolver.openInputStream(uri).use { input ->
-        requireNotNull(input) { "Cannot open uri: $uriString" }
-        target.outputStream().use { output -> input.copyTo(output) }
-    }
-
-    return target
-}
-
-private data class PresentationAnalysisRequest(
+private data class PresentationAnalysisSubmission(
     val name: String,
     val date: String,
     val category: Category,
@@ -253,14 +217,14 @@ private data class PresentationAnalysisRequest(
     val audioFileUri: String,
 )
 
-private fun AnalysisForm.toPresentationAnalysisRequestOrNull(): PresentationAnalysisRequest? {
+private fun AnalysisForm.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {
     val category = category ?: return null
     val purpose = purpose ?: return null
     val style = style ?: return null
     val audience = audience ?: return null
     val audioFileUri = audioFileUri ?: return null
 
-    return PresentationAnalysisRequest(
+    return PresentationAnalysisSubmission(
         name = presentationTitle.trim(),
         date = presentationDate,
         category = category,
