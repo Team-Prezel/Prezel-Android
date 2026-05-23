@@ -55,7 +55,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private fun moveNext() {
-        if (!currentState.canMoveNext && currentState.step != AnalysisFlowStep.ANALYZING) return
+        if (!currentState.canMoveNext) return
 
         if (currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) {
             analyzePresentation()
@@ -68,12 +68,12 @@ internal class AnalysisFlowViewModel @Inject constructor(
                     AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisFlowStep.PRESENTATION_SITUATION
                     AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.SCRIPT_INPUT
                     AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.AUDIO_UPLOAD
-                    AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.ANALYZING
-                    AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.REPORT
+                    AnalysisFlowStep.AUDIO_UPLOAD,
+                    AnalysisFlowStep.ANALYZING,
                     AnalysisFlowStep.REPORT,
                     AnalysisFlowStep.FILE_RECOGNITION_FAILED,
                     AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
-                    -> AnalysisFlowStep.REPORT
+                    -> step
                 },
             )
         }
