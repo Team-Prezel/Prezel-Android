@@ -44,8 +44,6 @@ dependencies {
     implementation(projects.featureLoginImpl)
     implementation(projects.featureHomeApi)
     implementation(projects.featureHomeImpl)
-    implementation(projects.featureAnalysisApi)
-    implementation(projects.featureAnalysisImpl)
     implementation(projects.featureHistoryApi)
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
@@ -53,6 +51,7 @@ dependencies {
 
     implementation(projects.featureTermsImpl)
     implementation(projects.featurePracticeImpl)
+    implementation(projects.featureAnalysisImpl)
     implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
 

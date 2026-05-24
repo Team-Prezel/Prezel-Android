@@ -56,7 +56,6 @@ private val AUDIO_FILE_MIME_TYPES = arrayOf(
     "audio/mp4", // mp4, m4a
     "audio/x-m4a", // m4a
 )
-private const val AUDIO_PREVIEW_FILE_URI = "content://prezel/sample.m4a"
 private const val AUDIO_UPLOAD_TAB_COUNT = 1
 
 @Composable
@@ -366,7 +365,7 @@ private fun AudioUploadScreenProgressPreview() {
     PrezelTheme {
         AudioUploadScreen(
             form = AnalysisForm(),
-            pendingAudioFileUri = AUDIO_PREVIEW_FILE_URI,
+            pendingAudioFileUri = "content://prezel/sample.m4a",
             uploadProgress = 0.5f,
             progress = AnalysisFlowUiState(step = AnalysisFlowStep.AUDIO_UPLOAD).progress,
             buttonEnabled = false,
@@ -385,7 +384,7 @@ private fun AudioUploadScreenSelectedPreview() {
         AudioUploadScreen(
             uiState = AnalysisFlowUiState(
                 step = AnalysisFlowStep.AUDIO_UPLOAD,
-                form = AnalysisForm(audioFileUri = AUDIO_PREVIEW_FILE_URI),
+                form = AnalysisForm(audioFileUri = "content://prezel/sample.m4a"),
             ),
             onAudioFileSelected = {},
             onAnalyze = {},

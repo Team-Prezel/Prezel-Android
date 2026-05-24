@@ -354,7 +354,7 @@ private fun HomeScreenSinglePreview() {
     val uiState = HomeUiState.SingleContent(
         presentation = PresentationUiModel(
             id = 1L,
-            category = Category.PERSUASION,
+            category = Category.OFFER,
             title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
             dDay = -1,

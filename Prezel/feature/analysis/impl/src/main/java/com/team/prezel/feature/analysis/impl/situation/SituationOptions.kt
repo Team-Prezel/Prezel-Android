@@ -78,46 +78,46 @@ internal fun audienceOptions(): ImmutableList<SituationChipOption<Audience>> =
 
 private val Category.titleResId: Int
     @StringRes get() = when (this) {
-        Category.PERSUASION -> R.string.feature_analysis_impl_situation_category_persuasion
+        Category.OFFER -> R.string.feature_analysis_impl_situation_category_persuasion
         Category.EVENT -> R.string.feature_analysis_impl_situation_category_event
         Category.EDUCATION -> R.string.feature_analysis_impl_situation_category_academic
-        Category.REPORT -> R.string.feature_analysis_impl_situation_category_business
+        Category.WORK -> R.string.feature_analysis_impl_situation_category_business
     }
 
 private val Category.descriptionResId: Int
     @StringRes get() = when (this) {
-        Category.PERSUASION -> R.string.feature_analysis_impl_situation_category_persuasion_description
+        Category.OFFER -> R.string.feature_analysis_impl_situation_category_persuasion_description
         Category.EVENT -> R.string.feature_analysis_impl_situation_category_event_description
         Category.EDUCATION -> R.string.feature_analysis_impl_situation_category_academic_description
-        Category.REPORT -> R.string.feature_analysis_impl_situation_category_business_description
+        Category.WORK -> R.string.feature_analysis_impl_situation_category_business_description
     }
 
 private val Category.iconResId: Int
     @DrawableRes get() = when (this) {
-        Category.PERSUASION -> PrezelIcons.Hand
+        Category.OFFER -> PrezelIcons.Hand
         Category.EVENT -> PrezelIcons.Balloon
         Category.EDUCATION -> PrezelIcons.College
-        Category.REPORT -> PrezelIcons.Company
+        Category.WORK -> PrezelIcons.Company
     }
 
 private val Purpose.titleResId: Int
     @StringRes get() = when (this) {
-        Purpose.CONTENT_DELIVERY -> R.string.feature_analysis_impl_situation_purpose_content_delivery
-        Purpose.IMPROVE_UNDERSTANDING -> R.string.feature_analysis_impl_situation_purpose_improve_understanding
-        Purpose.BUILD_EMPATHY -> R.string.feature_analysis_impl_situation_purpose_build_empathy
+        Purpose.INFO -> R.string.feature_analysis_impl_situation_purpose_content_delivery
+        Purpose.UNDERSTANDING -> R.string.feature_analysis_impl_situation_purpose_improve_understanding
+        Purpose.EMPATHY -> R.string.feature_analysis_impl_situation_purpose_build_empathy
     }
 
 private val Style.titleResId: Int
     @StringRes get() = when (this) {
-        Style.PROFESSIONAL -> R.string.feature_analysis_impl_situation_style_professional
+        Style.FORMAL -> R.string.feature_analysis_impl_situation_style_professional
         Style.FRIENDLY -> R.string.feature_analysis_impl_situation_style_friendly
         Style.CALM -> R.string.feature_analysis_impl_situation_style_calm
-        Style.COMFORTABLE -> R.string.feature_analysis_impl_situation_style_comfortable
+        Style.CASUAL -> R.string.feature_analysis_impl_situation_style_comfortable
     }
 
 private val Audience.titleResId: Int
     @StringRes get() = when (this) {
-        Audience.GENERAL_AUDIENCE -> R.string.feature_analysis_impl_situation_audience_general
-        Audience.EXPERT -> R.string.feature_analysis_impl_situation_audience_expert
-        Audience.TEAMMATES -> R.string.feature_analysis_impl_situation_audience_team
+        Audience.GENERAL -> R.string.feature_analysis_impl_situation_audience_general
+        Audience.PROFESSIONAL -> R.string.feature_analysis_impl_situation_audience_expert
+        Audience.TEAMMATE -> R.string.feature_analysis_impl_situation_audience_team
     }

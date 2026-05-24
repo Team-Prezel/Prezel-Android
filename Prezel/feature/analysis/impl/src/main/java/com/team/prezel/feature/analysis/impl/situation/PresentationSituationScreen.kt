@@ -323,9 +323,9 @@ private fun PresentationSituationScreenPreview() {
                 step = AnalysisFlowStep.PRESENTATION_SITUATION,
                 form = AnalysisForm(
                     category = Category.EDUCATION,
-                    purpose = Purpose.CONTENT_DELIVERY,
+                    purpose = Purpose.INFO,
                     style = Style.CALM,
-                    audience = Audience.EXPERT,
+                    audience = Audience.PROFESSIONAL,
                 ),
             ),
             onSelectCategory = {},
@@ -355,7 +355,7 @@ private fun CategoryOptionGridPreview() {
 private fun PurposeOptionsPreview() {
     PrezelTheme {
         ChipOptionsContent(
-            options = purposeOptions().toChipContentOptions(Purpose.CONTENT_DELIVERY),
+            options = purposeOptions().toChipContentOptions(Purpose.INFO),
             onSelect = {},
         )
     }
@@ -377,7 +377,7 @@ private fun StyleOptionsPreview() {
 private fun AudienceOptionsPreview() {
     PrezelTheme {
         ChipOptionsContent(
-            options = audienceOptions().toChipContentOptions(Audience.EXPERT),
+            options = audienceOptions().toChipContentOptions(Audience.PROFESSIONAL),
             onSelect = {},
         )
     }
