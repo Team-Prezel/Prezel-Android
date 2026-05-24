@@ -42,14 +42,12 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     override fun onIntent(intent: AnalysisFlowUiIntent) {
+        intent.reduceFormOrNull(currentState.form)?.let { nextForm ->
+            updateState { copy(form = nextForm) }
+            return
+        }
+
         when (intent) {
-            is AnalysisFlowUiIntent.UpdatePresentationTitle -> updateForm { copy(presentationTitle = intent.title) }
-            is AnalysisFlowUiIntent.UpdatePresentationDate -> updateForm { copy(presentationDate = intent.date) }
-            is AnalysisFlowUiIntent.SelectSituationOption -> selectSituationOption(intent.option)
-            is AnalysisFlowUiIntent.SelectScriptInputType -> updateForm { copy(scriptInputType = intent.inputType) }
-            is AnalysisFlowUiIntent.UpdateScript -> updateForm { copy(script = intent.script) }
-            is AnalysisFlowUiIntent.SelectScriptFile -> updateForm { copy(scriptFileUri = intent.fileUri) }
-            is AnalysisFlowUiIntent.SelectAudioFile -> updateForm { copy(audioFileUri = intent.fileUri) }
             AnalysisFlowUiIntent.ClickRecordingControl -> handleRecordingControlClick()
             AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
             AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
@@ -57,17 +55,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowUiIntent.Next -> moveNext()
             AnalysisFlowUiIntent.SkipScript -> skipScript()
             AnalysisFlowUiIntent.Back -> moveBack()
-        }
-    }
-
-    private fun selectSituationOption(option: AnalysisSituationOption) {
-        updateForm {
-            when (option) {
-                is AnalysisSituationOption.CategoryOption -> copy(category = option.category)
-                is AnalysisSituationOption.PurposeOption -> copy(purpose = option.purpose)
-                is AnalysisSituationOption.StyleOption -> copy(style = option.style)
-                is AnalysisSituationOption.AudienceOption -> copy(audience = option.audience)
-            }
+            else -> Unit
         }
     }
 
@@ -104,52 +92,25 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
-            submission
-                .analyzePresentationRecording()
-                .onSuccess { result ->
+            val analysisResult = submission.analyzePresentationRecording(
+                analysisFileCache = analysisFileCache,
+                analyzePresentationRecordingUseCase = analyzePresentationRecordingUseCase,
+            )
+
+            analysisResult.fold(
+                onSuccess = { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        handleAnalysisSuccess(result)
+                        updateState {
+                            copy(
+                                step = AnalysisFlowStep.REPORT,
+                                analysisResult = result,
+                            )
+                        }
                     }
-                }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
-        }
-    }
-
-    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
-        runCatching {
-            val audioFilePath = audioFileUri
-                ?.let { uri ->
-                    val audioFile = analysisFileCache.copyUriToCache(
-                        uriString = uri,
-                        prefix = "audio",
-                    )
-                    audioFile.absolutePath
-                }
-                ?: recordingFilePath
-            val scriptFile = scriptFileUri?.let { uri ->
-                analysisFileCache.copyUriToCache(
-                    uriString = uri,
-                    prefix = "script",
-                )
-            }
-
-            analyzePresentationRecordingUseCase(
-                name = name,
-                date = date.toRequestDate(),
-                category = category,
-                purpose = purpose,
-                style = style,
-                audience = audience,
-                script = script,
-                scriptFilePath = scriptFile?.absolutePath,
-                audioFilePath = audioFilePath,
-            ).getOrThrow()
-        }
-
-    private fun handleAnalysisSuccess(analysisResult: PresentationRecordingAnalysisResult) {
-        updateState {
-            copy(
-                step = AnalysisFlowStep.REPORT,
-                analysisResult = analysisResult,
+                },
+                onFailure = { throwable ->
+                    handleAnalysisFailure(throwable.toAnalysisFailureAction())
+                },
             )
         }
     }
@@ -176,37 +137,42 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private fun retryFileUpload(uploadType: AnalysisUploadType) {
         when (uploadType) {
-            AnalysisUploadType.SCRIPT -> retryScriptFileUpload()
-            AnalysisUploadType.AUDIO -> retryAudioUpload()
-        }
-    }
+            AnalysisUploadType.SCRIPT -> {
+                updateState {
+                    copy(
+                        step = AnalysisFlowStep.SCRIPT_INPUT,
+                        form = form.copy(
+                            scriptInputType = ScriptInputType.FILE_UPLOAD,
+                            scriptFileUri = null,
+                        ),
+                    )
+                }
+            }
 
-    private fun retryAudioUpload() {
-        updateState {
-            copy(
-                step = AnalysisFlowStep.VOICE_RECORDING,
-                form = form.copy(audioFileUri = null),
-            )
-        }
-        audioController.reset()
-    }
-
-    private fun retryScriptFileUpload() {
-        updateState {
-            copy(
-                step = AnalysisFlowStep.SCRIPT_INPUT,
-                form = form.copy(
-                    scriptInputType = ScriptInputType.FILE_UPLOAD,
-                    scriptFileUri = null,
-                ),
-            )
+            AnalysisUploadType.AUDIO -> {
+                updateState {
+                    copy(
+                        step = AnalysisFlowStep.VOICE_RECORDING,
+                        form = form.copy(audioFileUri = null),
+                    )
+                }
+                audioController.reset()
+            }
         }
     }
 
     private fun skipScript() {
         if (currentState.step != AnalysisFlowStep.SCRIPT_INPUT) return
 
-        updateState { copy(step = AnalysisFlowStep.VOICE_RECORDING) }
+        updateState {
+            copy(
+                step = AnalysisFlowStep.VOICE_RECORDING,
+                form = form.copy(
+                    script = "",
+                    scriptFileUri = null,
+                ),
+            )
+        }
     }
 
     private fun moveBack() {
@@ -229,10 +195,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
         } else {
             updateState { copy(step = previousStep) }
         }
-    }
-
-    private fun updateForm(reducer: AnalysisForm.() -> AnalysisForm) {
-        updateState { copy(form = form.reducer()) }
     }
 
     private fun handleRecordingControlClick() {
@@ -286,6 +248,60 @@ private data class PresentationAnalysisSubmission(
     val audioFileUri: String?,
     val recordingFilePath: String,
 )
+
+private fun AnalysisFlowUiIntent.reduceFormOrNull(form: AnalysisForm): AnalysisForm? =
+    when (this) {
+        is AnalysisFlowUiIntent.UpdatePresentationTitle -> form.copy(presentationTitle = title)
+        is AnalysisFlowUiIntent.UpdatePresentationDate -> form.copy(presentationDate = date)
+        is AnalysisFlowUiIntent.SelectScriptInputType -> form.copy(scriptInputType = inputType)
+        is AnalysisFlowUiIntent.UpdateScript -> form.copy(script = script)
+        is AnalysisFlowUiIntent.SelectScriptFile -> form.copy(scriptFileUri = fileUri)
+        is AnalysisFlowUiIntent.SelectAudioFile -> form.copy(audioFileUri = fileUri)
+        is AnalysisFlowUiIntent.SelectSituationOption -> form.selectSituationOption(option)
+        else -> null
+    }
+
+private fun AnalysisForm.selectSituationOption(option: AnalysisSituationOption): AnalysisForm =
+    when (option) {
+        is AnalysisSituationOption.CategoryOption -> copy(category = option.category)
+        is AnalysisSituationOption.PurposeOption -> copy(purpose = option.purpose)
+        is AnalysisSituationOption.StyleOption -> copy(style = option.style)
+        is AnalysisSituationOption.AudienceOption -> copy(audience = option.audience)
+    }
+
+private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
+    analysisFileCache: AnalysisFileCache,
+    analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
+): Result<PresentationRecordingAnalysisResult> =
+    runCatching {
+        val audioFilePath = audioFileUri
+            ?.let { uri ->
+                val audioFile = analysisFileCache.copyUriToCache(
+                    uriString = uri,
+                    prefix = "audio",
+                )
+                audioFile.absolutePath
+            }
+            ?: recordingFilePath
+        val scriptFile = scriptFileUri?.let { uri ->
+            analysisFileCache.copyUriToCache(
+                uriString = uri,
+                prefix = "script",
+            )
+        }
+
+        analyzePresentationRecordingUseCase(
+            name = name,
+            date = date.toRequestDate(),
+            category = category,
+            purpose = purpose,
+            style = style,
+            audience = audience,
+            script = script,
+            scriptFilePath = scriptFile?.absolutePath,
+            audioFilePath = audioFilePath,
+        ).getOrThrow()
+    }
 
 private fun AnalysisFlowUiState.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {
     val category = form.category ?: return null

@@ -72,19 +72,44 @@ private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
 ) {
+    VoiceRecordingGuideSnackbar(step = uiState.step)
+
+    val onClickRecordingControl = rememberVoiceRecordingControlClick(
+        uiState = uiState,
+        onIntent = onIntent,
+    )
+
+    AnalysisStepContent(
+        uiState = uiState,
+        onIntent = onIntent,
+        onClickRecordingControl = onClickRecordingControl,
+    )
+}
+
+@Composable
+private fun VoiceRecordingGuideSnackbar(step: AnalysisFlowStep) {
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(uiState.step) {
-        if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+    LaunchedEffect(step) {
+        if (step == AnalysisFlowStep.VOICE_RECORDING) {
             snackbarHostState.showPrezelSnackbar(
                 message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
             )
         }
     }
+}
 
-    val onClickRecordingControl = rememberAnalysisRecordAudioPermissionControlClickHandler(
+@Composable
+private fun rememberVoiceRecordingControlClick(
+    uiState: AnalysisFlowUiState,
+    onIntent: (AnalysisFlowUiIntent) -> Unit,
+): () -> Unit {
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+
+    return rememberAnalysisRecordAudioPermissionControlClickHandler(
         recordingState = uiState.recordingState,
         onClickRecordingControl = { onIntent(AnalysisFlowUiIntent.ClickRecordingControl) },
         onPermissionDenied = {
@@ -102,7 +127,43 @@ private fun AnalysisScreen(
             }
         },
     )
+}
 
+@Composable
+private fun AnalysisStepContent(
+    uiState: AnalysisFlowUiState,
+    onIntent: (AnalysisFlowUiIntent) -> Unit,
+    onClickRecordingControl: () -> Unit,
+) {
+    when (uiState.step) {
+        AnalysisFlowStep.PRESENTATION_SCHEDULE,
+        AnalysisFlowStep.PRESENTATION_SITUATION,
+        AnalysisFlowStep.SCRIPT_INPUT,
+        AnalysisFlowStep.AUDIO_UPLOAD,
+        AnalysisFlowStep.VOICE_RECORDING,
+        -> AnalysisInputStepContent(
+            uiState = uiState,
+            onIntent = onIntent,
+            onClickRecordingControl = onClickRecordingControl,
+        )
+
+        AnalysisFlowStep.ANALYZING,
+        AnalysisFlowStep.REPORT,
+        AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+        AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
+        -> AnalysisResultStepContent(
+            step = uiState.step,
+            onIntent = onIntent,
+        )
+    }
+}
+
+@Composable
+private fun AnalysisInputStepContent(
+    uiState: AnalysisFlowUiState,
+    onIntent: (AnalysisFlowUiIntent) -> Unit,
+    onClickRecordingControl: () -> Unit,
+) {
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE -> PresentationScheduleScreen(
             uiState = uiState,
@@ -148,6 +209,20 @@ private fun AnalysisScreen(
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
 
+        AnalysisFlowStep.ANALYZING,
+        AnalysisFlowStep.REPORT,
+        AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+        AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
+        -> Unit
+    }
+}
+
+@Composable
+private fun AnalysisResultStepContent(
+    step: AnalysisFlowStep,
+    onIntent: (AnalysisFlowUiIntent) -> Unit,
+) {
+    when (step) {
         AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen()
 
         AnalysisFlowStep.REPORT -> AnalysisReportScreen()
@@ -159,5 +234,12 @@ private fun AnalysisScreen(
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> ScriptFileRecognitionFailedScreen(
             onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.SCRIPT)) },
         )
+
+        AnalysisFlowStep.PRESENTATION_SCHEDULE,
+        AnalysisFlowStep.PRESENTATION_SITUATION,
+        AnalysisFlowStep.SCRIPT_INPUT,
+        AnalysisFlowStep.AUDIO_UPLOAD,
+        AnalysisFlowStep.VOICE_RECORDING,
+        -> Unit
     }
 }

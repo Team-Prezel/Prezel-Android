@@ -165,6 +165,7 @@ private fun ScriptInputScreen(
                     maxLength = SCRIPT_MAX_LENGTH,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
             }
         }
     }
@@ -344,6 +345,47 @@ private fun ScriptInputDirectScreenPreview() {
                 form = AnalysisForm(
                     scriptInputType = ScriptInputType.DIRECT_INPUT,
                     script = stringResource(R.string.feature_analysis_impl_script_placeholder),
+                ),
+            ),
+            onSelectInputType = {},
+            onScriptChange = {},
+            onScriptFileSelected = {},
+            onNext = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun ScriptInputLongDirectScreenPreview() {
+    PrezelTheme {
+        ScriptInputScreen(
+            uiState = AnalysisFlowUiState(
+                step = AnalysisFlowStep.SCRIPT_INPUT,
+                form = AnalysisForm(
+                    scriptInputType = ScriptInputType.DIRECT_INPUT,
+                    script =
+                        """
+                        안녕하세요 자신의 말로 자신있게 세상을 설득할 수 있는 날을 기다리는 팀 손가락입니다.
+                        저희 팀은 고승환, 박하영, 조민경, 최수빈, 한효주 총 5명으로 구성되어 있으며,
+                        다음과 같은 목차로 발표 진행하겠습니다.
+                        한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.
+                        저희는 학교에서의 간단한 자기소개부터 회사의 성과보고까지 정말 다양하게,
+                        그리고 정말 자주 발표를 경험합니다. 하지만 많은 발표를 해왔음에도 불구하고
+                        발표를 생각했을 때 긴장하게 되는데요. 이처럼 발표를 앞둔 상황에서 경험하는
+                        두려움과 심리적 압박감을 발표 불안이라 합니다.
+                        면접에서도, 학교에서도, 발표 능력을 기본 역량처럼 여기는 사회 분위기로 인해
+                        이런 불안이 더해지고자 때문이었습니다. 가장 발표를 자주 경험하는 직장인을 예시로 들었을 때,
+                        실수에 대한 두려움을 발표 불안의 주된 원인으로 꼽았습니다.
+                        즉, 발표와 가까운 환경의 사람들조차 실수가 두려워 발표에 어려움을 겪고 있다는 건데요.
+                        이때 사람들은 클래스 수강, 집단 상담 등 발표 불안을 이겨내기 위해 다양한 시도를 하고 있었습니다.
+                        특히 발표 코칭 학원을 등록하며 적극적인 대처를 취하는 사람들까지는 증가하고 있습니다.
+                        그러나 대학생과 사회 초년생의 평균 수입과 비교했을 때 비싼 비용과 시간적 여유가 없어
+                        지속적으로 수강하기 어렵다는 문제점이 있었습니다.
+                        비용과 시간, 이런 고질적인 문제를 해결할 방법은 없을까요?
+                        """.trimIndent(),
                 ),
             ),
             onSelectInputType = {},

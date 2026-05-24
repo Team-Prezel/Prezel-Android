@@ -40,7 +40,7 @@ internal class MediaRecordingAudioController @Inject constructor(
         }.onFailure {
             recorderSession.reset()
             _audioSessionState.value = AudioSessionState.Idle
-            emitEffect(AudioSessionEffect.RecordingStartFailed)
+            _audioSessionEffect.emit(AudioSessionEffect.RecordingStartFailed)
         }
     }
 
@@ -61,7 +61,7 @@ internal class MediaRecordingAudioController @Inject constructor(
                 )
             }.onFailure {
                 _audioSessionState.value = AudioSessionState.Idle
-                emitEffect(AudioSessionEffect.RecordingStopFailed)
+                _audioSessionEffect.emit(AudioSessionEffect.RecordingStopFailed)
             }
     }
 
@@ -77,7 +77,7 @@ internal class MediaRecordingAudioController @Inject constructor(
                 recordingTimerJob?.cancel()
                 _audioSessionState.value = AudioSessionState.PausedRecording(elapsedSeconds = elapsedSeconds)
             }.onFailure {
-                emitEffect(AudioSessionEffect.RecordingStopFailed)
+                _audioSessionEffect.emit(AudioSessionEffect.RecordingStopFailed)
             }
     }
 
@@ -93,7 +93,7 @@ internal class MediaRecordingAudioController @Inject constructor(
                 _audioSessionState.value = AudioSessionState.Recording(elapsedSeconds = elapsedSeconds)
                 startRecordingTimer()
             }.onFailure {
-                emitEffect(AudioSessionEffect.RecordingStartFailed)
+                _audioSessionEffect.emit(AudioSessionEffect.RecordingStartFailed)
             }
     }
 
@@ -192,7 +192,7 @@ internal class MediaRecordingAudioController @Inject constructor(
             source = source,
             durationSeconds = durationSeconds,
         )
-        emitEffect(AudioSessionEffect.PlaybackStartFailed)
+        _audioSessionEffect.emit(AudioSessionEffect.PlaybackStartFailed)
     }
 
     private fun startRecordingTimer() {
@@ -231,12 +231,12 @@ internal class MediaRecordingAudioController @Inject constructor(
         playerSession.release()
     }
 
-    private fun emitEffect(effect: AudioSessionEffect) {
-        _audioSessionEffect.trySend(effect)
-    }
-
     private companion object {
         const val RECORDING_TIMER_DELAY_MILLIS = 1_000L
         const val PLAYBACK_TIMER_DELAY_MILLIS = 1_000L
     }
+}
+
+private fun Channel<AudioSessionEffect>.emit(effect: AudioSessionEffect) {
+    trySend(effect)
 }
