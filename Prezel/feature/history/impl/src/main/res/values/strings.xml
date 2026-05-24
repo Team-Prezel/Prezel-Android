@@ -8,20 +8,20 @@
     <string name="feature_history_impl_add_presentation">발표 추가하기</string>
 
     <!-- Presentation Chips -->
-    <string name="feature_history_impl_category_persuasion">설득·제안</string>
-    <string name="feature_history_impl_category_event">행사·공개</string>
     <string name="feature_history_impl_category_education">학술·교육</string>
-    <string name="feature_history_impl_category_report">업무·보고</string>
-    <string name="feature_history_impl_purpose_content_delivery">내용 전달</string>
-    <string name="feature_history_impl_purpose_improve_understanding">이해 증진</string>
-    <string name="feature_history_impl_purpose_build_empathy">공감 형성</string>
-    <string name="feature_history_impl_style_professional">전문적인</string>
+    <string name="feature_history_impl_category_work">업무·보고</string>
+    <string name="feature_history_impl_category_offer">설득·제안</string>
+    <string name="feature_history_impl_category_event">행사·공개</string>
+    <string name="feature_history_impl_purpose_info">내용 전달</string>
+    <string name="feature_history_impl_purpose_understanding">이해 증진</string>
+    <string name="feature_history_impl_purpose_empathy">공감 형성</string>
+    <string name="feature_history_impl_style_formal">전문적인</string>
     <string name="feature_history_impl_style_friendly">친근한</string>
     <string name="feature_history_impl_style_calm">차분한</string>
-    <string name="feature_history_impl_style_comfortable">편안한</string>
+    <string name="feature_history_impl_style_casual">편안한</string>
     <string name="feature_history_impl_audience_general">일반 청중</string>
-    <string name="feature_history_impl_audience_expert">전문가</string>
-    <string name="feature_history_impl_audience_teammates">팀/동료</string>
+    <string name="feature_history_impl_audience_professional">전문가</string>
+    <string name="feature_history_impl_audience_teammate">팀/동료</string>
 
     <!-- Message  -->
     <string name="feature_history_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>

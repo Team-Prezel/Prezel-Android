@@ -83,7 +83,7 @@ fun PrezelAccordion(
             )
         }
 
-        if (showDivider) {
+        if (showDivider && !expanded) {
             PrezelHorizontalDivider(
                 type = PrezelDividerType.THICK,
             )

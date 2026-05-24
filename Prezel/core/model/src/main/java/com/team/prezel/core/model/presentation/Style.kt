@@ -1,8 +1,8 @@
 package com.team.prezel.core.model.presentation
 
 enum class Style {
-    PROFESSIONAL,
+    FORMAL,
     FRIENDLY,
     CALM,
-    COMFORTABLE,
+    CASUAL,
 }

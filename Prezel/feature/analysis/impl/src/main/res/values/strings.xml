@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_analysis_impl_schedule_title">발표 일정 설정</string>
+    <string name="feature_analysis_impl_schedule_headline">새로운 발표 일정을 만들어주세요.</string>
+    <string name="feature_analysis_impl_schedule_description">발표 이름과 날짜를 입력해주세요.</string>
+    <string name="feature_analysis_impl_presentation_name_label">발표 이름</string>
+    <string name="feature_analysis_impl_presentation_name_placeholder">발표의 이름을 설정해주세요</string>
+    <string name="feature_analysis_impl_presentation_date_label">발표 날짜</string>
+    <string name="feature_analysis_impl_presentation_date_placeholder">발표하는 날짜를 알려주세요</string>
+
+    <string name="feature_analysis_impl_situation_title">발표 상황 설정</string>
+    <string name="feature_analysis_impl_situation_headline">발표 상황을 선택해주세요.</string>
+    <string name="feature_analysis_impl_situation_description">어떤 성격의 발표인지 알려주세요.</string>
+    <string name="feature_analysis_impl_situation_category_label">유형</string>
+    <string name="feature_analysis_impl_situation_purpose_label">목적</string>
+    <string name="feature_analysis_impl_situation_style_label">스타일</string>
+    <string name="feature_analysis_impl_situation_scale_label">청중</string>
+    <string name="feature_analysis_impl_situation_category_default">학술·교육</string>
+    <string name="feature_analysis_impl_situation_purpose_default">내용 전달</string>
+    <string name="feature_analysis_impl_situation_style_default">전문적인</string>
+    <string name="feature_analysis_impl_situation_scale_default">전문가</string>
+    <string name="feature_analysis_impl_situation_category_academic">학술·교육</string>
+    <string name="feature_analysis_impl_situation_category_academic_description">배운 내용이나 분석 주제를 전달하는 발표예요.</string>
+    <string name="feature_analysis_impl_situation_category_business">업무·보고</string>
+    <string name="feature_analysis_impl_situation_category_business_description">진행 중인 일이나 결과를 공유하는 발표예요.</string>
+    <string name="feature_analysis_impl_situation_category_persuasion">설득·제안</string>
+    <string name="feature_analysis_impl_situation_category_persuasion_description">다른 사람의 선택을 이끄는 발표예요.</string>
+    <string name="feature_analysis_impl_situation_category_event">행사·공개</string>
+    <string name="feature_analysis_impl_situation_category_event_description">여러 사람 앞에서 내용을 소개하는 발표예요.</string>
+    <string name="feature_analysis_impl_situation_purpose_content_delivery">내용 전달</string>
+    <string name="feature_analysis_impl_situation_purpose_improve_understanding">이해 증진</string>
+    <string name="feature_analysis_impl_situation_purpose_build_empathy">공감 형성</string>
+    <string name="feature_analysis_impl_situation_style_professional">전문적인</string>
+    <string name="feature_analysis_impl_situation_style_friendly">친근한</string>
+    <string name="feature_analysis_impl_situation_style_calm">차분한</string>
+    <string name="feature_analysis_impl_situation_style_comfortable">편안한</string>
+    <string name="feature_analysis_impl_situation_audience_general">일반 청중</string>
+    <string name="feature_analysis_impl_situation_audience_expert">전문가</string>
+    <string name="feature_analysis_impl_situation_audience_team">팀/동료</string>
+
+    <string name="feature_analysis_impl_script_title">대본 입력</string>
+    <string name="feature_analysis_impl_script_headline">발표에 사용할 대본을 추가해주세요.</string>
+    <string name="feature_analysis_impl_script_description">대본 파일을 업로드하거나 직접 입력할 수 있어요.</string>
+    <string name="feature_analysis_impl_script_placeholder">발표 대본을 입력해주세요</string>
+    <string name="feature_analysis_impl_script_file_placeholder">대본 파일을 추가해주세요.</string>
+    <string name="feature_analysis_impl_script_file_format">제공하는 파일 형식 : txt</string>
+    <string name="feature_analysis_impl_script_upload_button">파일 추가하기</string>
+    <string name="feature_analysis_impl_script_file_remove">대본 파일 삭제</string>
+    <string name="feature_analysis_impl_script_direct_input">직접 입력</string>
+
+    <string name="feature_analysis_impl_audio_title">음성 녹음</string>
+    <string name="feature_analysis_impl_audio_headline">대본을 읽은 음성 파일을 업로드해주세요.</string>
+    <string name="feature_analysis_impl_audio_description">분석을 위해 음성 파일이 필요해요.</string>
+    <string name="feature_analysis_impl_audio_file_placeholder">음성 파일을 업로드하세요</string>
+    <string name="feature_analysis_impl_audio_file_format">제공하는 파일 형식 : m4a, mp4, mp3</string>
+    <string name="feature_analysis_impl_audio_file_remove">음성 파일 삭제</string>
+    <string name="feature_analysis_impl_audio_upload_button">파일 추가하기</string>
+
+    <string name="feature_analysis_impl_upload_title">파일 업로드</string>
+    <string name="feature_analysis_impl_direct_input_title">직접 입력</string>
+    <string name="feature_analysis_impl_analyzing_title">분석 중</string>
+    <string name="feature_analysis_impl_analyzing_headline">발표 음성을 분석하고 있어요</string>
+    <string name="feature_analysis_impl_report_placeholder">분석 리포트 화면</string>
+    <string name="feature_analysis_impl_file_recognition_failed_title">분석할 수 있는 음성 파일을 찾지 못했어요.</string>
+    <string name="feature_analysis_impl_file_recognition_failed_description">다른 음성 파일로 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_script_file_recognition_failed_title">분석할 수 있는 텍스트 파일을 찾지 못했어요.</string>
+    <string name="feature_analysis_impl_script_file_recognition_failed_description">다른 텍스트 파일로 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_error_auth_expired">로그인이 만료되었어요. 다시 로그인해 주세요.</string>
+    <string name="feature_analysis_impl_error_analysis_failed">분석 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_error_network_failed">네트워크 연결을 확인해 주세요.</string>
+    <string name="feature_analysis_impl_error_unknown_failed">알 수 없는 오류가 발생했어요.</string>
+    <string name="feature_analysis_impl_back">뒤로가기</string>
+    <string name="feature_analysis_impl_next">다음</string>
+    <string name="feature_analysis_impl_skip">건너뛰기</string>
+    <string name="feature_analysis_impl_retry">다시 시도하기</string>
+    <string name="feature_analysis_impl_analyze">분석하기</string>
+</resources>

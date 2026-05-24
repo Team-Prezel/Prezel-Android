@@ -48,7 +48,7 @@ private fun PresentationContentPreview() {
     PrezelTheme {
         val presentation = PresentationUiModel(
             id = 1L,
-            category = Category.PERSUASION,
+            category = Category.OFFER,
             title = "설득하는 발표",
             date = LocalDate(2026, 10, 1),
             dDay = 3,

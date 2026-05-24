@@ -1,8 +1,11 @@
 package com.team.prezel.feature.home.impl.main
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -14,13 +17,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
+import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
+import com.team.prezel.core.designsystem.component.actions.button.floating.PrezelFloatingMenu
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
@@ -46,6 +56,8 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HomeScreen(
+    navigateToFileUploadAnalysis: () -> Unit,
+    navigateToVoiceRecordingAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -77,6 +89,8 @@ internal fun HomeScreen(
         onClickPracticeRecording = { navigator.navigate(PracticeNavKey) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
+        onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
+        onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
         modifier = modifier,
     )
 }
@@ -90,9 +104,12 @@ private fun HomeScreen(
     onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
+    onClickVoiceRecordingAnalysis: () -> Unit,
+    onClickFileUploadAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
+    var isFabExpanded by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val maxScreenHeight = maxHeight
@@ -116,7 +133,62 @@ private fun HomeScreen(
                 onClickTab = { pageIndex -> scope.launch { pagerState.scrollToPage(pageIndex) } },
                 modifier = Modifier.onHeightChanged { newHeight -> headerHeight = newHeight },
             )
+
+            if (isFabExpanded) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.32f))
+                        .clickable { isFabExpanded = false },
+                )
+            }
+
+            HomeAnalysisFloatingMenu(
+                isExpanded = isFabExpanded,
+                onChangeExpanded = { isFabExpanded = it },
+                onClickVoiceRecording = {
+                    isFabExpanded = false
+                    onClickVoiceRecordingAnalysis()
+                },
+                onClickFileUpload = {
+                    isFabExpanded = false
+                    onClickFileUploadAnalysis()
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = PrezelTheme.spacing.V24, bottom = PrezelTheme.spacing.V24),
+            )
         }
+    }
+}
+
+@Composable
+private fun HomeAnalysisFloatingMenu(
+    isExpanded: Boolean,
+    onChangeExpanded: (Boolean) -> Unit,
+    onClickVoiceRecording: () -> Unit,
+    onClickFileUpload: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    PrezelFloatingMenu(
+        isExpanded = isExpanded,
+        onChangeExpanded = onChangeExpanded,
+        iconResId = PrezelIcons.Plus,
+        openIconResId = PrezelIcons.Cancel,
+        size = ButtonSize.REGULAR,
+        hierarchy = ButtonHierarchy.PRIMARY,
+        modifier = modifier,
+    ) {
+        MenuItem(
+            label = stringResource(R.string.feature_home_impl_analysis_voice_recording),
+            iconResId = PrezelIcons.Mic,
+            onClick = onClickVoiceRecording,
+        )
+        MenuItem(
+            label = stringResource(R.string.feature_home_impl_analysis_file_upload),
+            iconResId = PrezelIcons.Folder,
+            onClick = onClickFileUpload,
+        )
     }
 }
 
@@ -270,6 +342,8 @@ private fun HomeScreenEmptyPreview() {
             onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
+            onClickVoiceRecordingAnalysis = { },
+            onClickFileUploadAnalysis = { },
         )
     }
 }
@@ -280,7 +354,7 @@ private fun HomeScreenSinglePreview() {
     val uiState = HomeUiState.SingleContent(
         presentation = PresentationUiModel(
             id = 1L,
-            category = Category.PERSUASION,
+            category = Category.OFFER,
             title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
             dDay = -1,
@@ -294,6 +368,8 @@ private fun HomeScreenSinglePreview() {
             onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
+            onClickVoiceRecordingAnalysis = { },
+            onClickFileUploadAnalysis = { },
         )
     }
 }
@@ -320,6 +396,8 @@ private fun HomeScreenMultiplePreview() {
             onClickPracticeRecording = { },
             onClickAnalyzePresentation = { },
             onClickWriteFeedback = { },
+            onClickVoiceRecordingAnalysis = { },
+            onClickFileUploadAnalysis = { },
         )
     }
 }

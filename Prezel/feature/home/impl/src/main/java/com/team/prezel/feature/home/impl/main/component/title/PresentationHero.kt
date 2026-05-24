@@ -101,19 +101,19 @@ private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
 @StringRes
 private fun Category.labelResId(): Int =
     when (this) {
-        Category.PERSUASION -> R.string.feature_home_impl_category_persuasion
+        Category.OFFER -> R.string.feature_home_impl_category_persuasion
         Category.EVENT -> R.string.feature_home_impl_category_event
         Category.EDUCATION -> R.string.feature_home_impl_category_education
-        Category.REPORT -> R.string.feature_home_impl_category_report
+        Category.WORK -> R.string.feature_home_impl_category_report
     }
 
 @DrawableRes
 private fun Category.backgroundResId(): Int =
     when (this) {
-        Category.PERSUASION -> R.drawable.feature_home_impl_section_title_hand
+        Category.OFFER -> R.drawable.feature_home_impl_section_title_hand
         Category.EVENT -> R.drawable.feature_home_impl_section_title_event
         Category.EDUCATION -> R.drawable.feature_home_impl_section_title_college
-        Category.REPORT -> R.drawable.feature_home_impl_section_title_company
+        Category.WORK -> R.drawable.feature_home_impl_section_title_company
     }
 
 @BasicPreview
@@ -123,7 +123,7 @@ private fun HomePresentationPagePreview() {
         PresentationHero(
             presentation = PresentationUiModel(
                 id = 1L,
-                category = Category.PERSUASION,
+                category = Category.OFFER,
                 title = "설득하는 발표",
                 date = LocalDate(2026, 10, 1),
                 dDay = 3,

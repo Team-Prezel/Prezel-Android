@@ -51,6 +51,7 @@ dependencies {
 
     implementation(projects.featureTermsImpl)
     implementation(projects.featurePracticeImpl)
+    implementation(projects.featureAnalysisImpl)
     implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
 
