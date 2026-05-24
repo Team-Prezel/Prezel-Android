@@ -13,6 +13,7 @@ internal data class PracticeRecordingUiState(
         get() = when (val state = recordingState) {
             AudioSessionState.Idle -> 0
             is AudioSessionState.Recording -> state.elapsedSeconds
+            is AudioSessionState.PausedRecording -> state.elapsedSeconds
             is AudioSessionState.ReadyToPlay -> state.positionSeconds
             is AudioSessionState.Playing -> state.positionSeconds
         }
@@ -21,6 +22,7 @@ internal data class PracticeRecordingUiState(
         get() = when (val state = recordingState) {
             AudioSessionState.Idle,
             is AudioSessionState.Recording,
+            is AudioSessionState.PausedRecording,
             -> 0
 
             is AudioSessionState.ReadyToPlay -> state.durationSeconds

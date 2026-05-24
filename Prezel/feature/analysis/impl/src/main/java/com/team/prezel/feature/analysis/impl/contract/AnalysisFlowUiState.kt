@@ -1,6 +1,7 @@
 package com.team.prezel.feature.analysis.impl.contract
 
 import androidx.compose.runtime.Immutable
+import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
@@ -12,6 +13,7 @@ import com.team.prezel.core.ui.base.UiState
 internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
     val form: AnalysisForm = AnalysisForm(),
+    val recordingState: AudioSessionState = AudioSessionState.Idle,
     val analysisResult: PresentationRecordingAnalysisResult? = null,
 ) : UiState {
     val progress: Float
@@ -22,7 +24,10 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> 0.5f
 
-            AnalysisFlowStep.AUDIO_UPLOAD -> 0.75f
+            AnalysisFlowStep.AUDIO_UPLOAD,
+            AnalysisFlowStep.VOICE_RECORDING,
+            -> 0.75f
+
             AnalysisFlowStep.ANALYZING,
             AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
@@ -44,6 +49,7 @@ internal data class AnalysisFlowUiState(
             }
 
             AnalysisFlowStep.AUDIO_UPLOAD -> !form.audioFileUri.isNullOrBlank()
+            AnalysisFlowStep.VOICE_RECORDING -> recordingState.recordingFilePath != null
             AnalysisFlowStep.ANALYZING,
             AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
@@ -76,8 +82,19 @@ internal enum class AnalysisFlowStep {
     PRESENTATION_SITUATION,
     SCRIPT_INPUT,
     AUDIO_UPLOAD,
+    VOICE_RECORDING,
     ANALYZING,
     REPORT,
     FILE_RECOGNITION_FAILED,
     SCRIPT_FILE_RECOGNITION_FAILED,
 }
+
+internal val AudioSessionState.recordingFilePath: String?
+    get() = when (this) {
+        is AudioSessionState.ReadyToPlay -> source.filePath
+        is AudioSessionState.Playing -> source.filePath
+        AudioSessionState.Idle,
+        is AudioSessionState.Recording,
+        is AudioSessionState.PausedRecording,
+        -> null
+    }

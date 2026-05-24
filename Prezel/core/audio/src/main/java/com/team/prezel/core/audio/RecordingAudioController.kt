@@ -10,6 +10,10 @@ interface RecordingAudioController {
 
     fun startRecording()
 
+    fun pauseRecording()
+
+    fun resumeRecording()
+
     fun stopRecording()
 
     fun startPlayback()

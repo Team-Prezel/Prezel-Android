@@ -35,6 +35,12 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
         val fileUri: String?,
     ) : AnalysisFlowUiIntent
 
+    data object ClickRecordingControl : AnalysisFlowUiIntent
+
+    data object StopRecording : AnalysisFlowUiIntent
+
+    data object ResetRecording : AnalysisFlowUiIntent
+
     data object Next : AnalysisFlowUiIntent
 
     data class RetryFileUpload(

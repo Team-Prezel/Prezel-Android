@@ -41,6 +41,16 @@ internal class MediaRecorderSession @Inject constructor(
             reset()
         }
 
+    override fun pause(): Result<Unit> =
+        runCatching {
+            recorder!!.pause()
+        }
+
+    override fun resume(): Result<Unit> =
+        runCatching {
+            recorder!!.resume()
+        }
+
     override fun stop(elapsedSeconds: Int): Result<RecordedAudio> =
         runCatching {
             val file = currentAudioFile!!

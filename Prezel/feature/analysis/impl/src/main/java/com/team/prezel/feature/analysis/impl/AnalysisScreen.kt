@@ -2,6 +2,7 @@ package com.team.prezel.feature.analysis.impl
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,6 +15,8 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
+import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingScreen
+import com.team.prezel.feature.analysis.impl.recording.rememberAnalysisRecordAudioPermissionControlClickHandler
 import com.team.prezel.feature.analysis.impl.result.AnalysisLoadingScreen
 import com.team.prezel.feature.analysis.impl.result.AnalysisReportScreen
 import com.team.prezel.feature.analysis.impl.result.FileRecognitionFailedScreen
@@ -21,6 +24,7 @@ import com.team.prezel.feature.analysis.impl.result.ScriptFileRecognitionFailedS
 import com.team.prezel.feature.analysis.impl.schedule.PresentationScheduleScreen
 import com.team.prezel.feature.analysis.impl.script.ScriptInputScreen
 import com.team.prezel.feature.analysis.impl.situation.PresentationSituationScreen
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun AnalysisScreen(
@@ -41,6 +45,15 @@ internal fun AnalysisScreen(
                         AnalysisUiMessage.ANALYSIS_FAILED -> R.string.feature_analysis_impl_error_analysis_failed
                         AnalysisUiMessage.NETWORK_FAILED -> R.string.feature_analysis_impl_error_network_failed
                         AnalysisUiMessage.UNKNOWN_FAILED -> R.string.feature_analysis_impl_error_unknown_failed
+                        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_DENIED ->
+                            R.string.feature_analysis_impl_voice_recording_permission_denied
+
+                        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED ->
+                            R.string.feature_analysis_impl_voice_recording_permission_permanently_denied
+
+                        AnalysisUiMessage.RECORDING_START_FAILED -> R.string.feature_analysis_impl_voice_recording_failed
+                        AnalysisUiMessage.RECORDING_STOP_FAILED -> R.string.feature_analysis_impl_voice_recording_stop_failed
+                        AnalysisUiMessage.PLAYBACK_START_FAILED -> R.string.feature_analysis_impl_voice_recording_playback_failed
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
@@ -59,6 +72,37 @@ private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
 ) {
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(uiState.step) {
+        if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+            snackbarHostState.showPrezelSnackbar(
+                message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
+            )
+        }
+    }
+
+    val onClickRecordingControl = rememberAnalysisRecordAudioPermissionControlClickHandler(
+        recordingState = uiState.recordingState,
+        onClickRecordingControl = { onIntent(AnalysisFlowUiIntent.ClickRecordingControl) },
+        onPermissionDenied = {
+            coroutineScope.launch {
+                snackbarHostState.showPrezelSnackbar(
+                    message = resources.getString(R.string.feature_analysis_impl_voice_recording_permission_denied),
+                )
+            }
+        },
+        onPermissionPermanentlyDenied = {
+            coroutineScope.launch {
+                snackbarHostState.showPrezelSnackbar(
+                    message = resources.getString(R.string.feature_analysis_impl_voice_recording_permission_permanently_denied),
+                )
+            }
+        },
+    )
+
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE -> PresentationScheduleScreen(
             uiState = uiState,
@@ -91,6 +135,15 @@ private fun AnalysisScreen(
         AnalysisFlowStep.AUDIO_UPLOAD -> AudioUploadScreen(
             uiState = uiState,
             onAudioFileSelected = { onIntent(AnalysisFlowUiIntent.SelectAudioFile(it)) },
+            onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
+            onBack = { onIntent(AnalysisFlowUiIntent.Back) },
+        )
+
+        AnalysisFlowStep.VOICE_RECORDING -> VoiceRecordingScreen(
+            uiState = uiState,
+            onClickRecordingControl = onClickRecordingControl,
+            onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
+            onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },
             onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )

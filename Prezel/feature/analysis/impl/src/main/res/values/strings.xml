@@ -55,6 +55,18 @@
     <string name="feature_analysis_impl_audio_file_format">제공하는 파일 형식 : m4a, mp4, mp3</string>
     <string name="feature_analysis_impl_audio_file_remove">음성 파일 삭제</string>
     <string name="feature_analysis_impl_audio_upload_button">파일 추가하기</string>
+    <string name="feature_analysis_impl_voice_recording_guide">조용한 공간에서 녹음을 시작해주세요. 주변 소음으로 분석 정확도가 낮아질 수 있어요.</string>
+    <string name="feature_analysis_impl_voice_recording_ready_title">지금부터 발표해볼까요?</string>
+    <string name="feature_analysis_impl_voice_recording_recording_title">듣고 있어요</string>
+    <string name="feature_analysis_impl_voice_recording_paused_title">일시정지됐어요</string>
+    <string name="feature_analysis_impl_voice_recording_playing_title">녹음을 확인해보세요</string>
+    <string name="feature_analysis_impl_voice_recording_script_label">대본</string>
+    <string name="feature_analysis_impl_voice_recording_no_script">입력된 대본이 없어요.</string>
+    <string name="feature_analysis_impl_voice_recording_permission_denied">마이크 권한이 필요해요.</string>
+    <string name="feature_analysis_impl_voice_recording_permission_permanently_denied">설정에서 마이크 권한을 허용해주세요.</string>
+    <string name="feature_analysis_impl_voice_recording_failed">녹음을 시작하지 못했어요. 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_voice_recording_stop_failed">녹음을 저장하지 못했어요. 다시 시도해 주세요.</string>
+    <string name="feature_analysis_impl_voice_recording_playback_failed">녹음을 재생하지 못했어요.</string>
 
     <string name="feature_analysis_impl_upload_title">파일 업로드</string>
     <string name="feature_analysis_impl_direct_input_title">직접 입력</string>

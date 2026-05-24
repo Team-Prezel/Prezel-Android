@@ -1,6 +1,9 @@
 package com.team.prezel.feature.analysis.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.audio.AudioSessionEffect
+import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
@@ -17,6 +20,8 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
+import com.team.prezel.feature.analysis.impl.contract.recordingFilePath
+import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -27,8 +32,14 @@ import javax.inject.Inject
 internal class AnalysisFlowViewModel @Inject constructor(
     private val analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
     private val analysisFileCache: AnalysisFileCache,
+    private val audioController: RecordingAudioController,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
     private var analyzeJob: Job? = null
+
+    init {
+        collectAudioSessionState()
+        collectAudioSessionEffect()
+    }
 
     override fun onIntent(intent: AnalysisFlowUiIntent) {
         when (intent) {
@@ -39,6 +50,9 @@ internal class AnalysisFlowViewModel @Inject constructor(
             is AnalysisFlowUiIntent.UpdateScript -> updateForm { copy(script = intent.script) }
             is AnalysisFlowUiIntent.SelectScriptFile -> updateForm { copy(scriptFileUri = intent.fileUri) }
             is AnalysisFlowUiIntent.SelectAudioFile -> updateForm { copy(audioFileUri = intent.fileUri) }
+            AnalysisFlowUiIntent.ClickRecordingControl -> handleRecordingControlClick()
+            AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
+            AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
             is AnalysisFlowUiIntent.RetryFileUpload -> retryFileUpload(intent.uploadType)
             AnalysisFlowUiIntent.Next -> moveNext()
             AnalysisFlowUiIntent.SkipScript -> skipScript()
@@ -60,7 +74,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun moveNext() {
         if (!currentState.canMoveNext) return
 
-        if (currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) {
+        if (currentState.step == AnalysisFlowStep.VOICE_RECORDING || currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) {
             analyzePresentation()
             return
         }
@@ -70,8 +84,9 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 step = when (step) {
                     AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisFlowStep.PRESENTATION_SITUATION
                     AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.SCRIPT_INPUT
-                    AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.AUDIO_UPLOAD
+                    AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.VOICE_RECORDING
                     AnalysisFlowStep.AUDIO_UPLOAD,
+                    AnalysisFlowStep.VOICE_RECORDING,
                     AnalysisFlowStep.ANALYZING,
                     AnalysisFlowStep.REPORT,
                     AnalysisFlowStep.FILE_RECOGNITION_FAILED,
@@ -83,7 +98,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private fun analyzePresentation() {
-        val submission = currentState.form.toPresentationAnalysisSubmissionOrNull() ?: return
+        val submission = currentState.toPresentationAnalysisSubmissionOrNull() ?: return
 
         updateState { copy(step = AnalysisFlowStep.ANALYZING) }
 
@@ -101,10 +116,15 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
         runCatching {
-            val audioFile = analysisFileCache.copyUriToCache(
-                uriString = audioFileUri,
-                prefix = "audio",
-            )
+            val audioFilePath = audioFileUri
+                ?.let { uri ->
+                    val audioFile = analysisFileCache.copyUriToCache(
+                        uriString = uri,
+                        prefix = "audio",
+                    )
+                    audioFile.absolutePath
+                }
+                ?: recordingFilePath
             val scriptFile = scriptFileUri?.let { uri ->
                 analysisFileCache.copyUriToCache(
                     uriString = uri,
@@ -121,7 +141,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 audience = audience,
                 script = script,
                 scriptFilePath = scriptFile?.absolutePath,
-                audioFilePath = audioFile.absolutePath,
+                audioFilePath = audioFilePath,
             ).getOrThrow()
         }
 
@@ -149,7 +169,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
             is AnalysisFailureAction.ShowMessage -> {
                 viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.ShowMessage(action.message)) }
-                updateState { copy(step = AnalysisFlowStep.AUDIO_UPLOAD) }
+                updateState { copy(step = AnalysisFlowStep.VOICE_RECORDING) }
             }
         }
     }
@@ -164,10 +184,11 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun retryAudioUpload() {
         updateState {
             copy(
-                step = AnalysisFlowStep.AUDIO_UPLOAD,
+                step = AnalysisFlowStep.VOICE_RECORDING,
                 form = form.copy(audioFileUri = null),
             )
         }
+        audioController.reset()
     }
 
     private fun retryScriptFileUpload() {
@@ -185,7 +206,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun skipScript() {
         if (currentState.step != AnalysisFlowStep.SCRIPT_INPUT) return
 
-        updateState { copy(step = AnalysisFlowStep.AUDIO_UPLOAD) }
+        updateState { copy(step = AnalysisFlowStep.VOICE_RECORDING) }
     }
 
     private fun moveBack() {
@@ -196,9 +217,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.PRESENTATION_SCHEDULE
             AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.PRESENTATION_SITUATION
             AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
-            AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
-            AnalysisFlowStep.REPORT -> AnalysisFlowStep.AUDIO_UPLOAD
-            AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
+            AnalysisFlowStep.VOICE_RECORDING -> AnalysisFlowStep.SCRIPT_INPUT
+            AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.VOICE_RECORDING
+            AnalysisFlowStep.REPORT -> AnalysisFlowStep.VOICE_RECORDING
+            AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.VOICE_RECORDING
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
         }
 
@@ -212,6 +234,44 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun updateForm(reducer: AnalysisForm.() -> AnalysisForm) {
         updateState { copy(form = form.reducer()) }
     }
+
+    private fun handleRecordingControlClick() {
+        when (currentState.recordingState) {
+            AudioSessionState.Idle -> audioController.startRecording()
+            is AudioSessionState.Recording -> audioController.pauseRecording()
+            is AudioSessionState.PausedRecording -> audioController.resumeRecording()
+            is AudioSessionState.ReadyToPlay -> audioController.startPlayback()
+            is AudioSessionState.Playing -> audioController.stopPlayback()
+        }
+    }
+
+    private fun collectAudioSessionState() {
+        viewModelScope.launch {
+            audioController.audioSessionState.collect { audioState ->
+                updateState { copy(recordingState = audioState) }
+            }
+        }
+    }
+
+    private fun collectAudioSessionEffect() {
+        viewModelScope.launch {
+            audioController.audioSessionEffect.collect { effect ->
+                sendEffect(AnalysisFlowUiEffect.ShowMessage(effect.toUiMessage()))
+            }
+        }
+    }
+
+    private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
+        when (this) {
+            AudioSessionEffect.RecordingStartFailed -> AnalysisUiMessage.RECORDING_START_FAILED
+            AudioSessionEffect.RecordingStopFailed -> AnalysisUiMessage.RECORDING_STOP_FAILED
+            AudioSessionEffect.PlaybackStartFailed -> AnalysisUiMessage.PLAYBACK_START_FAILED
+        }
+
+    override fun onCleared() {
+        audioController.release()
+        super.onCleared()
+    }
 }
 
 private data class PresentationAnalysisSubmission(
@@ -223,27 +283,29 @@ private data class PresentationAnalysisSubmission(
     val audience: Audience,
     val script: String?,
     val scriptFileUri: String?,
-    val audioFileUri: String,
+    val audioFileUri: String?,
+    val recordingFilePath: String,
 )
 
-private fun AnalysisForm.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {
-    val category = category ?: return null
-    val purpose = purpose ?: return null
-    val style = style ?: return null
-    val audience = audience ?: return null
-    val audioFileUri = audioFileUri ?: return null
-    val isFileUpload = scriptInputType == ScriptInputType.FILE_UPLOAD
+private fun AnalysisFlowUiState.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {
+    val category = form.category ?: return null
+    val purpose = form.purpose ?: return null
+    val style = form.style ?: return null
+    val audience = form.audience ?: return null
+    val recordingFilePath = form.audioFileUri ?: recordingState.recordingFilePath ?: return null
+    val isFileUpload = form.scriptInputType == ScriptInputType.FILE_UPLOAD
 
     return PresentationAnalysisSubmission(
-        name = presentationTitle.trim(),
-        date = presentationDate,
+        name = form.presentationTitle.trim(),
+        date = form.presentationDate,
         category = category,
         purpose = purpose,
         style = style,
         audience = audience,
-        script = script.takeIf { !isFileUpload && it.isNotBlank() },
-        scriptFileUri = scriptFileUri.takeIf { isFileUpload && !it.isNullOrBlank() },
-        audioFileUri = audioFileUri,
+        script = form.script.takeIf { !isFileUpload && it.isNotBlank() },
+        scriptFileUri = form.scriptFileUri.takeIf { isFileUpload && !it.isNullOrBlank() },
+        audioFileUri = form.audioFileUri,
+        recordingFilePath = recordingFilePath,
     )
 }
 

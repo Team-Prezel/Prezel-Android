@@ -47,6 +47,7 @@ internal class MediaRecordingAudioController @Inject constructor(
     override fun stopRecording() {
         val elapsedSeconds = when (val state = audioSessionState.value) {
             is AudioSessionState.Recording -> state.elapsedSeconds
+            is AudioSessionState.PausedRecording -> state.elapsedSeconds
             else -> return
         }
 
@@ -61,6 +62,38 @@ internal class MediaRecordingAudioController @Inject constructor(
             }.onFailure {
                 _audioSessionState.value = AudioSessionState.Idle
                 emitEffect(AudioSessionEffect.RecordingStopFailed)
+            }
+    }
+
+    override fun pauseRecording() {
+        val elapsedSeconds = when (val state = audioSessionState.value) {
+            is AudioSessionState.Recording -> state.elapsedSeconds
+            else -> return
+        }
+
+        recorderSession
+            .pause()
+            .onSuccess {
+                recordingTimerJob?.cancel()
+                _audioSessionState.value = AudioSessionState.PausedRecording(elapsedSeconds = elapsedSeconds)
+            }.onFailure {
+                emitEffect(AudioSessionEffect.RecordingStopFailed)
+            }
+    }
+
+    override fun resumeRecording() {
+        val elapsedSeconds = when (val state = audioSessionState.value) {
+            is AudioSessionState.PausedRecording -> state.elapsedSeconds
+            else -> return
+        }
+
+        recorderSession
+            .resume()
+            .onSuccess {
+                _audioSessionState.value = AudioSessionState.Recording(elapsedSeconds = elapsedSeconds)
+                startRecordingTimer()
+            }.onFailure {
+                emitEffect(AudioSessionEffect.RecordingStartFailed)
             }
     }
 
@@ -185,7 +218,7 @@ internal class MediaRecordingAudioController @Inject constructor(
 
                     AudioSessionState.Playing(
                         source = state.source,
-                        positionSeconds = playerSession.currentPositionSeconds(),
+                        positionSeconds = (state.positionSeconds + 1).coerceAtMost(state.durationSeconds),
                         durationSeconds = state.durationSeconds,
                     )
                 }
@@ -204,6 +237,6 @@ internal class MediaRecordingAudioController @Inject constructor(
 
     private companion object {
         const val RECORDING_TIMER_DELAY_MILLIS = 1_000L
-        const val PLAYBACK_TIMER_DELAY_MILLIS = 250L
+        const val PLAYBACK_TIMER_DELAY_MILLIS = 1_000L
     }
 }
