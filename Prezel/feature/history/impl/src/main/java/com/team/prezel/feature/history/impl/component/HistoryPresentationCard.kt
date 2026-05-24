@@ -153,35 +153,35 @@ private fun HistoryMetaChip(
 @StringRes
 private fun Category.labelResId(): Int =
     when (this) {
-        Category.OFFER -> R.string.feature_history_impl_category_persuasion
-        Category.EVENT -> R.string.feature_history_impl_category_event
         Category.EDUCATION -> R.string.feature_history_impl_category_education
-        Category.WORK -> R.string.feature_history_impl_category_report
+        Category.WORK -> R.string.feature_history_impl_category_work
+        Category.OFFER -> R.string.feature_history_impl_category_offer
+        Category.EVENT -> R.string.feature_history_impl_category_event
     }
 
 @StringRes
 private fun Purpose.labelResId(): Int =
     when (this) {
-        Purpose.INFO -> R.string.feature_history_impl_purpose_content_delivery
-        Purpose.UNDERSTANDING -> R.string.feature_history_impl_purpose_improve_understanding
-        Purpose.EMPATHY -> R.string.feature_history_impl_purpose_build_empathy
+        Purpose.INFO -> R.string.feature_history_impl_purpose_info
+        Purpose.UNDERSTANDING -> R.string.feature_history_impl_purpose_understanding
+        Purpose.EMPATHY -> R.string.feature_history_impl_purpose_empathy
     }
 
 @StringRes
 private fun Style.labelResId(): Int =
     when (this) {
-        Style.FORMAL -> R.string.feature_history_impl_style_professional
+        Style.FORMAL -> R.string.feature_history_impl_style_formal
         Style.FRIENDLY -> R.string.feature_history_impl_style_friendly
         Style.CALM -> R.string.feature_history_impl_style_calm
-        Style.CASUAL -> R.string.feature_history_impl_style_comfortable
+        Style.CASUAL -> R.string.feature_history_impl_style_casual
     }
 
 @StringRes
 private fun Audience.labelResId(): Int =
     when (this) {
         Audience.GENERAL -> R.string.feature_history_impl_audience_general
-        Audience.PROFESSIONAL -> R.string.feature_history_impl_audience_expert
-        Audience.TEAMMATE -> R.string.feature_history_impl_audience_teammates
+        Audience.PROFESSIONAL -> R.string.feature_history_impl_audience_professional
+        Audience.TEAMMATE -> R.string.feature_history_impl_audience_teammate
     }
 
 @BasicPreview

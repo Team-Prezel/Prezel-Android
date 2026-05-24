@@ -18,6 +18,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import javax.inject.Inject
@@ -27,6 +28,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private val analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
     private val analysisFileCache: AnalysisFileCache,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
+    private var analyzeJob: Job? = null
+
     override fun onIntent(intent: AnalysisFlowUiIntent) {
         when (intent) {
             is AnalysisFlowUiIntent.UpdatePresentationTitle -> updateForm { copy(presentationTitle = intent.title) }
@@ -84,11 +87,15 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
         updateState { copy(step = AnalysisFlowStep.ANALYZING) }
 
-        viewModelScope.launch {
+        analyzeJob?.cancel()
+        analyzeJob = viewModelScope.launch {
             submission
                 .analyzePresentationRecording()
-                .onSuccess(::handleAnalysisSuccess)
-                .onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
+                .onSuccess { result ->
+                    if (currentState.step == AnalysisFlowStep.ANALYZING) {
+                        handleAnalysisSuccess(result)
+                    }
+                }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
         }
     }
 
@@ -182,6 +189,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private fun moveBack() {
+        if (currentState.step == AnalysisFlowStep.ANALYZING) analyzeJob?.cancel()
+
         val previousStep = when (currentState.step) {
             AnalysisFlowStep.PRESENTATION_SCHEDULE -> null
             AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.PRESENTATION_SCHEDULE
@@ -223,6 +232,7 @@ private fun AnalysisForm.toPresentationAnalysisSubmissionOrNull(): PresentationA
     val style = style ?: return null
     val audience = audience ?: return null
     val audioFileUri = audioFileUri ?: return null
+    val isFileUpload = scriptInputType == ScriptInputType.FILE_UPLOAD
 
     return PresentationAnalysisSubmission(
         name = presentationTitle.trim(),
@@ -231,8 +241,8 @@ private fun AnalysisForm.toPresentationAnalysisSubmissionOrNull(): PresentationA
         purpose = purpose,
         style = style,
         audience = audience,
-        script = script.takeIf(String::isNotBlank),
-        scriptFileUri = scriptFileUri.takeIf { scriptInputType == ScriptInputType.FILE_UPLOAD && !it.isNullOrBlank() },
+        script = script.takeIf { !isFileUpload && it.isNotBlank() },
+        scriptFileUri = scriptFileUri.takeIf { isFileUpload && !it.isNullOrBlank() },
         audioFileUri = audioFileUri,
     )
 }
