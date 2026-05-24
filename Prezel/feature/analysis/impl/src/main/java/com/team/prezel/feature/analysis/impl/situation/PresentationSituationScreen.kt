@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -199,7 +201,9 @@ private fun CategoryOptionGrid(
                         option = option,
                         selected = selectedValue == option.value,
                         onClick = { onSelect(option.value) },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f),
                     )
                 }
                 if (rowOptions.size == 1) {
@@ -229,7 +233,7 @@ private fun CategoryOptionCard(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(backgroundColor, PrezelTheme.shapes.V8)
                 .border(
                     width = PrezelTheme.stroke.V1,
@@ -248,7 +252,7 @@ private fun CategoryOptionCard(
                 color = PrezelTheme.colors.textRegular,
                 style = PrezelTheme.typography.caption2Regular,
             )
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
+            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 painter = painterResource(option.iconResId),
                 contentDescription = null,
