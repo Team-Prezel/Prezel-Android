@@ -33,16 +33,17 @@ internal data class AnalysisFlowUiState(
         get() = when (step) {
             AnalysisFlowStep.PRESENTATION_SCHEDULE ->
                 form.presentationTitle.trim().length >= 2 && form.presentationDate.isNotBlank()
+
             AnalysisFlowStep.PRESENTATION_SITUATION -> {
                 form.category != null && form.purpose != null && form.style != null && form.audience != null
             }
 
             AnalysisFlowStep.SCRIPT_INPUT -> when (form.scriptInputType) {
-                ScriptInputType.FILE_UPLOAD -> form.scriptFileUri != null
+                ScriptInputType.FILE_UPLOAD -> !form.scriptFileUri.isNullOrBlank()
                 ScriptInputType.DIRECT_INPUT -> form.script.isNotBlank()
             }
 
-            AnalysisFlowStep.AUDIO_UPLOAD -> form.audioFileUri != null
+            AnalysisFlowStep.AUDIO_UPLOAD -> !form.audioFileUri.isNullOrBlank()
             AnalysisFlowStep.ANALYZING,
             AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,

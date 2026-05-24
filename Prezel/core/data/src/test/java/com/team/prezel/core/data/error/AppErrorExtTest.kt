@@ -40,4 +40,20 @@ class AppErrorExtTest {
         assertEquals(AppError.SCRIPT_FILE_RECOGNITION_FAILED, exception.error)
         assertEquals("분석할 수 있는 파일 내용이 없습니다.", exception.message)
     }
+
+    @Test
+    fun `AI 엔진 분석 실패 에러는 서버 에러로 변환한다`() {
+        val result = Result
+            .failure<Unit>(
+                ApiException(
+                    status = 500,
+                    errorCode = ServerErrorCode.VOICE_ANALYSIS_FAILED,
+                    message = "분석 중 문제가 발생했어요.",
+                ),
+            ).mapDomainFailure()
+
+        val exception = assertIs<AppException>(result.exceptionOrNull())
+        assertEquals(AppError.SERVER_ERROR, exception.error)
+        assertEquals("분석 중 문제가 발생했어요.", exception.message)
+    }
 }
