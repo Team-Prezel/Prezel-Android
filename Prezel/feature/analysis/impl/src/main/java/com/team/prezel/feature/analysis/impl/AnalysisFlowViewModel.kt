@@ -232,7 +232,7 @@ private fun AnalysisForm.toPresentationAnalysisSubmissionOrNull(): PresentationA
         style = style,
         audience = audience,
         script = script.takeIf(String::isNotBlank),
-        scriptFileUri = scriptFileUri.takeIf { scriptInputType == ScriptInputType.FILE_UPLOAD },
+        scriptFileUri = scriptFileUri.takeIf { scriptInputType == ScriptInputType.FILE_UPLOAD && !it.isNullOrBlank() },
         audioFileUri = audioFileUri,
     )
 }

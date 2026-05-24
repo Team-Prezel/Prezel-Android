@@ -13,10 +13,6 @@ import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.network.model.practice.AnalyzePracticeRecordingResponse
 import com.team.prezel.core.network.model.practice.PracticeSentenceResponse
-import com.team.prezel.core.network.model.practice.PresentationAnalysisAudience
-import com.team.prezel.core.network.model.practice.PresentationAnalysisPurpose
-import com.team.prezel.core.network.model.practice.PresentationAnalysisStyle
-import com.team.prezel.core.network.model.practice.PresentationAnalysisType
 import com.team.prezel.core.network.model.practice.PresentationRecordingAnalysisResponse
 import kotlin.math.roundToInt
 
@@ -57,13 +53,13 @@ internal fun PresentationRecordingAnalysisResponse.toDomain(): PresentationRecor
         expectedQuestions = expectedQuestions.map { it.toDomain() },
     )
 
-internal fun Category.toRequestType(): PresentationAnalysisType = PresentationAnalysisType.valueOf(name)
+internal fun Category.toRequestType(): String = name
 
-internal fun Purpose.toRequestPurpose(): PresentationAnalysisPurpose = PresentationAnalysisPurpose.valueOf(name)
+internal fun Purpose.toRequestPurpose(): String = name
 
-internal fun Style.toRequestStyle(): PresentationAnalysisStyle = PresentationAnalysisStyle.valueOf(name)
+internal fun Style.toRequestStyle(): String = name
 
-internal fun Audience.toRequestAudience(): PresentationAnalysisAudience = PresentationAnalysisAudience.valueOf(name)
+internal fun Audience.toRequestAudience(): String = name
 
 internal fun PresentationRecordingAnalysisResponse.GrowthGraph.toDomain(): PresentationGrowthGraph =
     PresentationGrowthGraph(

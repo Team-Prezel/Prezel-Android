@@ -15,10 +15,9 @@ import dagger.multibindings.IntoSet
 internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
     entry<AnalysisNavKey.Create> {
         val navigator = LocalNavigator.current
-        val navigateToHome = { navigator.replaceRoot(HomeNavKey) }
 
         AnalysisScreen(
-            onBack = navigateToHome,
+            onBack = { navigator.replaceRoot(HomeNavKey) },
         )
     }
 }
