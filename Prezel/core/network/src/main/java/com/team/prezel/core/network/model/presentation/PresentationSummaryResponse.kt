@@ -32,9 +32,9 @@ data class PresentationSummaryResponse(
     @SerialName("summaryFeedback")
     val summaryFeedback: String,
     @SerialName("accuracyScore")
-    val accuracyScore: Double,
+    val accuracyScore: Double? = null,
     @SerialName("scriptMatchRate")
-    val scriptMatchRate: Double,
+    val scriptMatchRate: Double? = null,
     @SerialName("spellErrorCount")
     val spellErrorCount: Int,
     @SerialName("grammarErrorCount")
