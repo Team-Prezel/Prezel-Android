@@ -23,11 +23,14 @@ class Navigator(
      *
      * @param key 이동할 목적지 키
      */
-    fun navigate(key: NavKey) {
+    fun navigate(
+        key: NavKey,
+        clearStack: Boolean = false,
+    ) {
         when (key) {
             state.currentTopLevelKey -> clearSubStack()
             in state.topLevelKeys -> goToTopLevel(key)
-            else -> goToKey(key)
+            else -> goToKey(key = key, clearStack = clearStack)
         }
     }
 
@@ -83,12 +86,19 @@ class Navigator(
      * 최상위가 아닌 목적지로 이동합니다.
      *
      * 정책:
-     * - 현재 하위 스택에서 동일 키가 이미 있으면 제거합니다.
-     * - 제거 후 스택 끝에 추가하여 현재 목적지로 만듭니다.
+     * - [clearStack]가 true면 현재 하위 스택의 루트만 남기고 제거합니다.
+     * - 동일 키가 이미 존재하면 제거 후 마지막에 추가합니다.
      * - 결과적으로 하위 스택 내 동일 키는 1개만 유지됩니다.
      */
-    private fun goToKey(key: NavKey) {
+    private fun goToKey(
+        key: NavKey,
+        clearStack: Boolean,
+    ) {
         state.currentSubStack.apply {
+            if (clearStack && size > 1) {
+                subList(1, size).clear()
+            }
+
             remove(key)
             add(key)
         }
