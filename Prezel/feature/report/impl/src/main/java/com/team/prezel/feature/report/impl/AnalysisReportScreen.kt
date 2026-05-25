@@ -1,18 +1,22 @@
 package com.team.prezel.feature.report.impl
 
+import androidx.annotation.StringRes
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.report.impl.component.ReportBodyContent
 import com.team.prezel.feature.report.impl.component.ReportHeaderContent
 import com.team.prezel.feature.report.impl.component.ReportScreenLayout
@@ -20,6 +24,7 @@ import com.team.prezel.feature.report.impl.component.modal.ReportDialog
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiEffect
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiState
+import com.team.prezel.feature.report.impl.model.AnalysisReportUiMessage
 import com.team.prezel.feature.report.impl.preview.ReportPreviewPastUiState
 import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
 
@@ -32,11 +37,17 @@ internal fun AnalysisReportScreen(
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = LocalSnackbarHostState.current
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()
+                is AnalysisReportUiEffect.ShowMessage -> {
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.resId))
+                }
+
                 is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId)
                 is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId)
             }
@@ -136,6 +147,12 @@ private fun AnalysisReportScreenContent(
         modifier = modifier,
     )
 }
+
+private val AnalysisReportUiMessage.resId: Int
+    @StringRes get() = when (this) {
+        AnalysisReportUiMessage.FETCH_REPORT_FAILED -> R.string.feature_report_impl_fetch_report_failed
+        AnalysisReportUiMessage.DELETE_REPORT_FAILED -> R.string.feature_report_impl_delete_report_failed
+    }
 
 @BasicPreview
 @Composable

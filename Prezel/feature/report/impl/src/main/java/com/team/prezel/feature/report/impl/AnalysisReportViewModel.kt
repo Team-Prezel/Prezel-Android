@@ -10,6 +10,7 @@ import com.team.prezel.feature.report.impl.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiState
 import com.team.prezel.feature.report.impl.contract.toAnalysisReportUiState
 import com.team.prezel.feature.report.impl.model.AnalysisReportDialog
+import com.team.prezel.feature.report.impl.model.AnalysisReportUiMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -55,7 +56,10 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
                     this@AnalysisReportViewModel.presentationId = result.presentationId
                     analysisResultId = result.analysisResultId
                     updateState { result.toAnalysisReportUiState(isPast = isPast) }
-                }.onFailure { }
+                }.onFailure {
+                    sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.FETCH_REPORT_FAILED))
+                    sendEffect(AnalysisReportUiEffect.NavigateToBack)
+                }
         }
     }
 
@@ -79,7 +83,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         viewModelScope.launch {
             deletePresentationAnalysisUseCase(analysisResultId = analysisResultId!!)
                 .onSuccess { sendEffect(AnalysisReportUiEffect.NavigateToBack) }
-                .onFailure { }
+                .onFailure { sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.DELETE_REPORT_FAILED)) }
         }
     }
 

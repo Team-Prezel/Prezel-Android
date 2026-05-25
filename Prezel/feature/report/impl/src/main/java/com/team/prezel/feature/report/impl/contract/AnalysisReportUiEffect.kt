@@ -1,9 +1,14 @@
 package com.team.prezel.feature.report.impl.contract
 
 import com.team.prezel.core.ui.base.UiEffect
+import com.team.prezel.feature.report.impl.model.AnalysisReportUiMessage
 
 internal sealed interface AnalysisReportUiEffect : UiEffect {
     data object NavigateToBack : AnalysisReportUiEffect
+
+    data class ShowMessage(
+        val message: AnalysisReportUiMessage,
+    ) : AnalysisReportUiEffect
 
     data class NavigateToAnalysisScript(
         val presentationId: Long,
