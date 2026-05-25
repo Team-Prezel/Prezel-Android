@@ -1,7 +1,17 @@
 package com.team.prezel.core.model.presentation
 
-enum class Audience {
-    GENERAL,
-    PROFESSIONAL,
-    TEAMMATE,
+enum class Audience(
+    val value: String,
+) {
+    GENERAL("GENERAL"),
+    PROFESSIONAL("PROFESSIONAL"),
+    TEAMMATE("TEAMMATE"),
+    ;
+
+    companion object {
+        fun from(value: String): Audience =
+            entries.find { entry ->
+                entry.value == value.uppercase()
+            } ?: throw IllegalArgumentException("지원하지 않는 청중 타입입니다.")
+    }
 }

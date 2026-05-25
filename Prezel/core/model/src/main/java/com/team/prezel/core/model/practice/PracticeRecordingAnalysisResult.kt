@@ -2,18 +2,22 @@ package com.team.prezel.core.model.practice
 
 data class PracticeRecordingAnalysisResult(
     val pronunciationScore: Int,
-    val speed: PracticeRecordingSpeed,
+    val speed: RecordingSpeed,
     val overallEvaluation: PracticeRecordingOverallEvaluation,
 )
 
-enum class PracticeRecordingSpeed {
-    SLOW,
-    ADEQUATE,
-    FAST,
-}
+enum class PracticeRecordingOverallEvaluation(
+    val value: String,
+) {
+    PERFECT("PERFECT"),
+    GOOD("GOOD"),
+    TRY("TRY"),
+    ;
 
-enum class PracticeRecordingOverallEvaluation {
-    PERFECT,
-    GOOD,
-    TRY,
+    companion object {
+        fun from(value: String): PracticeRecordingOverallEvaluation =
+            entries.find { entry ->
+                entry.value == value.uppercase()
+            } ?: throw IllegalArgumentException("지원하지 않는 타입입니다.")
+    }
 }

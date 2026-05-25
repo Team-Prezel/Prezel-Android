@@ -1,6 +1,6 @@
 package com.team.prezel.core.model.presentation
 
-import kotlin.time.Instant
+import com.team.prezel.core.model.practice.RecordingSpeed
 
 data class PresentationAnalysisSummary(
     val presentationId: Long,
@@ -10,11 +10,11 @@ data class PresentationAnalysisSummary(
     val purpose: Purpose,
     val style: Style,
     val audience: Audience,
-    val analyzedAt: Instant,
+    val analyzedAt: String,
     val durationSeconds: Int,
     val formattedDuration: String,
     val spm: Int,
-    val speedEvaluation: String,
+    val speedEvaluation: RecordingSpeed,
     val summaryFeedback: String,
     val accuracyScore: Double,
     val scriptMatchRate: Double,
