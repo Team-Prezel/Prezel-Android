@@ -3,6 +3,7 @@ package com.team.prezel.feature.history.impl.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
+import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.history.impl.HistoryScreen
 import com.team.prezel.feature.report.api.ReportNavKey
@@ -19,6 +20,9 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
         HistoryScreen(
             navigateToReport = { presentationId, isPast ->
                 navigator.navigate(ReportNavKey(presentationId = presentationId, isPast = isPast))
+            },
+            navigateToAnalysis = {
+                navigator.navigate(AnalysisNavKey.Create)
             },
         )
     }

@@ -45,6 +45,7 @@ import kotlinx.datetime.LocalDate
 @Composable
 internal fun HistoryScreen(
     navigateToReport: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
@@ -79,6 +80,7 @@ internal fun HistoryScreen(
         modifier = modifier,
         pagerState = pagerState,
         onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.id)) },
+        onClickAddPresentation = navigateToAnalysis,
     )
 }
 
@@ -88,6 +90,7 @@ internal fun HistoryScreen(
     uiState: HistoryUiState,
     pagerState: PagerState,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -104,6 +107,7 @@ internal fun HistoryScreen(
             uiState = uiState,
             pagerState = pagerState,
             onClickHistoryItem = onClickHistoryItem,
+            onClickAddPresentation = onClickAddPresentation,
         )
     }
 }
@@ -113,6 +117,7 @@ private fun HistoryContent(
     uiState: HistoryUiState,
     pagerState: PagerState,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickAddPresentation: () -> Unit,
 ) {
     val tabs = persistentListOf(
         stringResource(R.string.feature_history_impl_tab_preparing),
@@ -147,7 +152,7 @@ private fun HistoryContent(
                     if (items.isEmpty()) {
                         HistoryEmptyContent(
                             type = pageType,
-                            onClickAddPresentation = { },
+                            onClickAddPresentation = onClickAddPresentation,
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
@@ -212,6 +217,7 @@ private fun HistoryScreenPreview() {
             uiState = previewState,
             pagerState = pagerState,
             onClickHistoryItem = { },
+            onClickAddPresentation = {},
         )
     }
 }
