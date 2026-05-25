@@ -8,15 +8,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.report.impl.analysis.component.AnalysisReportContent
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiEffect
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiState
+import com.team.prezel.feature.report.impl.detail.component.ReportDetailScreen
 import com.team.prezel.feature.report.impl.detail.preview.ReportDetailPreviewData
 
 @Composable
 internal fun AnalysisReportScreen(
     navigateToHome: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
@@ -32,8 +33,8 @@ internal fun AnalysisReportScreen(
 
     AnalysisReportScreenContent(
         uiState = uiState,
-        onSaveClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickSave) },
-        onDeleteClick = navigateToHome,
+        onBackClick = onBack,
+        onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         modifier = modifier,
     )
 }
@@ -41,16 +42,16 @@ internal fun AnalysisReportScreen(
 @Composable
 internal fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState,
-    onSaveClick: () -> Unit,
+    onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
-        is AnalysisReportUiState.Content -> AnalysisReportContent(
-            state = uiState,
-            onSaveClick = onSaveClick,
-            onDeleteClick = onDeleteClick,
+        is AnalysisReportUiState.Content -> ReportDetailScreen(
+            reportDetail = uiState.reportDetail,
             modifier = modifier,
+            onBackClick = onBackClick,
+            onDeleteClick = onDeleteClick,
         )
 
         AnalysisReportUiState.Loading -> Unit
@@ -63,7 +64,7 @@ private fun AnalysisReportScreenPreview() {
     PrezelTheme {
         AnalysisReportScreenContent(
             uiState = ReportDetailPreviewData.analysisState,
-            onSaveClick = { },
+            onBackClick = { },
             onDeleteClick = { },
         )
     }
@@ -75,7 +76,7 @@ private fun AnalysisReportScreenLoadingPreview() {
     PrezelTheme {
         AnalysisReportScreenContent(
             uiState = AnalysisReportUiState.Loading,
-            onSaveClick = { },
+            onBackClick = { },
             onDeleteClick = { },
         )
     }

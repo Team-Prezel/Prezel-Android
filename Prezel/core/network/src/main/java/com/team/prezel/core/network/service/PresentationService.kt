@@ -1,6 +1,7 @@
 package com.team.prezel.core.network.service
 
 import com.team.prezel.core.network.model.BaseResponse
+import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -37,4 +38,9 @@ interface PresentationService {
     suspend fun deleteAnalysis(
         @Path("analysisResultId") analysisResultId: Long,
     ): BaseResponse<Unit>
+
+    @GET("/recording/{presentationId}/upcoming")
+    suspend fun getUpcomingPresentationDetail(
+        @Path("presentationId") presentationId: Long,
+    ): BaseResponse<GetPresentationDetailResponse>
 }

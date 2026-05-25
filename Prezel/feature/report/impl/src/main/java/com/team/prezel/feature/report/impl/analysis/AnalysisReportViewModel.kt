@@ -1,8 +1,8 @@
 package com.team.prezel.feature.report.impl.analysis
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
-import com.team.prezel.feature.report.api.ReportNavKey
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiEffect
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.analysis.contract.AnalysisReportUiState
@@ -15,16 +15,29 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = AnalysisReportViewModel.Factory::class)
 internal class AnalysisReportViewModel @AssistedInject constructor(
-    @Assisted navKey: ReportNavKey.Analysis,
-) : BaseViewModel<AnalysisReportUiState, AnalysisReportUiIntent, AnalysisReportUiEffect>(navKey.payload.toAnalysisReportUiState()) {
+    @Assisted presentationId: Long,
+    private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
+) : BaseViewModel<AnalysisReportUiState, AnalysisReportUiIntent, AnalysisReportUiEffect>(AnalysisReportUiState.Loading) {
     @AssistedFactory
     interface Factory {
-        fun create(navKey: ReportNavKey.Analysis): AnalysisReportViewModel
+        fun create(presentationId: Long): AnalysisReportViewModel
+    }
+
+    init {
+        fetchData(presentationId = presentationId)
     }
 
     override fun onIntent(intent: AnalysisReportUiIntent) {
         when (intent) {
-            AnalysisReportUiIntent.ClickSave -> viewModelScope.launch { sendEffect(AnalysisReportUiEffect.NavigateHome) }
+            AnalysisReportUiIntent.ClickDelete -> viewModelScope.launch { sendEffect(AnalysisReportUiEffect.NavigateHome) }
+        }
+    }
+
+    private fun fetchData(presentationId: Long) {
+        viewModelScope.launch {
+            fetchPresentationDetailUseCase(presentationId = presentationId)
+                .onSuccess { result -> updateState { result.toAnalysisReportUiState() } }
+                .onFailure { }
         }
     }
 }

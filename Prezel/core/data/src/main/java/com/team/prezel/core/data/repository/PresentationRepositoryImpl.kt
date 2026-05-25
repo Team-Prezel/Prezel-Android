@@ -26,7 +26,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
-    ): Result<PresentationAnalysisSummary> =
+    ): Result<Long> =
         runCatching {
             presentationRemoteDataSource.analyzePresentation(
                 name = name,
@@ -40,7 +40,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 audioFilePath = audioFilePath,
             )
         }.mapCatching { response ->
-            response.toDomain()
+            response.presentationId
         }.mapDomainFailure()
 
     override suspend fun reAnalyzePresentation(
@@ -73,5 +73,12 @@ internal class PresentationRepositoryImpl @Inject constructor(
     override suspend fun deleteAnalysis(analysisResultId: Long): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.deleteAnalysis(analysisResultId = analysisResultId)
+        }.mapDomainFailure()
+
+    override suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary> =
+        runCatching {
+            presentationRemoteDataSource.getUpcomingPresentationDetail(presentationId = presentationId)
+        }.mapCatching { response ->
+            response.toDomain()
         }.mapDomainFailure()
 }

@@ -27,4 +27,6 @@ interface PresentationRemoteDataSource {
     suspend fun getWordDetail(analysisResultId: Long): PresentationWordDetailResponse
 
     suspend fun deleteAnalysis(analysisResultId: Long)
+
+    suspend fun getUpcomingPresentationDetail(presentationId: Long): PresentationSummaryResponse
 }

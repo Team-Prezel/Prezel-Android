@@ -73,6 +73,9 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         presentationService.deleteAnalysis(analysisResultId = analysisResultId).requireSuccess()
     }
 
+    override suspend fun getUpcomingPresentationDetail(presentationId: Long): PresentationSummaryResponse =
+        presentationService.getUpcomingPresentationDetail(presentationId = presentationId).requireData().analysisResult
+
     private fun String.toAudioMultipart(): MultiPartFormDataContent =
         MultiPartFormDataContent(
             formData {

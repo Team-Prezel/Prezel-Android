@@ -1,7 +1,6 @@
 package com.team.prezel.feature.report.api
 
 import androidx.navigation3.runtime.NavKey
-import com.team.prezel.feature.report.api.model.ReportAnalysisPayload
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,6 +12,6 @@ sealed interface ReportNavKey : NavKey {
 
     @Serializable
     data class Analysis(
-        val payload: ReportAnalysisPayload,
+        val presentationId: Long,
     ) : ReportNavKey
 }

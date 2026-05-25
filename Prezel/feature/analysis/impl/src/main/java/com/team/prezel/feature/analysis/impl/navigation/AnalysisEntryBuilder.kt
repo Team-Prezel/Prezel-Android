@@ -7,7 +7,6 @@ import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.analysis.impl.AnalysisScreen
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
-import com.team.prezel.feature.report.api.model.ReportAnalysisPayload.Companion.toPayload
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,9 +19,9 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
 
         AnalysisScreen(
             onBack = { navigator.replaceRoot(HomeNavKey) },
-            navigateToReport = { result ->
+            navigateToReport = { presentationId ->
                 navigator.navigate(
-                    key = ReportNavKey.Analysis(payload = result.toPayload()),
+                    key = ReportNavKey.Analysis(presentationId = presentationId),
                     clearStack = true,
                 )
             },

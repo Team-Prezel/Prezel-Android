@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -92,13 +91,13 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 .analyzePresentationRecording()
                 .onSuccess { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(result = result))
+                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
                     }
                 }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
         }
     }
 
-    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationAnalysisSummary> =
+    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
         runCatching {
             val audioFile = analysisFileCache.copyUriToCache(
                 uriString = audioFileUri,

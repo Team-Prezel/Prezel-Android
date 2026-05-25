@@ -19,7 +19,7 @@ interface PresentationRepository {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
-    ): Result<PresentationAnalysisSummary>
+    ): Result<Long>
 
     suspend fun reAnalyzePresentation(
         presentationId: Long,
@@ -31,4 +31,6 @@ interface PresentationRepository {
     suspend fun fetchWordDetail(analysisResultId: Long): Result<PresentationWordDetail>
 
     suspend fun deleteAnalysis(analysisResultId: Long): Result<Unit>
+
+    suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary>
 }

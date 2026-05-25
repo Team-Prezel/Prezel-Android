@@ -22,8 +22,9 @@ internal fun EntryProviderScope<NavKey>.featureReportEntryBuilder() {
 
         AnalysisReportScreen(
             navigateToHome = { navigator.replaceRoot(HomeNavKey) },
+            onBack = { navigator.goBack() },
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
-                creationCallback = { factory -> factory.create(key) },
+                creationCallback = { factory -> factory.create(key.presentationId) },
             ),
         )
     }
