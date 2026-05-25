@@ -44,8 +44,6 @@ import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.detail.model.PresentationInfoUiModel
 import com.team.prezel.feature.report.impl.detail.preview.ReportDetailPreviewData
-import com.team.prezel.feature.report.impl.detail.util.dateLabel
-import com.team.prezel.feature.report.impl.detail.util.durationLabel
 
 @Composable
 internal fun ReportHeaderSection(
@@ -133,10 +131,24 @@ private fun HeaderMetadataSection(
             }
 
             HeaderInfoRow(label = stringResource(R.string.feature_report_impl_label_presentation_time)) {
-                HeaderMetadataText(text = info.durationLabel())
+                HeaderMetadataText(text = info.durationSeconds.toDurationString())
             }
         }
     }
+}
+
+private fun PresentationInfoUiModel.dateLabel(): String = analyzedAt.split("-").let { "${it[0]}년 ${it[1]}월 ${it[2]}일" }
+
+private fun Int.toDurationString(): String {
+    val hours = this / 3600
+    val minutes = (this % 3600) / 60
+    val seconds = this % 60
+
+    return buildList {
+        if (hours > 0) add("${hours}시간")
+        if (minutes > 0) add("${minutes}분")
+        if (seconds > 0 || isEmpty()) add("${seconds}초")
+    }.joinToString(" ")
 }
 
 @Composable
@@ -198,29 +210,29 @@ private fun HeaderMetaChip(text: String) {
 private fun Category.label(): String =
     stringResource(
         when (this) {
-            Category.PERSUASION -> R.string.feature_report_impl_category_persuasion
+            Category.OFFER -> R.string.feature_report_impl_category_persuasion
             Category.EVENT -> R.string.feature_report_impl_category_event
             Category.EDUCATION -> R.string.feature_report_impl_category_education
-            Category.REPORT -> R.string.feature_report_impl_category_report
+            Category.WORK -> R.string.feature_report_impl_category_report
         },
     )
 
 @Composable
 private fun Category.icon(): Int =
     when (this) {
-        Category.PERSUASION -> PrezelIcons.Hand
+        Category.OFFER -> PrezelIcons.Hand
         Category.EVENT -> PrezelIcons.Balloon
         Category.EDUCATION -> PrezelIcons.College
-        Category.REPORT -> PrezelIcons.Company
+        Category.WORK -> PrezelIcons.Company
     }
 
 @Composable
 private fun Purpose.label(): String =
     stringResource(
         when (this) {
-            Purpose.CONTENT_DELIVERY -> R.string.feature_report_impl_purpose_content_delivery
-            Purpose.IMPROVE_UNDERSTANDING -> R.string.feature_report_impl_purpose_improve_understanding
-            Purpose.BUILD_EMPATHY -> R.string.feature_report_impl_purpose_build_empathy
+            Purpose.INFO -> R.string.feature_report_impl_purpose_content_delivery
+            Purpose.UNDERSTANDING -> R.string.feature_report_impl_purpose_improve_understanding
+            Purpose.EMPATHY -> R.string.feature_report_impl_purpose_build_empathy
         },
     )
 
@@ -228,10 +240,10 @@ private fun Purpose.label(): String =
 private fun Style.label(): String =
     stringResource(
         when (this) {
-            Style.PROFESSIONAL -> R.string.feature_report_impl_style_professional
+            Style.FORMAL -> R.string.feature_report_impl_style_professional
             Style.FRIENDLY -> R.string.feature_report_impl_style_friendly
             Style.CALM -> R.string.feature_report_impl_style_calm
-            Style.COMFORTABLE -> R.string.feature_report_impl_style_comfortable
+            Style.CASUAL -> R.string.feature_report_impl_style_comfortable
         },
     )
 
@@ -239,9 +251,9 @@ private fun Style.label(): String =
 private fun Audience.label(): String =
     stringResource(
         when (this) {
-            Audience.GENERAL_AUDIENCE -> R.string.feature_report_impl_audience_general
-            Audience.EXPERT -> R.string.feature_report_impl_audience_expert
-            Audience.TEAMMATES -> R.string.feature_report_impl_audience_teammates
+            Audience.GENERAL -> R.string.feature_report_impl_audience_general
+            Audience.PROFESSIONAL -> R.string.feature_report_impl_audience_expert
+            Audience.TEAMMATE -> R.string.feature_report_impl_audience_teammates
         },
     )
 

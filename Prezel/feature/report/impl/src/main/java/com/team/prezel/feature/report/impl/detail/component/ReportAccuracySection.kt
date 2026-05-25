@@ -21,10 +21,10 @@ import com.team.prezel.core.designsystem.component.feedback.tooltip.PrezelToolti
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.core.ui.component.graph.SpeedGraph
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.detail.model.SpeedGraphData
-import com.team.prezel.feature.report.impl.detail.model.SpeedResult
 import com.team.prezel.feature.report.impl.detail.preview.ReportDetailPreviewData
 
 @Composable
@@ -135,19 +135,19 @@ private fun MetricLabel(
 }
 
 @Composable
-private fun SpeedResult.label(): String =
+private fun RecordingSpeed.label(): String =
     when (this) {
-        SpeedResult.SLOW -> "느려요"
-        SpeedResult.ADEQUATE -> "적당해요"
-        SpeedResult.FAST -> "빨라요"
+        RecordingSpeed.SLOW -> "느려요"
+        RecordingSpeed.ADEQUATE -> "적당해요"
+        RecordingSpeed.FAST -> "빨라요"
     }
 
 @Composable
-private fun SpeedResult.labelColor(): Color =
+private fun RecordingSpeed.labelColor(): Color =
     when (this) {
-        SpeedResult.ADEQUATE -> PrezelTheme.colors.feedbackGoodRegular
-        SpeedResult.SLOW,
-        SpeedResult.FAST,
+        RecordingSpeed.ADEQUATE -> PrezelTheme.colors.feedbackGoodRegular
+        RecordingSpeed.SLOW,
+        RecordingSpeed.FAST,
         -> PrezelTheme.colors.feedbackWarningRegular
     }
 

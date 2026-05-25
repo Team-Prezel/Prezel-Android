@@ -11,6 +11,7 @@ dependencies {
     implementation(projects.coreModel)
     implementation(projects.featureAnalysisApi)
     implementation(projects.featureHomeApi)
+    implementation(projects.featureReportApi)
 
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.datetime)

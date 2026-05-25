@@ -5,7 +5,6 @@ import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
-import kotlin.time.Instant
 
 @Immutable
 internal data class PresentationInfoUiModel(
@@ -14,6 +13,6 @@ internal data class PresentationInfoUiModel(
     val purpose: Purpose,
     val style: Style,
     val audience: Audience,
-    val analyzedAt: Instant,
-    val formattedDuration: String,
+    val analyzedAt: String,
+    val durationSeconds: Int,
 )

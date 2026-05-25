@@ -13,8 +13,11 @@ import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.detail.component.ReportDetailScreen
 import com.team.prezel.feature.report.impl.detail.preview.ReportDetailPreviewData
 import com.team.prezel.feature.report.impl.history.contract.HistoryReportUiState
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Composable
 internal fun HistoryReportContent(
@@ -36,10 +39,13 @@ internal fun HistoryReportContent(
         },
         topSections = {
             SelfFeedbackSection(selfFeedback = state.selfFeedback)
+            // todo 임시로 시간 설정함 -> API 추가되면 수정
             PracticeHistorySection(
-                presentationDate = state.reportDetail.presentationInfo.analyzedAt
+                presentationDate = Clock.System
+                    .now()
                     .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .date,
+                    .date
+                    .plus(10, DateTimeUnit.DAY),
                 practices = state.practices,
             )
         },

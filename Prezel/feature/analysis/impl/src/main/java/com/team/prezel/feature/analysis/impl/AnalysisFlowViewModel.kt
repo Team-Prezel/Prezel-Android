@@ -1,10 +1,10 @@
 package com.team.prezel.feature.analysis.impl
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
+import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
+import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AnalysisFlowViewModel @Inject constructor(
-    private val analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
+    private val analyzePresentationUseCase: AnalyzePresentationUseCase,
     private val analysisFileCache: AnalysisFileCache,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
     private var analyzeJob: Job? = null
@@ -73,7 +73,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
                     AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.AUDIO_UPLOAD
                     AnalysisFlowStep.AUDIO_UPLOAD,
                     AnalysisFlowStep.ANALYZING,
-                    AnalysisFlowStep.REPORT,
                     AnalysisFlowStep.FILE_RECOGNITION_FAILED,
                     AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
                     -> step
@@ -93,13 +92,13 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 .analyzePresentationRecording()
                 .onSuccess { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        handleAnalysisSuccess(result)
+                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(result = result))
                     }
                 }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
         }
     }
 
-    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationRecordingAnalysisResult> =
+    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<PresentationAnalysisSummary> =
         runCatching {
             val audioFile = analysisFileCache.copyUriToCache(
                 uriString = audioFileUri,
@@ -111,8 +110,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                     prefix = "script",
                 )
             }
-
-            analyzePresentationRecordingUseCase(
+            analyzePresentationUseCase(
                 name = name,
                 date = date.toRequestDate(),
                 category = category,
@@ -124,15 +122,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 audioFilePath = audioFile.absolutePath,
             ).getOrThrow()
         }
-
-    private fun handleAnalysisSuccess(analysisResult: PresentationRecordingAnalysisResult) {
-        updateState {
-            copy(
-                step = AnalysisFlowStep.REPORT,
-                analysisResult = analysisResult,
-            )
-        }
-    }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
         when (action) {
@@ -197,7 +186,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.PRESENTATION_SITUATION
             AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
             AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
-            AnalysisFlowStep.REPORT -> AnalysisFlowStep.AUDIO_UPLOAD
             AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
         }

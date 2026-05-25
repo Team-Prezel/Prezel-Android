@@ -1,5 +1,6 @@
 package com.team.prezel.feature.report.impl.detail.preview
 
+import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
@@ -13,30 +14,28 @@ import com.team.prezel.feature.report.impl.detail.model.QuestionUiModel
 import com.team.prezel.feature.report.impl.detail.model.ReportDetailUiModel
 import com.team.prezel.feature.report.impl.detail.model.ScriptAnalysisGraphData
 import com.team.prezel.feature.report.impl.detail.model.SpeedGraphData
-import com.team.prezel.feature.report.impl.detail.model.SpeedResult
 import com.team.prezel.feature.report.impl.history.contract.HistoryReportUiState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalDate
-import kotlin.time.Instant
 
 internal object ReportDetailPreviewData {
     val reportDetail =
         ReportDetailUiModel(
             presentationInfo = PresentationInfoUiModel(
-                category = Category.REPORT,
+                category = Category.EDUCATION,
                 title = "분기 실적 공유",
-                purpose = Purpose.CONTENT_DELIVERY,
-                style = Style.PROFESSIONAL,
-                audience = Audience.TEAMMATES,
-                analyzedAt = Instant.parse("2026-05-14T10:15:30Z"),
-                formattedDuration = "05:32",
+                purpose = Purpose.INFO,
+                style = Style.CALM,
+                audience = Audience.PROFESSIONAL,
+                analyzedAt = "2026-05-14",
+                durationSeconds = 332,
             ),
             summaryFeedback = "핵심 메시지는 명확했지만 전달 속도 편차가 있었습니다.",
             accuracyScore = 82.0,
             scriptMatchRate = 76.0,
             speedGraphData = SpeedGraphData(
                 spm = 240,
-                result = SpeedResult.ADEQUATE,
+                result = RecordingSpeed.ADEQUATE,
             ),
             improvementGraphData = ImprovementGraphData(
                 items = persistentListOf(
