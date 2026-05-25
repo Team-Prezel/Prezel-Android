@@ -2,21 +2,43 @@ package com.team.prezel.core.data.repository
 
 import com.team.prezel.core.data.error.mapDomainFailure
 import com.team.prezel.core.data.mapper.toDomain
-import com.team.prezel.core.data.mapper.toRequestParts
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
-import com.team.prezel.core.model.presentation.PresentationAnalysisRequest
+import com.team.prezel.core.model.presentation.Audience
+import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
 import javax.inject.Inject
 
 internal class PresentationRepositoryImpl @Inject constructor(
     private val presentationRemoteDataSource: PresentationRemoteDataSource,
 ) : PresentationRepository {
-    override suspend fun analyzePresentation(request: PresentationAnalysisRequest): Result<PresentationAnalysisSummary> =
+    override suspend fun analyzePresentation(
+        name: String,
+        date: String,
+        category: Category,
+        purpose: Purpose,
+        style: Style,
+        audience: Audience,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): Result<PresentationAnalysisSummary> =
         runCatching {
-            presentationRemoteDataSource.analyzePresentation(request = request.toRequestParts())
+            presentationRemoteDataSource.analyzePresentation(
+                name = name,
+                date = date,
+                type = category.value,
+                purpose = purpose.value,
+                style = style.value,
+                audience = audience.value,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+            )
         }.mapCatching { response ->
             response.toDomain()
         }.mapDomainFailure()
