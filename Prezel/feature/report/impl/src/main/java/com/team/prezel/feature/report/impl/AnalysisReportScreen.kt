@@ -45,7 +45,10 @@ internal fun AnalysisReportScreen(
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()
                 is AnalysisReportUiEffect.ShowMessage -> {
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.resId))
+                    snackbarHostState.showPrezelSnackbar(
+                        message = resources.getString(effect.message.resId),
+                        useRaisedPosition = false,
+                    )
                 }
 
                 is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId)
