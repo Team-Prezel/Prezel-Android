@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.LargeDevicePreview
+import com.team.prezel.core.designsystem.preview.PreviewColumn
+import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
 @Immutable
@@ -225,39 +227,113 @@ private val VoiceChromeGradient.stop: Float
 @LargeDevicePreview
 @Composable
 private fun PrezelVoiceChromeComponentPreview() {
-    PrezelTheme {
-        Column {
-            Row {
+    PreviewSurface {
+        PreviewColumn {
+            VoiceChromeStatusPreviewSection()
+            Spacer(modifier = Modifier.height(4.dp))
+            VoiceChromeGradientPreviewSection()
+            Spacer(modifier = Modifier.height(4.dp))
+            VoiceChromeTitlePreviewSection()
+        }
+    }
+}
+
+@Composable
+private fun VoiceChromeStatusPreviewSection() {
+    VoiceChromePreviewSection(title = "Status") {
+        Row {
+            VoiceChromePreviewItem(label = "Status - Idle") {
                 PrezelVoiceChrome(titleText = "지금부터 발표해볼까요?")
-
-                PrezelVoiceChrome(
-                    titleText = "지금부터 발표해볼까요?",
-                    status = VoiceChromeStatus.WAITING,
-                )
             }
-
-            Row {
-                PrezelVoiceChrome(
-                    titleText = "지금부터 발표해볼까요?",
-                    status = VoiceChromeStatus.LISTENING,
-                    gradient = VoiceChromeGradient.NONE,
-                )
-                Spacer(modifier = Modifier.width(20.dp))
+            VoiceChromePreviewItem(label = "Status - Listening") {
                 PrezelVoiceChrome(
                     titleText = "지금부터 발표해볼까요?",
                     status = VoiceChromeStatus.LISTENING,
                     gradient = VoiceChromeGradient.MIN,
                 )
-                Spacer(modifier = Modifier.width(20.dp))
+            }
+            VoiceChromePreviewItem(label = "Status - Waiting") {
+                PrezelVoiceChrome(
+                    titleText = "지금부터 발표해볼까요?",
+                    status = VoiceChromeStatus.WAITING,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun VoiceChromeGradientPreviewSection() {
+    VoiceChromePreviewSection(title = "Gradient") {
+        Row {
+            VoiceChromePreviewItem(label = "Gradient - None") {
+                PrezelVoiceChrome(
+                    titleText = "지금부터 발표해볼까요?",
+                    status = VoiceChromeStatus.LISTENING,
+                    gradient = VoiceChromeGradient.NONE,
+                )
+            }
+            VoiceChromePreviewItem(label = "Gradient - Min") {
+                PrezelVoiceChrome(
+                    titleText = "지금부터 발표해볼까요?",
+                    status = VoiceChromeStatus.LISTENING,
+                    gradient = VoiceChromeGradient.MIN,
+                )
+            }
+            VoiceChromePreviewItem(label = "Gradient - Max") {
                 PrezelVoiceChrome(
                     titleText = "지금부터 발표해볼까요?",
                     status = VoiceChromeStatus.LISTENING,
                     gradient = VoiceChromeGradient.MAX,
                 )
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
         }
+    }
+}
+
+@Composable
+private fun VoiceChromeTitlePreviewSection() {
+    VoiceChromePreviewSection(title = "Title") {
+        Row {
+            VoiceChromePreviewItem(label = "Title - Default") {
+                PrezelVoiceChrome(titleText = "지금부터 발표해볼까요?")
+            }
+            VoiceChromePreviewItem(label = "Title - Custom") {
+                PrezelVoiceChrome(titleText = "수고하셨어요")
+            }
+        }
+    }
+}
+
+@Composable
+private fun VoiceChromePreviewSection(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column {
+        Text(
+            text = title,
+            style = PrezelTheme.typography.body2Bold,
+            color = PrezelTheme.colors.textLarge,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        content()
+    }
+}
+
+@Composable
+private fun VoiceChromePreviewItem(
+    label: String,
+    content: @Composable () -> Unit,
+) {
+    Column {
+        Text(
+            text = label,
+            style = PrezelTheme.typography.caption1Medium,
+            color = PrezelTheme.colors.textMedium,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        content()
     }
 }
 
@@ -280,11 +356,15 @@ private fun PrezelVoiceChromeAnimatedPreview() {
     val gradientStop = VoiceChromeGradient.MIN.stop +
         (VoiceChromeGradient.MAX.stop - VoiceChromeGradient.MIN.stop) * progress
 
-    PrezelTheme {
-        PrezelVoiceChromeContent(
-            titleText = "지금부터 발표해볼까요?",
-            status = VoiceChromeStatus.LISTENING,
-            gradientStop = gradientStop,
-        )
+    PreviewSurface {
+        PreviewColumn {
+            VoiceChromePreviewItem(label = "Animated - Listening") {
+                PrezelVoiceChromeContent(
+                    titleText = "지금부터 발표해볼까요?",
+                    status = VoiceChromeStatus.LISTENING,
+                    gradientStop = gradientStop,
+                )
+            }
+        }
     }
 }
