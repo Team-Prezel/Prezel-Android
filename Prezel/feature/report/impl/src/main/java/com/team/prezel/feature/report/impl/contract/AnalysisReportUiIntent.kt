@@ -12,4 +12,8 @@ internal sealed interface AnalysisReportUiIntent : UiIntent {
     data object DismissDialog : AnalysisReportUiIntent
 
     data object ClickDialogConform : AnalysisReportUiIntent
+
+    data object ClickReWriteScript : AnalysisReportUiIntent
+
+    data object ClickReRecording : AnalysisReportUiIntent
 }

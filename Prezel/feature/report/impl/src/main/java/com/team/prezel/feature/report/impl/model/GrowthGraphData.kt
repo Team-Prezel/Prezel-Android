@@ -24,10 +24,10 @@ internal data class GrowthGraphData(
     val selectedItemIndex: Int = (items.size / 2).coerceAtMost(3),
 ) {
     init {
-        require(selectedItemIndex in 0..items.size)
+        require(selectedItemIndex in 0..items.size) { "$selectedItemIndex" }
     }
 
-    val selectedItem: GrowthGraphItemUiModel = items[selectedItemIndex]
+    val selectedItem: GrowthGraphItemUiModel? = items.getOrNull(selectedItemIndex)
     val graphItems: ImmutableList<CardGraphItem> = items.map(GrowthGraphItemUiModel::graphItem).toImmutableList()
 }
 

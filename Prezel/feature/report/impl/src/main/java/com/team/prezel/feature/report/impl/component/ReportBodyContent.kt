@@ -36,6 +36,8 @@ internal fun ReportBodyContent(
     uiState: AnalysisReportUiState.Content,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (Int) -> Unit,
+    onReWriteScriptClick: () -> Unit,
+    onReRecordingClick: () -> Unit,
 ) {
     if (uiState.isPast) {
         SelfFeedbackSection(selfFeedback = uiState.selfFeedback)
@@ -52,8 +54,13 @@ internal fun ReportBodyContent(
     GrowthGraphSection(
         growthGraphData = uiState.growthGraphData,
         onCardIndexChange = onImprovementCardIndexChange,
+        onReRecordingClick = onReRecordingClick,
     )
-    ScriptAnalysisSection(scriptAnalysisGraphData = uiState.scriptAnalysisGraphData)
+    ScriptAnalysisSection(
+        isWrittenScript = uiState.isScriptWritten,
+        scriptAnalysisGraphData = uiState.scriptAnalysisGraphData,
+        onReWriteScriptClick = onReWriteScriptClick,
+    )
     ExpectedQuestionsSection(questions = uiState.expectedQuestions)
 
     PrezelButton(
@@ -82,6 +89,8 @@ private fun ReportBodyContentPreview() {
                 uiState = previewReportDetail(uiState),
                 onDeleteClick = { },
                 onImprovementCardIndexChange = { index -> uiState = updateSelectedGrowthCard(uiState, index) },
+                onReWriteScriptClick = {},
+                onReRecordingClick = {},
             )
         }
     }

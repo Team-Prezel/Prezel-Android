@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.actions.button.PrezelTextButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
@@ -20,6 +23,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.graph.StickGraph
 import com.team.prezel.core.ui.component.graph.StickGraphItemType
 import com.team.prezel.feature.report.impl.R
+import com.team.prezel.feature.report.impl.component.common.EmptyStateCard
 import com.team.prezel.feature.report.impl.component.common.MetricResultCard
 import com.team.prezel.feature.report.impl.component.common.ReportSection
 import com.team.prezel.feature.report.impl.model.ScriptAnalysisGraphData
@@ -28,16 +32,49 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentMap
 
 @Composable
-internal fun ScriptAnalysisSection(scriptAnalysisGraphData: ScriptAnalysisGraphData) {
+internal fun ScriptAnalysisSection(
+    isWrittenScript: Boolean,
+    scriptAnalysisGraphData: ScriptAnalysisGraphData,
+    onReWriteScriptClick: () -> Unit,
+) {
     ReportSection(
-        title = { ScriptAnalysisSectionTitle() },
+        title = {
+            ScriptAnalysisSectionTitle(
+                showReWriteButton = isWrittenScript,
+                onReWriteScriptClick = onReWriteScriptClick,
+            )
+        },
     ) {
-        ScriptAnalysisContent(scriptAnalysisGraphData = scriptAnalysisGraphData)
+        if (isWrittenScript) {
+            ScriptAnalysisContent(scriptAnalysisGraphData = scriptAnalysisGraphData)
+            return@ReportSection
+        }
+
+        EmptyStateContent(onReWriteScriptClick = onReWriteScriptClick)
     }
 }
 
 @Composable
-private fun ScriptAnalysisSectionTitle() {
+private fun EmptyStateContent(onReWriteScriptClick: () -> Unit) {
+    EmptyStateCard(text = stringResource(R.string.feature_report_impl_script_analysis_empty_state_message))
+
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
+    PrezelTextButton(
+        text = stringResource(R.string.feature_report_impl_write_script),
+        size = ButtonSize.REGULAR,
+        type = ButtonType.FILLED,
+        hierarchy = ButtonHierarchy.SECONDARY,
+        onClick = onReWriteScriptClick,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun ScriptAnalysisSectionTitle(
+    showReWriteButton: Boolean,
+    onReWriteScriptClick: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -49,15 +86,17 @@ private fun ScriptAnalysisSectionTitle() {
             color = PrezelTheme.colors.textLarge,
         )
 
-        PrezelButton(
-            text = "다시 대본쓰기",
-            iconResId = PrezelIcons.Script,
-            type = ButtonType.OUTLINED,
-            size = ButtonSize.XSMALL,
-            hierarchy = ButtonHierarchy.SECONDARY,
-            isRounded = true,
-            onClick = {},
-        )
+        if (showReWriteButton) {
+            PrezelButton(
+                text = stringResource(R.string.feature_report_impl_re_write_script),
+                iconResId = PrezelIcons.Script,
+                type = ButtonType.OUTLINED,
+                size = ButtonSize.XSMALL,
+                hierarchy = ButtonHierarchy.SECONDARY,
+                isRounded = true,
+                onClick = onReWriteScriptClick,
+            )
+        }
     }
 }
 
@@ -108,7 +147,21 @@ private fun ScriptAnalysisGraphData.toStickGraphData() =
 private fun ScriptAnalysisSectionPreview() {
     PrezelTheme {
         ScriptAnalysisSection(
+            isWrittenScript = true,
             scriptAnalysisGraphData = ReportPreviewUpcomingUiState.scriptAnalysisGraphData,
+            onReWriteScriptClick = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun EmptyScriptAnalysisSectionPreview() {
+    PrezelTheme {
+        ScriptAnalysisSection(
+            isWrittenScript = false,
+            scriptAnalysisGraphData = ReportPreviewUpcomingUiState.scriptAnalysisGraphData,
+            onReWriteScriptClick = {},
         )
     }
 }

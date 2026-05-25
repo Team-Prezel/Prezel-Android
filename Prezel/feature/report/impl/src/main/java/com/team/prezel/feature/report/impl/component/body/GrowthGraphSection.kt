@@ -47,9 +47,10 @@ import kotlinx.collections.immutable.persistentListOf
 internal fun GrowthGraphSection(
     growthGraphData: GrowthGraphData,
     onCardIndexChange: (Int) -> Unit,
+    onReRecordingClick: () -> Unit,
 ) {
     ReportSection(
-        title = { GrowthGraphSectionTitle() },
+        title = { GrowthGraphSectionTitle(onReRecordingClick = onReRecordingClick) },
     ) {
         GrowthGraphContent(
             growthGraphData = growthGraphData,
@@ -61,7 +62,7 @@ internal fun GrowthGraphSection(
 }
 
 @Composable
-private fun GrowthGraphSectionTitle() {
+private fun GrowthGraphSectionTitle(onReRecordingClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -75,7 +76,7 @@ private fun GrowthGraphSectionTitle() {
             )
             Spacer(modifier = Modifier.width(PrezelTheme.spacing.V4))
             PrezelTooltipBox(
-                text = "이전 연습과 비교하여 성장하는\n나의 발표를 확인할 수 있어요.",
+                text = stringResource(R.string.feature_report_impl_growth_graph_tooltip),
             ) {
                 Icon(
                     painter = painterResource(PrezelIcons.InfoCircleOutlined),
@@ -86,13 +87,13 @@ private fun GrowthGraphSectionTitle() {
             }
         }
         PrezelButton(
-            text = "다시 녹음하기",
+            text = stringResource(R.string.feature_report_impl_re_recording),
             iconResId = PrezelIcons.Mic,
             type = ButtonType.OUTLINED,
             size = ButtonSize.XSMALL,
             hierarchy = ButtonHierarchy.SECONDARY,
             isRounded = true,
-            onClick = {},
+            onClick = onReRecordingClick,
         )
     }
 }
@@ -214,6 +215,7 @@ private fun GrowthGraphSectionPreview() {
         GrowthGraphSection(
             growthGraphData = ReportPreviewUpcomingUiState.growthGraphData,
             onCardIndexChange = {},
+            onReRecordingClick = {},
         )
     }
 }
@@ -223,10 +225,9 @@ private fun GrowthGraphSectionPreview() {
 private fun EmptyGrowthGraphSectionPreview() {
     PrezelTheme {
         GrowthGraphSection(
-            growthGraphData = ReportPreviewUpcomingUiState.growthGraphData.copy(
-                items = persistentListOf(),
-            ),
+            growthGraphData = GrowthGraphData(items = persistentListOf()),
             onCardIndexChange = {},
+            onReRecordingClick = {},
         )
     }
 }

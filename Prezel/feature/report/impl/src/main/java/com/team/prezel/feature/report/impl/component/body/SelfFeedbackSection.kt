@@ -32,7 +32,7 @@ internal fun SelfFeedbackSection(selfFeedback: String?) {
     ) {
         if (selfFeedback.isNullOrBlank()) {
             PrezelTextButton(
-                text = "피드백 작성하기",
+                text = stringResource(R.string.feature_report_impl_write_feedback),
                 size = ButtonSize.REGULAR,
                 type = ButtonType.FILLED,
                 hierarchy = ButtonHierarchy.SECONDARY,

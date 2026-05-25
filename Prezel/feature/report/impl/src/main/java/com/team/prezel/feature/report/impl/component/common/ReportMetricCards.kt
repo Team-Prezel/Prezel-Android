@@ -65,7 +65,10 @@ internal fun MetricResultCard(
     }
 }
 
-internal fun Double.toPercentLabel(): String = "${roundToInt()}%"
+internal fun Double?.toPercentLabel(): String {
+    val base = this?.roundToInt()
+    return "${base ?: "-"}%"
+}
 
 @BasicPreview
 @Composable

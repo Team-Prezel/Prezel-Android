@@ -26,6 +26,8 @@ import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
 @Composable
 internal fun AnalysisReportScreen(
     onBack: () -> Unit,
+    navigateToAnalysisScript: (presentationId: Long) -> Unit,
+    navigateToAnalysisRecording: (presentationId: Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
@@ -35,6 +37,8 @@ internal fun AnalysisReportScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()
+                is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId)
+                is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId)
             }
         }
     }
@@ -46,6 +50,8 @@ internal fun AnalysisReportScreen(
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
         onDialogDismiss = { viewModel.onIntent(AnalysisReportUiIntent.DismissDialog) },
         onDialogConfirmClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDialogConform) },
+        onReWriteScriptClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReWriteScript) },
+        onReRecordingClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReRecording) },
         modifier = modifier,
     )
 }
@@ -58,6 +64,8 @@ internal fun AnalysisReportScreen(
     onImprovementCardIndexChange: (index: Int) -> Unit,
     onDialogDismiss: () -> Unit,
     onDialogConfirmClick: () -> Unit,
+    onReWriteScriptClick: () -> Unit,
+    onReRecordingClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -70,6 +78,8 @@ internal fun AnalysisReportScreen(
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
                 onDialogDismiss = onDialogDismiss,
                 onDialogConfirmClick = onDialogConfirmClick,
+                onReWriteScriptClick = onReWriteScriptClick,
+                onReRecordingClick = onReRecordingClick,
             )
         }
 
@@ -85,6 +95,8 @@ private fun AnalysisReportScreenContent(
     onImprovementCardIndexChange: (index: Int) -> Unit,
     onDialogDismiss: () -> Unit,
     onDialogConfirmClick: () -> Unit,
+    onReWriteScriptClick: () -> Unit,
+    onReRecordingClick: () -> Unit,
     modifier: Modifier,
 ) {
     uiState.reportDialog?.let { type ->
@@ -117,6 +129,8 @@ private fun AnalysisReportScreenContent(
                 uiState = uiState,
                 onDeleteClick = onDeleteClick,
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
+                onReWriteScriptClick = onReWriteScriptClick,
+                onReRecordingClick = onReRecordingClick,
             )
         },
         modifier = modifier,
@@ -134,6 +148,8 @@ private fun UpcomingAnalysisReportScreenPreview() {
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
             onDialogConfirmClick = {},
+            onReWriteScriptClick = { },
+            onReRecordingClick = {},
         )
     }
 }
@@ -149,6 +165,8 @@ private fun PastAnalysisReportScreenPreview() {
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
             onDialogConfirmClick = {},
+            onReWriteScriptClick = { },
+            onReRecordingClick = {},
         )
     }
 }
@@ -164,6 +182,8 @@ private fun AnalysisReportScreenLoadingPreview() {
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
             onDialogConfirmClick = {},
+            onReWriteScriptClick = { },
+            onReRecordingClick = {},
         )
     }
 }

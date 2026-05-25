@@ -32,8 +32,8 @@ import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
 
 @Composable
 internal fun AccuracySection(
-    accuracyScore: Double,
-    scriptMatchRate: Double,
+    accuracyScore: Double?,
+    scriptMatchRate: Double?,
     speedGraphData: SpeedGraphData,
 ) {
     ReportSection(
@@ -78,8 +78,8 @@ private fun SpeedMetricRow(speedGraphData: SpeedGraphData) {
 
 @Composable
 private fun AccuracyMetricCards(
-    accuracyScore: Double,
-    scriptMatchRate: Double,
+    accuracyScore: Double?,
+    scriptMatchRate: Double?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -119,7 +119,7 @@ private fun MetricLabel(
                 color = PrezelTheme.colors.textMedium,
             )
             PrezelTooltipBox(
-                text = "SPM은 1분당 말하는 음절의 수에요.",
+                text = stringResource(R.string.feature_report_impl_speed_tooltip),
             ) {
                 Icon(
                     painter = painterResource(PrezelIcons.InfoCircleOutlined),
@@ -139,11 +139,13 @@ private fun MetricLabel(
 
 @Composable
 private fun RecordingSpeed.label(): String =
-    when (this) {
-        RecordingSpeed.SLOW -> "느려요"
-        RecordingSpeed.ADEQUATE -> "적당해요"
-        RecordingSpeed.FAST -> "빨라요"
-    }
+    stringResource(
+        when (this) {
+            RecordingSpeed.SLOW -> R.string.feature_report_impl_speed_label_slow
+            RecordingSpeed.ADEQUATE -> R.string.feature_report_impl_speed_label_adequate
+            RecordingSpeed.FAST -> R.string.feature_report_impl_speed_label_fast
+        },
+    )
 
 @Composable
 private fun RecordingSpeed.labelColor(): Color =

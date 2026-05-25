@@ -192,6 +192,8 @@ private fun ReportScreenLayoutPreview() {
                     uiState = ReportPreviewUpcomingUiState,
                     onDeleteClick = { },
                     onImprovementCardIndexChange = {},
+                    onReWriteScriptClick = {},
+                    onReRecordingClick = {},
                 )
             },
         )

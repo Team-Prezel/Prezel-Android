@@ -17,8 +17,8 @@ internal sealed interface AnalysisReportUiState : UiState {
     data class Content(
         val presentationInfo: PresentationInfoUiModel,
         val summaryFeedback: String,
-        val accuracyScore: Double,
-        val scriptMatchRate: Double,
+        val accuracyScore: Double?,
+        val scriptMatchRate: Double?,
         val speedGraphData: SpeedGraphData,
         val growthGraphData: GrowthGraphData,
         val scriptAnalysisGraphData: ScriptAnalysisGraphData,
@@ -26,5 +26,7 @@ internal sealed interface AnalysisReportUiState : UiState {
         val selfFeedback: String?,
         val isPast: Boolean,
         val reportDialog: AnalysisReportDialog? = null,
-    ) : AnalysisReportUiState
+    ) : AnalysisReportUiState {
+        val isScriptWritten: Boolean = accuracyScore != null && scriptMatchRate != null
+    }
 }

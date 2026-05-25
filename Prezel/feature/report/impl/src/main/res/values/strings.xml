@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_report_impl_save">저장</string>
     <string name="feature_report_impl_delete">리포트 삭제</string>
     <string name="feature_report_impl_back">뒤로가기</string>
     <string name="feature_report_impl_section_summary_feedback">요약 피드백</string>
@@ -31,6 +30,15 @@
     <string name="feature_report_impl_label_speech">발화</string>
     <string name="feature_report_impl_label_script_match">대본 일치율</string>
     <string name="feature_report_impl_label_total_errors">총 오류 수</string>
+    <string name="feature_report_impl_speed_tooltip">SPM은 1분당 말하는 음절의 수에요.</string>
+    <string name="feature_report_impl_speed_label_slow">느려요</string>
+    <string name="feature_report_impl_speed_label_adequate">적당해요</string>
+    <string name="feature_report_impl_speed_label_fast">빨라요</string>
+    <string name="feature_report_impl_growth_graph_tooltip">이전 연습과 비교하여 성장하는\n나의 발표를 확인할 수 있어요.</string>
+    <string name="feature_report_impl_re_recording">다시 녹음하기</string>
+    <string name="feature_report_impl_re_write_script">다시 대본쓰기</string>
+    <string name="feature_report_impl_write_script">대본 입력하기</string>
+    <string name="feature_report_impl_write_feedback">피드백 작성하기</string>
     <string name="feature_report_impl_empty_growth_graph">대본을 입력하고 실제 발화를 비교해\n발음과 대본 일치율을 분석해보세요.</string>
     <string name="feature_report_impl_empty_questions">대본을 입력하고 예상 질문을 받아보세요.</string>
     <string name="feature_report_impl_empty_practice_history">연습 기록이 아직 없어요.</string>
@@ -48,6 +56,5 @@
 
     <string name="feature_report_impl_delete_report_dialog_title">분석 리포트를 삭제하시겠어요?</string>
     <string name="feature_report_impl_delete_report_dialog_description">삭제된 분석 리포트는 다시 복구하기 어렵습니다.</string>
-
-
+    <string name="feature_report_impl_script_analysis_empty_state_message">대본을 입력하고\n맞춤법과 주술호응을 분석해보세요.</string>
 </resources>

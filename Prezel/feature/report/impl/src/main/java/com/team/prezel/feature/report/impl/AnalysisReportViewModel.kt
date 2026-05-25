@@ -27,6 +27,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         fun create(navKey: ReportNavKey): AnalysisReportViewModel
     }
 
+    private var presentationId: Long? = null
     private var analysisResultId: Long? = null
 
     init {
@@ -39,6 +40,8 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
             is AnalysisReportUiIntent.ClickGrowthGraphItem -> updateGrowthGraphSelectedItem(index = intent.index)
             AnalysisReportUiIntent.ClickDialogConform -> handleClickDialogConform()
             AnalysisReportUiIntent.DismissDialog -> updateContent { copy(reportDialog = null) }
+            AnalysisReportUiIntent.ClickReRecording -> updateContent { copy(reportDialog = AnalysisReportDialog.RE_RECORDING) }
+            AnalysisReportUiIntent.ClickReWriteScript -> handleReWriteScriptClick()
         }
     }
 
@@ -49,6 +52,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         viewModelScope.launch {
             fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
                 .onSuccess { result ->
+                    this@AnalysisReportViewModel.presentationId = result.presentationId
                     analysisResultId = result.analysisResultId
                     updateState { result.toAnalysisReportUiState(isPast = isPast) }
                 }.onFailure { }
@@ -60,7 +64,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     }
 
     private fun handleClickDialogConform() {
-        val dialog = (currentState as? AnalysisReportUiState.Content)?.reportDialog ?: return
+        val dialog = contentState?.reportDialog ?: return
 
         when (dialog) {
             AnalysisReportDialog.RE_RECORDING -> Unit
@@ -79,8 +83,20 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         }
     }
 
+    private fun handleReWriteScriptClick() {
+        if (contentState?.isScriptWritten == true) return updateContent { copy(reportDialog = AnalysisReportDialog.RE_WRITE_SCRIPT) }
+
+        viewModelScope.launch {
+            presentationId?.let { id ->
+                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisScript(presentationId = id))
+            }
+        }
+    }
+
+    private val contentState: AnalysisReportUiState.Content? get() = (currentState as? AnalysisReportUiState.Content)
+
     private fun updateContent(transform: AnalysisReportUiState.Content.() -> AnalysisReportUiState.Content) {
-        val state = currentState as? AnalysisReportUiState.Content ?: return
+        val state = contentState ?: return
         updateState { transform(state) }
     }
 }
