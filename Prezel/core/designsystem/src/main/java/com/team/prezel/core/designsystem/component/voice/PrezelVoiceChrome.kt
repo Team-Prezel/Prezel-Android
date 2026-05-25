@@ -1,11 +1,15 @@
 package com.team.prezel.core.designsystem.component.voice
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -13,11 +17,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -58,11 +64,31 @@ fun PrezelVoiceChrome(
     status: VoiceChromeStatus = VoiceChromeStatus.IDLE,
     gradient: VoiceChromeGradient = VoiceChromeGradient.NONE,
 ) {
+    val transition = rememberInfiniteTransition(label = "VoiceChromeGradientTransition")
+    val animatedGradientStop by transition.animateFloat(
+        initialValue = gradient.initialAnimatedStop,
+        targetValue = gradient.targetAnimatedStop,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 2400,
+                delayMillis = 160,
+                easing = LinearEasing,
+            ),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "VoiceChromeGradientStop",
+    )
+    val gradientStop = when {
+        status != VoiceChromeStatus.LISTENING -> VoiceChromeGradient.NONE.stop
+        gradient == VoiceChromeGradient.NONE -> VoiceChromeGradient.NONE.stop
+        else -> animatedGradientStop
+    }
+
     PrezelVoiceChromeContent(
         titleText = titleText,
         modifier = modifier,
         status = status,
-        gradientStop = gradient.stop,
+        gradientStop = gradientStop,
     )
 }
 
@@ -73,13 +99,30 @@ private fun PrezelVoiceChromeContent(
     status: VoiceChromeStatus = VoiceChromeStatus.IDLE,
     gradientStop: Float = VoiceChromeGradient.NONE.stop,
 ) {
-    val lineColor = when (status) {
+    val targetLineColor = when (status) {
         VoiceChromeStatus.IDLE,
         VoiceChromeStatus.LISTENING,
         -> PrezelTheme.colors.interactiveRegular
 
         VoiceChromeStatus.WAITING -> PrezelTheme.colors.borderLarge
     }
+    val lineColor by animateColorAsState(
+        targetValue = targetLineColor,
+        animationSpec = tween(durationMillis = 280),
+        label = "VoiceChromeLineColor",
+    )
+    val targetTitleColor = when (status) {
+        VoiceChromeStatus.IDLE,
+        VoiceChromeStatus.LISTENING,
+        -> PrezelTheme.colors.interactiveRegular
+
+        VoiceChromeStatus.WAITING -> PrezelTheme.colors.textMedium
+    }
+    val titleColor by animateColorAsState(
+        targetValue = targetTitleColor,
+        animationSpec = tween(durationMillis = 280),
+        label = "VoiceChromeTitleColor",
+    )
 
     Box(
         modifier = modifier
@@ -94,6 +137,7 @@ private fun PrezelVoiceChromeContent(
         VoiceChromeTitle(
             titleText = titleText,
             status = status,
+            color = titleColor,
         )
 
         VoiceChromeLine(
@@ -107,6 +151,7 @@ private fun PrezelVoiceChromeContent(
 private fun VoiceChromeTitle(
     titleText: String,
     status: VoiceChromeStatus,
+    color: Color,
 ) {
     val baseStyle = PrezelTheme.typography.title1Bold.copy(textAlign = TextAlign.Center)
 
@@ -119,13 +164,13 @@ private fun VoiceChromeTitle(
         VoiceChromeStatus.LISTENING -> Text(
             text = stringResource(R.string.core_designsystem_voice_chrome_listening),
             style = baseStyle,
-            color = PrezelTheme.colors.interactiveRegular,
+            color = color,
         )
 
         VoiceChromeStatus.WAITING -> Text(
             text = stringResource(R.string.core_designsystem_voice_chrome_waiting),
             style = baseStyle,
-            color = PrezelTheme.colors.textMedium,
+            color = color,
         )
     }
 }
@@ -150,7 +195,14 @@ private fun BoxScope.VoiceChromeLine(
     status: VoiceChromeStatus,
     color: Color,
 ) {
-    val visible = status != VoiceChromeStatus.IDLE
+    val lineProgress by animateFloatAsState(
+        targetValue = if (status == VoiceChromeStatus.IDLE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 560,
+            easing = CubicBezierEasing(0f, 0f, 0.58f, 1f),
+        ),
+        label = "VoiceChromeLineProgress",
+    )
 
     Box(
         modifier = Modifier
@@ -166,7 +218,11 @@ private fun BoxScope.VoiceChromeLine(
                 )
 
                 onDrawBehind {
-                    if (visible) {
+                    val halfLineWidth = size.width * lineProgress / 2f
+                    clipRect(
+                        left = size.width / 2f - halfLineWidth,
+                        right = size.width / 2f + halfLineWidth,
+                    ) {
                         drawRect(brush = lineBrush)
                     }
                 }
@@ -220,8 +276,26 @@ private fun Modifier.voiceChromeBackground(
 private val VoiceChromeGradient.stop: Float
     get() = when (this) {
         VoiceChromeGradient.NONE -> 0f
-        VoiceChromeGradient.MIN -> 0.24f
+        VoiceChromeGradient.MIN -> 0.28f
         VoiceChromeGradient.MAX -> 0.44f
+    }
+
+private val VoiceChromeGradient.initialAnimatedStop: Float
+    get() = when (this) {
+        VoiceChromeGradient.NONE,
+        VoiceChromeGradient.MIN,
+        -> VoiceChromeGradient.MIN.stop
+
+        VoiceChromeGradient.MAX -> VoiceChromeGradient.MAX.stop
+    }
+
+private val VoiceChromeGradient.targetAnimatedStop: Float
+    get() = when (this) {
+        VoiceChromeGradient.NONE,
+        VoiceChromeGradient.MIN,
+        -> VoiceChromeGradient.MAX.stop
+
+        VoiceChromeGradient.MAX -> VoiceChromeGradient.MIN.stop
     }
 
 @LargeDevicePreview
@@ -232,8 +306,6 @@ private fun PrezelVoiceChromeComponentPreview() {
             VoiceChromeStatusPreviewSection()
             Spacer(modifier = Modifier.height(4.dp))
             VoiceChromeGradientPreviewSection()
-            Spacer(modifier = Modifier.height(4.dp))
-            VoiceChromeTitlePreviewSection()
         }
     }
 }
@@ -292,20 +364,6 @@ private fun VoiceChromeGradientPreviewSection() {
 }
 
 @Composable
-private fun VoiceChromeTitlePreviewSection() {
-    VoiceChromePreviewSection(title = "Title") {
-        Row {
-            VoiceChromePreviewItem(label = "Title - Default") {
-                PrezelVoiceChrome(titleText = "지금부터 발표해볼까요?")
-            }
-            VoiceChromePreviewItem(label = "Title - Custom") {
-                PrezelVoiceChrome(titleText = "수고하셨어요")
-            }
-        }
-    }
-}
-
-@Composable
 private fun VoiceChromePreviewSection(
     title: String,
     content: @Composable () -> Unit,
@@ -339,30 +397,64 @@ private fun VoiceChromePreviewItem(
 
 @BasicPreview
 @Composable
-private fun PrezelVoiceChromeAnimatedPreview() {
-    val transition = rememberInfiniteTransition(label = "VoiceChromePreviewTransition")
-    val progress by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1_200,
-                easing = LinearEasing,
-            ),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "VoiceChromePreviewGradient",
-    )
-    val gradientStop = VoiceChromeGradient.MIN.stop +
-        (VoiceChromeGradient.MAX.stop - VoiceChromeGradient.MIN.stop) * progress
+private fun PrezelVoiceChromeIdleMinTogglePreview() {
+    var status by remember { mutableStateOf(VoiceChromeStatus.IDLE) }
 
     PreviewSurface {
         PreviewColumn {
-            VoiceChromePreviewItem(label = "Animated - Listening") {
-                PrezelVoiceChromeContent(
+            VoiceChromePreviewItem(label = "Idle <-> Min") {
+                PrezelVoiceChrome(
+                    titleText = "지금부터 발표해볼까요?",
+                    modifier = Modifier.clickable {
+                        status = if (status == VoiceChromeStatus.IDLE) {
+                            VoiceChromeStatus.LISTENING
+                        } else {
+                            VoiceChromeStatus.IDLE
+                        }
+                    },
+                    status = status,
+                    gradient = VoiceChromeGradient.MIN,
+                )
+            }
+        }
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PrezelVoiceChromeMaxWaitingTogglePreview() {
+    var status by remember { mutableStateOf(VoiceChromeStatus.LISTENING) }
+
+    PreviewSurface {
+        PreviewColumn {
+            VoiceChromePreviewItem(label = "Max <-> Waiting") {
+                PrezelVoiceChrome(
+                    titleText = "지금부터 발표해볼까요?",
+                    modifier = Modifier.clickable {
+                        status = if (status == VoiceChromeStatus.WAITING) {
+                            VoiceChromeStatus.LISTENING
+                        } else {
+                            VoiceChromeStatus.WAITING
+                        }
+                    },
+                    status = status,
+                    gradient = VoiceChromeGradient.MAX,
+                )
+            }
+        }
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PrezelVoiceChromeMaxMinMaxPreview() {
+    PreviewSurface {
+        PreviewColumn {
+            VoiceChromePreviewItem(label = "Max <-> Min") {
+                PrezelVoiceChrome(
                     titleText = "지금부터 발표해볼까요?",
                     status = VoiceChromeStatus.LISTENING,
-                    gradientStop = gradientStop,
+                    gradient = VoiceChromeGradient.MAX,
                 )
             }
         }
