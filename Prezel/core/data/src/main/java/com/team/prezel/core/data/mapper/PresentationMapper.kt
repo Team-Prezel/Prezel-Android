@@ -6,12 +6,14 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.ExpectedQuestion
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationGrowthPoint
+import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
+import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationExpectedQuestionResponse
 import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptAnalysisResponse
@@ -19,6 +21,7 @@ import com.team.prezel.core.network.model.presentation.PresentationScriptDetailR
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordAnalysisResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import kotlinx.datetime.LocalDate
 
 internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary =
     PresentationAnalysisSummary(
@@ -42,16 +45,17 @@ internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary
         totalErrorCount = totalErrorCount,
         growth = growthGraph.map { item -> item.toDomain() },
         expectedQuestions = expectedQuestions.map { item -> item.toDomain() },
+        selfFeedback = reviewContent,
     )
 
-internal fun PresentationGrowthResponse.toDomain(): PresentationGrowthPoint =
+private fun PresentationGrowthResponse.toDomain(): PresentationGrowthPoint =
     PresentationGrowthPoint(
         attempt = attempt,
         accuracyScore = accuracyScore,
         scriptMatchRate = scriptMatchRate,
     )
 
-internal fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
+private fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
     ExpectedQuestion(
         question = question,
         answer = answer,
@@ -89,4 +93,16 @@ internal fun PresentationWordAnalysisResponse.toDomain(): WordAnalysisDetail =
         accuracy = accuracy,
         startTimeMs = startTimeMs,
         endTimeMs = endTimeMs,
+    )
+
+internal fun GetPresentationsResponse.toDomain(): PresentationInfo =
+    PresentationInfo(
+        id = presentationId,
+        title = title,
+        presentationDate = LocalDate.parse(presentationDate),
+        category = Category.from(value = type),
+        purpose = Purpose.from(value = purpose),
+        style = Style.from(value = style),
+        audience = Audience.from(value = audience),
+        dDay = dday,
     )

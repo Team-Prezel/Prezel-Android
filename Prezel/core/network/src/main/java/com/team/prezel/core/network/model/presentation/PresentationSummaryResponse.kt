@@ -45,6 +45,8 @@ data class PresentationSummaryResponse(
     val growthGraph: List<PresentationGrowthResponse>,
     @SerialName("expectedQuestions")
     val expectedQuestions: List<PresentationExpectedQuestionResponse>,
+    @SerialName("reviewContent")
+    val reviewContent: String? = null,
 )
 
 @Serializable

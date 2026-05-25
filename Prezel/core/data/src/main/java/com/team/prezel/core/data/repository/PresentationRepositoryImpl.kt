@@ -6,11 +6,13 @@ import com.team.prezel.core.domain.repository.presentation.PresentationRepositor
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
+import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
+import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import javax.inject.Inject
 
 internal class PresentationRepositoryImpl @Inject constructor(
@@ -75,9 +77,30 @@ internal class PresentationRepositoryImpl @Inject constructor(
             presentationRemoteDataSource.deleteAnalysis(analysisResultId = analysisResultId)
         }.mapDomainFailure()
 
+    override suspend fun getUpcomingPresentations(): Result<List<PresentationInfo>> =
+        runCatching {
+            presentationRemoteDataSource.getUpcomingPresentations()
+        }.mapCatching { response ->
+            response.map(GetPresentationsResponse::toDomain)
+        }.mapDomainFailure()
+
+    override suspend fun getPastPresentations(): Result<List<PresentationInfo>> =
+        runCatching {
+            presentationRemoteDataSource.getPastPresentations()
+        }.mapCatching { response ->
+            response.map(GetPresentationsResponse::toDomain)
+        }.mapDomainFailure()
+
     override suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary> =
         runCatching {
             presentationRemoteDataSource.getUpcomingPresentationDetail(presentationId = presentationId)
+        }.mapCatching { response ->
+            response.toDomain()
+        }.mapDomainFailure()
+
+    override suspend fun getPastPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary> =
+        runCatching {
+            presentationRemoteDataSource.getPastPresentationDetail(presentationId = presentationId)
         }.mapCatching { response ->
             response.toDomain()
         }.mapDomainFailure()

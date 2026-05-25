@@ -3,6 +3,7 @@ package com.team.prezel.core.domain.repository.presentation
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
+import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
@@ -32,5 +33,11 @@ interface PresentationRepository {
 
     suspend fun deleteAnalysis(analysisResultId: Long): Result<Unit>
 
+    suspend fun getUpcomingPresentations(): Result<List<PresentationInfo>>
+
+    suspend fun getPastPresentations(): Result<List<PresentationInfo>>
+
     suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary>
+
+    suspend fun getPastPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary>
 }

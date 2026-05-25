@@ -23,6 +23,7 @@ data class PresentationAnalysisSummary(
     val totalErrorCount: Int,
     val growth: List<PresentationGrowthPoint>,
     val expectedQuestions: List<ExpectedQuestion>,
+    val selfFeedback: String?,
 )
 
 data class PresentationGrowthPoint(

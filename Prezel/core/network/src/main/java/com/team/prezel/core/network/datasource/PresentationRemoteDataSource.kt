@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.datasource
 
+import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -28,5 +29,11 @@ interface PresentationRemoteDataSource {
 
     suspend fun deleteAnalysis(analysisResultId: Long)
 
+    suspend fun getUpcomingPresentations(): List<GetPresentationsResponse>
+
+    suspend fun getPastPresentations(): List<GetPresentationsResponse>
+
     suspend fun getUpcomingPresentationDetail(presentationId: Long): PresentationSummaryResponse
+
+    suspend fun getPastPresentationDetail(presentationId: Long): PresentationSummaryResponse
 }
