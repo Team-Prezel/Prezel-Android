@@ -1,0 +1,147 @@
+package com.team.prezel.feature.report.impl
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.BasicPreview
+import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.report.impl.component.ReportBodyContent
+import com.team.prezel.feature.report.impl.component.ReportHeaderContent
+import com.team.prezel.feature.report.impl.component.ReportScreenLayout
+import com.team.prezel.feature.report.impl.contract.AnalysisReportUiEffect
+import com.team.prezel.feature.report.impl.contract.AnalysisReportUiIntent
+import com.team.prezel.feature.report.impl.contract.AnalysisReportUiState
+import com.team.prezel.feature.report.impl.preview.ReportPreviewPastUiState
+import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
+
+@Composable
+internal fun AnalysisReportScreen(
+    navigateToHome: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: AnalysisReportViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                AnalysisReportUiEffect.NavigateHome -> navigateToHome()
+            }
+        }
+    }
+
+    AnalysisReportScreen(
+        uiState = uiState,
+        onBackClick = onBack,
+        onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
+        onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun AnalysisReportScreen(
+    uiState: AnalysisReportUiState,
+    onBackClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onImprovementCardIndexChange: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (uiState) {
+        is AnalysisReportUiState.Content -> {
+            AnalysisReportScreenContent(
+                uiState = uiState,
+                onBackClick = onBackClick,
+                onDeleteClick = onDeleteClick,
+                modifier = modifier,
+                onImprovementCardIndexChange = onImprovementCardIndexChange,
+            )
+        }
+
+        AnalysisReportUiState.Loading -> Unit
+    }
+}
+
+@Composable
+private fun AnalysisReportScreenContent(
+    uiState: AnalysisReportUiState.Content,
+    onBackClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onImprovementCardIndexChange: (index: Int) -> Unit,
+    modifier: Modifier,
+) {
+    ReportScreenLayout(
+        appBarTitle = uiState.presentationInfo.title,
+        leadingIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    painter = painterResource(PrezelIcons.ArrowLeft),
+                    contentDescription = stringResource(R.string.feature_report_impl_back),
+                    tint = PrezelTheme.colors.iconRegular,
+                )
+            }
+        },
+        headerContent = { titleModifier ->
+            ReportHeaderContent(
+                info = uiState.presentationInfo,
+                titleModifier = titleModifier,
+            )
+        },
+        bodyContent = {
+            ReportBodyContent(
+                uiState = uiState,
+                onDeleteClick = onDeleteClick,
+                onImprovementCardIndexChange = onImprovementCardIndexChange,
+            )
+        },
+        modifier = modifier,
+    )
+}
+
+@BasicPreview
+@Composable
+private fun UpcomingAnalysisReportScreenPreview() {
+    PrezelTheme {
+        AnalysisReportScreen(
+            uiState = ReportPreviewUpcomingUiState,
+            onBackClick = { },
+            onDeleteClick = { },
+            onImprovementCardIndexChange = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun PastAnalysisReportScreenPreview() {
+    PrezelTheme {
+        AnalysisReportScreen(
+            uiState = ReportPreviewPastUiState,
+            onBackClick = { },
+            onDeleteClick = { },
+            onImprovementCardIndexChange = {},
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun AnalysisReportScreenLoadingPreview() {
+    PrezelTheme {
+        AnalysisReportScreen(
+            uiState = AnalysisReportUiState.Loading,
+            onBackClick = { },
+            onDeleteClick = { },
+            onImprovementCardIndexChange = {},
+        )
+    }
+}

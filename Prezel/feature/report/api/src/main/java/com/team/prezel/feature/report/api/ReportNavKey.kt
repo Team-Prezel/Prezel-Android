@@ -4,14 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface ReportNavKey : NavKey {
-    @Serializable
-    data class History(
-        val id: Long,
-    ) : ReportNavKey
-
-    @Serializable
-    data class Analysis(
-        val presentationId: Long,
-    ) : ReportNavKey
-}
+data class ReportNavKey(
+    val presentationId: Long,
+    val isPast: Boolean = false,
+) : NavKey

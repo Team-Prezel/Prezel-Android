@@ -32,6 +32,7 @@ internal fun HistoryItemList(
             vertical = PrezelTheme.spacing.V16,
         ),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V14),
+        overscrollEffect = null,
     ) {
         items(items = items, key = { item -> item.id }) { item ->
             HistoryPresentationCard(

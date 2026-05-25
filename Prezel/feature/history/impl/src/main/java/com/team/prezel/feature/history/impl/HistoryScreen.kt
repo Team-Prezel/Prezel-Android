@@ -39,10 +39,12 @@ import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HistoryScreen(
+    navigateToReport: (presentationId: Long, isPast: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
@@ -64,6 +66,10 @@ internal fun HistoryScreen(
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
+
+                is HistoryUiEffect.NavigateToReport -> {
+                    navigateToReport(effect.presentationId, effect.isPast)
+                }
             }
         }
     }
@@ -72,7 +78,7 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
-        onClickHistoryItem = { },
+        onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.id)) },
     )
 }
 
@@ -136,10 +142,7 @@ private fun HistoryContent(
                 }
 
                 is HistoryUiState.Content -> {
-                    val items = uiState.pages
-                        .firstOrNull { it.type == pageType }
-                        ?.items
-                        ?: persistentListOf()
+                    val items = uiState.currentPageItem(type = pageType)
 
                     if (items.isEmpty()) {
                         HistoryEmptyContent(
@@ -149,7 +152,7 @@ private fun HistoryContent(
                         )
                     } else {
                         HistoryItemList(
-                            items = items,
+                            items = items.toImmutableList(),
                             onClickItem = onClickHistoryItem,
                             modifier = Modifier.fillMaxSize(),
                         )

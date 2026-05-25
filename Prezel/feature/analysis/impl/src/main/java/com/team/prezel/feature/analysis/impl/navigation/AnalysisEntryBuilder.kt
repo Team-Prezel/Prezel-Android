@@ -21,7 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
             onBack = { navigator.replaceRoot(HomeNavKey) },
             navigateToReport = { presentationId ->
                 navigator.navigate(
-                    key = ReportNavKey.Analysis(presentationId = presentationId),
+                    key = ReportNavKey(presentationId = presentationId),
                     clearStack = true,
                 )
             },

@@ -1,5 +1,6 @@
 package com.team.prezel.feature.history.impl.component
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -113,7 +114,7 @@ private fun HistoryPresentationCardChips(
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HistoryCategoryChip(text = stringResource(item.category.labelResId()))
+        HistoryCategoryChip(text = stringResource(item.category.labelResId()), category = item.category)
         HistoryMetaChip(text = stringResource(item.purpose.labelResId()))
         HistoryMetaChip(text = stringResource(item.style.labelResId()))
         HistoryMetaChip(text = stringResource(item.audience.labelResId()))
@@ -123,12 +124,13 @@ private fun HistoryPresentationCardChips(
 @Composable
 private fun HistoryCategoryChip(
     text: String,
+    category: Category,
     modifier: Modifier = Modifier,
 ) {
     PrezelChip(
         text = text,
         modifier = modifier,
-        iconResId = PrezelIcons.Blank,
+        iconResId = category.iconResId(),
         type = ChipType.FILLED,
         size = ChipSize.SMALL,
         state = ChipState.ACTIVE,
@@ -146,6 +148,7 @@ private fun HistoryMetaChip(
         modifier = modifier,
         type = ChipType.OUTLINED,
         size = ChipSize.SMALL,
+        hierarchy = ChipHierarchy.PRIMARY,
         status = ChipStatus.DEFAULT,
     )
 }
@@ -157,6 +160,15 @@ private fun Category.labelResId(): Int =
         Category.WORK -> R.string.feature_history_impl_category_work
         Category.OFFER -> R.string.feature_history_impl_category_offer
         Category.EVENT -> R.string.feature_history_impl_category_event
+    }
+
+@DrawableRes
+private fun Category.iconResId(): Int =
+    when (this) {
+        Category.EDUCATION -> PrezelIcons.College
+        Category.WORK -> PrezelIcons.Company
+        Category.OFFER -> PrezelIcons.Hand
+        Category.EVENT -> PrezelIcons.Balloon
     }
 
 @StringRes

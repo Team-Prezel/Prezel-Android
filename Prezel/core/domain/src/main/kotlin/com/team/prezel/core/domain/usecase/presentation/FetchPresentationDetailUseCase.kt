@@ -7,6 +7,12 @@ import javax.inject.Inject
 class FetchPresentationDetailUseCase @Inject constructor(
     private val presentationRepository: PresentationRepository,
 ) {
-    suspend operator fun invoke(presentationId: Long): Result<PresentationAnalysisSummary> =
-        presentationRepository.getUpcomingPresentationDetail(presentationId = presentationId)
+    suspend operator fun invoke(
+        presentationId: Long,
+        isPast: Boolean = false,
+    ): Result<PresentationAnalysisSummary> {
+        if (isPast) return presentationRepository.getPastPresentationDetail(presentationId = presentationId)
+
+        return presentationRepository.getUpcomingPresentationDetail(presentationId = presentationId)
+    }
 }

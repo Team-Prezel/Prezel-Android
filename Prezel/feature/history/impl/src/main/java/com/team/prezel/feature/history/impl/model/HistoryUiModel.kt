@@ -3,7 +3,7 @@ package com.team.prezel.feature.history.impl.model
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Presentation
+import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import kotlinx.datetime.LocalDate
@@ -20,8 +20,6 @@ internal data class HistoryUiModel(
     val style: Style,
     val audience: Audience,
 ) {
-    val isPreparing: Boolean = dDay >= 0
-
     val dDayLabel: String = when {
         dDay > 0 -> "D-$dDay"
         dDay == 0 -> "D-Day"
@@ -31,18 +29,16 @@ internal data class HistoryUiModel(
     val dateLabel: String = "%04d.%02d.%02d".format(date.year, date.month.number, date.day)
 
     companion object {
-        fun toUiModel(presentation: Presentation): HistoryUiModel {
-            val dDay = presentation.dDay()
-            return HistoryUiModel(
-                id = presentation.id,
-                dDay = dDay,
-                date = presentation.date,
-                title = presentation.title,
-                category = presentation.category,
-                purpose = presentation.purpose,
-                style = presentation.style,
-                audience = presentation.audience,
+        fun PresentationInfo.toUiModel(): HistoryUiModel =
+            HistoryUiModel(
+                id = id,
+                dDay = dDay.toIntOrNull() ?: -1,
+                date = presentationDate,
+                title = title,
+                category = category,
+                purpose = purpose,
+                style = style,
+                audience = audience,
             )
-        }
     }
 }

@@ -2,11 +2,8 @@ package com.team.prezel.feature.home.impl.main.model
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Presentation
+import com.team.prezel.core.model.presentation.PresentationInfo
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
 
 @Immutable
 internal data class PresentationUiModel(
@@ -26,13 +23,13 @@ internal data class PresentationUiModel(
     }
 
     companion object {
-        fun Presentation.toUiModel(now: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): PresentationUiModel =
+        fun PresentationInfo.toUiModel(): PresentationUiModel =
             PresentationUiModel(
                 id = id,
                 category = category,
                 title = title,
-                date = date,
-                dDay = dDay(now = now),
+                date = presentationDate,
+                dDay = dDay.toIntOrNull() ?: -1,
             )
     }
 }

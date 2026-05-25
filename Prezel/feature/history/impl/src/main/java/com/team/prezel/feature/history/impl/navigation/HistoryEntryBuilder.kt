@@ -2,8 +2,10 @@ package com.team.prezel.feature.history.impl.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.history.impl.HistoryScreen
+import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +14,13 @@ import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
     entry<HistoryNavKey> {
-        HistoryScreen()
+        val navigator = LocalNavigator.current
+
+        HistoryScreen(
+            navigateToReport = { presentationId, isPast ->
+                navigator.navigate(ReportNavKey(presentationId = presentationId, isPast = isPast))
+            },
+        )
     }
 }
 

@@ -7,4 +7,9 @@ internal sealed interface HistoryUiEffect : UiEffect {
     data class ShowMessage(
         val message: HistoryUiMessage,
     ) : HistoryUiEffect
+
+    data class NavigateToReport(
+        val presentationId: Long,
+        val isPast: Boolean,
+    ) : HistoryUiEffect
 }
