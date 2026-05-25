@@ -8,4 +8,8 @@ internal sealed interface AnalysisReportUiIntent : UiIntent {
     data class ClickGrowthGraphItem(
         val index: Int,
     ) : AnalysisReportUiIntent
+
+    data object DismissDialog : AnalysisReportUiIntent
+
+    data object ClickDialogConform : AnalysisReportUiIntent
 }

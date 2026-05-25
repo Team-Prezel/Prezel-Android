@@ -16,6 +16,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.report.impl.component.ReportBodyContent
 import com.team.prezel.feature.report.impl.component.ReportHeaderContent
 import com.team.prezel.feature.report.impl.component.ReportScreenLayout
+import com.team.prezel.feature.report.impl.component.modal.ReportDialog
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiEffect
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiState
@@ -24,7 +25,6 @@ import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
 
 @Composable
 internal fun AnalysisReportScreen(
-    navigateToHome: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
@@ -34,7 +34,7 @@ internal fun AnalysisReportScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                AnalysisReportUiEffect.NavigateHome -> navigateToHome()
+                AnalysisReportUiEffect.NavigateToBack -> onBack()
             }
         }
     }
@@ -44,6 +44,8 @@ internal fun AnalysisReportScreen(
         onBackClick = onBack,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
+        onDialogDismiss = { viewModel.onIntent(AnalysisReportUiIntent.DismissDialog) },
+        onDialogConfirmClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDialogConform) },
         modifier = modifier,
     )
 }
@@ -54,6 +56,8 @@ internal fun AnalysisReportScreen(
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
+    onDialogDismiss: () -> Unit,
+    onDialogConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -64,6 +68,8 @@ internal fun AnalysisReportScreen(
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
+                onDialogDismiss = onDialogDismiss,
+                onDialogConfirmClick = onDialogConfirmClick,
             )
         }
 
@@ -77,8 +83,18 @@ private fun AnalysisReportScreenContent(
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
+    onDialogDismiss: () -> Unit,
+    onDialogConfirmClick: () -> Unit,
     modifier: Modifier,
 ) {
+    uiState.reportDialog?.let { type ->
+        ReportDialog(
+            type = type,
+            onDismissClick = onDialogDismiss,
+            onConformClick = onDialogConfirmClick,
+        )
+    }
+
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
         leadingIcon = {
@@ -116,6 +132,8 @@ private fun UpcomingAnalysisReportScreenPreview() {
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
+            onDialogDismiss = {},
+            onDialogConfirmClick = {},
         )
     }
 }
@@ -129,6 +147,8 @@ private fun PastAnalysisReportScreenPreview() {
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
+            onDialogDismiss = {},
+            onDialogConfirmClick = {},
         )
     }
 }
@@ -142,6 +162,8 @@ private fun AnalysisReportScreenLoadingPreview() {
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
+            onDialogDismiss = {},
+            onDialogConfirmClick = {},
         )
     }
 }

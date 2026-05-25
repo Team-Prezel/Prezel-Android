@@ -4,7 +4,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
-import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
 import com.team.prezel.feature.report.impl.AnalysisReportScreen
 import com.team.prezel.feature.report.impl.AnalysisReportViewModel
@@ -19,7 +18,6 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
         val navigator = LocalNavigator.current
 
         AnalysisReportScreen(
-            navigateToHome = { navigator.replaceRoot(HomeNavKey) },
             onBack = { navigator.goBack() },
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },

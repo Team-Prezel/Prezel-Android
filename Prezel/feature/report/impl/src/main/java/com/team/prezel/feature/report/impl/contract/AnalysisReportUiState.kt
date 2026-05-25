@@ -2,6 +2,7 @@ package com.team.prezel.feature.report.impl.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.ui.base.UiState
+import com.team.prezel.feature.report.impl.model.AnalysisReportDialog
 import com.team.prezel.feature.report.impl.model.GrowthGraphData
 import com.team.prezel.feature.report.impl.model.PresentationInfoUiModel
 import com.team.prezel.feature.report.impl.model.QuestionUiModel
@@ -24,5 +25,6 @@ internal sealed interface AnalysisReportUiState : UiState {
         val expectedQuestions: ImmutableList<QuestionUiModel>,
         val selfFeedback: String?,
         val isPast: Boolean,
+        val reportDialog: AnalysisReportDialog? = null,
     ) : AnalysisReportUiState
 }

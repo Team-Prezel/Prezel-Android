@@ -34,4 +34,20 @@
     <string name="feature_report_impl_empty_growth_graph">대본을 입력하고 실제 발화를 비교해\n발음과 대본 일치율을 분석해보세요.</string>
     <string name="feature_report_impl_empty_questions">대본을 입력하고 예상 질문을 받아보세요.</string>
     <string name="feature_report_impl_empty_practice_history">연습 기록이 아직 없어요.</string>
+
+    <!--  Dialog  -->
+    <string name="feature_report_impl_dialog_cancel_action">취소</string>
+    <string name="feature_report_impl_dialog_confirm_action">다시하기</string>
+    <string name="feature_report_impl_dialog_delete_action">삭제</string>
+
+    <string name="feature_report_impl_re_recording_dialog_title">다시 녹음하시겠어요?</string>
+    <string name="feature_report_impl_re_recording_dialog_description">새로운 녹음 시 기존 녹음은 사라집니다.</string>
+
+    <string name="feature_report_impl_re_write_script_dialog_title">다시 대본을 쓰시겠어요?</string>
+    <string name="feature_report_impl_re_write_script_dialog_description">새로운 대본 작성 시 기존 대본은 사라집니다.</string>
+
+    <string name="feature_report_impl_delete_report_dialog_title">분석 리포트를 삭제하시겠어요?</string>
+    <string name="feature_report_impl_delete_report_dialog_description">삭제된 분석 리포트는 다시 복구하기 어렵습니다.</string>
+
+
 </resources>
