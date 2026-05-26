@@ -4,6 +4,7 @@ import com.team.prezel.core.common.error.AppError
 import com.team.prezel.core.common.error.AppException
 import com.team.prezel.core.network.model.ApiException
 import com.team.prezel.core.network.model.ServerErrorCode
+import kotlinx.coroutines.CancellationException
 import java.io.IOException
 
 internal fun <T> Result<T>.mapDomainFailure(): Result<T> =
@@ -14,6 +15,8 @@ internal fun <T> Result<T>.mapDomainFailure(): Result<T> =
 
 private fun Throwable.toDomainThrowable(): Throwable =
     when (this) {
+        is CancellationException -> this
+
         is ApiException ->
             AppException(
                 error = errorCode.toDomainError(),
