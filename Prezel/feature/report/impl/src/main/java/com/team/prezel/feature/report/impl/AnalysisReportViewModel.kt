@@ -71,8 +71,8 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         val dialog = contentState?.reportDialog ?: return
 
         when (dialog) {
-            AnalysisReportDialog.RE_RECORDING -> Unit
-            AnalysisReportDialog.RE_WRITE_SCRIPT -> Unit
+            AnalysisReportDialog.RE_RECORDING -> navigateToAnalysisRecording()
+            AnalysisReportDialog.RE_WRITE_SCRIPT -> navigateToAnalysisScript()
             AnalysisReportDialog.DELETE_REPORT -> deletePresentation()
         }
     }
@@ -84,6 +84,22 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
             deletePresentationAnalysisUseCase(analysisResultId = analysisResultId!!)
                 .onSuccess { sendEffect(AnalysisReportUiEffect.NavigateToBack) }
                 .onFailure { sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.DELETE_REPORT_FAILED)) }
+        }
+    }
+
+    private fun navigateToAnalysisRecording() {
+        presentationId?.let { id ->
+            viewModelScope.launch {
+                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisRecording(presentationId = id))
+            }
+        }
+    }
+
+    private fun navigateToAnalysisScript() {
+        presentationId?.let { id ->
+            viewModelScope.launch {
+                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisScript(presentationId = id))
+            }
         }
     }
 
