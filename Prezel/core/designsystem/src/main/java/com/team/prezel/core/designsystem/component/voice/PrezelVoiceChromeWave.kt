@@ -245,8 +245,8 @@ private fun DrawScope.drawVoiceChromeWaveBaseline(
 
     drawLine(
         color = color,
-        start = Offset(x = size.width / 2f, y = 0f),
-        end = Offset(x = size.width / 2f, y = size.height),
+        start = Offset(x = 0f, y = size.height / 2f),
+        end = Offset(x = size.width, y = size.height / 2f),
         strokeWidth = strokeWidth,
     )
 }

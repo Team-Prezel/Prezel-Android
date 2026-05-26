@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -64,24 +65,26 @@ fun PrezelVoiceChrome(
     status: VoiceChromeStatus = VoiceChromeStatus.IDLE,
     gradient: VoiceChromeGradient = VoiceChromeGradient.NONE,
 ) {
-    val transition = rememberInfiniteTransition(label = "VoiceChromeGradientTransition")
-    val animatedGradientStop by transition.animateFloat(
-        initialValue = gradient.initialAnimatedStop,
-        targetValue = gradient.targetAnimatedStop,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 2400,
-                delayMillis = 160,
-                easing = LinearEasing,
+    val shouldAnimateGradient = status == VoiceChromeStatus.LISTENING &&
+        gradient != VoiceChromeGradient.NONE
+    val gradientStop = if (shouldAnimateGradient) {
+        val transition = rememberInfiniteTransition(label = "VoiceChromeGradientTransition")
+        val animatedGradientStop by transition.animateFloat(
+            initialValue = gradient.initialAnimatedStop,
+            targetValue = gradient.targetAnimatedStop,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 2400,
+                    delayMillis = 160,
+                    easing = LinearEasing,
+                ),
+                repeatMode = RepeatMode.Reverse,
             ),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "VoiceChromeGradientStop",
-    )
-    val gradientStop = when {
-        status != VoiceChromeStatus.LISTENING -> VoiceChromeGradient.NONE.stop
-        gradient == VoiceChromeGradient.NONE -> VoiceChromeGradient.NONE.stop
-        else -> animatedGradientStop
+            label = "VoiceChromeGradientStop",
+        )
+        animatedGradientStop
+    } else {
+        VoiceChromeGradient.NONE.stop
     }
 
     PrezelVoiceChromeContent(
@@ -207,7 +210,8 @@ private fun BoxScope.VoiceChromeLine(
     Box(
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .size(width = 360.dp, height = 4.dp)
+            .fillMaxWidth()
+            .height(4.dp)
             .drawWithCache {
                 val lineBrush = Brush.horizontalGradient(
                     colorStops = arrayOf(
@@ -239,10 +243,14 @@ private fun Modifier.voiceChromeBackground(
         val shouldDrawGradient = status == VoiceChromeStatus.LISTENING && gradientStop > 0f
         val gradientBrush = if (shouldDrawGradient) {
             Brush.radialGradient(
-                colorStops = arrayOf(
-                    0f to color,
-                    gradientStop to color.copy(alpha = 0f),
-                ),
+                0f to color.copy(alpha = 1f),
+                gradientStop * 0.12f to color.copy(alpha = 0.86f),
+                gradientStop * 0.24f to color.copy(alpha = 0.68f),
+                gradientStop * 0.38f to color.copy(alpha = 0.48f),
+                gradientStop * 0.54f to color.copy(alpha = 0.30f),
+                gradientStop * 0.72f to color.copy(alpha = 0.14f),
+                gradientStop * 0.88f to color.copy(alpha = 0.05f),
+                gradientStop to color.copy(alpha = 0f),
                 center = Offset(size.width / 2f, size.height),
                 radius = size.width,
             )
