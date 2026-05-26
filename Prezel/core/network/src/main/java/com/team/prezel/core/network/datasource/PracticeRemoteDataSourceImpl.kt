@@ -47,6 +47,8 @@ internal class PracticeRemoteDataSourceImpl @Inject constructor(
 
     private fun File.toChannelProvider(): ChannelProvider =
         ChannelProvider(size = length()) {
+            require(exists()) { "녹음 파일이 존재하지 않습니다: $path" }
+            require(canRead()) { "녹음 파일을 읽을 수 없습니다: $path" }
             inputStream().toByteReadChannel()
         }
 }

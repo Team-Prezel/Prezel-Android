@@ -41,10 +41,10 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                 append("purpose", purpose)
                 append("style", style)
                 append("audience", audience)
-                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
                 appendAudioPart(audioFilePath = audioFilePath)
-                scriptFilePath?.let { path ->
-                    appendTextPart(scriptFilePath = path)
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
                 }
             },
         )
@@ -104,7 +104,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         )
     }
 
-    private fun FormBuilder.appendTextPart(scriptFilePath: String) {
+    private fun FormBuilder.appendScriptPart(scriptFilePath: String) {
         val file = File(scriptFilePath)
 
         append(
@@ -119,6 +119,8 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 
     private fun File.toChannelProvider(): ChannelProvider =
         ChannelProvider(size = length()) {
+            require(exists()) { "파일이 존재하지 않습니다: $path" }
+            require(canRead()) { "파일을 읽을 수 없습니다: $path" }
             inputStream().toByteReadChannel()
         }
 }
