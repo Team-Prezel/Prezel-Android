@@ -93,10 +93,7 @@ internal class HttpClientFactory @Inject constructor(
         install(Logging) {
             logger = KtorPrettyLogger
             level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
-
-            if (!BuildConfig.DEBUG) {
-                sanitizeHeader { header -> header == HttpHeaders.Authorization }
-            }
+            sanitizeHeader { header -> header == HttpHeaders.Authorization }
         }
     }
 
