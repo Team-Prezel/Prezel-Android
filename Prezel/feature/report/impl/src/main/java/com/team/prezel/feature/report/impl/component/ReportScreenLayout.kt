@@ -194,6 +194,7 @@ private fun ReportScreenLayoutPreview() {
                     onImprovementCardIndexChange = {},
                     onReWriteScriptClick = {},
                     onReRecordingClick = {},
+                    onFeedBackWriteClick = {},
                 )
             },
         )

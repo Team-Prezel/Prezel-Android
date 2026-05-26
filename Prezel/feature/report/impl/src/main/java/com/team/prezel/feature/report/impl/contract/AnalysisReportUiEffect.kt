@@ -17,4 +17,8 @@ internal sealed interface AnalysisReportUiEffect : UiEffect {
     data class NavigateToAnalysisRecording(
         val presentationId: Long,
     ) : AnalysisReportUiEffect
+
+    data class NavigateToSelfFeedbackWrite(
+        val presentationId: Long,
+    ) : AnalysisReportUiEffect
 }

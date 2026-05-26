@@ -33,6 +33,7 @@ internal fun AnalysisReportScreen(
     onBack: () -> Unit,
     navigateToAnalysisScript: (presentationId: Long) -> Unit,
     navigateToAnalysisRecording: (presentationId: Long) -> Unit,
+    navigateToSelfFeedbackWrite: (presentationId: Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
@@ -53,6 +54,7 @@ internal fun AnalysisReportScreen(
 
                 is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId)
                 is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId)
+                is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> navigateToSelfFeedbackWrite(effect.presentationId)
             }
         }
     }
@@ -66,6 +68,7 @@ internal fun AnalysisReportScreen(
         onDialogConfirmClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDialogConform) },
         onReWriteScriptClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReWriteScript) },
         onReRecordingClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReRecording) },
+        onFeedBackWriteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickFeedbackWrite) },
         modifier = modifier,
     )
 }
@@ -80,6 +83,7 @@ internal fun AnalysisReportScreen(
     onDialogConfirmClick: () -> Unit,
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
+    onFeedBackWriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -94,6 +98,7 @@ internal fun AnalysisReportScreen(
                 onDialogConfirmClick = onDialogConfirmClick,
                 onReWriteScriptClick = onReWriteScriptClick,
                 onReRecordingClick = onReRecordingClick,
+                onFeedBackWriteClick = onFeedBackWriteClick,
             )
         }
 
@@ -111,6 +116,7 @@ private fun AnalysisReportScreenContent(
     onDialogConfirmClick: () -> Unit,
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
+    onFeedBackWriteClick: () -> Unit,
     modifier: Modifier,
 ) {
     uiState.reportDialog?.let { type ->
@@ -145,6 +151,7 @@ private fun AnalysisReportScreenContent(
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
                 onReWriteScriptClick = onReWriteScriptClick,
                 onReRecordingClick = onReRecordingClick,
+                onFeedBackWriteClick = onFeedBackWriteClick,
             )
         },
         modifier = modifier,
@@ -168,8 +175,9 @@ private fun UpcomingAnalysisReportScreenPreview() {
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
             onDialogConfirmClick = {},
-            onReWriteScriptClick = { },
+            onReWriteScriptClick = {},
             onReRecordingClick = {},
+            onFeedBackWriteClick = {},
         )
     }
 }
@@ -187,6 +195,7 @@ private fun PastAnalysisReportScreenPreview() {
             onDialogConfirmClick = {},
             onReWriteScriptClick = { },
             onReRecordingClick = {},
+            onFeedBackWriteClick = {},
         )
     }
 }
@@ -204,6 +213,7 @@ private fun AnalysisReportScreenLoadingPreview() {
             onDialogConfirmClick = {},
             onReWriteScriptClick = { },
             onReRecordingClick = {},
+            onFeedBackWriteClick = {},
         )
     }
 }

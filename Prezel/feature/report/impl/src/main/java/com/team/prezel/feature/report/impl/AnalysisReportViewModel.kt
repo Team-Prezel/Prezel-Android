@@ -43,6 +43,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
             AnalysisReportUiIntent.DismissDialog -> updateContent { copy(reportDialog = null) }
             AnalysisReportUiIntent.ClickReRecording -> updateContent { copy(reportDialog = AnalysisReportDialog.RE_RECORDING) }
             AnalysisReportUiIntent.ClickReWriteScript -> handleReWriteScriptClick()
+            AnalysisReportUiIntent.ClickFeedbackWrite -> navigateToSelfFeedbackWrite()
         }
     }
 
@@ -88,29 +89,24 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     }
 
     private fun navigateToAnalysisRecording() {
-        presentationId?.let { id ->
-            viewModelScope.launch {
-                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisRecording(presentationId = id))
-            }
-        }
+        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToAnalysisRecording) ?: return
+        viewModelScope.launch { sendEffect(effect) }
     }
 
     private fun navigateToAnalysisScript() {
-        presentationId?.let { id ->
-            viewModelScope.launch {
-                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisScript(presentationId = id))
-            }
-        }
+        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToAnalysisScript) ?: return
+        viewModelScope.launch { sendEffect(effect) }
     }
 
     private fun handleReWriteScriptClick() {
         if (contentState?.isScriptWritten == true) return updateContent { copy(reportDialog = AnalysisReportDialog.RE_WRITE_SCRIPT) }
 
-        viewModelScope.launch {
-            presentationId?.let { id ->
-                sendEffect(AnalysisReportUiEffect.NavigateToAnalysisScript(presentationId = id))
-            }
-        }
+        navigateToAnalysisScript()
+    }
+
+    private fun navigateToSelfFeedbackWrite() {
+        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToSelfFeedbackWrite) ?: return
+        viewModelScope.launch { sendEffect(effect) }
     }
 
     private val contentState: AnalysisReportUiState.Content? get() = (currentState as? AnalysisReportUiState.Content)

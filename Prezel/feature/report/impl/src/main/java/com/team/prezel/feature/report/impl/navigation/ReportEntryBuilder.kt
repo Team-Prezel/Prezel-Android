@@ -21,6 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
             onBack = { navigator.goBack() },
             navigateToAnalysisScript = {},
             navigateToAnalysisRecording = {},
+            navigateToSelfFeedbackWrite = {},
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
             ),

@@ -20,7 +20,10 @@ import com.team.prezel.feature.report.impl.component.common.ReportSection
 import com.team.prezel.feature.report.impl.preview.ReportPreviewPastUiState
 
 @Composable
-internal fun SelfFeedbackSection(selfFeedback: String?) {
+internal fun SelfFeedbackSection(
+    selfFeedback: String?,
+    onFeedBackWriteClick: () -> Unit,
+) {
     ReportSection(
         title = {
             Text(
@@ -36,7 +39,7 @@ internal fun SelfFeedbackSection(selfFeedback: String?) {
                 size = ButtonSize.REGULAR,
                 type = ButtonType.FILLED,
                 hierarchy = ButtonHierarchy.SECONDARY,
-                onClick = {},
+                onClick = onFeedBackWriteClick,
                 modifier = Modifier.fillMaxWidth(),
             )
         } else {
@@ -63,6 +66,7 @@ private fun SelfFeedbackSectionPreview() {
     PrezelTheme {
         SelfFeedbackSection(
             selfFeedback = ReportPreviewPastUiState.selfFeedback,
+            onFeedBackWriteClick = {},
         )
     }
 }
@@ -73,6 +77,7 @@ private fun EmptySelfFeedbackSectionPreview() {
     PrezelTheme {
         SelfFeedbackSection(
             selfFeedback = null,
+            onFeedBackWriteClick = {},
         )
     }
 }

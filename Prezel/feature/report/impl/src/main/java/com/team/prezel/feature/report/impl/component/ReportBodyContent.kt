@@ -38,9 +38,13 @@ internal fun ReportBodyContent(
     onImprovementCardIndexChange: (Int) -> Unit,
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
+    onFeedBackWriteClick: () -> Unit,
 ) {
     if (uiState.isPast) {
-        SelfFeedbackSection(selfFeedback = uiState.selfFeedback)
+        SelfFeedbackSection(
+            selfFeedback = uiState.selfFeedback,
+            onFeedBackWriteClick = onFeedBackWriteClick,
+        )
         // todo: API 배포 이후 수정 예정
         // PracticeHistorySection()
     }
@@ -91,6 +95,7 @@ private fun ReportBodyContentPreview() {
                 onImprovementCardIndexChange = { index -> uiState = updateSelectedGrowthCard(uiState, index) },
                 onReWriteScriptClick = {},
                 onReRecordingClick = {},
+                onFeedBackWriteClick = {},
             )
         }
     }
