@@ -149,7 +149,6 @@ private fun AnalysisStepContent(
         )
 
         AnalysisFlowStep.ANALYZING,
-        AnalysisFlowStep.REPORT,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
         -> AnalysisResultStepContent(
@@ -211,7 +210,6 @@ private fun AnalysisInputStepContent(
         )
 
         AnalysisFlowStep.ANALYZING,
-        AnalysisFlowStep.REPORT,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
         -> Unit

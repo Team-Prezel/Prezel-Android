@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.audio.AudioSessionEffect
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
-import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
@@ -91,20 +90,12 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
-            val analysisResult = submission.analyzePresentationRecording(
-                analysisFileCache = analysisFileCache,
-                analyzePresentationRecordingUseCase = analyzePresentationRecordingUseCase,
-            )
+            val analysisResult = submission.analyzePresentationRecording()
 
             analysisResult.fold(
                 onSuccess = { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        updateState {
-                            copy(
-                                step = AnalysisFlowStep.REPORT,
-                                analysisResult = result,
-                            )
-                        }
+                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
                     }
                 },
                 onFailure = { throwable ->
@@ -114,18 +105,17 @@ internal class AnalysisFlowViewModel @Inject constructor(
         }
     }
 
-                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
-                    }
-                }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
-        }
-    }
-
     private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
         runCatching {
-            val audioFile = analysisFileCache.copyUriToCache(
-                uriString = audioFileUri,
-                prefix = "audio",
-            )
+            val audioFilePath = audioFileUri
+                ?.let { uri ->
+                    val audioFile = analysisFileCache.copyUriToCache(
+                        uriString = uri,
+                        prefix = "audio",
+                    )
+                    audioFile.absolutePath
+                }
+                ?: recordingFilePath
             val scriptFile = scriptFileUri?.let { uri ->
                 analysisFileCache.copyUriToCache(
                     uriString = uri,
@@ -141,7 +131,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 audience = audience,
                 script = script,
                 scriptFilePath = scriptFile?.absolutePath,
-                audioFilePath = audioFile.absolutePath,
+                audioFilePath = audioFilePath,
             ).getOrThrow()
         }
 
@@ -215,10 +205,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
             AnalysisFlowStep.VOICE_RECORDING -> AnalysisFlowStep.SCRIPT_INPUT
             AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.VOICE_RECORDING
-            AnalysisFlowStep.REPORT -> AnalysisFlowStep.VOICE_RECORDING
             AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.VOICE_RECORDING
-            AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
-            AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
         }
 
@@ -299,40 +286,6 @@ private fun AnalysisForm.selectSituationOption(option: AnalysisSituationOption):
         is AnalysisSituationOption.PurposeOption -> copy(purpose = option.purpose)
         is AnalysisSituationOption.StyleOption -> copy(style = option.style)
         is AnalysisSituationOption.AudienceOption -> copy(audience = option.audience)
-    }
-
-private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
-    analysisFileCache: AnalysisFileCache,
-    analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
-): Result<PresentationRecordingAnalysisResult> =
-    runCatching {
-        val audioFilePath = audioFileUri
-            ?.let { uri ->
-                val audioFile = analysisFileCache.copyUriToCache(
-                    uriString = uri,
-                    prefix = "audio",
-                )
-                audioFile.absolutePath
-            }
-            ?: recordingFilePath
-        val scriptFile = scriptFileUri?.let { uri ->
-            analysisFileCache.copyUriToCache(
-                uriString = uri,
-                prefix = "script",
-            )
-        }
-
-        analyzePresentationRecordingUseCase(
-            name = name,
-            date = date.toRequestDate(),
-            category = category,
-            purpose = purpose,
-            style = style,
-            audience = audience,
-            script = script,
-            scriptFilePath = scriptFile?.absolutePath,
-            audioFilePath = audioFilePath,
-        ).getOrThrow()
     }
 
 private fun AnalysisFlowUiState.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {

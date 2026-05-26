@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,11 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.AudioSource
 import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
+import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChrome
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -83,7 +83,7 @@ private fun VoiceRecordingScreen(
         if (recordingState.isCompleted) {
             VoiceRecordingCompletedTopBar(onBack = onBack)
         } else {
-            VoiceRecordingHeader(
+            VoiceRecordingChromeTopBar(
                 recordingState = recordingState,
                 onBack = onBack,
             )
@@ -119,36 +119,38 @@ private fun VoiceRecordingCompletedTopBar(onBack: () -> Unit) {
             onBack = onBack,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .statusBarsPadding()
                 .padding(top = PrezelTheme.spacing.V4, end = PrezelTheme.spacing.V8),
         )
     }
 }
 
 @Composable
-private fun VoiceRecordingHeader(
+private fun VoiceRecordingChromeTopBar(
     recordingState: AudioSessionState,
     onBack: () -> Unit,
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(252.dp)
             .background(PrezelTheme.colors.bgMedium),
     ) {
-        VoiceRecordingCloseButton(
-            onBack = onBack,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = PrezelTheme.spacing.V4, end = PrezelTheme.spacing.V8),
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            VoiceRecordingCloseButton(
+                onBack = onBack,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .statusBarsPadding()
+                    .padding(top = PrezelTheme.spacing.V4, end = PrezelTheme.spacing.V8),
+            )
+        }
 
-        Text(
-            text = stringResource(recordingState.titleResId),
-            color = PrezelTheme.colors.interactiveRegular,
-            style = PrezelTheme.typography.title1Bold,
-            modifier = Modifier.align(Alignment.Center),
-            textAlign = TextAlign.Center,
+        PrezelVoiceChrome(
+            titleText = stringResource(recordingState.titleResId),
+            status = recordingState.toVoiceChromeStatus(),
+            gradient = VoiceChromeGradient.MIN,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

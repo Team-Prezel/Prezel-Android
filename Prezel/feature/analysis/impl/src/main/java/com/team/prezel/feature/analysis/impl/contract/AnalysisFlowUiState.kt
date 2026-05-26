@@ -13,7 +13,6 @@ internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
     val form: AnalysisForm = AnalysisForm(),
     val recordingState: AudioSessionState = AudioSessionState.Idle,
-    val analysisResult: PresentationRecordingAnalysisResult? = null,
 ) : UiState {
     val progress: Float
         get() = when (step) {

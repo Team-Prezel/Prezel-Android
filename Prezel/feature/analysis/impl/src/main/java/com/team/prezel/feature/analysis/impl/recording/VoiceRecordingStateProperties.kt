@@ -3,6 +3,7 @@ package com.team.prezel.feature.analysis.impl.recording
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.analysis.impl.R
@@ -40,6 +41,16 @@ internal val AudioSessionState.titleResId: Int
         is AudioSessionState.PausedRecording -> R.string.feature_analysis_impl_voice_recording_paused_title
         is AudioSessionState.ReadyToPlay -> R.string.feature_analysis_impl_voice_recording_playing_title
         is AudioSessionState.Playing -> R.string.feature_analysis_impl_voice_recording_playing_title
+    }
+
+internal fun AudioSessionState.toVoiceChromeStatus(): VoiceChromeStatus =
+    when (this) {
+        is AudioSessionState.Recording -> VoiceChromeStatus.LISTENING
+        is AudioSessionState.PausedRecording -> VoiceChromeStatus.WAITING
+        AudioSessionState.Idle,
+        is AudioSessionState.ReadyToPlay,
+        is AudioSessionState.Playing,
+        -> VoiceChromeStatus.IDLE
     }
 
 internal val AudioSessionState.actionIconResId: Int
