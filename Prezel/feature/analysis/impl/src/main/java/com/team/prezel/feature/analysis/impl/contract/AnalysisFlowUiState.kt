@@ -7,12 +7,15 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
     val form: AnalysisForm = AnalysisForm(),
     val recordingState: AudioSessionState = AudioSessionState.Idle,
+    val recordingVolumes: ImmutableList<Float> = persistentListOf(),
 ) : UiState {
     val progress: Float
         get() = when (step) {

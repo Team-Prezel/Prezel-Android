@@ -51,6 +51,8 @@ internal class MediaRecorderSession @Inject constructor(
             recorder!!.resume()
         }
 
+    override fun maxAmplitude(): Int = recorder?.maxAmplitude ?: 0
+
     override fun stop(elapsedSeconds: Int): Result<RecordedAudio> =
         runCatching {
             val file = currentAudioFile!!

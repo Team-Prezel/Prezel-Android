@@ -7,6 +7,8 @@ internal interface AudioRecorderSession {
 
     fun resume(): Result<Unit>
 
+    fun maxAmplitude(): Int
+
     fun stop(elapsedSeconds: Int): Result<RecordedAudio>
 
     fun reset()

@@ -1,5 +1,8 @@
 package com.team.prezel.feature.analysis.impl.recording
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,14 +40,18 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonH
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
+import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChromeWave
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.analysis.impl.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun VoiceRecordingContent(
     script: String,
     recordingState: AudioSessionState,
+    recordingVolumes: ImmutableList<Float>,
     onClickRecordingControl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -67,6 +75,7 @@ internal fun VoiceRecordingContent(
         if (recordingState !is AudioSessionState.Idle) {
             VoiceRecordingStatusArea(
                 recordingState = recordingState,
+                recordingVolumes = recordingVolumes,
                 onClickRecordingControl = onClickRecordingControl,
             )
         }
@@ -162,10 +171,15 @@ private fun VoiceRecordingScriptGradient(
 @Composable
 private fun VoiceRecordingStatusArea(
     recordingState: AudioSessionState,
+    recordingVolumes: ImmutableList<Float>,
     onClickRecordingControl: () -> Unit,
 ) {
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-    RecordingWaveform(modifier = Modifier.fillMaxWidth())
+    RecordingWaveform(
+        recordingState = recordingState,
+        recordingVolumes = recordingVolumes,
+        modifier = Modifier.fillMaxWidth(),
+    )
     Spacer(modifier = Modifier.height(recordingState.recordingStatusSpacing))
 
     if (recordingState.isCompleted) {
@@ -202,13 +216,78 @@ private fun ScriptZoomButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun RecordingWaveform(modifier: Modifier = Modifier) {
-    Spacer(
-        modifier = modifier
-            .height(60.dp)
-            .background(color = PrezelTheme.colors.bgLarge),
+private fun RecordingWaveform(
+    recordingState: AudioSessionState,
+    recordingVolumes: ImmutableList<Float>,
+    modifier: Modifier = Modifier,
+) {
+    val playbackProgress = recordingState.playbackProgress()
+
+    PrezelVoiceChromeWave(
+        status = recordingState.toVoiceChromeStatus(),
+        volumes = recordingState.visibleRecordingVolumes(
+            recordingVolumes = recordingVolumes,
+            playbackProgress = playbackProgress,
+        ),
+        showBaseline = false,
+        modifier = modifier,
     )
 }
+
+@Composable
+private fun AudioSessionState.playbackProgress(): Float {
+    if (this !is AudioSessionState.Playing) return playbackProgress
+
+    return key(source, durationSeconds) {
+        val animatedPlaybackProgress by animateFloatAsState(
+            targetValue = playbackProgress,
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = LinearEasing,
+            ),
+            label = "RecordingWaveformPlaybackProgress",
+        )
+
+        animatedPlaybackProgress
+    }
+}
+
+private fun AudioSessionState.visibleRecordingVolumes(
+    recordingVolumes: ImmutableList<Float>,
+    playbackProgress: Float,
+): ImmutableList<Float> =
+    when (this) {
+        is AudioSessionState.Playing -> {
+            if (durationSeconds <= 0 || recordingVolumes.isEmpty()) {
+                recordingVolumes
+            } else {
+                val visibleCount = (playbackProgress * recordingVolumes.size)
+                    .toInt()
+                    .coerceIn(1, recordingVolumes.size)
+                recordingVolumes.take(visibleCount).toImmutableList()
+            }
+        }
+
+        AudioSessionState.Idle,
+        is AudioSessionState.Recording,
+        is AudioSessionState.PausedRecording,
+        is AudioSessionState.ReadyToPlay,
+        -> recordingVolumes
+    }
+
+private val AudioSessionState.playbackProgress: Float
+    get() = when (this) {
+        is AudioSessionState.Playing -> {
+            if (durationSeconds <= 0) 0f else positionSeconds.toFloat() / durationSeconds
+        }
+
+        AudioSessionState.Idle,
+        is AudioSessionState.Recording,
+        is AudioSessionState.PausedRecording,
+        -> 0f
+
+        is AudioSessionState.ReadyToPlay -> 1f
+    }
 
 @Composable
 private fun RecordingTimer(

@@ -37,6 +37,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     init {
         collectAudioSessionState()
+        collectRecordingVolumes()
         collectAudioSessionEffect()
     }
 
@@ -230,6 +231,14 @@ internal class AnalysisFlowViewModel @Inject constructor(
         viewModelScope.launch {
             audioController.audioSessionState.collect { audioState ->
                 updateState { copy(recordingState = audioState) }
+            }
+        }
+    }
+
+    private fun collectRecordingVolumes() {
+        viewModelScope.launch {
+            audioController.recordingVolumes.collect { volumes ->
+                updateState { copy(recordingVolumes = volumes) }
             }
         }
     }

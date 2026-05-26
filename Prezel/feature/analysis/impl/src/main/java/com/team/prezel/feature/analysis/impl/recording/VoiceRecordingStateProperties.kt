@@ -47,10 +47,9 @@ internal fun AudioSessionState.toVoiceChromeStatus(): VoiceChromeStatus =
     when (this) {
         is AudioSessionState.Recording -> VoiceChromeStatus.LISTENING
         is AudioSessionState.PausedRecording -> VoiceChromeStatus.WAITING
-        AudioSessionState.Idle,
-        is AudioSessionState.ReadyToPlay,
-        is AudioSessionState.Playing,
-        -> VoiceChromeStatus.IDLE
+        is AudioSessionState.Playing -> VoiceChromeStatus.LISTENING
+        is AudioSessionState.ReadyToPlay -> VoiceChromeStatus.WAITING
+        AudioSessionState.Idle -> VoiceChromeStatus.IDLE
     }
 
 internal val AudioSessionState.actionIconResId: Int
