@@ -17,7 +17,7 @@ enum class PracticeRecordingOverallEvaluation(
     companion object {
         fun from(value: String): PracticeRecordingOverallEvaluation =
             entries.find { entry ->
-                entry.value == value.uppercase()
+                entry.value.equals(other = value, ignoreCase = true)
             } ?: throw IllegalArgumentException("지원하지 않는 타입입니다.")
     }
 }

@@ -12,7 +12,7 @@ enum class Style(
     companion object {
         fun from(value: String): Style =
             entries.find { entry ->
-                entry.value == value.uppercase()
+                entry.value.equals(other = value, ignoreCase = true)
             } ?: throw IllegalArgumentException("지원하지 않는 발표 스타일입니다.")
     }
 }

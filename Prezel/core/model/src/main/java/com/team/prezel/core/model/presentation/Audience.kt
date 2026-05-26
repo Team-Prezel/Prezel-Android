@@ -11,7 +11,7 @@ enum class Audience(
     companion object {
         fun from(value: String): Audience =
             entries.find { entry ->
-                entry.value == value.uppercase()
+                entry.value.equals(other = value, ignoreCase = true)
             } ?: throw IllegalArgumentException("지원하지 않는 청중 타입입니다.")
     }
 }

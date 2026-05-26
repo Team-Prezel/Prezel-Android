@@ -12,7 +12,7 @@ enum class Category(
     companion object {
         fun from(value: String): Category =
             entries.find { entry ->
-                entry.value == value.uppercase()
+                entry.value.equals(other = value, ignoreCase = true)
             } ?: throw IllegalArgumentException("지원하지 않는 발표 카테고리입니다.")
     }
 }

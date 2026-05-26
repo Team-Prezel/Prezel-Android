@@ -11,7 +11,7 @@ enum class Purpose(
     companion object {
         fun from(value: String): Purpose =
             entries.find { entry ->
-                entry.value == value.uppercase()
+                entry.value.equals(other = value, ignoreCase = true)
             } ?: throw IllegalArgumentException("지원하지 않는 발표 목적입니다.")
     }
 }
