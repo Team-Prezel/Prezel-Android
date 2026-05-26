@@ -103,6 +103,8 @@ private fun PresentationSituationScreen(
             onSelectStyle = onSelectStyle,
             onSelectAudience = onSelectAudience,
         )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
     }
 }
 

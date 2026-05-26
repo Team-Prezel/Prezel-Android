@@ -26,6 +26,7 @@ fun PrezelIconButton(
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
     enabled: Boolean = true,
     isRounded: Boolean = false,
+    isUseRipple: Boolean = true,
     buttonDefault: PrezelButtonDefault = PrezelButtonDefaults.getDefault(
         isIconOnly = true,
         isRounded = isRounded,
@@ -42,6 +43,7 @@ fun PrezelIconButton(
         onClick = onClick,
         modifier = modifier,
         config = buttonDefault,
+        isUseRipple = isUseRipple,
     )
 }
 

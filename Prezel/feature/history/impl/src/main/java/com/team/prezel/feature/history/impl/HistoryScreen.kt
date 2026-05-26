@@ -39,10 +39,13 @@ import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HistoryScreen(
+    navigateToReport: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
@@ -64,6 +67,10 @@ internal fun HistoryScreen(
                     }
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
                 }
+
+                is HistoryUiEffect.NavigateToReport -> {
+                    navigateToReport(effect.presentationId, effect.isPast)
+                }
             }
         }
     }
@@ -72,7 +79,8 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
-        onClickHistoryItem = { },
+        onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.presentationId)) },
+        onClickAddPresentation = navigateToAnalysis,
     )
 }
 
@@ -82,6 +90,7 @@ internal fun HistoryScreen(
     uiState: HistoryUiState,
     pagerState: PagerState,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -98,6 +107,7 @@ internal fun HistoryScreen(
             uiState = uiState,
             pagerState = pagerState,
             onClickHistoryItem = onClickHistoryItem,
+            onClickAddPresentation = onClickAddPresentation,
         )
     }
 }
@@ -107,6 +117,7 @@ private fun HistoryContent(
     uiState: HistoryUiState,
     pagerState: PagerState,
     onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickAddPresentation: () -> Unit,
 ) {
     val tabs = persistentListOf(
         stringResource(R.string.feature_history_impl_tab_preparing),
@@ -136,20 +147,17 @@ private fun HistoryContent(
                 }
 
                 is HistoryUiState.Content -> {
-                    val items = uiState.pages
-                        .firstOrNull { it.type == pageType }
-                        ?.items
-                        ?: persistentListOf()
+                    val items = uiState.currentPageItem(type = pageType)
 
                     if (items.isEmpty()) {
                         HistoryEmptyContent(
                             type = pageType,
-                            onClickAddPresentation = { },
+                            onClickAddPresentation = onClickAddPresentation,
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
                         HistoryItemList(
-                            items = items,
+                            items = items.toImmutableList(),
                             onClickItem = onClickHistoryItem,
                             modifier = Modifier.fillMaxSize(),
                         )
@@ -174,14 +182,14 @@ private fun HistoryScreenPreview() {
                 type = HistoryPageType.PREPARING,
                 items = persistentListOf(
                     HistoryUiModel(
-                        id = 1L,
-                        dDay = 5,
-                        date = LocalDate(2026, 4, 19),
+                        presentationId = 1L,
                         title = "캡스톤서비스기획 중간고사 발표",
+                        presentationDate = LocalDate(2026, 4, 19),
                         category = Category.EDUCATION,
                         purpose = Purpose.INFO,
                         style = Style.FORMAL,
                         audience = Audience.PROFESSIONAL,
+                        dDay = "D-5",
                     ),
                 ),
             ),
@@ -189,14 +197,14 @@ private fun HistoryScreenPreview() {
                 type = HistoryPageType.COMPLETED,
                 items = persistentListOf(
                     HistoryUiModel(
-                        id = 2L,
-                        dDay = -1,
-                        date = LocalDate(2026, 4, 12),
+                        presentationId = 2L,
                         title = "서비스 런칭 회고 발표",
+                        presentationDate = LocalDate(2026, 4, 12),
                         category = Category.OFFER,
                         purpose = Purpose.EMPATHY,
                         style = Style.CALM,
                         audience = Audience.GENERAL,
+                        dDay = "D+1",
                     ),
                 ),
             ),
@@ -209,6 +217,7 @@ private fun HistoryScreenPreview() {
             uiState = previewState,
             pagerState = pagerState,
             onClickHistoryItem = { },
+            onClickAddPresentation = {},
         )
     }
 }

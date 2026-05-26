@@ -4,6 +4,7 @@ import com.team.prezel.core.designsystem.R
 
 object PrezelIcons {
     val ArrowLeft = R.drawable.core_designsystem_ic_arrow_left
+    val ArrowTopRight = R.drawable.core_designsystem_ic_arrow_top_right
     val Balloon = R.drawable.core_designsystem_ic_balloon
     val Blank = R.drawable.core_designsystem_ic_blank
     val Calendar = R.drawable.core_designsystem_ic_calendar
@@ -43,6 +44,7 @@ object PrezelIcons {
     val Reset = R.drawable.core_designsystem_ic_reset
     val Rotate = R.drawable.core_designsystem_ic_rotate
     val Search = R.drawable.core_designsystem_ic_search
+    val Script = R.drawable.core_designsystem_ic_script
     val Setting = R.drawable.core_designsystem_ic_setting
     val SkipBackward = R.drawable.core_designsystem_ic_backward
     val SkipForward = R.drawable.core_designsystem_ic_forward

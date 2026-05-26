@@ -16,6 +16,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.clearAuthTokens
@@ -54,6 +55,7 @@ internal class HttpClientFactory @Inject constructor(
         block: HttpClientConfig<*>.() -> Unit = {
             configureDefaultRequest()
             installContentNegotiation()
+            installHttpTimeout()
             installUserAgent()
             installLogging()
             installAuth()
@@ -73,6 +75,14 @@ internal class HttpClientFactory @Inject constructor(
         }
     }
 
+    internal fun HttpClientConfig<*>.installHttpTimeout() {
+        install(HttpTimeout) {
+            // 분석 결과 대기 시간으로 인해 소켓 타임 아웃 시간을 30초로 설정.
+            // 추후 클라이언트 분리 혹은 다른 처리가 필요함.
+            socketTimeoutMillis = 30_000L
+        }
+    }
+
     internal fun HttpClientConfig<*>.installUserAgent() {
         install(UserAgent) {
             agent = buildUserAgent()
@@ -82,8 +92,8 @@ internal class HttpClientFactory @Inject constructor(
     internal fun HttpClientConfig<*>.installLogging() {
         install(Logging) {
             logger = KtorPrettyLogger
-            sanitizeHeader { header -> header == HttpHeaders.Authorization }
             level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
+            sanitizeHeader { header -> header == HttpHeaders.Authorization }
         }
     }
 

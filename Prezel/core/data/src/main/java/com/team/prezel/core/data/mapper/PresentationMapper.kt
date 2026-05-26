@@ -1,0 +1,108 @@
+package com.team.prezel.core.data.mapper
+
+import com.team.prezel.core.model.practice.RecordingSpeed
+import com.team.prezel.core.model.presentation.Audience
+import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.ExpectedQuestion
+import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
+import com.team.prezel.core.model.presentation.PresentationGrowthPoint
+import com.team.prezel.core.model.presentation.PresentationInfo
+import com.team.prezel.core.model.presentation.PresentationScriptDetail
+import com.team.prezel.core.model.presentation.PresentationWordDetail
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.ScriptCorrection
+import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.core.model.presentation.WordAnalysisDetail
+import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.PresentationExpectedQuestionResponse
+import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
+import com.team.prezel.core.network.model.presentation.PresentationScriptAnalysisResponse
+import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
+import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
+import com.team.prezel.core.network.model.presentation.PresentationWordAnalysisResponse
+import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import kotlinx.datetime.LocalDate
+
+internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary =
+    PresentationAnalysisSummary(
+        presentationId = presentationId,
+        analysisResultId = analysisResultId,
+        title = name,
+        category = Category.from(value = type),
+        purpose = Purpose.from(value = purpose),
+        style = Style.from(value = style),
+        audience = Audience.from(value = audience),
+        analyzedAt = analysisDate,
+        durationSeconds = durationSeconds,
+        formattedDuration = formattedDuration,
+        spm = spm,
+        speedEvaluation = RecordingSpeed.from(value = speedEval),
+        summaryFeedback = summaryFeedback,
+        accuracyScore = accuracyScore,
+        scriptMatchRate = scriptMatchRate,
+        spellErrorCount = spellErrorCount,
+        grammarErrorCount = grammarErrorCount,
+        totalErrorCount = totalErrorCount,
+        growth = growthGraph.map { item -> item.toDomain() },
+        expectedQuestions = expectedQuestions.map { item -> item.toDomain() },
+        selfFeedback = reviewContent,
+    )
+
+private fun PresentationGrowthResponse.toDomain(): PresentationGrowthPoint =
+    PresentationGrowthPoint(
+        attempt = attempt,
+        accuracyScore = accuracyScore,
+        scriptMatchRate = scriptMatchRate,
+    )
+
+private fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
+    ExpectedQuestion(
+        question = question,
+        answer = answer,
+    )
+
+internal fun PresentationScriptDetailResponse.toDomain(): PresentationScriptDetail =
+    PresentationScriptDetail(
+        presentationId = presentationId,
+        audioUrl = audioUrl,
+        originalScript = originalScript,
+        scriptCorrections = scriptDetails.map { item -> item.toDomain() },
+    )
+
+internal fun PresentationScriptAnalysisResponse.toDomain(): ScriptCorrection =
+    ScriptCorrection(
+        errorType = errorType,
+        sentence = sentence,
+        originalText = originalText,
+        correctedText = correctedText,
+        reason = reason,
+    )
+
+internal fun PresentationWordDetailResponse.toDomain(): PresentationWordDetail =
+    PresentationWordDetail(
+        presentationId = presentationId,
+        audioUrl = audioUrl,
+        wordDetails = wordDetails.map { item -> item.toDomain() },
+    )
+
+internal fun PresentationWordAnalysisResponse.toDomain(): WordAnalysisDetail =
+    WordAnalysisDetail(
+        word = word,
+        status = status,
+        description = description,
+        accuracy = accuracy,
+        startTimeMs = startTimeMs,
+        endTimeMs = endTimeMs,
+    )
+
+internal fun GetPresentationsResponse.toDomain(): PresentationInfo =
+    PresentationInfo(
+        id = presentationId,
+        title = title,
+        presentationDate = LocalDate.parse(presentationDate),
+        category = Category.from(value = type),
+        purpose = Purpose.from(value = purpose),
+        style = Style.from(value = style),
+        audience = Audience.from(value = audience),
+        dDay = dday,
+    )

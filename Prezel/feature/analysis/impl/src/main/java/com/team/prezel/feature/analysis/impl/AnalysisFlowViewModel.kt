@@ -5,9 +5,9 @@ import com.team.prezel.core.audio.AudioSessionEffect
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.practice.AnalyzePresentationRecordingUseCase
+import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AnalysisFlowViewModel @Inject constructor(
-    private val analyzePresentationRecordingUseCase: AnalyzePresentationRecordingUseCase,
+    private val analyzePresentationUseCase: AnalyzePresentationUseCase,
     private val analysisFileCache: AnalysisFileCache,
     private val audioController: RecordingAudioController,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
@@ -76,7 +76,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
                     AnalysisFlowStep.AUDIO_UPLOAD,
                     AnalysisFlowStep.VOICE_RECORDING,
                     AnalysisFlowStep.ANALYZING,
-                    AnalysisFlowStep.REPORT,
                     AnalysisFlowStep.FILE_RECOGNITION_FAILED,
                     AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
                     -> step
@@ -114,6 +113,37 @@ internal class AnalysisFlowViewModel @Inject constructor(
             )
         }
     }
+
+                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
+                    }
+                }.onFailure { throwable -> handleAnalysisFailure(throwable.toAnalysisFailureAction()) }
+        }
+    }
+
+    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
+        runCatching {
+            val audioFile = analysisFileCache.copyUriToCache(
+                uriString = audioFileUri,
+                prefix = "audio",
+            )
+            val scriptFile = scriptFileUri?.let { uri ->
+                analysisFileCache.copyUriToCache(
+                    uriString = uri,
+                    prefix = "script",
+                )
+            }
+            analyzePresentationUseCase(
+                name = name,
+                date = date.toRequestDate(),
+                category = category,
+                purpose = purpose,
+                style = style,
+                audience = audience,
+                script = script,
+                scriptFilePath = scriptFile?.absolutePath,
+                audioFilePath = audioFile.absolutePath,
+            ).getOrThrow()
+        }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
         when (action) {
@@ -187,6 +217,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.VOICE_RECORDING
             AnalysisFlowStep.REPORT -> AnalysisFlowStep.VOICE_RECORDING
             AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.VOICE_RECORDING
+            AnalysisFlowStep.ANALYZING -> AnalysisFlowStep.AUDIO_UPLOAD
+            AnalysisFlowStep.FILE_RECOGNITION_FAILED -> AnalysisFlowStep.AUDIO_UPLOAD
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFlowStep.SCRIPT_INPUT
         }
 

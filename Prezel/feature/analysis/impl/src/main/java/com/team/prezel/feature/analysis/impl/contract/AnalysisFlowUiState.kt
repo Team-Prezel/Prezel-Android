@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiState
@@ -29,7 +28,6 @@ internal data class AnalysisFlowUiState(
             -> 0.75f
 
             AnalysisFlowStep.ANALYZING,
-            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             -> 1f
         }
@@ -51,7 +49,6 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.AUDIO_UPLOAD -> !form.audioFileUri.isNullOrBlank()
             AnalysisFlowStep.VOICE_RECORDING -> recordingState.recordingFilePath != null
             AnalysisFlowStep.ANALYZING,
-            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> false
@@ -84,7 +81,6 @@ internal enum class AnalysisFlowStep {
     AUDIO_UPLOAD,
     VOICE_RECORDING,
     ANALYZING,
-    REPORT,
     FILE_RECOGNITION_FAILED,
     SCRIPT_FILE_RECOGNITION_FAILED,
 }

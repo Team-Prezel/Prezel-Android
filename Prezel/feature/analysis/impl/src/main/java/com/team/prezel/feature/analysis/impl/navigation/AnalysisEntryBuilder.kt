@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.analysis.impl.AnalysisScreen
-import com.team.prezel.feature.home.api.HomeNavKey
+import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,13 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
         val navigator = LocalNavigator.current
 
         AnalysisScreen(
-            onBack = { navigator.replaceRoot(HomeNavKey) },
+            onBack = { navigator.goBack() },
+            navigateToReport = { presentationId ->
+                navigator.navigate(
+                    key = ReportNavKey(presentationId = presentationId),
+                    clearStack = true,
+                )
+            },
         )
     }
 }
