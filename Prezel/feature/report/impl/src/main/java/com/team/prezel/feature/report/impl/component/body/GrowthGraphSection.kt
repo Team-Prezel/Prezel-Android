@@ -68,10 +68,10 @@ private fun GrowthGraphSectionTitle(onReRecordingClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.feature_report_impl_section_growth_graph),
-                style = PrezelTheme.typography.body2Bold,
+                style = PrezelTheme.typography.title2Bold,
                 color = PrezelTheme.colors.textLarge,
             )
             Spacer(modifier = Modifier.width(PrezelTheme.spacing.V4))

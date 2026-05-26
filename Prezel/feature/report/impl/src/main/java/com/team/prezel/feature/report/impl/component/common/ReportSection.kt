@@ -32,7 +32,7 @@ private fun ReportSectionPreview() {
             title = {
                 Text(
                     text = "Section Title",
-                    style = PrezelTheme.typography.body2Bold,
+                    style = PrezelTheme.typography.title2Bold,
                     color = PrezelTheme.colors.textLarge,
                 )
             },

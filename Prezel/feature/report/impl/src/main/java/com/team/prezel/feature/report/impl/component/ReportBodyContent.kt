@@ -100,6 +100,7 @@ private fun previewReportDetail(uiState: AnalysisReportUiState.Content): Analysi
     uiState.copy(
         growthGraphData = uiState.growthGraphData.copy(
             items = persistentListOf(),
+            selectedItemIndex = 0,
         ),
     )
 

@@ -52,7 +52,7 @@ internal fun AccuracySection(
 private fun AccuracySectionTitle() {
     Text(
         text = stringResource(R.string.feature_report_impl_section_accuracy),
-        style = PrezelTheme.typography.body2Bold,
+        style = PrezelTheme.typography.title2Bold,
         color = PrezelTheme.colors.textLarge,
     )
 }
@@ -115,8 +115,8 @@ private fun MetricLabel(
         ) {
             Text(
                 text = title,
-                style = PrezelTheme.typography.body3Medium,
-                color = PrezelTheme.colors.textMedium,
+                style = PrezelTheme.typography.body3Regular,
+                color = PrezelTheme.colors.textRegular,
             )
             PrezelTooltipBox(
                 text = stringResource(R.string.feature_report_impl_speed_tooltip),

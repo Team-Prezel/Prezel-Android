@@ -39,7 +39,7 @@ internal fun ExpectedQuestionsSection(questions: ImmutableList<QuestionUiModel>)
 private fun ExpectedQuestionsSectionTitle() {
     Text(
         text = stringResource(R.string.feature_report_impl_section_expected_questions),
-        style = PrezelTheme.typography.body2Bold,
+        style = PrezelTheme.typography.title2Bold,
         color = PrezelTheme.colors.textLarge,
     )
 }
@@ -50,19 +50,26 @@ private fun QuestionAccordionList(questions: ImmutableList<QuestionUiModel>) {
         CompositionLocalProvider(
             LocalContentColor provides PrezelTheme.colors.textLarge,
         ) {
-            questions.forEach { question ->
-                QuestionAccordion(question = question)
+            questions.forEachIndexed { index, question ->
+                QuestionAccordion(
+                    question = question,
+                    showDivider = index != questions.lastIndex,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun QuestionAccordion(question: QuestionUiModel) {
+private fun QuestionAccordion(
+    question: QuestionUiModel,
+    showDivider: Boolean,
+) {
     PrezelAccordion(
         title = question.question,
-        nested = false,
         initiallyExpanded = false,
+        nested = false,
+        showDivider = showDivider,
     ) {
         QuestionAnswer(answer = question.answer)
     }

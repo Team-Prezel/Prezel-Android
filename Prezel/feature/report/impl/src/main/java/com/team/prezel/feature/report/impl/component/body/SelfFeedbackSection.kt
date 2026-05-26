@@ -25,7 +25,7 @@ internal fun SelfFeedbackSection(selfFeedback: String?) {
         title = {
             Text(
                 text = stringResource(R.string.feature_report_impl_section_self_feedback),
-                style = PrezelTheme.typography.body2Bold,
+                style = PrezelTheme.typography.title2Bold,
                 color = PrezelTheme.colors.textLarge,
             )
         },

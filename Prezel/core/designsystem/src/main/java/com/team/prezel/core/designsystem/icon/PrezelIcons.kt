@@ -4,7 +4,7 @@ import com.team.prezel.core.designsystem.R
 
 object PrezelIcons {
     val ArrowLeft = R.drawable.core_designsystem_ic_arrow_left
-    val ArrowTopRight = R.drawable.core_designsystem_ic_top_right
+    val ArrowTopRight = R.drawable.core_designsystem_ic_arrow_top_right
     val Balloon = R.drawable.core_designsystem_ic_balloon
     val Blank = R.drawable.core_designsystem_ic_blank
     val Calendar = R.drawable.core_designsystem_ic_calendar

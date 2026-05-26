@@ -21,7 +21,7 @@ internal fun SummarySection(summary: String) {
         title = {
             Text(
                 text = stringResource(R.string.feature_report_impl_section_summary_feedback),
-                style = PrezelTheme.typography.body2Bold,
+                style = PrezelTheme.typography.title2Bold,
                 color = PrezelTheme.colors.textLarge,
             )
         },
