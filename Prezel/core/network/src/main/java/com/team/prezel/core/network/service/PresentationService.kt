@@ -46,12 +46,12 @@ interface PresentationService {
     @GET("recording/past")
     suspend fun getPastPresentations(): BaseResponse<List<GetPresentationsResponse>>
 
-    @GET("/recording/{presentationId}/upcoming")
+    @GET("recording/{presentationId}/upcoming")
     suspend fun getUpcomingPresentationDetail(
         @Path("presentationId") presentationId: Long,
     ): BaseResponse<GetPresentationDetailResponse>
 
-    @GET("/recording/{presentationId}/past")
+    @GET("recording/{presentationId}/past")
     suspend fun getPastPresentationDetail(
         @Path("presentationId") presentationId: Long,
     ): BaseResponse<GetPresentationDetailResponse>
