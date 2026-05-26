@@ -34,7 +34,7 @@ internal fun HistoryItemList(
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V14),
         overscrollEffect = null,
     ) {
-        items(items = items, key = { item -> item.id }) { item ->
+        items(items = items, key = { item -> item.presentationId }) { item ->
             HistoryPresentationCard(
                 item = item,
                 onClick = { onClickItem(item) },
@@ -50,24 +50,24 @@ private fun HistoryItemListPreview() {
         HistoryItemList(
             items = persistentListOf(
                 HistoryUiModel(
-                    id = 1L,
-                    dDay = 5,
-                    date = LocalDate(2025, 10, 20),
+                    presentationId = 1L,
                     title = "캡스톤서비스기획 중간고사 발표",
+                    presentationDate = LocalDate(2025, 10, 20),
                     category = Category.EDUCATION,
                     purpose = Purpose.INFO,
                     style = Style.FORMAL,
                     audience = Audience.PROFESSIONAL,
+                    dDay = "D-5",
                 ),
                 HistoryUiModel(
-                    id = 2L,
-                    dDay = 7,
-                    date = LocalDate(2025, 10, 22),
+                    presentationId = 2L,
                     title = "IT동아리 대규모 세미나",
+                    presentationDate = LocalDate(2025, 10, 22),
                     category = Category.WORK,
                     purpose = Purpose.INFO,
                     style = Style.FRIENDLY,
                     audience = Audience.GENERAL,
+                    dDay = "D-7",
                 ),
             ),
             onClickItem = { },

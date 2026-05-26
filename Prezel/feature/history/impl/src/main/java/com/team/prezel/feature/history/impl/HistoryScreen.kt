@@ -79,7 +79,7 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
-        onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.id)) },
+        onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.presentationId)) },
         onClickAddPresentation = navigateToAnalysis,
     )
 }
@@ -182,14 +182,14 @@ private fun HistoryScreenPreview() {
                 type = HistoryPageType.PREPARING,
                 items = persistentListOf(
                     HistoryUiModel(
-                        id = 1L,
-                        dDay = 5,
-                        date = LocalDate(2026, 4, 19),
+                        presentationId = 1L,
                         title = "캡스톤서비스기획 중간고사 발표",
+                        presentationDate = LocalDate(2026, 4, 19),
                         category = Category.EDUCATION,
                         purpose = Purpose.INFO,
                         style = Style.FORMAL,
                         audience = Audience.PROFESSIONAL,
+                        dDay = "D-5",
                     ),
                 ),
             ),
@@ -197,14 +197,14 @@ private fun HistoryScreenPreview() {
                 type = HistoryPageType.COMPLETED,
                 items = persistentListOf(
                     HistoryUiModel(
-                        id = 2L,
-                        dDay = -1,
-                        date = LocalDate(2026, 4, 12),
+                        presentationId = 2L,
                         title = "서비스 런칭 회고 발표",
+                        presentationDate = LocalDate(2026, 4, 12),
                         category = Category.OFFER,
                         purpose = Purpose.EMPATHY,
                         style = Style.CALM,
                         audience = Audience.GENERAL,
+                        dDay = "D+1",
                     ),
                 ),
             ),

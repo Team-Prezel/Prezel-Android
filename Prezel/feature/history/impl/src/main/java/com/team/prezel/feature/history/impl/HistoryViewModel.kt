@@ -63,7 +63,7 @@ internal class HistoryViewModel @Inject constructor(
 
     private fun handleClickItem(presentationId: Long) {
         val pastItems = (currentState as? HistoryUiState.Content)?.currentPageItem(type = HistoryPageType.COMPLETED).orEmpty()
-        val isPast = pastItems.any { history -> history.id == presentationId }
+        val isPast = pastItems.any { history -> history.presentationId == presentationId }
 
         viewModelScope.launch {
             sendEffect(HistoryUiEffect.NavigateToReport(presentationId = presentationId, isPast = isPast))

@@ -11,34 +11,28 @@ import kotlinx.datetime.number
 
 @Immutable
 internal data class HistoryUiModel(
-    val id: Long,
-    val dDay: Int,
-    val date: LocalDate,
+    val presentationId: Long,
     val title: String,
+    val presentationDate: LocalDate,
     val category: Category,
     val purpose: Purpose,
     val style: Style,
     val audience: Audience,
+    val dDay: String,
 ) {
-    val dDayLabel: String = when {
-        dDay > 0 -> "D-$dDay"
-        dDay == 0 -> "D-Day"
-        else -> "D+${-dDay}"
-    }
-
-    val dateLabel: String = "%04d.%02d.%02d".format(date.year, date.month.number, date.day)
+    val dateLabel: String = "%04d.%02d.%02d".format(presentationDate.year, presentationDate.month.number, presentationDate.day)
 
     companion object {
         fun PresentationInfo.toUiModel(): HistoryUiModel =
             HistoryUiModel(
-                id = id,
-                dDay = dDay.toIntOrNull() ?: -1,
-                date = presentationDate,
+                presentationId = id,
                 title = title,
+                presentationDate = presentationDate,
                 category = category,
                 purpose = purpose,
                 style = style,
                 audience = audience,
+                dDay = dDay,
             )
     }
 }

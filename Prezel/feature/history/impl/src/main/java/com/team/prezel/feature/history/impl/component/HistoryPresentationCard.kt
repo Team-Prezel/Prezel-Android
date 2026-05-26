@@ -55,7 +55,7 @@ internal fun HistoryPresentationCard(
             verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
         ) {
             HistoryPresentationCardHeader(
-                dDayLabel = item.dDayLabel,
+                dDayLabel = item.dDay,
                 dateLabel = item.dateLabel,
             )
             HistoryPresentationCardTitle(title = item.title)
@@ -207,14 +207,14 @@ private fun HistoryPresentationCardPreview() {
         ) {
             HistoryPresentationCard(
                 item = HistoryUiModel(
-                    id = 1L,
-                    dDay = 5,
-                    date = LocalDate(2025, 10, 20),
+                    presentationId = 1L,
                     title = "캡스톤서비스기획 중간고사 발표",
+                    presentationDate = LocalDate(2025, 10, 20),
                     category = Category.EDUCATION,
                     purpose = Purpose.INFO,
                     style = Style.FORMAL,
                     audience = Audience.PROFESSIONAL,
+                    dDay = "D-5",
                 ),
                 onClick = { },
             )
