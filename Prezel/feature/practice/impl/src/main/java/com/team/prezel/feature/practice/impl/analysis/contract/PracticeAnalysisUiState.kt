@@ -2,7 +2,7 @@ package com.team.prezel.feature.practice.impl.analysis.contract
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
-import com.team.prezel.core.model.practice.PracticeRecordingSpeed
+import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.core.ui.base.UiState
 import com.team.prezel.feature.practice.impl.analysis.model.PracticeAnalysisErrorType
 
@@ -14,7 +14,7 @@ internal sealed interface PracticeAnalysisUiState : UiState {
     @Immutable
     data class Success(
         val pronunciationScore: Int,
-        val speed: PracticeRecordingSpeed,
+        val speed: RecordingSpeed,
         val overallEvaluation: PracticeRecordingOverallEvaluation,
     ) : PracticeAnalysisUiState
 

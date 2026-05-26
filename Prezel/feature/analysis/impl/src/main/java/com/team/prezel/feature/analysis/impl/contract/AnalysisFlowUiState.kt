@@ -3,7 +3,6 @@ package com.team.prezel.feature.analysis.impl.contract
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationRecordingAnalysisResult
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiState
@@ -12,7 +11,6 @@ import com.team.prezel.core.ui.base.UiState
 internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
     val form: AnalysisForm = AnalysisForm(),
-    val analysisResult: PresentationRecordingAnalysisResult? = null,
 ) : UiState {
     val progress: Float
         get() = when (step) {
@@ -24,7 +22,6 @@ internal data class AnalysisFlowUiState(
 
             AnalysisFlowStep.AUDIO_UPLOAD -> 0.75f
             AnalysisFlowStep.ANALYZING,
-            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             -> 1f
         }
@@ -45,7 +42,6 @@ internal data class AnalysisFlowUiState(
 
             AnalysisFlowStep.AUDIO_UPLOAD -> !form.audioFileUri.isNullOrBlank()
             AnalysisFlowStep.ANALYZING,
-            AnalysisFlowStep.REPORT,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> false
@@ -77,7 +73,6 @@ internal enum class AnalysisFlowStep {
     SCRIPT_INPUT,
     AUDIO_UPLOAD,
     ANALYZING,
-    REPORT,
     FILE_RECOGNITION_FAILED,
     SCRIPT_FILE_RECOGNITION_FAILED,
 }

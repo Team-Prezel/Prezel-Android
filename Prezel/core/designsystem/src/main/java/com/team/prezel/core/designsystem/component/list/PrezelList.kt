@@ -68,7 +68,6 @@ private fun RowScope.PrezelListTitle(
     Text(
         text = title,
         modifier = Modifier.weight(1f),
-        maxLines = 1,
         style = prezelListTextStyle(size),
         color = textColor,
     )

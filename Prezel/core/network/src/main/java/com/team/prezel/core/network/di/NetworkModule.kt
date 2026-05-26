@@ -3,10 +3,12 @@ package com.team.prezel.core.network.di
 import com.team.prezel.core.network.client.HttpClientFactory
 import com.team.prezel.core.network.service.AuthService
 import com.team.prezel.core.network.service.PracticeService
+import com.team.prezel.core.network.service.PresentationService
 import com.team.prezel.core.network.service.TermsService
 import com.team.prezel.core.network.service.UserService
 import com.team.prezel.core.network.service.createAuthService
 import com.team.prezel.core.network.service.createPracticeService
+import com.team.prezel.core.network.service.createPresentationService
 import com.team.prezel.core.network.service.createTermsService
 import com.team.prezel.core.network.service.createUserService
 import dagger.Module
@@ -43,6 +45,10 @@ object NetworkModule {
     @Provides
     @Singleton
     internal fun providePracticeService(ktorfit: Ktorfit): PracticeService = ktorfit.createPracticeService()
+
+    @Provides
+    @Singleton
+    internal fun providePresentationService(ktorfit: Ktorfit): PresentationService = ktorfit.createPresentationService()
 
     @Provides
     @Singleton

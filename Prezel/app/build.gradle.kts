@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.featureAnalysisImpl)
     implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
+    implementation(projects.featureReportImpl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

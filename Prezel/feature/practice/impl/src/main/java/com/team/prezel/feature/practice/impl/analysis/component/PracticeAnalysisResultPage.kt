@@ -28,13 +28,13 @@ import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
-import com.team.prezel.core.model.practice.PracticeRecordingSpeed
+import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.feature.practice.impl.R
 
 @Composable
 internal fun PracticeAnalysisResultPage(
     pronunciationScore: Int,
-    speed: PracticeRecordingSpeed,
+    speed: RecordingSpeed,
     overallEvaluation: PracticeRecordingOverallEvaluation,
     onComplete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,7 +61,7 @@ private fun PracticeRecordingResultContent(
     @DrawableRes cardResId: Int,
     cardContentDescription: String,
     pronunciationScore: Int,
-    speed: PracticeRecordingSpeed,
+    speed: RecordingSpeed,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -110,7 +110,7 @@ private fun PracticeRecordingResultButtonArea(
 @Composable
 private fun PracticeAnalysisMetricRow(
     pronunciationScore: Int,
-    speed: PracticeRecordingSpeed,
+    speed: RecordingSpeed,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -156,12 +156,12 @@ private fun PracticeAnalysisMetricRow(
     }
 }
 
-private val PracticeRecordingSpeed.labelResId: Int
+private val RecordingSpeed.labelResId: Int
     @StringRes
     get() = when (this) {
-        PracticeRecordingSpeed.SLOW -> R.string.feature_practice_impl_practice_recording_analysis_speed_slow
-        PracticeRecordingSpeed.ADEQUATE -> R.string.feature_practice_impl_practice_recording_analysis_speed_adequate
-        PracticeRecordingSpeed.FAST -> R.string.feature_practice_impl_practice_recording_analysis_speed_fast
+        RecordingSpeed.SLOW -> R.string.feature_practice_impl_practice_recording_analysis_speed_slow
+        RecordingSpeed.ADEQUATE -> R.string.feature_practice_impl_practice_recording_analysis_speed_adequate
+        RecordingSpeed.FAST -> R.string.feature_practice_impl_practice_recording_analysis_speed_fast
     }
 
 private val PracticeRecordingOverallEvaluation.contentDescriptionResId: Int
@@ -199,7 +199,7 @@ private fun PracticeAnalysisResultPerfectPagePreview() {
     PrezelTheme {
         PracticeAnalysisResultPage(
             pronunciationScore = 96,
-            speed = PracticeRecordingSpeed.ADEQUATE,
+            speed = RecordingSpeed.ADEQUATE,
             overallEvaluation = PracticeRecordingOverallEvaluation.PERFECT,
             onComplete = {},
         )
@@ -212,7 +212,7 @@ private fun PracticeAnalysisResultGoodPagePreview() {
     PrezelTheme {
         PracticeAnalysisResultPage(
             pronunciationScore = 90,
-            speed = PracticeRecordingSpeed.ADEQUATE,
+            speed = RecordingSpeed.ADEQUATE,
             overallEvaluation = PracticeRecordingOverallEvaluation.GOOD,
             onComplete = {},
         )
@@ -225,7 +225,7 @@ private fun PracticeAnalysisResultTryPagePreview() {
     PrezelTheme {
         PracticeAnalysisResultPage(
             pronunciationScore = 58,
-            speed = PracticeRecordingSpeed.FAST,
+            speed = RecordingSpeed.FAST,
             overallEvaluation = PracticeRecordingOverallEvaluation.TRY,
             onComplete = {},
         )

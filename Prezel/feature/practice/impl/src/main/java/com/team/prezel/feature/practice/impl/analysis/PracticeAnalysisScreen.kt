@@ -9,7 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.practice.PracticeRecordingOverallEvaluation
-import com.team.prezel.core.model.practice.PracticeRecordingSpeed
+import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.feature.practice.impl.analysis.component.PracticeAnalysisFailurePage
 import com.team.prezel.feature.practice.impl.analysis.component.PracticeAnalysisLoadingPage
 import com.team.prezel.feature.practice.impl.analysis.component.PracticeAnalysisResultPage
@@ -79,7 +79,7 @@ private fun AnalysisScreenSuccessPreview() {
         PracticeAnalysisScreen(
             uiState = PracticeAnalysisUiState.Success(
                 pronunciationScore = 85,
-                speed = PracticeRecordingSpeed.ADEQUATE,
+                speed = RecordingSpeed.ADEQUATE,
                 overallEvaluation = PracticeRecordingOverallEvaluation.GOOD,
             ),
             onRetry = {},

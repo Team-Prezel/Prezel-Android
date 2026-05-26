@@ -3,7 +3,7 @@ package com.team.prezel.feature.home.impl.main
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Presentation
+import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -41,23 +41,25 @@ internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, 
 
     private fun getPresentations(): List<PresentationUiModel> =
         listOf(
-            Presentation(
+            PresentationInfo(
                 id = 1L,
                 title = "신규 서비스 제안 발표",
-                date = LocalDate(2026, 4, 10),
+                presentationDate = LocalDate(2026, 4, 10),
                 category = Category.OFFER,
                 purpose = Purpose.INFO,
                 style = Style.FORMAL,
                 audience = Audience.GENERAL,
+                dDay = "10",
             ),
-            Presentation(
+            PresentationInfo(
                 id = 2L,
                 title = "주간 업무 공유",
-                date = LocalDate(2026, 4, 12),
+                presentationDate = LocalDate(2026, 4, 12),
                 category = Category.WORK,
                 purpose = Purpose.INFO,
                 style = Style.FORMAL,
                 audience = Audience.GENERAL,
+                dDay = "10",
             ),
         ).map { presentation -> presentation.toUiModel() }
 }

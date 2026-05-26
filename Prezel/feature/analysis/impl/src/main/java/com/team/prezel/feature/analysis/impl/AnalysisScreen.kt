@@ -15,7 +15,6 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import com.team.prezel.feature.analysis.impl.result.AnalysisLoadingScreen
-import com.team.prezel.feature.analysis.impl.result.AnalysisReportScreen
 import com.team.prezel.feature.analysis.impl.result.FileRecognitionFailedScreen
 import com.team.prezel.feature.analysis.impl.result.ScriptFileRecognitionFailedScreen
 import com.team.prezel.feature.analysis.impl.schedule.PresentationScheduleScreen
@@ -25,6 +24,7 @@ import com.team.prezel.feature.analysis.impl.situation.PresentationSituationScre
 @Composable
 internal fun AnalysisScreen(
     onBack: () -> Unit,
+    navigateToReport: (presentationId: Long) -> Unit,
     viewModel: AnalysisFlowViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -35,6 +35,7 @@ internal fun AnalysisScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
+                is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
                         AnalysisUiMessage.AUTH_EXPIRED -> R.string.feature_analysis_impl_error_auth_expired
@@ -96,8 +97,6 @@ private fun AnalysisScreen(
         )
 
         AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen()
-
-        AnalysisFlowStep.REPORT -> AnalysisReportScreen()
 
         AnalysisFlowStep.FILE_RECOGNITION_FAILED -> FileRecognitionFailedScreen(
             onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.AUDIO)) },
