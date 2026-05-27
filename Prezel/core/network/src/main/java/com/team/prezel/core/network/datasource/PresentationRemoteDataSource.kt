@@ -20,6 +20,8 @@ interface PresentationRemoteDataSource {
 
     suspend fun reAnalyzePresentation(
         presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
         audioFilePath: String,
     ): PresentationSummaryResponse
 

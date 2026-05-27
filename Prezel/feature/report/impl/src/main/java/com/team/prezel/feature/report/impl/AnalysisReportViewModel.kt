@@ -30,6 +30,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
 
     private var presentationId: Long? = null
     private var analysisResultId: Long? = null
+    private val isPast: Boolean = navKey.isPast
 
     init {
         fetchData(presentationId = navKey.presentationId, isPast = navKey.isPast)
@@ -89,12 +90,22 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     }
 
     private fun navigateToAnalysisRecording() {
-        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToAnalysisRecording) ?: return
+        val effect = presentationId?.let {
+            AnalysisReportUiEffect.NavigateToAnalysisRecording(
+                presentationId = it,
+                isPast = isPast,
+            )
+        } ?: return
         viewModelScope.launch { sendEffect(effect) }
     }
 
     private fun navigateToAnalysisScript() {
-        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToAnalysisScript) ?: return
+        val effect = presentationId?.let {
+            AnalysisReportUiEffect.NavigateToAnalysisScript(
+                presentationId = it,
+                isPast = isPast,
+            )
+        } ?: return
         viewModelScope.launch { sendEffect(effect) }
     }
 

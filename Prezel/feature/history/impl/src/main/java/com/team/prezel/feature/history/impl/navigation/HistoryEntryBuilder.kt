@@ -22,7 +22,7 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
                 navigator.navigate(ReportNavKey(presentationId = presentationId, isPast = isPast))
             },
             navigateToAnalysis = {
-                navigator.navigate(AnalysisNavKey.Create)
+                navigator.navigate(AnalysisNavKey.Schedule())
             },
         )
     }

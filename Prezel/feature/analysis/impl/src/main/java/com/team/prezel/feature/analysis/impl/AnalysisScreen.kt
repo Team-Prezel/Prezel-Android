@@ -1,10 +1,10 @@
 package com.team.prezel.feature.analysis.impl
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
@@ -28,17 +28,23 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun AnalysisScreen(
     onBack: () -> Unit,
+    navigateToStep: (AnalysisFlowStep) -> Unit,
     navigateToReport: (presentationId: Long) -> Unit,
-    viewModel: AnalysisFlowViewModel = hiltViewModel(),
+    viewModel: AnalysisFlowViewModel,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
 
+    BackHandler {
+        viewModel.onIntent(AnalysisFlowUiIntent.Back)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
+                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step)
                 is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {

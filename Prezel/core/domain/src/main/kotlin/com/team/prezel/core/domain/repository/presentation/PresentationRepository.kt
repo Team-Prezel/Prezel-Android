@@ -24,6 +24,8 @@ interface PresentationRepository {
 
     suspend fun reAnalyzePresentation(
         presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
         audioFilePath: String,
     ): Result<PresentationAnalysisSummary>
 

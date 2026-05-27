@@ -16,19 +16,19 @@ internal data class AnalysisFlowUiState(
     val form: AnalysisForm = AnalysisForm(),
     val recordingState: AudioSessionState = AudioSessionState.Idle,
     val recordingVolumes: ImmutableList<Float> = persistentListOf(),
+    val reRecordingPresentationId: Long? = null,
+    val reWritingScriptPresentationId: Long? = null,
 ) : UiState {
     val progress: Float
         get() = when (step) {
             AnalysisFlowStep.PRESENTATION_SCHEDULE -> 0.25f
-            AnalysisFlowStep.PRESENTATION_SITUATION,
+            AnalysisFlowStep.PRESENTATION_SITUATION -> 0.5f
             AnalysisFlowStep.SCRIPT_INPUT,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
-            -> 0.5f
+            -> 0.75f
 
             AnalysisFlowStep.AUDIO_UPLOAD,
             AnalysisFlowStep.VOICE_RECORDING,
-            -> 0.75f
-
             AnalysisFlowStep.ANALYZING,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             -> 1f

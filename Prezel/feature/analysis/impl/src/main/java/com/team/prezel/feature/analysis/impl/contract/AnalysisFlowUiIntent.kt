@@ -1,12 +1,28 @@
 package com.team.prezel.feature.analysis.impl.contract
 
+import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiIntent
 
+@Immutable
 internal sealed interface AnalysisFlowUiIntent : UiIntent {
+    data class EnterStep(
+        val step: AnalysisFlowStep,
+    ) : AnalysisFlowUiIntent
+
+    data class StartReRecording(
+        val presentationId: Long,
+        val isPast: Boolean,
+    ) : AnalysisFlowUiIntent
+
+    data class StartReWritingScript(
+        val presentationId: Long,
+        val isPast: Boolean,
+    ) : AnalysisFlowUiIntent
+
     data class UpdatePresentationTitle(
         val title: String,
     ) : AnalysisFlowUiIntent

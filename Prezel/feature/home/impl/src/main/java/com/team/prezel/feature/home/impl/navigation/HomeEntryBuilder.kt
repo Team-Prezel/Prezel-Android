@@ -18,10 +18,10 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
 
         HomeScreen(
             navigateToFileUploadAnalysis = {
-                navigator.navigate(AnalysisNavKey.Create)
+                navigator.navigate(AnalysisNavKey.Schedule())
             },
             navigateToVoiceRecordingAnalysis = {
-                navigator.navigate(AnalysisNavKey.Create)
+                navigator.navigate(AnalysisNavKey.Schedule())
             },
         )
     }
