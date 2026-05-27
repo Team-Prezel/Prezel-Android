@@ -23,65 +23,31 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
-    entry<AnalysisNavKey.Schedule> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE),
-            stepToNavKey = key::toNavKey,
+    analysisEntry<AnalysisNavKey.Schedule> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE) }
+    analysisEntry<AnalysisNavKey.Situation> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SITUATION) }
+    analysisEntry<AnalysisNavKey.Script> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.SCRIPT_INPUT) }
+    analysisEntry<AnalysisNavKey.AudioUpload> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.AUDIO_UPLOAD) }
+    analysisEntry<AnalysisNavKey.Recording> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.VOICE_RECORDING) }
+    analysisEntry<AnalysisNavKey.Analyzing> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.ANALYZING) }
+    analysisEntry<AnalysisNavKey.ReRecording> { key ->
+        AnalysisFlowUiIntent.StartReRecording(
+            presentationId = key.presentationId,
+            isPast = key.isPast,
         )
     }
-    entry<AnalysisNavKey.Situation> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SITUATION),
-            stepToNavKey = key::toNavKey,
+    analysisEntry<AnalysisNavKey.ReWritingScript> { key ->
+        AnalysisFlowUiIntent.StartReWritingScript(
+            presentationId = key.presentationId,
+            isPast = key.isPast,
         )
     }
-    entry<AnalysisNavKey.Script> { key ->
+}
+
+private inline fun <reified T : AnalysisNavKey> EntryProviderScope<NavKey>.analysisEntry(crossinline enterIntent: (T) -> AnalysisFlowUiIntent) {
+    entry<T> { key ->
         AnalysisRoute(
             flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.SCRIPT_INPUT),
-            stepToNavKey = key::toNavKey,
-        )
-    }
-    entry<AnalysisNavKey.AudioUpload> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.AUDIO_UPLOAD),
-            stepToNavKey = key::toNavKey,
-        )
-    }
-    entry<AnalysisNavKey.Recording> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.VOICE_RECORDING),
-            stepToNavKey = key::toNavKey,
-        )
-    }
-    entry<AnalysisNavKey.Analyzing> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.ANALYZING),
-            stepToNavKey = key::toNavKey,
-        )
-    }
-    entry<AnalysisNavKey.ReRecording> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.StartReRecording(
-                presentationId = key.presentationId,
-                isPast = key.isPast,
-            ),
-            stepToNavKey = key::toNavKey,
-        )
-    }
-    entry<AnalysisNavKey.ReWritingScript> { key ->
-        AnalysisRoute(
-            flowId = key.flowId,
-            enterIntent = AnalysisFlowUiIntent.StartReWritingScript(
-                presentationId = key.presentationId,
-                isPast = key.isPast,
-            ),
+            enterIntent = enterIntent(key),
             stepToNavKey = key::toNavKey,
         )
     }
@@ -137,7 +103,7 @@ private tailrec fun Context.findViewModelStoreOwner(): ViewModelStoreOwner =
     when (this) {
         is ViewModelStoreOwner -> this
         is ContextWrapper -> baseContext.findViewModelStoreOwner()
-        else -> error("ViewModelStoreOwner is not available from context: $this")
+        else -> error("Context에서 ViewModelStoreOwner를 찾을 수 없습니다: $this")
     }
 
 @Module

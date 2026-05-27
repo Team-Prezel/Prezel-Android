@@ -7,27 +7,19 @@ import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.domain.usecase.presentation.ReAnalyzePresentationUseCase
-import com.team.prezel.core.model.presentation.Audience
-import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.analysis.impl.cache.AnalysisFileCache
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
-import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
-import com.team.prezel.feature.analysis.impl.contract.AnalysisSituationOption
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
-import com.team.prezel.feature.analysis.impl.contract.recordingFilePath
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,9 +33,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private var analyzeJob: Job? = null
 
     init {
-        collectAudioSessionState()
-        collectRecordingVolumes()
-        collectAudioSessionEffect()
+        collectAudioSession()
     }
 
     override fun onIntent(intent: AnalysisFlowUiIntent) {
@@ -64,7 +54,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 isPast = intent.isPast,
             )
 
-            AnalysisFlowUiIntent.ClickRecordingControl -> handleRecordingControlClick()
+            AnalysisFlowUiIntent.ClickRecordingControl -> audioController.handleControlClick(currentState.recordingState)
             AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
             AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
             is AnalysisFlowUiIntent.RetryFileUpload -> retryFileUpload(intent.uploadType)
@@ -252,9 +242,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             ).getOrThrow()
         }
 
-    private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(
-        presentationId: Long,
-    ): Result<PresentationAnalysisSummary> =
+    private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(presentationId: Long): Result<PresentationAnalysisSummary> =
         runCatching {
             val audioFilePath = audioFileUri
                 ?.let { uri ->
@@ -353,44 +341,36 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun moveBack() {
         if (currentState.step == AnalysisFlowStep.ANALYZING) analyzeJob?.cancel()
 
-        if (
-            currentState.step == AnalysisFlowStep.PRESENTATION_SCHEDULE ||
-            currentState.reRecordingPresentationId != null ||
-            currentState.reWritingScriptPresentationId != null
-        ) {
+        if (currentState.shouldResetRecordingOnBack) {
+            audioController.reset()
+        }
+
+        currentState.backClearedFormOrNull()?.let { clearedForm ->
+            updateState {
+                copy(form = clearedForm)
+            }
+        }
+
+        if (currentState.shouldReleaseAudioOnBack) {
             audioController.release()
         }
 
         viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateBack) }
     }
 
-    private fun handleRecordingControlClick() {
-        when (currentState.recordingState) {
-            AudioSessionState.Idle -> audioController.startRecording()
-            is AudioSessionState.Recording -> audioController.pauseRecording()
-            is AudioSessionState.PausedRecording -> audioController.resumeRecording()
-            is AudioSessionState.ReadyToPlay -> audioController.startPlayback()
-            is AudioSessionState.Playing -> audioController.stopPlayback()
-        }
-    }
-
-    private fun collectAudioSessionState() {
+    private fun collectAudioSession() {
         viewModelScope.launch {
             audioController.audioSessionState.collect { audioState ->
                 updateState { copy(recordingState = audioState) }
             }
         }
-    }
 
-    private fun collectRecordingVolumes() {
         viewModelScope.launch {
             audioController.recordingVolumes.collect { volumes ->
                 updateState { copy(recordingVolumes = volumes) }
             }
         }
-    }
 
-    private fun collectAudioSessionEffect() {
         viewModelScope.launch {
             audioController.audioSessionEffect.collect { effect ->
                 sendEffect(AnalysisFlowUiEffect.ShowMessage(effect.toUiMessage()))
@@ -398,91 +378,25 @@ internal class AnalysisFlowViewModel @Inject constructor(
         }
     }
 
-    private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
-        when (this) {
-            AudioSessionEffect.RecordingStartFailed -> AnalysisUiMessage.RECORDING_START_FAILED
-            AudioSessionEffect.RecordingStopFailed -> AnalysisUiMessage.RECORDING_STOP_FAILED
-            AudioSessionEffect.PlaybackStartFailed -> AnalysisUiMessage.PLAYBACK_START_FAILED
-        }
-
     override fun onCleared() {
         audioController.release()
         super.onCleared()
     }
 }
 
-private data class PresentationAnalysisSubmission(
-    val name: String,
-    val date: String,
-    val category: Category,
-    val purpose: Purpose,
-    val style: Style,
-    val audience: Audience,
-    val script: String?,
-    val scriptFileUri: String?,
-    val audioFileUri: String?,
-    val recordingFilePath: String,
-)
-
-private fun AnalysisFlowUiIntent.reduceFormOrNull(form: AnalysisForm): AnalysisForm? =
+private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
     when (this) {
-        is AnalysisFlowUiIntent.UpdatePresentationTitle -> form.copy(presentationTitle = title)
-        is AnalysisFlowUiIntent.UpdatePresentationDate -> form.copy(presentationDate = date)
-        is AnalysisFlowUiIntent.SelectScriptInputType -> form.copy(scriptInputType = inputType)
-        is AnalysisFlowUiIntent.UpdateScript -> form.copy(script = script)
-        is AnalysisFlowUiIntent.SelectScriptFile -> form.copy(scriptFileUri = fileUri)
-        is AnalysisFlowUiIntent.SelectAudioFile -> form.copy(audioFileUri = fileUri)
-        is AnalysisFlowUiIntent.SelectSituationOption -> form.selectSituationOption(option)
-        else -> null
+        AudioSessionEffect.RecordingStartFailed -> AnalysisUiMessage.RECORDING_START_FAILED
+        AudioSessionEffect.RecordingStopFailed -> AnalysisUiMessage.RECORDING_STOP_FAILED
+        AudioSessionEffect.PlaybackStartFailed -> AnalysisUiMessage.PLAYBACK_START_FAILED
     }
 
-private fun AnalysisForm.selectSituationOption(option: AnalysisSituationOption): AnalysisForm =
-    when (option) {
-        is AnalysisSituationOption.CategoryOption -> copy(category = option.category)
-        is AnalysisSituationOption.PurposeOption -> copy(purpose = option.purpose)
-        is AnalysisSituationOption.StyleOption -> copy(style = option.style)
-        is AnalysisSituationOption.AudienceOption -> copy(audience = option.audience)
+private fun RecordingAudioController.handleControlClick(recordingState: AudioSessionState) {
+    when (recordingState) {
+        AudioSessionState.Idle -> startRecording()
+        is AudioSessionState.Recording -> pauseRecording()
+        is AudioSessionState.PausedRecording -> resumeRecording()
+        is AudioSessionState.ReadyToPlay -> startPlayback()
+        is AudioSessionState.Playing -> stopPlayback()
     }
-
-private fun PresentationAnalysisSummary.toAnalysisForm(): AnalysisForm =
-    AnalysisForm(
-        presentationTitle = title,
-        presentationDate = analyzedAt,
-        category = category,
-        purpose = purpose,
-        style = style,
-        audience = audience,
-    )
-
-private fun AnalysisFlowUiState.toPresentationAnalysisSubmissionOrNull(): PresentationAnalysisSubmission? {
-    val category = form.category ?: return null
-    val purpose = form.purpose ?: return null
-    val style = form.style ?: return null
-    val audience = form.audience ?: return null
-    val recordingFilePath = form.audioFileUri ?: recordingState.recordingFilePath ?: return null
-    val isFileUpload = form.scriptInputType == ScriptInputType.FILE_UPLOAD
-
-    return PresentationAnalysisSubmission(
-        name = form.presentationTitle.trim(),
-        date = form.presentationDate,
-        category = category,
-        purpose = purpose,
-        style = style,
-        audience = audience,
-        script = form.script.takeIf { !isFileUpload && it.isNotBlank() },
-        scriptFileUri = form.scriptFileUri.takeIf { isFileUpload && !it.isNullOrBlank() },
-        audioFileUri = form.audioFileUri,
-        recordingFilePath = recordingFilePath,
-    )
 }
-
-private fun String.toRequestDate(): String =
-    runCatching {
-        val (year, month, day) = split("년 ", "월 ", "일")
-
-        LocalDate(
-            year = year.toInt(),
-            month = month.toInt(),
-            day = day.toInt(),
-        ).toString()
-    }.getOrDefault(this)
