@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
+import com.team.prezel.feature.analysis.api.AnalysisStartType
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.home.impl.main.HomeScreen
 import dagger.Module
@@ -18,10 +19,10 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
 
         HomeScreen(
             navigateToFileUploadAnalysis = {
-                navigator.navigate(AnalysisNavKey.Schedule())
+                navigator.navigate(AnalysisNavKey.Schedule(startType = AnalysisStartType.FILE_UPLOAD))
             },
             navigateToVoiceRecordingAnalysis = {
-                navigator.navigate(AnalysisNavKey.Schedule())
+                navigator.navigate(AnalysisNavKey.Schedule(startType = AnalysisStartType.VOICE_RECORDING))
             },
         )
     }

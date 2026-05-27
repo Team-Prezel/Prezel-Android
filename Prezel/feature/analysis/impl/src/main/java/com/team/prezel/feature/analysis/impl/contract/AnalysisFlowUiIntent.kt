@@ -6,11 +6,13 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiIntent
+import com.team.prezel.feature.analysis.api.AnalysisStartType
 
 @Immutable
 internal sealed interface AnalysisFlowUiIntent : UiIntent {
     data class EnterStep(
         val step: AnalysisFlowStep,
+        val startType: AnalysisStartType,
     ) : AnalysisFlowUiIntent
 
     data class StartReRecording(

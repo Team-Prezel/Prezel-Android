@@ -23,12 +23,12 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
-    analysisEntry<AnalysisNavKey.Schedule> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE) }
-    analysisEntry<AnalysisNavKey.Situation> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.PRESENTATION_SITUATION) }
-    analysisEntry<AnalysisNavKey.Script> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.SCRIPT_INPUT) }
-    analysisEntry<AnalysisNavKey.AudioUpload> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.AUDIO_UPLOAD) }
-    analysisEntry<AnalysisNavKey.Recording> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.VOICE_RECORDING) }
-    analysisEntry<AnalysisNavKey.Analyzing> { AnalysisFlowUiIntent.EnterStep(AnalysisFlowStep.ANALYZING) }
+    analysisEntry<AnalysisNavKey.Schedule> { key -> key.enterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE) }
+    analysisEntry<AnalysisNavKey.Situation> { key -> key.enterStep(AnalysisFlowStep.PRESENTATION_SITUATION) }
+    analysisEntry<AnalysisNavKey.Script> { key -> key.enterStep(AnalysisFlowStep.SCRIPT_INPUT) }
+    analysisEntry<AnalysisNavKey.AudioUpload> { key -> key.enterStep(AnalysisFlowStep.AUDIO_UPLOAD) }
+    analysisEntry<AnalysisNavKey.Recording> { key -> key.enterStep(AnalysisFlowStep.VOICE_RECORDING) }
+    analysisEntry<AnalysisNavKey.Analyzing> { key -> key.enterStep(AnalysisFlowStep.ANALYZING) }
     analysisEntry<AnalysisNavKey.ReRecording> { key ->
         AnalysisFlowUiIntent.StartReRecording(
             presentationId = key.presentationId,
@@ -42,6 +42,12 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
         )
     }
 }
+
+private fun AnalysisNavKey.enterStep(step: AnalysisFlowStep): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.EnterStep(
+        step = step,
+        startType = startType,
+    )
 
 private inline fun <reified T : AnalysisNavKey> EntryProviderScope<NavKey>.analysisEntry(crossinline enterIntent: (T) -> AnalysisFlowUiIntent) {
     entry<T> { key ->
@@ -85,18 +91,18 @@ private fun AnalysisRoute(
 
 private fun AnalysisNavKey.toNavKey(step: AnalysisFlowStep): AnalysisNavKey =
     when (step) {
-        AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisNavKey.Schedule(flowId = flowId)
-        AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisNavKey.Situation(flowId = flowId)
+        AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisNavKey.Schedule(flowId = flowId, startType = startType)
+        AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisNavKey.Situation(flowId = flowId, startType = startType)
         AnalysisFlowStep.SCRIPT_INPUT,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
-        -> AnalysisNavKey.Script(flowId = flowId)
+        -> AnalysisNavKey.Script(flowId = flowId, startType = startType)
 
-        AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisNavKey.AudioUpload(flowId = flowId)
+        AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisNavKey.AudioUpload(flowId = flowId, startType = startType)
         AnalysisFlowStep.VOICE_RECORDING,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
-        -> AnalysisNavKey.Recording(flowId = flowId)
+        -> AnalysisNavKey.Recording(flowId = flowId, startType = startType)
 
-        AnalysisFlowStep.ANALYZING -> AnalysisNavKey.Analyzing(flowId = flowId)
+        AnalysisFlowStep.ANALYZING -> AnalysisNavKey.Analyzing(flowId = flowId, startType = startType)
     }
 
 private tailrec fun Context.findViewModelStoreOwner(): ViewModelStoreOwner =

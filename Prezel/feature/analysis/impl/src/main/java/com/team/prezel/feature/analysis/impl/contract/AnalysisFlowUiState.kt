@@ -7,6 +7,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiState
+import com.team.prezel.feature.analysis.api.AnalysisStartType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -18,6 +19,7 @@ internal data class AnalysisFlowUiState(
     val recordingVolumes: ImmutableList<Float> = persistentListOf(),
     val reRecordingPresentationId: Long? = null,
     val reWritingScriptPresentationId: Long? = null,
+    val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
 ) : UiState {
     val progress: Float
         get() = when (step) {

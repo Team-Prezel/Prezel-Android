@@ -9,6 +9,7 @@ import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailU
 import com.team.prezel.core.domain.usecase.presentation.ReAnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.ui.base.BaseViewModel
+import com.team.prezel.feature.analysis.api.AnalysisStartType
 import com.team.prezel.feature.analysis.impl.cache.AnalysisFileCache
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
@@ -43,7 +44,12 @@ internal class AnalysisFlowViewModel @Inject constructor(
         }
 
         when (intent) {
-            is AnalysisFlowUiIntent.EnterStep -> updateState { copy(step = intent.step) }
+            is AnalysisFlowUiIntent.EnterStep -> updateState {
+                copy(
+                    step = intent.step,
+                    startType = intent.startType,
+                )
+            }
             is AnalysisFlowUiIntent.StartReRecording -> startReRecording(
                 presentationId = intent.presentationId,
                 isPast = intent.isPast,
@@ -76,7 +82,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
         val nextStep = when (currentState.step) {
             AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisFlowStep.PRESENTATION_SITUATION
             AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisFlowStep.SCRIPT_INPUT
-            AnalysisFlowStep.SCRIPT_INPUT -> AnalysisFlowStep.VOICE_RECORDING
+            AnalysisFlowStep.SCRIPT_INPUT -> currentState.audioInputStep
             AnalysisFlowStep.AUDIO_UPLOAD,
             AnalysisFlowStep.VOICE_RECORDING,
             AnalysisFlowStep.ANALYZING,
@@ -283,7 +289,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             }
 
             is AnalysisFailureAction.ShowMessage -> {
-                val retryStep = AnalysisFlowStep.VOICE_RECORDING
+                val retryStep = currentState.audioInputStep
                 viewModelScope.launch {
                     sendEffect(AnalysisFlowUiEffect.ShowMessage(action.message))
                 }
@@ -309,14 +315,16 @@ internal class AnalysisFlowViewModel @Inject constructor(
             }
 
             AnalysisUploadType.AUDIO -> {
-                val retryStep = AnalysisFlowStep.VOICE_RECORDING
+                val retryStep = currentState.audioInputStep
                 updateState {
                     copy(
                         step = retryStep,
                         form = form.copy(audioFileUri = null),
                     )
                 }
-                audioController.reset()
+                if (retryStep == AnalysisFlowStep.VOICE_RECORDING) {
+                    audioController.reset()
+                }
                 viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = retryStep)) }
             }
         }
@@ -325,7 +333,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun skipScript() {
         if (currentState.step != AnalysisFlowStep.SCRIPT_INPUT) return
 
-        val nextStep = AnalysisFlowStep.VOICE_RECORDING
+        val nextStep = currentState.audioInputStep
         updateState {
             copy(
                 step = nextStep,
@@ -383,6 +391,12 @@ internal class AnalysisFlowViewModel @Inject constructor(
         super.onCleared()
     }
 }
+
+private val AnalysisFlowUiState.audioInputStep: AnalysisFlowStep
+    get() = when (startType) {
+        AnalysisStartType.FILE_UPLOAD -> AnalysisFlowStep.AUDIO_UPLOAD
+        AnalysisStartType.VOICE_RECORDING -> AnalysisFlowStep.VOICE_RECORDING
+    }
 
 private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
     when (this) {
