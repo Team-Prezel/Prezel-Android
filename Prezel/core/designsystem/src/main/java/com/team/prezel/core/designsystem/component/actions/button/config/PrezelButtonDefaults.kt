@@ -121,7 +121,7 @@ object PrezelButtonDefaults {
             ButtonType.GHOST,
             -> Color.Transparent
 
-            ButtonType.FILLED -> PrezelTheme.colors.bgLarge
+            ButtonType.FILLED -> PrezelTheme.colors.bgDisabled
         }
 
     @Composable
