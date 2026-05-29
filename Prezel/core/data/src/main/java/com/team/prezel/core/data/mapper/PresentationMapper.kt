@@ -4,6 +4,8 @@ import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.ExpectedQuestion
+import com.team.prezel.core.model.presentation.MainData
+import com.team.prezel.core.model.presentation.PracticeRecords
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationGrowthPoint
 import com.team.prezel.core.model.presentation.PresentationInfo
@@ -13,6 +15,8 @@ import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
+import com.team.prezel.core.network.model.presentation.GetMainDataResponse
+import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationExpectedQuestionResponse
 import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
@@ -105,4 +109,29 @@ internal fun GetPresentationsResponse.toDomain(): PresentationInfo =
         style = Style.from(value = style),
         audience = Audience.from(value = audience),
         dDay = dday,
+    )
+
+internal fun GetPracticeRecordsResponse.toDomain(): PracticeRecords =
+    PracticeRecords(
+        dates = dates.map(LocalDate::parse),
+        startDate = LocalDate.parse(startDate),
+        endDate = LocalDate.parse(endDate),
+    )
+
+internal fun GetMainDataResponse.toDomain(): MainData =
+    MainData(
+        presentationId = presentationId.toLong(),
+        title = title,
+        type = type,
+        presentationDate = LocalDate.parse(presentationDate),
+        isPast = isPast,
+        dDay = dDay,
+        growthGraph = growthGraph?.map { item -> item.toDomain() }.orEmpty(),
+    )
+
+private fun GetMainDataResponse.GrowthGraph.toDomain(): PresentationGrowthPoint =
+    PresentationGrowthPoint(
+        attempt = attempt,
+        accuracyScore = accuracyScore,
+        scriptMatchRate = scriptMatchRate,
     )

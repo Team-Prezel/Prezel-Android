@@ -16,6 +16,7 @@ interface PracticeService {
 
     @POST("recording/practice/analyze")
     suspend fun analyzePracticeRecording(
+        @Query("presentationId") presentationId: Long,
         @Query("referenceText") referenceText: String,
         @Body audio: MultiPartFormDataContent,
     ): BaseResponse<AnalyzePracticeRecordingResponse>

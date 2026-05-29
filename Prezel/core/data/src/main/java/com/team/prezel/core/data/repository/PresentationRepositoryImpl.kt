@@ -5,6 +5,8 @@ import com.team.prezel.core.data.mapper.toDomain
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.MainData
+import com.team.prezel.core.model.presentation.PracticeRecords
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
@@ -12,6 +14,7 @@ import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
+import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import javax.inject.Inject
 
@@ -103,5 +106,19 @@ internal class PresentationRepositoryImpl @Inject constructor(
             presentationRemoteDataSource.getPastPresentationDetail(presentationId = presentationId)
         }.mapCatching { response ->
             response.toDomain()
+        }.mapDomainFailure()
+
+    override suspend fun getPracticeRecords(presentationId: Long): Result<PracticeRecords> =
+        runCatching {
+            presentationRemoteDataSource.getPracticeRecords(presentationId = presentationId)
+        }.mapCatching { response ->
+            response.toDomain()
+        }.mapDomainFailure()
+
+    override suspend fun getMainData(): Result<List<MainData>> =
+        runCatching {
+            presentationRemoteDataSource.getMainData()
+        }.mapCatching { response ->
+            response.map(GetMainDataResponse::toDomain)
         }.mapDomainFailure()
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.team.prezel.core.ui.base.UiState
 import com.team.prezel.feature.report.impl.model.AnalysisReportDialog
 import com.team.prezel.feature.report.impl.model.GrowthGraphData
+import com.team.prezel.feature.report.impl.model.PracticeRecordsUiModel
 import com.team.prezel.feature.report.impl.model.PresentationInfoUiModel
 import com.team.prezel.feature.report.impl.model.QuestionUiModel
 import com.team.prezel.feature.report.impl.model.ScriptAnalysisGraphData
@@ -25,6 +26,7 @@ internal sealed interface AnalysisReportUiState : UiState {
         val expectedQuestions: ImmutableList<QuestionUiModel>,
         val selfFeedback: String?,
         val isPast: Boolean,
+        val practiceRecords: PracticeRecordsUiModel,
         val reportDialog: AnalysisReportDialog? = null,
     ) : AnalysisReportUiState {
         val isScriptWritten: Boolean = accuracyScore != null && scriptMatchRate != null

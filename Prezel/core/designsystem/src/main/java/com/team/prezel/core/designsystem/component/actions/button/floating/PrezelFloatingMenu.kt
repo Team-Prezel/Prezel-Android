@@ -38,6 +38,7 @@ fun PrezelFloatingMenu(
     @DrawableRes openIconResId: Int = PrezelIcons.Cancel,
     size: ButtonSize = ButtonSize.REGULAR,
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
+    enabled: Boolean = true,
     items: @Composable PrezelMenuScope.() -> Unit,
 ) {
     Column(
@@ -64,6 +65,7 @@ fun PrezelFloatingMenu(
             openIconResId = openIconResId,
             size = size,
             hierarchy = hierarchy,
+            enabled = enabled,
         )
     }
 }

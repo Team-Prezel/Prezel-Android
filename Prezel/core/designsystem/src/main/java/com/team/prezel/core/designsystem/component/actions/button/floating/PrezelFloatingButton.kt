@@ -29,12 +29,14 @@ fun PrezelFloatingButton(
     modifier: Modifier = Modifier,
     size: ButtonSize = ButtonSize.REGULAR,
     hierarchy: ButtonHierarchy = ButtonHierarchy.PRIMARY,
+    enabled: Boolean = true,
     @DrawableRes openIconResId: Int = PrezelIcons.Cancel,
 ) {
     PrezelIconButton(
         iconResId = if (isExpanded) openIconResId else iconResId,
         size = size,
         hierarchy = hierarchy,
+        enabled = enabled,
         isRounded = true,
         modifier = modifier.prezelDropShadow(
             style = PrezelDropShadowDefaults.Regular(

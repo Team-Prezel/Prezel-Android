@@ -8,11 +8,13 @@ import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.feature.report.impl.contract.AnalysisReportUiState
 import com.team.prezel.feature.report.impl.model.GrowthGraphData
 import com.team.prezel.feature.report.impl.model.GrowthGraphItemUiModel
+import com.team.prezel.feature.report.impl.model.PracticeRecordsUiModel
 import com.team.prezel.feature.report.impl.model.PresentationInfoUiModel
 import com.team.prezel.feature.report.impl.model.QuestionUiModel
 import com.team.prezel.feature.report.impl.model.ScriptAnalysisGraphData
 import com.team.prezel.feature.report.impl.model.SpeedGraphData
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.datetime.LocalDate
 
 private val ReportPreviewBaseUiState: AnalysisReportUiState.Content = AnalysisReportUiState.Content(
     presentationInfo = PresentationInfoUiModel(
@@ -59,6 +61,15 @@ private val ReportPreviewBaseUiState: AnalysisReportUiState.Content = AnalysisRe
     ),
     selfFeedback = "아 발표 드디어 끝났다",
     isPast = false,
+    practiceRecords = PracticeRecordsUiModel(
+        practicedDates = listOf(
+            LocalDate(2026, 5, 10),
+            LocalDate(2026, 5, 12),
+            LocalDate(2026, 5, 13),
+        ),
+        startDate = LocalDate(2026, 5, 10),
+        endDate = LocalDate(2026, 5, 14),
+    ),
 )
 
 internal val ReportPreviewPastUiState: AnalysisReportUiState.Content = ReportPreviewBaseUiState.copy(isPast = true)

@@ -19,11 +19,13 @@ internal class PracticeRepositoryImpl @Inject constructor(
         }.mapDomainFailure()
 
     override suspend fun analyzePracticeRecording(
+        presentationId: Long,
         recordingFilePath: String,
         referenceText: String,
     ): Result<PracticeRecordingAnalysisResult> =
         runCatching {
             practiceRemoteDataSource.analyzePracticeRecording(
+                presentationId = presentationId,
                 recordingFilePath = recordingFilePath,
                 referenceText = referenceText,
             )

@@ -62,7 +62,6 @@ internal fun ProfileScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(ProfileUiIntent.FetchData)
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
