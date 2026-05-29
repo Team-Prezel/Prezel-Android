@@ -4,9 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.analysis.impl.audio.AudioUploadScreen
@@ -17,6 +22,8 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingScreen
+import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingStatusBarStyle
+import com.team.prezel.feature.analysis.impl.recording.isCompleted
 import com.team.prezel.feature.analysis.impl.recording.rememberAnalysisRecordAudioPermissionControlClickHandler
 import com.team.prezel.feature.analysis.impl.result.AnalysisFailedScreen
 import com.team.prezel.feature.analysis.impl.result.AnalysisLoadingScreen
@@ -37,6 +44,9 @@ internal fun AnalysisScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    var isScriptExpanded by rememberSaveable(uiState.step) { mutableStateOf(false) }
+
+    VoiceRecordingStatusBarStyle(style = uiState.statusBarStyle(isScriptExpanded = isScriptExpanded))
 
     BackHandler {
         viewModel.onIntent(AnalysisFlowUiIntent.Back)
@@ -58,6 +68,7 @@ internal fun AnalysisScreen(
     AnalysisScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
+        onScriptExpandedChange = { isScriptExpanded = it },
     )
 }
 
@@ -79,12 +90,30 @@ private fun AnalysisUiMessage.toStringRes(): Int =
         AnalysisUiMessage.PLAYBACK_START_FAILED -> R.string.feature_analysis_impl_voice_recording_playback_failed
     }
 
+private fun AnalysisFlowUiState.statusBarStyle(isScriptExpanded: Boolean): EdgeToEdgeStatusBarStyle =
+    when (step) {
+        AnalysisFlowStep.VOICE_RECORDING if isScriptExpanded -> EdgeToEdgeStatusBarStyle.BG_REGULAR
+        AnalysisFlowStep.VOICE_RECORDING if recordingState.isCompleted -> EdgeToEdgeStatusBarStyle.BG_REGULAR
+        AnalysisFlowStep.VOICE_RECORDING -> EdgeToEdgeStatusBarStyle.BG_MEDIUM
+        else -> EdgeToEdgeStatusBarStyle.DEFAULT
+    }
+
 @Composable
 private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
+    onScriptExpandedChange: (Boolean) -> Unit,
 ) {
-    VoiceRecordingGuideSnackbar(step = uiState.step)
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSnackbarHostState.current
+
+    LaunchedEffect(uiState.step) {
+        if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+            snackbarHostState.showPrezelSnackbar(
+                message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
+            )
+        }
+    }
 
     val onClickRecordingControl = rememberVoiceRecordingControlClick(
         uiState = uiState,
@@ -95,21 +124,8 @@ private fun AnalysisScreen(
         uiState = uiState,
         onIntent = onIntent,
         onClickRecordingControl = onClickRecordingControl,
+        onScriptExpandedChange = onScriptExpandedChange,
     )
-}
-
-@Composable
-private fun VoiceRecordingGuideSnackbar(step: AnalysisFlowStep) {
-    val resources = LocalResources.current
-    val snackbarHostState = LocalSnackbarHostState.current
-
-    LaunchedEffect(step) {
-        if (step == AnalysisFlowStep.VOICE_RECORDING) {
-            snackbarHostState.showPrezelSnackbar(
-                message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
-            )
-        }
-    }
 }
 
 @Composable
@@ -146,6 +162,7 @@ private fun AnalysisStepContent(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
+    onScriptExpandedChange: (Boolean) -> Unit,
 ) {
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE,
@@ -157,6 +174,7 @@ private fun AnalysisStepContent(
             uiState = uiState,
             onIntent = onIntent,
             onClickRecordingControl = onClickRecordingControl,
+            onScriptExpandedChange = onScriptExpandedChange,
         )
 
         AnalysisFlowStep.ANALYZING,
@@ -175,6 +193,7 @@ private fun AnalysisInputStepContent(
     uiState: AnalysisFlowUiState,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
+    onScriptExpandedChange: (Boolean) -> Unit,
 ) {
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE -> PresentationScheduleScreen(
@@ -218,6 +237,7 @@ private fun AnalysisInputStepContent(
             onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
             onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },
             onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
+            onScriptExpandedChange = onScriptExpandedChange,
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
 

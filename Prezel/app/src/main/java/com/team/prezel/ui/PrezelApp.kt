@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -89,7 +90,7 @@ private fun PrezelAppContent(
     )
 
     SharedTransitionLayout {
-        Box {
+        Box(modifier = Modifier.fillMaxSize()) {
             ProvideSharedTransitionScope(this@SharedTransitionLayout) {
                 val provider = remember(entryBuilders, navigator) {
                     entryProvider {
@@ -193,12 +194,13 @@ private fun Activity.applyEdgeToEdgeStatusBarStyle(
     bgMedium: Color,
 ) {
     val insetsController = WindowCompat.getInsetsController(window, view)
-
-    window.statusBarColor = when (style) {
+    val statusBarColor = when (style) {
         EdgeToEdgeStatusBarStyle.DEFAULT -> Color.Transparent
         EdgeToEdgeStatusBarStyle.BG_REGULAR -> bgRegular
         EdgeToEdgeStatusBarStyle.BG_MEDIUM -> bgMedium
     }.toArgb()
+
+    window.statusBarColor = statusBarColor
     insetsController.isAppearanceLightStatusBars = true
 }
 

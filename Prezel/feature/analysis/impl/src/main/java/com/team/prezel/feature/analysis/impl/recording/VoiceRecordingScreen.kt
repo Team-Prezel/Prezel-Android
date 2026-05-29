@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.AudioSource
-import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChrome
 import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -43,6 +42,7 @@ internal fun VoiceRecordingScreen(
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
     onAnalyze: () -> Unit,
+    onScriptExpandedChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
     VoiceRecordingScreen(
@@ -54,6 +54,7 @@ internal fun VoiceRecordingScreen(
         onStopRecording = onStopRecording,
         onResetRecording = onResetRecording,
         onAnalyze = onAnalyze,
+        onScriptExpandedChange = onScriptExpandedChange,
         onBack = onBack,
     )
 }
@@ -68,17 +69,10 @@ private fun VoiceRecordingScreen(
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
     onAnalyze: () -> Unit,
+    onScriptExpandedChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
     var isScriptExpanded by rememberSaveable { mutableStateOf(false) }
-
-    VoiceRecordingStatusBarStyle(
-        style = if (recordingState.isCompleted || isScriptExpanded) {
-            EdgeToEdgeStatusBarStyle.BG_REGULAR
-        } else {
-            EdgeToEdgeStatusBarStyle.BG_MEDIUM
-        },
-    )
 
     Column(
         modifier = Modifier
@@ -101,7 +95,10 @@ private fun VoiceRecordingScreen(
             recordingState = recordingState,
             recordingVolumes = recordingVolumes,
             isScriptExpanded = isScriptExpanded,
-            onToggleScriptExpanded = { isScriptExpanded = !isScriptExpanded },
+            onToggleScriptExpanded = {
+                isScriptExpanded = !isScriptExpanded
+                onScriptExpandedChange(isScriptExpanded)
+            },
             onClickRecordingControl = onClickRecordingControl,
             modifier = Modifier.weight(1f),
         )
@@ -245,6 +242,7 @@ private fun VoiceRecordingScreenPreviewContent(recordingState: AudioSessionState
         onStopRecording = {},
         onResetRecording = {},
         onAnalyze = {},
+        onScriptExpandedChange = {},
         onBack = {},
     )
 }
@@ -272,6 +270,7 @@ private fun VoiceRecordingScreenInteractiveFlowPreview() {
             onStopRecording = { recordingState = recordingState.stopPreviewRecording() },
             onResetRecording = { recordingState = AudioSessionState.Idle },
             onAnalyze = {},
+            onScriptExpandedChange = {},
             onBack = {},
         )
     }
