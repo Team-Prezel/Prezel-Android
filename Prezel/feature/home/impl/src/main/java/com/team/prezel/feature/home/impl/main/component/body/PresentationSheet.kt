@@ -41,6 +41,8 @@ internal fun PresentationSheet(
 
         when (presentation) {
             is PresentationUiModel.Past -> {
+                if (presentation.growthGraphData.graphItems.isEmpty()) return@HomeBottomSheetContent
+
                 HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_past_graph_title))
                 CardGraph(
                     items = presentation.growthGraphData.graphItems,

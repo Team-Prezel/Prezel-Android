@@ -32,5 +32,5 @@ class AnalyzePresentationUseCase @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
-            ).onSuccess { println(date) }
+            )
 }
