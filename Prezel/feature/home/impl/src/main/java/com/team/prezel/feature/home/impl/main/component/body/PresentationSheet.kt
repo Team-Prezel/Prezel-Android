@@ -9,36 +9,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.ui.component.PracticeCard
+import com.team.prezel.core.ui.component.graph.CardGraph
 import com.team.prezel.feature.home.impl.R
+import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun PresentationSheet(
-    practiceCount: Int,
+    presentation: PresentationUiModel,
     onClickPracticeRecording: () -> Unit,
+    onClickCardGraphItemIndex: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val itemModifier = Modifier.padding(horizontal = PrezelTheme.spacing.V20)
-
     HomeBottomSheetContent(
         modifier = modifier,
-        contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32),
+        contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32, horizontal = PrezelTheme.spacing.V20),
     ) {
-        HomeBottomSheetTitle(
-            title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, practiceCount),
-            modifier = itemModifier,
+        HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, presentation.practiceCount))
+        PracticeCard(
+            dDay = presentation.practiceRecords.endDate,
+            items = presentation.practiceRecords.practices,
+            showActionButton = !presentation.isPastPresentation,
+            onClickAction = onClickPracticeRecording,
         )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
-        PrezelButton(
-            text = stringResource(R.string.feature_home_impl_practice_recording_action),
-            modifier = itemModifier,
-            onClick = onClickPracticeRecording,
-        )
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
+
+        when (presentation) {
+            is PresentationUiModel.Past -> {
+                HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_past_graph_title))
+                CardGraph(
+                    items = presentation.growthGraphData.graphItems,
+                    selectedItemIndex = presentation.growthGraphData.selectedItemIndex,
+                    onSelectItem = { index -> onClickCardGraphItemIndex(index) },
+                )
+            }
+
+            is PresentationUiModel.Upcoming -> {
+                HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_upcoming_keywords_title))
+            }
+        }
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V36))
     }
 }
 
@@ -46,23 +61,24 @@ internal fun PresentationSheet(
 @Composable
 private fun PresentationContentPreview() {
     PrezelTheme {
-        val presentation = PresentationUiModel(
+        val presentation = PresentationUiModel.Upcoming(
             id = 1L,
             category = Category.OFFER,
             title = "설득하는 발표",
             date = LocalDate(2026, 10, 1),
-            dDay = 3,
-            practiceCount = 5,
+            dDay = "-3",
+            practiceRecords = PracticeRecordsUiModel(
+                practicedDates = List(5) { LocalDate(2026, 9, 26 + it) },
+                startDate = LocalDate(2026, 9, 26),
+                endDate = LocalDate(2026, 10, 1),
+            ),
         )
 
-        Box(
-            modifier = Modifier
-                .height(100.dp)
-                .padding(top = 16.dp),
-        ) {
+        Box(modifier = Modifier.padding(top = 16.dp)) {
             PresentationSheet(
-                practiceCount = presentation.practiceCount,
+                presentation = presentation,
                 onClickPracticeRecording = {},
+                onClickCardGraphItemIndex = {},
             )
         }
     }

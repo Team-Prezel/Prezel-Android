@@ -17,6 +17,8 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.feature.home.impl.R
+import com.team.prezel.feature.home.impl.main.model.GrowthGraphData
+import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
@@ -91,7 +93,7 @@ private fun HomePresentationTitleRow(presentation: PresentationUiModel) {
             style = PrezelTheme.typography.title1Bold,
         )
         Text(
-            text = presentation.dDayLabel,
+            text = presentation.dDay,
             color = PrezelTheme.colors.interactiveRegular,
             style = PrezelTheme.typography.title1ExtraBold,
         )
@@ -121,12 +123,17 @@ private fun Category.backgroundResId(): Int =
 private fun HomePresentationPagePreview() {
     PrezelTheme {
         PresentationHero(
-            presentation = PresentationUiModel(
+            presentation = PresentationUiModel.Upcoming(
                 id = 1L,
                 category = Category.OFFER,
                 title = "설득하는 발표",
                 date = LocalDate(2026, 10, 1),
-                dDay = 3,
+                dDay = "-3",
+                practiceRecords = PracticeRecordsUiModel(
+                    practicedDates = listOf(LocalDate(2026, 9, 28)),
+                    startDate = LocalDate(2026, 9, 26),
+                    endDate = LocalDate(2026, 10, 1),
+                ),
             ),
             onClickAnalyzePresentation = {},
             onClickWriteFeedback = {},
@@ -139,12 +146,18 @@ private fun HomePresentationPagePreview() {
 private fun HomePresentationPagePastPreview() {
     PrezelTheme {
         PresentationHero(
-            presentation = PresentationUiModel(
+            presentation = PresentationUiModel.Past(
                 id = 2L,
                 category = Category.EDUCATION,
                 title = "교육 발표",
                 date = LocalDate(2026, 9, 20),
-                dDay = -5,
+                dDay = "+5",
+                practiceRecords = PracticeRecordsUiModel(
+                    practicedDates = listOf(LocalDate(2026, 9, 18), LocalDate(2026, 9, 19)),
+                    startDate = LocalDate(2026, 9, 15),
+                    endDate = LocalDate(2026, 9, 20),
+                ),
+                growthGraphData = GrowthGraphData(items = emptyList(), selectedItemIndex = 0),
             ),
             onClickAnalyzePresentation = {},
             onClickWriteFeedback = {},

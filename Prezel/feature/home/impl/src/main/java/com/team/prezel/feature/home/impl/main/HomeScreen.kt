@@ -1,16 +1,16 @@
 package com.team.prezel.feature.home.impl.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,11 +19,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
@@ -35,6 +47,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.navigation.LocalNavigator
+import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.R
@@ -47,12 +60,16 @@ import com.team.prezel.feature.home.impl.main.component.title.PresentationHero
 import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.model.GrowthGraphData
 import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
+import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import com.team.prezel.feature.practice.api.PracticeNavKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 @Composable
 internal fun HomeScreen(
@@ -91,6 +108,9 @@ internal fun HomeScreen(
         onClickWriteFeedback = { },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
+        onClickCardGraphItemIndex = { presentationId, index ->
+            viewModel.onIntent(HomeUiIntent.ClickCardGraphItem(presentationId = presentationId, index = index))
+        },
         modifier = modifier,
     )
 }
@@ -106,10 +126,36 @@ private fun HomeScreen(
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     onClickVoiceRecordingAnalysis: () -> Unit,
     onClickFileUploadAnalysis: () -> Unit,
+    onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
+    val appDimmerState = LocalAppDimmerState.current
+    val density = LocalDensity.current
+    val fabEndPaddingPx = with(density) { PrezelTheme.spacing.V24.roundToPx() }
     var isFabExpanded by remember { mutableStateOf(false) }
+    var collapsedFabBounds by remember { mutableStateOf<Rect?>(null) }
+    var expandedMenuBounds by remember { mutableStateOf<Rect?>(null) }
+    val onClickVoiceRecording = {
+        isFabExpanded = false
+        onClickVoiceRecordingAnalysis()
+    }
+    val onClickFileUpload = {
+        isFabExpanded = false
+        onClickFileUploadAnalysis()
+    }
+
+    LaunchedEffect(isFabExpanded) {
+        if (isFabExpanded) {
+            appDimmerState.show { isFabExpanded = false }
+        } else {
+            appDimmerState.hide()
+        }
+    }
+
+    DisposableEffect(appDimmerState) {
+        onDispose { appDimmerState.hide() }
+    }
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val maxScreenHeight = maxHeight
@@ -125,6 +171,7 @@ private fun HomeScreen(
                 onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
+                onClickCardGraphItemIndex = onClickCardGraphItemIndex,
             )
 
             HomeHeadSection(
@@ -134,30 +181,63 @@ private fun HomeScreen(
                 modifier = Modifier.onHeightChanged { newHeight -> headerHeight = newHeight },
             )
 
-            if (isFabExpanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.32f))
-                        .clickable { isFabExpanded = false },
-                )
-            }
-
             HomeAnalysisFloatingMenu(
-                isExpanded = isFabExpanded,
-                onChangeExpanded = { isFabExpanded = it },
-                onClickVoiceRecording = {
-                    isFabExpanded = false
-                    onClickVoiceRecordingAnalysis()
-                },
-                onClickFileUpload = {
-                    isFabExpanded = false
-                    onClickFileUploadAnalysis()
-                },
+                isExpanded = false,
+                onChangeExpanded = {},
+                onClickVoiceRecording = {},
+                onClickFileUpload = {},
+                enabled = false,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = PrezelTheme.spacing.V24, bottom = PrezelTheme.spacing.V24),
+                    .padding(end = PrezelTheme.spacing.V24, bottom = PrezelTheme.spacing.V24)
+                    .graphicsLayer { alpha = 0f }
+                    .clearAndSetSemantics { },
+                onFabPositioned = { coordinates -> collapsedFabBounds = coordinates.boundsInWindow() },
             )
+
+            HomeAnalysisFloatingMenu(
+                isExpanded = true,
+                onChangeExpanded = {},
+                onClickVoiceRecording = {},
+                onClickFileUpload = {},
+                enabled = false,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = PrezelTheme.spacing.V24, bottom = PrezelTheme.spacing.V24)
+                    .graphicsLayer { alpha = 0f }
+                    .clearAndSetSemantics { },
+                onFabPositioned = { coordinates -> expandedMenuBounds = coordinates.boundsInWindow() },
+            )
+
+            if (collapsedFabBounds != null && expandedMenuBounds != null) {
+                val expandedMenuWidth = with(density) { expandedMenuBounds!!.width.toDp() }
+                val expandedMenuHeight = with(density) { expandedMenuBounds!!.height.toDp() }
+
+                Popup(
+                    popupPositionProvider = remember(collapsedFabBounds, expandedMenuBounds, fabEndPaddingPx) {
+                        HomeFabPopupPositionProvider(
+                            collapsedFabBounds = collapsedFabBounds!!,
+                            expandedMenuBounds = expandedMenuBounds!!,
+                            endPaddingPx = fabEndPaddingPx,
+                        )
+                    },
+                ) {
+                    Box(
+                        modifier = Modifier.requiredSize(
+                            width = expandedMenuWidth,
+                            height = expandedMenuHeight,
+                        ),
+                        contentAlignment = Alignment.BottomEnd,
+                    ) {
+                        HomeAnalysisFloatingMenu(
+                            isExpanded = isFabExpanded,
+                            onChangeExpanded = { isFabExpanded = it },
+                            onClickVoiceRecording = onClickVoiceRecording,
+                            onClickFileUpload = onClickFileUpload,
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -168,7 +248,9 @@ private fun HomeAnalysisFloatingMenu(
     onChangeExpanded: (Boolean) -> Unit,
     onClickVoiceRecording: () -> Unit,
     onClickFileUpload: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
+    onFabPositioned: ((LayoutCoordinates) -> Unit)? = null,
 ) {
     PrezelFloatingMenu(
         isExpanded = isExpanded,
@@ -177,7 +259,14 @@ private fun HomeAnalysisFloatingMenu(
         openIconResId = PrezelIcons.Cancel,
         size = ButtonSize.REGULAR,
         hierarchy = ButtonHierarchy.PRIMARY,
-        modifier = modifier,
+        enabled = enabled,
+        modifier = modifier.then(
+            if (onFabPositioned == null) {
+                Modifier
+            } else {
+                Modifier.onGloballyPositioned(onFabPositioned)
+            },
+        ),
     ) {
         MenuItem(
             label = stringResource(R.string.feature_home_impl_analysis_voice_recording),
@@ -192,6 +281,27 @@ private fun HomeAnalysisFloatingMenu(
     }
 }
 
+private class HomeFabPopupPositionProvider(
+    private val collapsedFabBounds: Rect,
+    private val expandedMenuBounds: Rect,
+    private val endPaddingPx: Int,
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+    ): IntOffset {
+        val x = windowSize.width - popupContentSize.width - endPaddingPx
+        val y = (collapsedFabBounds.bottom - expandedMenuBounds.height).roundToInt()
+
+        return IntOffset(
+            x = max(0, x),
+            y = max(0, y),
+        )
+    }
+}
+
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
@@ -202,6 +312,7 @@ private fun HomeContent(
     onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
+    onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
 ) {
     when (uiState) {
         HomeUiState.Loading -> Unit
@@ -223,6 +334,7 @@ private fun HomeContent(
                 onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
+                onClickCardGraphItemIndex = { index -> onClickCardGraphItemIndex(uiState.presentation.id, index) },
             )
         }
 
@@ -235,6 +347,7 @@ private fun HomeContent(
                 onClickPracticeRecording = onClickPracticeRecording,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
+                onClickCardGraphItemIndex = onClickCardGraphItemIndex,
             )
         }
     }
@@ -269,21 +382,21 @@ private fun HomeSingleContent(
     onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
+    onClickCardGraphItemIndex: (index: Int) -> Unit,
 ) {
-    val presentation = uiState.presentation
-
     HomePageLayout(
         maxHeight = maxHeight,
         headerHeight = headerHeight,
         sheetContent = {
             PresentationSheet(
-                practiceCount = presentation.practiceCount,
+                presentation = uiState.presentation,
                 onClickPracticeRecording = onClickPracticeRecording,
+                onClickCardGraphItemIndex = onClickCardGraphItemIndex,
             )
         },
         heroContent = {
             PresentationHero(
-                presentation = presentation,
+                presentation = uiState.presentation,
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
             )
@@ -300,6 +413,7 @@ private fun HomeMultipleContent(
     onClickPracticeRecording: () -> Unit,
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
+    onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
@@ -315,8 +429,9 @@ private fun HomeMultipleContent(
             headerHeight = headerHeight,
             sheetContent = {
                 PresentationSheet(
-                    practiceCount = presentation.practiceCount,
+                    presentation = presentation,
                     onClickPracticeRecording = onClickPracticeRecording,
+                    onClickCardGraphItemIndex = { index -> onClickCardGraphItemIndex(presentation.id, index) },
                 )
             },
             heroContent = {
@@ -344,6 +459,7 @@ private fun HomeScreenEmptyPreview() {
             onClickWriteFeedback = { },
             onClickVoiceRecordingAnalysis = { },
             onClickFileUploadAnalysis = { },
+            onClickCardGraphItemIndex = { presentationId, index -> },
         )
     }
 }
@@ -352,12 +468,18 @@ private fun HomeScreenEmptyPreview() {
 @Composable
 private fun HomeScreenSinglePreview() {
     val uiState = HomeUiState.SingleContent(
-        presentation = PresentationUiModel(
+        presentation = PresentationUiModel.Past(
             id = 1L,
             category = Category.OFFER,
             title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
-            dDay = -1,
+            dDay = "+1",
+            practiceRecords = PracticeRecordsUiModel(
+                practicedDates = listOf(LocalDate(2026, 4, 1), LocalDate(2026, 4, 3)),
+                startDate = LocalDate(2026, 3, 30),
+                endDate = LocalDate(2026, 4, 3),
+            ),
+            growthGraphData = GrowthGraphData(items = emptyList(), selectedItemIndex = 0),
         ),
     )
     PrezelTheme {
@@ -370,6 +492,7 @@ private fun HomeScreenSinglePreview() {
             onClickWriteFeedback = { },
             onClickVoiceRecordingAnalysis = { },
             onClickFileUploadAnalysis = { },
+            onClickCardGraphItemIndex = { presentationId, index -> },
         )
     }
 }
@@ -379,12 +502,17 @@ private fun HomeScreenSinglePreview() {
 private fun HomeScreenMultiplePreview() {
     val uiState = HomeUiState.MultipleContent(
         List(3) { index ->
-            PresentationUiModel(
+            PresentationUiModel.Upcoming(
                 id = index.toLong(),
                 category = Category.EDUCATION,
                 title = "공백포함둘에서열글자",
                 date = LocalDate(2026, 4, 10 + index),
-                dDay = index,
+                dDay = "-$index",
+                practiceRecords = PracticeRecordsUiModel(
+                    practicedDates = listOf(LocalDate(2026, 4, 10 + index)),
+                    startDate = LocalDate(2026, 4, 7 + index),
+                    endDate = LocalDate(2026, 4, 10 + index),
+                ),
             )
         }.toPersistentList(),
     )
@@ -398,6 +526,7 @@ private fun HomeScreenMultiplePreview() {
             onClickWriteFeedback = { },
             onClickVoiceRecordingAnalysis = { },
             onClickFileUploadAnalysis = { },
+            onClickCardGraphItemIndex = { presentationId, index -> },
         )
     }
 }

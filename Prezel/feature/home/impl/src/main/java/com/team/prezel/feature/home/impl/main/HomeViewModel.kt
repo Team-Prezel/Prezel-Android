@@ -1,65 +1,76 @@
 package com.team.prezel.feature.home.impl.main
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.model.presentation.Audience
-import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationInfo
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.core.domain.usecase.presentation.FetchMainDataUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.contract.HomeUiState.Companion.toUiState
+import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
-import com.team.prezel.feature.home.impl.main.model.PresentationUiModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-internal class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiState, HomeUiIntent, HomeUiEffect>(HomeUiState.Loading) {
+internal class HomeViewModel @Inject constructor(
+    private val fetchMainDataUseCase: FetchMainDataUseCase,
+) : BaseViewModel<HomeUiState, HomeUiIntent, HomeUiEffect>(HomeUiState.Loading) {
     override fun onIntent(intent: HomeUiIntent) {
         when (intent) {
             HomeUiIntent.FetchData -> fetchData()
+            is HomeUiIntent.ClickCardGraphItem -> updateCardGraphData(intent.presentationId, intent.index)
         }
     }
 
     private fun fetchData() {
         viewModelScope.launch {
-            val nickname = "프레즐"
-            val presentations = getPresentations()
+            fetchMainDataUseCase()
+                .onSuccess { data -> updateState { data.toUiState() } }
+                .onFailure { sendEffect(HomeUiEffect.ShowMessage(HomeUiMessage.FETCH_DATA_FAILED)) }
+        }
+    }
 
-            updateState {
-                HomeUiState.from(
-                    presentations = presentations,
-                    nickname = nickname,
-                )
+    private fun updateCardGraphData(
+        presentationId: Long,
+        index: Int,
+    ) {
+        updateState {
+            when (this) {
+                HomeUiState.Loading, is HomeUiState.Empty -> this
+                is HomeUiState.SingleContent -> {
+                    val currentPresentation = presentation as? PresentationUiModel.Past ?: return@updateState this
+                    if (currentPresentation.id != presentationId) return@updateState this
+
+                    copy(
+                        presentation = currentPresentation.copy(
+                            growthGraphData = currentPresentation.growthGraphData.copy(
+                                selectedItemIndex = currentPresentation.growthGraphData.selectedItemIndex.toggle(index),
+                            ),
+                        ),
+                    )
+                }
+
+                is HomeUiState.MultipleContent -> {
+                    copy(
+                        presentations = presentations
+                            .map { presentation ->
+                                val currentPresentation = presentation as? PresentationUiModel.Past ?: return@map presentation
+                                if (currentPresentation.id != presentationId) return@map presentation
+
+                                currentPresentation.copy(
+                                    growthGraphData = currentPresentation.growthGraphData.copy(
+                                        selectedItemIndex = currentPresentation.growthGraphData.selectedItemIndex.toggle(index),
+                                    ),
+                                )
+                            }.toImmutableList(),
+                    )
+                }
             }
         }
     }
 
-    private fun getPresentations(): List<PresentationUiModel> =
-        listOf(
-            PresentationInfo(
-                id = 1L,
-                title = "신규 서비스 제안 발표",
-                presentationDate = LocalDate(2026, 4, 10),
-                category = Category.OFFER,
-                purpose = Purpose.INFO,
-                style = Style.FORMAL,
-                audience = Audience.GENERAL,
-                dDay = "10",
-            ),
-            PresentationInfo(
-                id = 2L,
-                title = "주간 업무 공유",
-                presentationDate = LocalDate(2026, 4, 12),
-                category = Category.WORK,
-                purpose = Purpose.INFO,
-                style = Style.FORMAL,
-                audience = Audience.GENERAL,
-                dDay = "10",
-            ),
-        ).map { presentation -> presentation.toUiModel() }
+    private fun Int?.toggle(index: Int): Int? = if (this == index) null else index
 }

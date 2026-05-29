@@ -8,6 +8,8 @@ android {
 
 dependencies {
     implementation(projects.coreModel)
+    implementation(projects.coreDomain)
+
     implementation(projects.featureAnalysisApi)
     implementation(projects.featureHomeApi)
     implementation(projects.featurePracticeApi)
