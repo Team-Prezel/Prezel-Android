@@ -1,6 +1,8 @@
 package com.team.prezel.core.network.service
 
 import com.team.prezel.core.network.model.BaseResponse
+import com.team.prezel.core.network.model.presentation.GetMainDataResponse
+import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
@@ -55,4 +57,12 @@ interface PresentationService {
     suspend fun getPastPresentationDetail(
         @Path("presentationId") presentationId: Long,
     ): BaseResponse<GetPresentationDetailResponse>
+
+    @GET("recording/{presentationId}/practice-records")
+    suspend fun getPracticeRecords(
+        @Path("presentationId") presentationId: Long,
+    ): BaseResponse<GetPracticeRecordsResponse>
+
+    @GET("main")
+    suspend fun getMainData(): BaseResponse<List<GetMainDataResponse>>
 }

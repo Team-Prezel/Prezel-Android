@@ -2,6 +2,8 @@ package com.team.prezel.core.domain.repository.presentation
 
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.MainData
+import com.team.prezel.core.model.presentation.PracticeRecords
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
@@ -40,4 +42,8 @@ interface PresentationRepository {
     suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary>
 
     suspend fun getPastPresentationDetail(presentationId: Long): Result<PresentationAnalysisSummary>
+
+    suspend fun getPracticeRecords(presentationId: Long): Result<PracticeRecords>
+
+    suspend fun getMainData(): Result<List<MainData>>
 }

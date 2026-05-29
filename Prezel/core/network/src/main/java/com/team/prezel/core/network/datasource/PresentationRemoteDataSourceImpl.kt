@@ -1,5 +1,7 @@
 package com.team.prezel.core.network.datasource
 
+import com.team.prezel.core.network.model.presentation.GetMainDataResponse
+import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
@@ -83,6 +85,11 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getPastPresentationDetail(presentationId: Long): PresentationSummaryResponse =
         presentationService.getPastPresentationDetail(presentationId = presentationId).requireData().analysisResult
+
+    override suspend fun getPracticeRecords(presentationId: Long): GetPracticeRecordsResponse =
+        presentationService.getPracticeRecords(presentationId = presentationId).requireData()
+
+    override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
 
     private fun String.toAudioMultipart(): MultiPartFormDataContent =
         MultiPartFormDataContent(
