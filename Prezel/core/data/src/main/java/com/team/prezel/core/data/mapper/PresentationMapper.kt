@@ -126,9 +126,7 @@ internal fun GetMainDataResponse.toDomain(): MainData =
         presentationDate = LocalDate.parse(presentationDate),
         isPast = isPast,
         dDay = dDay,
-        accuracyScoreChange = accuracyScoreChange,
-        scriptMatchRateChange = scriptMatchRateChange,
-        growthGraph = growthGraph.map { item -> item.toDomain() },
+        growthGraph = growthGraph?.map { item -> item.toDomain() }.orEmpty(),
     )
 
 private fun GetMainDataResponse.GrowthGraph.toDomain(): PresentationGrowthPoint =

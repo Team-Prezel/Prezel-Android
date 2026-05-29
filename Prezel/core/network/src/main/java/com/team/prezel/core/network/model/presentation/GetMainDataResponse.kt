@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GetMainDataResponse(
     @SerialName("accuracyScoreChange")
-    val accuracyScoreChange: Int,
+    val accuracyScoreChange: Int?,
     @SerialName("dday")
     val dDay: String,
     @SerialName("growthGraph")
-    val growthGraph: List<GrowthGraph>,
+    val growthGraph: List<GrowthGraph>?,
     @SerialName("isPast")
     val isPast: Boolean,
     @SerialName("presentationDate")
@@ -18,7 +18,7 @@ data class GetMainDataResponse(
     @SerialName("presentationId")
     val presentationId: Int,
     @SerialName("scriptMatchRateChange")
-    val scriptMatchRateChange: Int,
+    val scriptMatchRateChange: Int?,
     @SerialName("title")
     val title: String,
     @SerialName("type")

@@ -2,7 +2,7 @@ package com.team.prezel.core.model.presentation
 
 import kotlinx.datetime.LocalDate
 
-data class MainData(
+data class MainDataWithPracticeRecords(
     val presentationId: Long,
     val title: String,
     val type: String,
@@ -10,4 +10,5 @@ data class MainData(
     val isPast: Boolean,
     val dDay: String,
     val growthGraph: List<PresentationGrowthPoint>,
+    val practiceRecords: PracticeRecords,
 )
