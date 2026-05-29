@@ -71,6 +71,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
 
     private fun handleClickDialogConform() {
         val dialog = contentState?.reportDialog ?: return
+        updateContent { copy(reportDialog = null) }
 
         when (dialog) {
             AnalysisReportDialog.RE_RECORDING -> navigateToAnalysisRecording()

@@ -3,10 +3,9 @@ package com.team.prezel.feature.analysis.impl
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
-import com.team.prezel.feature.analysis.impl.contract.recordingFilePath
 
 internal val AnalysisFlowUiState.shouldResetRecordingOnBack: Boolean
-    get() = step == AnalysisFlowStep.VOICE_RECORDING && recordingState.recordingFilePath != null
+    get() = step == AnalysisFlowStep.VOICE_RECORDING
 
 internal val AnalysisFlowUiState.shouldReleaseAudioOnBack: Boolean
     get() =

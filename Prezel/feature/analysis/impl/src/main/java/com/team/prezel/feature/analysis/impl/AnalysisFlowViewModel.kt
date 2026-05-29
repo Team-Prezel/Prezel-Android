@@ -6,6 +6,7 @@ import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
+import com.team.prezel.core.domain.usecase.presentation.FetchPresentationScriptDetailUseCase
 import com.team.prezel.core.domain.usecase.presentation.ReAnalyzePresentationUseCase
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -28,6 +29,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private val analyzePresentationUseCase: AnalyzePresentationUseCase,
     private val reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
     private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
+    private val fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
     private val analysisFileCache: AnalysisFileCache,
     private val audioController: RecordingAudioController,
 ) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
@@ -173,13 +175,23 @@ internal class AnalysisFlowViewModel @Inject constructor(
         viewModelScope.launch {
             fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
                 .onSuccess { summary ->
-                    updateState {
-                        copy(
-                            form = summary.toAnalysisForm(),
-                            step = AnalysisFlowStep.VOICE_RECORDING,
-                            reRecordingPresentationId = presentationId,
-                        )
-                    }
+                    summary
+                        .fetchOriginalScript(fetchPresentationScriptDetailUseCase)
+                        .onSuccess { script ->
+                            updateState {
+                                copy(
+                                    form = summary.toAnalysisForm().copy(
+                                        scriptInputType = ScriptInputType.DIRECT_INPUT,
+                                        script = script.orEmpty(),
+                                    ),
+                                    step = AnalysisFlowStep.VOICE_RECORDING,
+                                    reRecordingPresentationId = presentationId,
+                                )
+                            }
+                        }.onFailure {
+                            sendEffect(AnalysisFlowUiEffect.ShowMessage(AnalysisUiMessage.SCRIPT_LOAD_FAILED))
+                            sendEffect(AnalysisFlowUiEffect.NavigateBack)
+                        }
                 }.onFailure {
                     sendEffect(AnalysisFlowUiEffect.ShowMessage(AnalysisUiMessage.ANALYSIS_FAILED))
                     sendEffect(AnalysisFlowUiEffect.NavigateBack)
@@ -397,6 +409,15 @@ private val AnalysisFlowUiState.audioInputStep: AnalysisFlowStep
         AnalysisStartType.FILE_UPLOAD -> AnalysisFlowStep.AUDIO_UPLOAD
         AnalysisStartType.VOICE_RECORDING -> AnalysisFlowStep.VOICE_RECORDING
     }
+
+private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
+    fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
+): Result<String?> {
+    if (accuracyScore == null || scriptMatchRate == null) return Result.success(null)
+
+    return fetchPresentationScriptDetailUseCase(analysisResultId = analysisResultId)
+        .map { it.originalScript }
+}
 
 private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
     when (this) {

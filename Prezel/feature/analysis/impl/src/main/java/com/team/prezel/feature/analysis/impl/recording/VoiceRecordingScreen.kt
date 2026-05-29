@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,8 +70,10 @@ private fun VoiceRecordingScreen(
     onAnalyze: () -> Unit,
     onBack: () -> Unit,
 ) {
+    var isScriptExpanded by rememberSaveable { mutableStateOf(false) }
+
     VoiceRecordingStatusBarStyle(
-        style = if (recordingState.isCompleted) {
+        style = if (recordingState.isCompleted || isScriptExpanded) {
             EdgeToEdgeStatusBarStyle.BG_REGULAR
         } else {
             EdgeToEdgeStatusBarStyle.BG_MEDIUM
@@ -82,19 +85,23 @@ private fun VoiceRecordingScreen(
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),
     ) {
-        if (recordingState.isCompleted) {
-            VoiceRecordingCompletedTopBar(onBack = onBack)
-        } else {
-            VoiceRecordingChromeTopBar(
-                recordingState = recordingState,
-                onBack = onBack,
-            )
+        if (!isScriptExpanded) {
+            if (recordingState.isCompleted) {
+                VoiceRecordingCompletedTopBar(onBack = onBack)
+            } else {
+                VoiceRecordingChromeTopBar(
+                    recordingState = recordingState,
+                    onBack = onBack,
+                )
+            }
         }
 
         VoiceRecordingContent(
             script = script,
             recordingState = recordingState,
             recordingVolumes = recordingVolumes,
+            isScriptExpanded = isScriptExpanded,
+            onToggleScriptExpanded = { isScriptExpanded = !isScriptExpanded },
             onClickRecordingControl = onClickRecordingControl,
             modifier = Modifier.weight(1f),
         )

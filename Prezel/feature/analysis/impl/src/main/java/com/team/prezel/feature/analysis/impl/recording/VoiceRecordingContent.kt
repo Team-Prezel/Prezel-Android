@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -43,6 +42,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.PrezelB
 import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChromeWave
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.analysis.impl.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -52,6 +52,8 @@ internal fun VoiceRecordingContent(
     script: String,
     recordingState: AudioSessionState,
     recordingVolumes: ImmutableList<Float>,
+    isScriptExpanded: Boolean,
+    onToggleScriptExpanded: () -> Unit,
     onClickRecordingControl: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,8 +64,11 @@ internal fun VoiceRecordingContent(
             .padding(vertical = PrezelTheme.spacing.V16),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (!recordingState.isCompleted) {
-            VoiceRecordingScriptHeader()
+        if (!recordingState.isCompleted || isScriptExpanded) {
+            VoiceRecordingScriptHeader(
+                isScriptExpanded = isScriptExpanded,
+                onToggleScriptExpanded = onToggleScriptExpanded,
+            )
             Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
         }
 
@@ -83,7 +88,10 @@ internal fun VoiceRecordingContent(
 }
 
 @Composable
-private fun VoiceRecordingScriptHeader() {
+private fun VoiceRecordingScriptHeader(
+    isScriptExpanded: Boolean,
+    onToggleScriptExpanded: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,10 +106,12 @@ private fun VoiceRecordingScriptHeader() {
         )
 
         ScriptZoomButton(
+            isScriptExpanded = isScriptExpanded,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .offset(x = PrezelTheme.spacing.V12)
                 .size(48.dp),
+            onClick = onToggleScriptExpanded,
         )
     }
 }
@@ -201,13 +211,23 @@ private fun VoiceRecordingStatusArea(
 }
 
 @Composable
-private fun ScriptZoomButton(modifier: Modifier = Modifier) {
-    IconButton(
-        modifier = modifier,
-        onClick = {},
+private fun ScriptZoomButton(
+    isScriptExpanded: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier.noRippleClickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
-            painter = painterResource(PrezelIcons.ZoomIn),
+            painter = painterResource(
+                if (isScriptExpanded) {
+                    PrezelIcons.ZoomOut
+                } else {
+                    PrezelIcons.ZoomIn
+                },
+            ),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = PrezelTheme.colors.iconRegular,

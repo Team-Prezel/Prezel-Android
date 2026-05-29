@@ -1,6 +1,7 @@
 package com.team.prezel.feature.analysis.impl
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,22 +48,7 @@ internal fun AnalysisScreen(
                 is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step)
                 is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
                 is AnalysisFlowUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        AnalysisUiMessage.AUTH_EXPIRED -> R.string.feature_analysis_impl_error_auth_expired
-                        AnalysisUiMessage.ANALYSIS_FAILED -> R.string.feature_analysis_impl_error_analysis_failed
-                        AnalysisUiMessage.NETWORK_FAILED -> R.string.feature_analysis_impl_error_network_failed
-                        AnalysisUiMessage.UNKNOWN_FAILED -> R.string.feature_analysis_impl_error_unknown_failed
-                        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_DENIED ->
-                            R.string.feature_analysis_impl_voice_recording_permission_denied
-
-                        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED ->
-                            R.string.feature_analysis_impl_voice_recording_permission_permanently_denied
-
-                        AnalysisUiMessage.RECORDING_START_FAILED -> R.string.feature_analysis_impl_voice_recording_failed
-                        AnalysisUiMessage.RECORDING_STOP_FAILED -> R.string.feature_analysis_impl_voice_recording_stop_failed
-                        AnalysisUiMessage.PLAYBACK_START_FAILED -> R.string.feature_analysis_impl_voice_recording_playback_failed
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toStringRes()))
                 }
             }
         }
@@ -73,6 +59,23 @@ internal fun AnalysisScreen(
         onIntent = viewModel::onIntent,
     )
 }
+
+@StringRes
+private fun AnalysisUiMessage.toStringRes(): Int =
+    when (this) {
+        AnalysisUiMessage.AUTH_EXPIRED -> R.string.feature_analysis_impl_error_auth_expired
+        AnalysisUiMessage.ANALYSIS_FAILED -> R.string.feature_analysis_impl_error_analysis_failed
+        AnalysisUiMessage.SCRIPT_LOAD_FAILED -> R.string.feature_analysis_impl_error_script_load_failed
+        AnalysisUiMessage.NETWORK_FAILED -> R.string.feature_analysis_impl_error_network_failed
+        AnalysisUiMessage.UNKNOWN_FAILED -> R.string.feature_analysis_impl_error_unknown_failed
+        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_DENIED -> R.string.feature_analysis_impl_voice_recording_permission_denied
+        AnalysisUiMessage.RECORD_AUDIO_PERMISSION_PERMANENTLY_DENIED ->
+            R.string.feature_analysis_impl_voice_recording_permission_permanently_denied
+
+        AnalysisUiMessage.RECORDING_START_FAILED -> R.string.feature_analysis_impl_voice_recording_failed
+        AnalysisUiMessage.RECORDING_STOP_FAILED -> R.string.feature_analysis_impl_voice_recording_stop_failed
+        AnalysisUiMessage.PLAYBACK_START_FAILED -> R.string.feature_analysis_impl_voice_recording_playback_failed
+    }
 
 @Composable
 private fun AnalysisScreen(

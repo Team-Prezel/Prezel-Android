@@ -3,6 +3,7 @@ package com.team.prezel.feature.analysis.impl.model
 internal enum class AnalysisUiMessage {
     AUTH_EXPIRED,
     ANALYSIS_FAILED,
+    SCRIPT_LOAD_FAILED,
     NETWORK_FAILED,
     UNKNOWN_FAILED,
     RECORD_AUDIO_PERMISSION_DENIED,
