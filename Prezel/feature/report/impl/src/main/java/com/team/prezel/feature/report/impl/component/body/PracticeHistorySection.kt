@@ -6,50 +6,29 @@ import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.PracticeCard
-import com.team.prezel.core.ui.component.PracticeCardItem
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.component.common.ReportSection
-import com.team.prezel.feature.report.impl.model.PracticeUiModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
+import com.team.prezel.feature.report.impl.model.PracticeRecordsUiModel
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
 @Composable
-internal fun PracticeHistorySection(
-    presentationDate: LocalDate,
-    practices: ImmutableList<PracticeUiModel>,
-) {
+internal fun PracticeHistorySection(practiceRecords: PracticeRecordsUiModel) {
     ReportSection(
         title = {
             Text(
                 text = stringResource(R.string.feature_report_impl_section_practice_history),
-                style = PrezelTheme.typography.body2Bold,
+                style = PrezelTheme.typography.title2Bold,
                 color = PrezelTheme.colors.textLarge,
             )
         },
     ) {
-        if (practices.isEmpty()) {
-            Text(
-                text = stringResource(R.string.feature_report_impl_empty_practice_history),
-                style = PrezelTheme.typography.body2Regular,
-                color = PrezelTheme.colors.textMedium,
-            )
-        } else {
-            PracticeCard(
-                dDay = presentationDate,
-                items = practices
-                    .map { item ->
-                        PracticeCardItem(
-                            date = item.date,
-                            isPracticed = item.isPracticed,
-                        )
-                    }.toImmutableList(),
-                showActionButton = false,
-            )
-        }
+        PracticeCard(
+            dDay = practiceRecords.endDate,
+            items = practiceRecords.practices,
+            showActionButton = false,
+        )
     }
 }
 
@@ -57,26 +36,19 @@ internal fun PracticeHistorySection(
 @Composable
 private fun PracticeHistorySectionPreview() {
     val base = LocalDate(2026, 5, 14)
-    PrezelTheme {
-        PracticeHistorySection(
-            presentationDate = base.plus(8, DateTimeUnit.DAY),
-            practices = List(8) {
-                PracticeUiModel(
-                    date = base.plus(it, DateTimeUnit.DAY),
-                    isPracticed = it % 2 == 0,
-                )
-            }.toImmutableList(),
-        )
-    }
-}
 
-@BasicPreview
-@Composable
-private fun EmptyPracticeHistorySectionPreview() {
+    val practiceRecords = PracticeRecordsUiModel(
+        startDate = base,
+        endDate = base.plus(8, DateTimeUnit.DAY),
+        practicedDates = listOf(
+            LocalDate(2026, 5, 14),
+            LocalDate(2026, 5, 16),
+            LocalDate(2026, 5, 17),
+            LocalDate(2026, 5, 20),
+        ),
+    )
+
     PrezelTheme {
-        PracticeHistorySection(
-            presentationDate = LocalDate(2026, 5, 14),
-            practices = persistentListOf(),
-        )
+        PracticeHistorySection(practiceRecords = practiceRecords)
     }
 }

@@ -4,4 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object PracticeNavKey : NavKey
+data class PracticeNavKey(
+    val presentationId: Long,
+) : NavKey

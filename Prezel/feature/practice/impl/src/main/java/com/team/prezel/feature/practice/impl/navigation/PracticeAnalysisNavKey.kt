@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PracticeAnalysisNavKey(
+    val presentationId: Long,
     val recordingFilePath: String,
     val referenceText: String,
 ) : NavKey

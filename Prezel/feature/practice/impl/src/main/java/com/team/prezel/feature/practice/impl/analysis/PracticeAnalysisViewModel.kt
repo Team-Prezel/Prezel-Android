@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = PracticeAnalysisViewModel.Factory::class)
 internal class PracticeAnalysisViewModel @AssistedInject constructor(
+    @Assisted("presentationId") private val presentationId: Long,
     @Assisted("recordingFilePath") private val recordingFilePath: String,
     @Assisted("referenceText") private val referenceText: String,
     private val analyzePracticeRecordingUseCase: AnalyzePracticeRecordingUseCase,
@@ -26,8 +27,9 @@ internal class PracticeAnalysisViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            @Assisted("recordingFilePath")recordingFilePath: String,
-            @Assisted("referenceText")referenceText: String,
+            @Assisted("presentationId") presentationId: Long,
+            @Assisted("recordingFilePath") recordingFilePath: String,
+            @Assisted("referenceText") referenceText: String,
         ): PracticeAnalysisViewModel
     }
 
@@ -42,6 +44,7 @@ internal class PracticeAnalysisViewModel @AssistedInject constructor(
             updateState { PracticeAnalysisUiState.Loading }
 
             analyzePracticeRecordingUseCase(
+                presentationId = presentationId,
                 recordingFilePath = recordingFilePath,
                 referenceText = referenceText,
             ).onSuccess { result ->

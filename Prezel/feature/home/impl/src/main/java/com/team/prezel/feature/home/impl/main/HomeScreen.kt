@@ -13,7 +13,6 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.state.rememberAppDimmerState
@@ -27,12 +26,12 @@ import com.team.prezel.feature.home.impl.main.model.GrowthGraphItemUiModel
 import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
-import com.team.prezel.feature.practice.api.PracticeNavKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HomeScreen(
+    navigateToPracticeRecording: (presentationId: Long) -> Unit,
     navigateToFileUploadAnalysis: () -> Unit,
     navigateToVoiceRecordingAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
@@ -42,7 +41,6 @@ internal fun HomeScreen(
     val pagerState = rememberPagerState(0) { uiState.presentationCount() }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
-    val navigator = LocalNavigator.current
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)
@@ -63,7 +61,7 @@ internal fun HomeScreen(
         uiState = uiState,
         pagerState = pagerState,
         onClickAddPresentation = { },
-        onClickPracticeRecording = { navigator.navigate(PracticeNavKey) },
+        onClickPracticeRecording = { presentationId -> navigateToPracticeRecording(presentationId) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,

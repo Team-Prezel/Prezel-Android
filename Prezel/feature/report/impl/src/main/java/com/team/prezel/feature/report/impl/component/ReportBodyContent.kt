@@ -24,6 +24,7 @@ import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.component.body.AccuracySection
 import com.team.prezel.feature.report.impl.component.body.ExpectedQuestionsSection
 import com.team.prezel.feature.report.impl.component.body.GrowthGraphSection
+import com.team.prezel.feature.report.impl.component.body.PracticeHistorySection
 import com.team.prezel.feature.report.impl.component.body.ScriptAnalysisSection
 import com.team.prezel.feature.report.impl.component.body.SelfFeedbackSection
 import com.team.prezel.feature.report.impl.component.body.SummarySection
@@ -45,8 +46,7 @@ internal fun ReportBodyContent(
             selfFeedback = uiState.selfFeedback,
             onFeedBackWriteClick = onFeedBackWriteClick,
         )
-        // todo: API 배포 이후 수정 예정
-        // PracticeHistorySection()
+        PracticeHistorySection(practiceRecords = uiState.practiceRecords)
     }
 
     SummarySection(summary = uiState.summaryFeedback)

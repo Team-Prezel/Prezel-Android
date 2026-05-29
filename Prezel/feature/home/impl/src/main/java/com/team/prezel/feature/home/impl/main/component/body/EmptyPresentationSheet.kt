@@ -15,10 +15,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.home.impl.R
 
 @Composable
-internal fun EmptyPresentationSheet(
-    onClickPracticeRecording: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun EmptyPresentationSheet(modifier: Modifier = Modifier) {
     HomeBottomSheetContent(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32, horizontal = PrezelTheme.spacing.V20),
@@ -27,7 +24,7 @@ internal fun EmptyPresentationSheet(
         Spacer(modifier = Modifier.height(12.dp))
         PrezelButton(
             text = stringResource(R.string.feature_home_impl_practice_recording_action),
-            onClick = onClickPracticeRecording,
+            onClick = {},
         )
     }
 }
@@ -41,7 +38,7 @@ private fun EmptyPresentationContentPreview() {
                 .height(100.dp)
                 .padding(top = 16.dp),
         ) {
-            EmptyPresentationSheet(onClickPracticeRecording = {})
+            EmptyPresentationSheet()
         }
     }
 }

@@ -19,6 +19,7 @@ internal class PracticeRemoteDataSourceImpl @Inject constructor(
     override suspend fun getPracticeSentence(): PracticeSentenceResponse = practiceService.getPracticeSentence().requireData()
 
     override suspend fun analyzePracticeRecording(
+        presentationId: Long,
         recordingFilePath: String,
         referenceText: String,
     ): AnalyzePracticeRecordingResponse {
@@ -40,6 +41,7 @@ internal class PracticeRemoteDataSourceImpl @Inject constructor(
 
         return practiceService
             .analyzePracticeRecording(
+                presentationId = presentationId,
                 referenceText = referenceText,
                 audio = multipart,
             ).requireData()

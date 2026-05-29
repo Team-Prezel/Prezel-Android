@@ -7,6 +7,7 @@ interface PracticeRemoteDataSource {
     suspend fun getPracticeSentence(): PracticeSentenceResponse
 
     suspend fun analyzePracticeRecording(
+        presentationId: Long,
         recordingFilePath: String,
         referenceText: String,
     ): AnalyzePracticeRecordingResponse
