@@ -30,9 +30,12 @@ internal fun AnalysisFlowUiIntent.reduceFormOrNull(form: AnalysisForm): Analysis
     when (this) {
         is AnalysisFlowUiIntent.UpdatePresentationTitle -> form.copy(presentationTitle = title)
         is AnalysisFlowUiIntent.UpdatePresentationDate -> form.copy(presentationDate = date)
-        is AnalysisFlowUiIntent.SelectScriptInputType -> form.copy(scriptInputType = inputType)
+        is AnalysisFlowUiIntent.SelectScriptInputType -> form.copy(
+            scriptInputType = inputType,
+            script = "",
+            scriptFileUri = null,
+        )
         is AnalysisFlowUiIntent.UpdateScript -> form.copy(script = script)
-        is AnalysisFlowUiIntent.SelectScriptFile -> form.copy(scriptFileUri = fileUri)
         is AnalysisFlowUiIntent.SelectAudioFile -> form.copy(audioFileUri = fileUri)
         is AnalysisFlowUiIntent.SelectSituationOption -> form.selectSituationOption(option)
         else -> null

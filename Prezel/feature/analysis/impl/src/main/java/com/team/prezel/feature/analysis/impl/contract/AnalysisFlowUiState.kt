@@ -32,6 +32,7 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.AUDIO_UPLOAD,
             AnalysisFlowStep.VOICE_RECORDING,
             AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.ANALYSIS_FAILED,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             -> 1f
         }
@@ -53,6 +54,7 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.AUDIO_UPLOAD -> !form.audioFileUri.isNullOrBlank()
             AnalysisFlowStep.VOICE_RECORDING -> recordingState.recordingFilePath != null
             AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.ANALYSIS_FAILED,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> false
@@ -85,6 +87,7 @@ internal enum class AnalysisFlowStep {
     AUDIO_UPLOAD,
     VOICE_RECORDING,
     ANALYZING,
+    ANALYSIS_FAILED,
     FILE_RECOGNITION_FAILED,
     SCRIPT_FILE_RECOGNITION_FAILED,
 }

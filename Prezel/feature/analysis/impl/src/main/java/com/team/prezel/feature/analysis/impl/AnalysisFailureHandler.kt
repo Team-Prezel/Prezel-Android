@@ -6,6 +6,8 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 
 internal sealed interface AnalysisFailureAction {
+    data object RetryAnalysis : AnalysisFailureAction
+
     data class RetryFileUpload(
         val uploadType: AnalysisUploadType,
     ) : AnalysisFailureAction
@@ -20,12 +22,14 @@ internal fun Throwable.toAnalysisFailureAction(): AnalysisFailureAction {
 
     return when (error) {
         AppError.INVALID_REQUEST,
-        AppError.VOICE_RECOGNITION_FAILED,
         -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.AUDIO)
 
         AppError.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.SCRIPT)
 
         AppError.UNAUTHORIZED -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.AUTH_EXPIRED)
+        AppError.VOICE_RECOGNITION_FAILED,
+        AppError.VOICE_ANALYSIS_FAILED,
+        -> AnalysisFailureAction.RetryAnalysis
         AppError.SERVER_ERROR -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.ANALYSIS_FAILED)
         AppError.NETWORK -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.NETWORK_FAILED)
 

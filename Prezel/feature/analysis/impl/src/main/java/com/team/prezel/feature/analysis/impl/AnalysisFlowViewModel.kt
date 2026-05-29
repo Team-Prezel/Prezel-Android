@@ -20,8 +20,10 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,7 +38,23 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private var analyzeJob: Job? = null
 
     init {
-        collectAudioSession()
+        viewModelScope.launch {
+            audioController.audioSessionState.collect { audioState ->
+                updateState { copy(recordingState = audioState) }
+            }
+        }
+
+        viewModelScope.launch {
+            audioController.recordingVolumes.collect { volumes ->
+                updateState { copy(recordingVolumes = volumes) }
+            }
+        }
+
+        viewModelScope.launch {
+            audioController.audioSessionEffect.collect { effect ->
+                sendEffect(AnalysisFlowUiEffect.ShowMessage(effect.toUiMessage()))
+            }
+        }
     }
 
     override fun onIntent(intent: AnalysisFlowUiIntent) {
@@ -62,6 +80,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 isPast = intent.isPast,
             )
 
+            is AnalysisFlowUiIntent.SelectScriptFile -> selectScriptFile(intent.fileUri)
             AnalysisFlowUiIntent.ClickRecordingControl -> audioController.handleControlClick(currentState.recordingState)
             AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
             AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
@@ -70,6 +89,33 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowUiIntent.SkipScript -> skipScript()
             AnalysisFlowUiIntent.Back -> moveBack()
             else -> Unit
+        }
+    }
+
+    private fun selectScriptFile(fileUri: String?) {
+        updateState {
+            copy(
+                form = form.copy(
+                    scriptFileUri = fileUri,
+                    script = if (fileUri == null) "" else form.script,
+                ),
+            )
+        }
+
+        if (fileUri == null) return
+
+        viewModelScope.launch {
+            runCatching { withContext(Dispatchers.IO) { analysisFileCache.readTextFromUri(fileUri) } }
+                .onSuccess { script ->
+                    if (currentState.form.scriptFileUri == fileUri) {
+                        updateState { copy(form = form.copy(script = script)) }
+                    }
+                }.onFailure {
+                    if (currentState.form.scriptFileUri == fileUri) {
+                        updateState { copy(form = form.copy(script = "")) }
+                    }
+                    sendEffect(AnalysisFlowUiEffect.ShowMessage(AnalysisUiMessage.SCRIPT_FILE_LOAD_FAILED))
+                }
         }
     }
 
@@ -88,6 +134,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowStep.AUDIO_UPLOAD,
             AnalysisFlowStep.VOICE_RECORDING,
             AnalysisFlowStep.ANALYZING,
+            AnalysisFlowStep.ANALYSIS_FAILED,
             AnalysisFlowStep.FILE_RECOGNITION_FAILED,
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> currentState.step
@@ -121,7 +168,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             analysisResult.fold(
                 onSuccess = { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        audioController.release()
+                        audioController.reset()
                         sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
                     }
                 },
@@ -147,7 +194,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             reAnalyzeResult.fold(
                 onSuccess = { result ->
                     if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        audioController.release()
+                        audioController.reset()
                         sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result.presentationId))
                     }
                 },
@@ -287,6 +334,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
         when (action) {
+            AnalysisFailureAction.RetryAnalysis -> {
+                updateState { copy(step = AnalysisFlowStep.ANALYSIS_FAILED) }
+            }
+
             is AnalysisFailureAction.RetryFileUpload -> {
                 val failureStep = when (action.uploadType) {
                     AnalysisUploadType.AUDIO -> AnalysisFlowStep.FILE_RECOGNITION_FAILED
@@ -327,14 +378,19 @@ internal class AnalysisFlowViewModel @Inject constructor(
             }
 
             AnalysisUploadType.AUDIO -> {
-                val retryStep = currentState.audioInputStep
+                val isAnalysisFailed = currentState.step == AnalysisFlowStep.ANALYSIS_FAILED
+                val retryStep = if (isAnalysisFailed) {
+                    AnalysisFlowStep.PRESENTATION_SCHEDULE
+                } else {
+                    currentState.audioInputStep
+                }
                 updateState {
                     copy(
                         step = retryStep,
                         form = form.copy(audioFileUri = null),
                     )
                 }
-                if (retryStep == AnalysisFlowStep.VOICE_RECORDING) {
+                if (retryStep == AnalysisFlowStep.VOICE_RECORDING || isAnalysisFailed) {
                     audioController.reset()
                 }
                 viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = retryStep)) }
@@ -361,7 +417,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     private fun moveBack() {
         if (currentState.step == AnalysisFlowStep.ANALYZING) analyzeJob?.cancel()
 
-        if (currentState.shouldResetRecordingOnBack) {
+        if (currentState.shouldResetAudioOnBack) {
             audioController.reset()
         }
 
@@ -371,31 +427,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             }
         }
 
-        if (currentState.shouldReleaseAudioOnBack) {
-            audioController.release()
-        }
-
         viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateBack) }
-    }
-
-    private fun collectAudioSession() {
-        viewModelScope.launch {
-            audioController.audioSessionState.collect { audioState ->
-                updateState { copy(recordingState = audioState) }
-            }
-        }
-
-        viewModelScope.launch {
-            audioController.recordingVolumes.collect { volumes ->
-                updateState { copy(recordingVolumes = volumes) }
-            }
-        }
-
-        viewModelScope.launch {
-            audioController.audioSessionEffect.collect { effect ->
-                sendEffect(AnalysisFlowUiEffect.ShowMessage(effect.toUiMessage()))
-            }
-        }
     }
 
     override fun onCleared() {

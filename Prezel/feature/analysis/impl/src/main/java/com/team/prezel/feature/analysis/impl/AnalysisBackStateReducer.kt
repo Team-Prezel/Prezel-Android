@@ -4,12 +4,10 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 
-internal val AnalysisFlowUiState.shouldResetRecordingOnBack: Boolean
-    get() = step == AnalysisFlowStep.VOICE_RECORDING
-
-internal val AnalysisFlowUiState.shouldReleaseAudioOnBack: Boolean
+internal val AnalysisFlowUiState.shouldResetAudioOnBack: Boolean
     get() =
-        step == AnalysisFlowStep.PRESENTATION_SCHEDULE ||
+        step == AnalysisFlowStep.VOICE_RECORDING ||
+            step == AnalysisFlowStep.PRESENTATION_SCHEDULE ||
             reRecordingPresentationId != null ||
             reWritingScriptPresentationId != null
 
@@ -21,6 +19,7 @@ internal fun AnalysisFlowUiState.backClearedFormOrNull(): AnalysisForm? =
         AnalysisFlowStep.AUDIO_UPLOAD,
         AnalysisFlowStep.VOICE_RECORDING,
         AnalysisFlowStep.ANALYZING,
+        AnalysisFlowStep.ANALYSIS_FAILED,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
         -> null

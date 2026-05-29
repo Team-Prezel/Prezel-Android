@@ -18,6 +18,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingScreen
 import com.team.prezel.feature.analysis.impl.recording.rememberAnalysisRecordAudioPermissionControlClickHandler
+import com.team.prezel.feature.analysis.impl.result.AnalysisFailedScreen
 import com.team.prezel.feature.analysis.impl.result.AnalysisLoadingScreen
 import com.team.prezel.feature.analysis.impl.result.FileRecognitionFailedScreen
 import com.team.prezel.feature.analysis.impl.result.ScriptFileRecognitionFailedScreen
@@ -66,6 +67,7 @@ private fun AnalysisUiMessage.toStringRes(): Int =
         AnalysisUiMessage.AUTH_EXPIRED -> R.string.feature_analysis_impl_error_auth_expired
         AnalysisUiMessage.ANALYSIS_FAILED -> R.string.feature_analysis_impl_error_analysis_failed
         AnalysisUiMessage.SCRIPT_LOAD_FAILED -> R.string.feature_analysis_impl_error_script_load_failed
+        AnalysisUiMessage.SCRIPT_FILE_LOAD_FAILED -> R.string.feature_analysis_impl_error_script_file_load_failed
         AnalysisUiMessage.NETWORK_FAILED -> R.string.feature_analysis_impl_error_network_failed
         AnalysisUiMessage.UNKNOWN_FAILED -> R.string.feature_analysis_impl_error_unknown_failed
         AnalysisUiMessage.RECORD_AUDIO_PERMISSION_DENIED -> R.string.feature_analysis_impl_voice_recording_permission_denied
@@ -158,6 +160,7 @@ private fun AnalysisStepContent(
         )
 
         AnalysisFlowStep.ANALYZING,
+        AnalysisFlowStep.ANALYSIS_FAILED,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
         -> AnalysisResultStepContent(
@@ -219,6 +222,7 @@ private fun AnalysisInputStepContent(
         )
 
         AnalysisFlowStep.ANALYZING,
+        AnalysisFlowStep.ANALYSIS_FAILED,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
         -> Unit
@@ -232,6 +236,10 @@ private fun AnalysisResultStepContent(
 ) {
     when (step) {
         AnalysisFlowStep.ANALYZING -> AnalysisLoadingScreen()
+
+        AnalysisFlowStep.ANALYSIS_FAILED -> AnalysisFailedScreen(
+            onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.AUDIO)) },
+        )
 
         AnalysisFlowStep.FILE_RECOGNITION_FAILED -> FileRecognitionFailedScreen(
             onRetry = { onIntent(AnalysisFlowUiIntent.RetryFileUpload(AnalysisUploadType.AUDIO)) },

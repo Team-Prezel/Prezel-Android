@@ -103,6 +103,7 @@ private fun AnalysisNavKey.toNavKey(step: AnalysisFlowStep): AnalysisNavKey =
 
         AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisNavKey.AudioUpload(flowId = flowId, startType = startType)
         AnalysisFlowStep.VOICE_RECORDING,
+        AnalysisFlowStep.ANALYSIS_FAILED,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,
         -> AnalysisNavKey.Recording(flowId = flowId, startType = startType)
 
