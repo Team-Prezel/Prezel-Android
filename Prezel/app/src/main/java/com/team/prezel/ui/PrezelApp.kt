@@ -5,6 +5,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -25,7 +28,10 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
+import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.rememberAppDimmerState
+import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
@@ -38,9 +44,11 @@ fun PrezelApp(
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val appDimmerState = rememberAppDimmerState()
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
+        LocalAppDimmerState provides appDimmerState,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
         DoubleBackToExitHandler(navigationState = appState.navigationState)
@@ -60,43 +68,55 @@ private fun PrezelAppContent(
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
+    val appDimmerState = LocalAppDimmerState.current
 
     ObserveGlobalEvents(
         globalEventBus = globalEventBus,
         navigateToSplash = { navigator.replaceRoot(SplashNavKey) },
     )
 
-    SharedTransitionLayout {
-        ProvideSharedTransitionScope(this@SharedTransitionLayout) {
-            val provider = remember(entryBuilders, navigator) {
-                entryProvider {
-                    entryBuilders.forEach { builder -> this.builder() }
+    Box(modifier = Modifier.fillMaxSize()) {
+        SharedTransitionLayout {
+            ProvideSharedTransitionScope(this@SharedTransitionLayout) {
+                val provider = remember(entryBuilders, navigator) {
+                    entryProvider {
+                        entryBuilders.forEach { builder -> this.builder() }
+                    }
+                }
+
+                PrezelNavigationScaffold(
+                    showNavigationBar = appState.shouldShowNavigationBar,
+                    snackbarHostState = LocalSnackbarHostState.current,
+                    navigationItems = { AppNavigationItems(appState = appState, navigateToKey = { key -> navigator.navigate(key) }) },
+                ) { padding ->
+                    NavDisplay(
+                        entries = appState.navigationState.toEntries(provider),
+                        onBack = navigator::goBack,
+                        modifier = Modifier.padding(padding),
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                                fadeOut(animationSpec = tween(durationMillis = 100))
+                        },
+                        popTransitionSpec = {
+                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                                fadeOut(animationSpec = tween(durationMillis = 100))
+                        },
+                        predictivePopTransitionSpec = {
+                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                                fadeOut(animationSpec = tween(durationMillis = 100))
+                        },
+                    )
                 }
             }
+        }
 
-            PrezelNavigationScaffold(
-                showNavigationBar = appState.shouldShowNavigationBar,
-                snackbarHostState = LocalSnackbarHostState.current,
-                navigationItems = { AppNavigationItems(appState = appState, navigateToKey = { key -> navigator.navigate(key) }) },
-            ) { padding ->
-                NavDisplay(
-                    entries = appState.navigationState.toEntries(provider),
-                    onBack = navigator::goBack,
-                    modifier = Modifier.padding(padding),
-                    transitionSpec = {
-                        fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                            fadeOut(animationSpec = tween(durationMillis = 100))
-                    },
-                    popTransitionSpec = {
-                        fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                            fadeOut(animationSpec = tween(durationMillis = 100))
-                    },
-                    predictivePopTransitionSpec = {
-                        fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                            fadeOut(animationSpec = tween(durationMillis = 100))
-                    },
-                )
-            }
+        if (appDimmerState.isVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(com.team.prezel.core.designsystem.theme.PrezelTheme.colors.scrimContainer)
+                    .noRippleClickable { appDimmerState.dismiss() },
+            )
         }
     }
 }
