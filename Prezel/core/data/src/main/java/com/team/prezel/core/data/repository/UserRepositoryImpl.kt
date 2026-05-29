@@ -12,12 +12,21 @@ import javax.inject.Inject
 internal class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
+    @Volatile
+    private var cachedNickname: String = ""
+
     override suspend fun fetchUserInfo(): Result<User> =
         runCatching {
             userRemoteDataSource.getUser()
         }.mapCatching { response ->
-            response.toDomain()
+            response.toDomain().also { user -> cachedNickname = user.nickname }
         }.mapDomainFailure()
+
+    override suspend fun getUserNickname(): Result<String> {
+        if (cachedNickname.isNotBlank()) return Result.success(cachedNickname)
+
+        return runCatching { fetchUserInfo().getOrThrow().nickname }
+    }
 
     override suspend fun patchProfile(
         nickname: String,
@@ -28,6 +37,7 @@ internal class UserRepositoryImpl @Inject constructor(
                 nickname = nickname,
                 profileImageFile = profileImageFile,
             )
+            cachedNickname = nickname
         }.mapDomainFailure()
 
     override suspend fun checkNicknameDuplication(nickname: Nickname): Result<Boolean> =

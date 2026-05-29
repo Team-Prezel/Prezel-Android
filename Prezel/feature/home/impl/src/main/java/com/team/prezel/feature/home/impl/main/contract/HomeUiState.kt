@@ -1,7 +1,7 @@
 package com.team.prezel.feature.home.impl.main.contract
 
 import androidx.compose.runtime.Immutable
-import com.team.prezel.core.model.presentation.MainDataWithPracticeRecords
+import com.team.prezel.core.model.presentation.MainDataBundle
 import com.team.prezel.core.ui.base.UiState
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel.Companion.toUiModel
@@ -35,10 +35,12 @@ internal sealed interface HomeUiState : UiState {
         }
 
     companion object {
-        fun List<MainDataWithPracticeRecords>.toUiState(): HomeUiState {
-            val uiModels = map { data -> data.toUiModel() }
-            return when (size) {
-                0 -> Empty(nickname = "TEMP")
+        fun MainDataBundle.toUiState(): HomeUiState {
+            val uiModels = presentations.map { data -> data.toUiModel() }
+            val fallbackNickname = nickname.ifBlank { "unknown" }
+
+            return when (presentations.size) {
+                0 -> Empty(nickname = fallbackNickname)
                 1 -> SingleContent(presentation = uiModels.first())
                 else -> MultipleContent(presentations = uiModels.toImmutableList())
             }

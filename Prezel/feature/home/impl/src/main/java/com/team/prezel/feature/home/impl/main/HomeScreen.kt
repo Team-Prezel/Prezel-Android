@@ -60,7 +60,7 @@ internal fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         pagerState = pagerState,
-        onClickAddPresentation = { },
+        onClickAddPresentation = navigateToVoiceRecordingAnalysis,
         onClickPracticeRecording = { presentationId -> navigateToPracticeRecording(presentationId) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },

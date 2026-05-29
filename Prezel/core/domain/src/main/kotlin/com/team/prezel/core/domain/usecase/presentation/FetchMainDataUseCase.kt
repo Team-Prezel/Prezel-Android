@@ -1,7 +1,9 @@
 package com.team.prezel.core.domain.usecase.presentation
 
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
+import com.team.prezel.core.domain.repository.profile.UserRepository
 import com.team.prezel.core.model.presentation.MainData
+import com.team.prezel.core.model.presentation.MainDataBundle
 import com.team.prezel.core.model.presentation.MainDataWithPracticeRecords
 import com.team.prezel.core.model.presentation.PracticeRecords
 import kotlinx.coroutines.async
@@ -11,13 +13,17 @@ import javax.inject.Inject
 
 class FetchMainDataUseCase @Inject constructor(
     private val repository: PresentationRepository,
+    private val userRepository: UserRepository,
 ) {
-    suspend operator fun invoke(): Result<List<MainDataWithPracticeRecords>> =
+    suspend operator fun invoke(): Result<MainDataBundle> =
         repository.getMainData().fold(
             onSuccess = { mainData ->
                 runCatching {
                     coroutineScope {
-                        mainData
+                        val nicknameDeferred = async {
+                            userRepository.getUserNickname().getOrThrow()
+                        }
+                        val presentations = mainData
                             .map { data ->
                                 async {
                                     val practiceRecords = repository
@@ -26,6 +32,11 @@ class FetchMainDataUseCase @Inject constructor(
                                     data.toMainDataWithPracticeRecords(practiceRecords = practiceRecords)
                                 }
                             }.awaitAll()
+
+                        MainDataBundle(
+                            nickname = nicknameDeferred.await(),
+                            presentations = presentations,
+                        )
                     }
                 }
             },

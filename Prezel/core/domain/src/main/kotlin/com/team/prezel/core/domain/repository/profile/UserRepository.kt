@@ -7,6 +7,8 @@ import java.io.File
 interface UserRepository {
     suspend fun fetchUserInfo(): Result<User>
 
+    suspend fun getUserNickname(): Result<String>
+
     suspend fun patchProfile(
         nickname: String,
         profileImageFile: File?,

@@ -2,10 +2,7 @@ package com.team.prezel.feature.home.impl.main.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,15 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
-import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.onHeightChanged
-import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.main.component.body.HomeBottomSheetContent
-import com.team.prezel.feature.home.impl.main.component.body.HomeBottomSheetTitle
+import com.team.prezel.feature.home.impl.main.component.body.EmptySheet
 import com.team.prezel.feature.home.impl.main.component.body.PresentationSheet
 import com.team.prezel.feature.home.impl.main.component.head.HomeHeadSection
 import com.team.prezel.feature.home.impl.main.component.title.EmptyPresentationHero
@@ -141,18 +133,7 @@ private fun HomeEmptyContent(
     HomePageLayout(
         maxHeight = maxHeight,
         headerHeight = headerHeight,
-        sheetContent = {
-            HomeBottomSheetContent(
-                contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32, horizontal = PrezelTheme.spacing.V20),
-            ) {
-                HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_empty_title))
-                Spacer(modifier = Modifier.height(12.dp))
-                PrezelButton(
-                    text = stringResource(R.string.feature_home_impl_practice_recording_action),
-                    onClick = {},
-                )
-            }
-        },
+        sheetContent = { EmptySheet() },
         heroContent = {
             EmptyPresentationHero(
                 nickname = nickname,
