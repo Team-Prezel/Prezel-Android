@@ -90,44 +90,44 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         presentationService.getPracticeRecords(presentationId = presentationId).requireData()
 
     override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
-
-    private fun String.toAudioMultipart(): MultiPartFormDataContent =
-        MultiPartFormDataContent(
-            formData {
-                appendAudioPart(this@toAudioMultipart)
-            },
-        )
-
-    private fun FormBuilder.appendAudioPart(audioFilePath: String) {
-        val audioFile = File(audioFilePath)
-
-        append(
-            key = "audio",
-            value = audioFile.toChannelProvider(),
-            headers = Headers.build {
-                append(HttpHeaders.ContentType, "audio/${audioFile.extension}")
-                append(HttpHeaders.ContentDisposition, "filename=\"${audioFile.name}\"")
-            },
-        )
-    }
-
-    private fun FormBuilder.appendScriptPart(scriptFilePath: String) {
-        val file = File(scriptFilePath)
-
-        append(
-            key = "scriptFile",
-            value = file.toChannelProvider(),
-            headers = Headers.build {
-                append(HttpHeaders.ContentType, "text/${file.extension}")
-                append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
-            },
-        )
-    }
-
-    private fun File.toChannelProvider(): ChannelProvider =
-        ChannelProvider(size = length()) {
-            require(exists()) { "파일이 존재하지 않습니다: $path" }
-            require(canRead()) { "파일을 읽을 수 없습니다: $path" }
-            inputStream().toByteReadChannel()
-        }
 }
+
+private fun String.toAudioMultipart(): MultiPartFormDataContent =
+    MultiPartFormDataContent(
+        formData {
+            appendAudioPart(this@toAudioMultipart)
+        },
+    )
+
+private fun FormBuilder.appendAudioPart(audioFilePath: String) {
+    val audioFile = File(audioFilePath)
+
+    append(
+        key = "audio",
+        value = audioFile.toChannelProvider(),
+        headers = Headers.build {
+            append(HttpHeaders.ContentType, "audio/${audioFile.extension}")
+            append(HttpHeaders.ContentDisposition, "filename=\"${audioFile.name}\"")
+        },
+    )
+}
+
+private fun FormBuilder.appendScriptPart(scriptFilePath: String) {
+    val file = File(scriptFilePath)
+
+    append(
+        key = "scriptFile",
+        value = file.toChannelProvider(),
+        headers = Headers.build {
+            append(HttpHeaders.ContentType, "text/${file.extension}")
+            append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+        },
+    )
+}
+
+private fun File.toChannelProvider(): ChannelProvider =
+    ChannelProvider(size = length()) {
+        require(exists()) { "파일이 존재하지 않습니다: $path" }
+        require(canRead()) { "파일을 읽을 수 없습니다: $path" }
+        inputStream().toByteReadChannel()
+    }

@@ -24,7 +24,6 @@ internal data class GrowthGraphData(
     val items: List<GrowthGraphItemUiModel>,
     val selectedItemIndex: Int? = null,
 ) {
-    val selectedItem: GrowthGraphItemUiModel? = selectedItemIndex?.let { index -> items.getOrNull(index) }
     val graphItems: ImmutableList<CardGraphItem> = items.map(GrowthGraphItemUiModel::graphItem).toImmutableList()
 
     companion object {

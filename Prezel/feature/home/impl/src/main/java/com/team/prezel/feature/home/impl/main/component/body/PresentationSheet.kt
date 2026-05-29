@@ -66,7 +66,7 @@ private fun PresentationContentPreview() {
             category = Category.OFFER,
             title = "설득하는 발표",
             date = LocalDate(2026, 10, 1),
-            dDay = "-3",
+            dDay = "D-3",
             practiceRecords = PracticeRecordsUiModel(
                 practicedDates = List(5) { LocalDate(2026, 9, 26 + it) },
                 startDate = LocalDate(2026, 9, 26),
