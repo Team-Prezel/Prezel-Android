@@ -222,13 +222,13 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
-                .onSuccess { summary ->
-                    summary
+                .onSuccess { detail ->
+                    detail.analysisSummary
                         .fetchOriginalScript(fetchPresentationScriptDetailUseCase)
                         .onSuccess { script ->
                             updateState {
                                 copy(
-                                    form = summary.toAnalysisForm().copy(
+                                    form = detail.analysisSummary.toAnalysisForm().copy(
                                         scriptInputType = ScriptInputType.DIRECT_INPUT,
                                         script = script.orEmpty(),
                                     ),
@@ -263,10 +263,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
-                .onSuccess { summary ->
+                .onSuccess { detail ->
                     updateState {
                         copy(
-                            form = summary.toAnalysisForm().copy(scriptInputType = ScriptInputType.DIRECT_INPUT),
+                            form = detail.analysisSummary.toAnalysisForm().copy(scriptInputType = ScriptInputType.DIRECT_INPUT),
                             step = AnalysisFlowStep.SCRIPT_INPUT,
                             reWritingScriptPresentationId = presentationId,
                         )
@@ -280,8 +280,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
         runCatching {
-            val audioFilePath = resolveAudioFilePath()
-            val scriptFilePath = resolveScriptFilePath()
+            val audioFilePath = resolveAudioFilePath(analysisFileCache)
+            val scriptFilePath = resolveScriptFilePath(analysisFileCache)
             analyzePresentationUseCase(
                 name = name,
                 date = date.toRequestDate(),
@@ -299,8 +299,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(presentationId: Long): Result<PresentationAnalysisSummary> =
         runCatching {
-            val audioFilePath = resolveAudioFilePath()
-            val scriptFilePath = resolveScriptFilePath()
+            val audioFilePath = resolveAudioFilePath(analysisFileCache)
+            val scriptFilePath = resolveScriptFilePath(analysisFileCache)
             reAnalyzePresentationUseCase(
                 presentationId = presentationId,
                 script = script,
@@ -309,24 +309,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
             ).getOrThrow()
         }.onFailure {
             if (it is CancellationException) throw it
-        }
-
-    private fun PresentationAnalysisSubmission.resolveAudioFilePath(): String =
-        audioFileUri
-            ?.let { uri ->
-                analysisFileCache.copyUriToCache(
-                    uriString = uri,
-                    prefix = "audio",
-                ).absolutePath
-            }
-            ?: recordingFilePath
-
-    private fun PresentationAnalysisSubmission.resolveScriptFilePath(): String? =
-        scriptFileUri?.let { uri ->
-            analysisFileCache.copyUriToCache(
-                uriString = uri,
-                prefix = "script",
-            ).absolutePath
         }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
@@ -447,6 +429,26 @@ private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
     return fetchPresentationScriptDetailUseCase(analysisResultId = analysisResultId)
         .map { it.originalScript }
 }
+
+private fun PresentationAnalysisSubmission.resolveAudioFilePath(analysisFileCache: AnalysisFileCache): String =
+    audioFileUri
+        ?.let { uri ->
+            analysisFileCache
+                .copyUriToCache(
+                    uriString = uri,
+                    prefix = "audio",
+                ).absolutePath
+        }
+        ?: recordingFilePath
+
+private fun PresentationAnalysisSubmission.resolveScriptFilePath(analysisFileCache: AnalysisFileCache): String? =
+    scriptFileUri?.let { uri ->
+        analysisFileCache
+            .copyUriToCache(
+                uriString = uri,
+                prefix = "script",
+            ).absolutePath
+    }
 
 private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
     when (this) {

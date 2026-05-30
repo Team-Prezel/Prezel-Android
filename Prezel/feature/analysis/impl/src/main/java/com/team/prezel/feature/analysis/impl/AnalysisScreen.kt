@@ -201,6 +201,31 @@ private fun AnalysisInputStepContent(
     onClickRecordingControl: () -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
 ) {
+    if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+        VoiceRecordingScreen(
+            uiState = uiState,
+            isScriptExpanded = isScriptExpanded,
+            onClickRecordingControl = onClickRecordingControl,
+            onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
+            onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },
+            onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
+            onScriptExpandedChange = onScriptExpandedChange,
+            onBack = { onIntent(AnalysisFlowUiIntent.Back) },
+        )
+        return
+    }
+
+    AnalysisFormInputStepContent(
+        uiState = uiState,
+        onIntent = onIntent,
+    )
+}
+
+@Composable
+private fun AnalysisFormInputStepContent(
+    uiState: AnalysisFlowUiState,
+    onIntent: (AnalysisFlowUiIntent) -> Unit,
+) {
     when (uiState.step) {
         AnalysisFlowStep.PRESENTATION_SCHEDULE -> PresentationScheduleScreen(
             uiState = uiState,
@@ -237,17 +262,7 @@ private fun AnalysisInputStepContent(
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )
 
-        AnalysisFlowStep.VOICE_RECORDING -> VoiceRecordingScreen(
-            uiState = uiState,
-            isScriptExpanded = isScriptExpanded,
-            onClickRecordingControl = onClickRecordingControl,
-            onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
-            onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },
-            onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
-            onScriptExpandedChange = onScriptExpandedChange,
-            onBack = { onIntent(AnalysisFlowUiIntent.Back) },
-        )
-
+        AnalysisFlowStep.VOICE_RECORDING,
         AnalysisFlowStep.ANALYZING,
         AnalysisFlowStep.ANALYSIS_FAILED,
         AnalysisFlowStep.FILE_RECOGNITION_FAILED,

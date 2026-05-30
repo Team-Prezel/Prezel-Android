@@ -107,18 +107,8 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
     override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
 }
 
-private fun String.toAudioMultipart(): MultiPartFormDataContent =
-    MultiPartFormDataContent(
-        formData {
-            appendAudioPart(this@toAudioMultipart)
-        },
-    )
-
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {
     val audioFile = File(audioFilePath)
-    private fun FormBuilder.appendAudioPart(audioFilePath: String) {
-        val audioFile = File(audioFilePath)
-
     append(
         key = "audio",
         value = audioFile.toChannelProvider(),

@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -110,6 +107,7 @@ private fun PrezelAppContent(
             }
         }
 
+        EdgeToEdgeStatusBarBackground(style = statusBarStyle)
         AppDimmerOverlay(isVisible = appDimmerState.isVisible, onDismiss = appDimmerState::dismiss)
     }
 }
@@ -160,35 +158,6 @@ private fun AppDimmerOverlay(
 private fun defaultPrezelNavTransition(): ContentTransform =
     fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
         fadeOut(animationSpec = tween(durationMillis = 100))
-                PrezelNavigationScaffold(
-                    showNavigationBar = appState.shouldShowNavigationBar,
-                    snackbarHostState = LocalSnackbarHostState.current,
-                    navigationItems = { AppNavigationItems(appState = appState, navigateToKey = { key -> navigator.navigate(key) }) },
-                ) { padding ->
-                    NavDisplay(
-                        entries = appState.navigationState.toEntries(provider),
-                        onBack = navigator::goBack,
-                        modifier = Modifier.padding(padding),
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                                fadeOut(animationSpec = tween(durationMillis = 100))
-                        },
-                        popTransitionSpec = {
-                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                                fadeOut(animationSpec = tween(durationMillis = 100))
-                        },
-                        predictivePopTransitionSpec = {
-                            fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                                fadeOut(animationSpec = tween(durationMillis = 100))
-                        },
-                    )
-                }
-            }
-
-            EdgeToEdgeStatusBarBackground(style = statusBarStyle)
-        }
-    }
-}
 
 @Composable
 private fun EdgeToEdgeStatusBarBackground(style: EdgeToEdgeStatusBarStyle) {
