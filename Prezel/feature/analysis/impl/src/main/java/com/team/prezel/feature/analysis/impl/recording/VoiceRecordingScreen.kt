@@ -28,6 +28,7 @@ import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
@@ -171,7 +172,7 @@ private fun VoiceRecordingCloseButton(
     ) {
         Icon(
             painter = painterResource(PrezelIcons.Cancel),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.feature_analysis_impl_close),
             modifier = Modifier.size(24.dp),
             tint = PrezelTheme.colors.iconRegular,
         )
