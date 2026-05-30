@@ -117,7 +117,12 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     }
 
     private fun navigateToSelfFeedbackWrite() {
-        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToSelfFeedbackWrite) ?: return
+        val presentationId = presentationId ?: return
+        val title = contentState?.presentationInfo?.title ?: return
+        val effect = AnalysisReportUiEffect.NavigateToSelfFeedbackWrite(
+            presentationId = presentationId,
+            title = title,
+        )
         viewModelScope.launch { sendEffect(effect) }
     }
 

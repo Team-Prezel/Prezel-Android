@@ -7,6 +7,7 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.feedback.api.FeedbackNavKey
 import com.team.prezel.feature.feedback.impl.FeedbackScreen
 import com.team.prezel.feature.feedback.impl.FeedbackViewModel
+import com.team.prezel.feature.home.api.HomeNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureFeedbackEntryBuilder() {
         FeedbackScreen(
             title = key.title,
             navigateBack = { navigator.goBack() },
+            navigateToHome = { navigator.navigate(HomeNavKey) },
             viewModel = hiltViewModel<FeedbackViewModel, FeedbackViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
             ),

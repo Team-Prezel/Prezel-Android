@@ -58,7 +58,7 @@ internal class FeedbackViewModel @AssistedInject constructor(
                 presentationId = navKey.presentationId,
                 content = content,
             ).onSuccess {
-                sendEffect(FeedbackUiEffect.NavigateBack)
+                sendEffect(FeedbackUiEffect.NavigateToHome)
             }.onFailure {
                 updateState { copy(isSaving = false) }
                 sendEffect(FeedbackUiEffect.ShowMessage(FeedbackUiMessage.SAVE_FAILED))

@@ -10,4 +10,5 @@ dependencies {
     implementation(projects.coreDomain)
 
     implementation(projects.featureFeedbackApi)
+    implementation(projects.featureHomeApi)
 }

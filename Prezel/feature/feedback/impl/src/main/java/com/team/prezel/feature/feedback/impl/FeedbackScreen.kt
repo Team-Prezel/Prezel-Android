@@ -48,6 +48,7 @@ import com.team.prezel.feature.feedback.impl.model.FeedbackUiMessage
 internal fun FeedbackScreen(
     title: String,
     navigateBack: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FeedbackViewModel = hiltViewModel(),
 ) {
@@ -59,6 +60,7 @@ internal fun FeedbackScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 FeedbackUiEffect.NavigateBack -> navigateBack()
+                FeedbackUiEffect.NavigateToHome -> navigateToHome()
                 is FeedbackUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
                         FeedbackUiMessage.SAVE_FAILED -> R.string.feature_feedback_impl_save_failed
