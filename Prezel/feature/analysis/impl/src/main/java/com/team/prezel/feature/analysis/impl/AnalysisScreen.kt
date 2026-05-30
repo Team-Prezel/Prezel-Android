@@ -67,6 +67,7 @@ internal fun AnalysisScreen(
 
     AnalysisScreen(
         uiState = uiState,
+        isScriptExpanded = isScriptExpanded,
         onIntent = viewModel::onIntent,
         onScriptExpandedChange = { isScriptExpanded = it },
     )
@@ -101,6 +102,7 @@ private fun AnalysisFlowUiState.statusBarStyle(isScriptExpanded: Boolean): EdgeT
 @Composable
 private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
+    isScriptExpanded: Boolean,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
 ) {
@@ -122,6 +124,7 @@ private fun AnalysisScreen(
 
     AnalysisStepContent(
         uiState = uiState,
+        isScriptExpanded = isScriptExpanded,
         onIntent = onIntent,
         onClickRecordingControl = onClickRecordingControl,
         onScriptExpandedChange = onScriptExpandedChange,
@@ -160,6 +163,7 @@ private fun rememberVoiceRecordingControlClick(
 @Composable
 private fun AnalysisStepContent(
     uiState: AnalysisFlowUiState,
+    isScriptExpanded: Boolean,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
@@ -172,6 +176,7 @@ private fun AnalysisStepContent(
         AnalysisFlowStep.VOICE_RECORDING,
         -> AnalysisInputStepContent(
             uiState = uiState,
+            isScriptExpanded = isScriptExpanded,
             onIntent = onIntent,
             onClickRecordingControl = onClickRecordingControl,
             onScriptExpandedChange = onScriptExpandedChange,
@@ -191,6 +196,7 @@ private fun AnalysisStepContent(
 @Composable
 private fun AnalysisInputStepContent(
     uiState: AnalysisFlowUiState,
+    isScriptExpanded: Boolean,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
@@ -233,6 +239,7 @@ private fun AnalysisInputStepContent(
 
         AnalysisFlowStep.VOICE_RECORDING -> VoiceRecordingScreen(
             uiState = uiState,
+            isScriptExpanded = isScriptExpanded,
             onClickRecordingControl = onClickRecordingControl,
             onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
             onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },

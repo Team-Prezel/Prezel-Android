@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            PrezelTheme {
+            PrezelTheme(isDarkTheme = false) {
                 val appState = rememberPrezelAppState(networkMonitor = networkMonitor)
 
                 PrezelApp(

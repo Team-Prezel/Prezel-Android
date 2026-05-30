@@ -15,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +37,7 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun VoiceRecordingScreen(
     uiState: AnalysisFlowUiState,
+    isScriptExpanded: Boolean,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
@@ -50,6 +50,7 @@ internal fun VoiceRecordingScreen(
         recordingState = uiState.recordingState,
         recordingVolumes = uiState.recordingVolumes,
         analyzeEnabled = uiState.canMoveNext,
+        isScriptExpanded = isScriptExpanded,
         onClickRecordingControl = onClickRecordingControl,
         onStopRecording = onStopRecording,
         onResetRecording = onResetRecording,
@@ -65,6 +66,7 @@ private fun VoiceRecordingScreen(
     recordingState: AudioSessionState,
     recordingVolumes: ImmutableList<Float>,
     analyzeEnabled: Boolean,
+    isScriptExpanded: Boolean,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
@@ -72,8 +74,6 @@ private fun VoiceRecordingScreen(
     onScriptExpandedChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
-    var isScriptExpanded by rememberSaveable { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,8 +96,7 @@ private fun VoiceRecordingScreen(
             recordingVolumes = recordingVolumes,
             isScriptExpanded = isScriptExpanded,
             onToggleScriptExpanded = {
-                isScriptExpanded = !isScriptExpanded
-                onScriptExpandedChange(isScriptExpanded)
+                onScriptExpandedChange(!isScriptExpanded)
             },
             onClickRecordingControl = onClickRecordingControl,
             modifier = Modifier.weight(1f),
@@ -238,6 +237,7 @@ private fun VoiceRecordingScreenPreviewContent(recordingState: AudioSessionState
             form = AnalysisForm(script = "한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다."),
             recordingState = recordingState,
         ),
+        isScriptExpanded = false,
         onClickRecordingControl = {},
         onStopRecording = {},
         onResetRecording = {},
@@ -266,6 +266,7 @@ private fun VoiceRecordingScreenInteractiveFlowPreview() {
                 form = AnalysisForm(script = "한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다."),
                 recordingState = recordingState,
             ),
+            isScriptExpanded = false,
             onClickRecordingControl = { recordingState = recordingState.nextControlState() },
             onStopRecording = { recordingState = recordingState.stopPreviewRecording() },
             onResetRecording = { recordingState = AudioSessionState.Idle },

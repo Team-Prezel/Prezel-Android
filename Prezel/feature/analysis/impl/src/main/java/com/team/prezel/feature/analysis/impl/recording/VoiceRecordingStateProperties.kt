@@ -7,6 +7,7 @@ import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.analysis.impl.R
+import java.util.Locale
 
 internal val AudioSessionState.currentSeconds: Int
     get() = when (this) {
@@ -74,5 +75,5 @@ internal val AudioSessionState.actionIconColor: Color
 internal fun Int.toTimerText(): String {
     val minutes = this / 60
     val seconds = this % 60
-    return "%02d:%02d".format(minutes, seconds)
+    return String.format(Locale.US, "%02d:%02d", minutes, seconds)
 }

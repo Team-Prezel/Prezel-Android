@@ -20,6 +20,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -279,21 +280,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
 
     private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
         runCatching {
-            val audioFilePath = audioFileUri
-                ?.let { uri ->
-                    val audioFile = analysisFileCache.copyUriToCache(
-                        uriString = uri,
-                        prefix = "audio",
-                    )
-                    audioFile.absolutePath
-                }
-                ?: recordingFilePath
-            val scriptFile = scriptFileUri?.let { uri ->
-                analysisFileCache.copyUriToCache(
-                    uriString = uri,
-                    prefix = "script",
-                )
-            }
+            val audioFilePath = resolveAudioFilePath()
+            val scriptFilePath = resolveScriptFilePath()
             analyzePresentationUseCase(
                 name = name,
                 date = date.toRequestDate(),
@@ -302,34 +290,43 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 style = style,
                 audience = audience,
                 script = script,
-                scriptFilePath = scriptFile?.absolutePath,
+                scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             ).getOrThrow()
+        }.onFailure {
+            if (it is CancellationException) throw it
         }
 
     private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(presentationId: Long): Result<PresentationAnalysisSummary> =
         runCatching {
-            val audioFilePath = audioFileUri
-                ?.let { uri ->
-                    val audioFile = analysisFileCache.copyUriToCache(
-                        uriString = uri,
-                        prefix = "audio",
-                    )
-                    audioFile.absolutePath
-                }
-                ?: recordingFilePath
-            val scriptFile = scriptFileUri?.let { uri ->
-                analysisFileCache.copyUriToCache(
-                    uriString = uri,
-                    prefix = "script",
-                )
-            }
+            val audioFilePath = resolveAudioFilePath()
+            val scriptFilePath = resolveScriptFilePath()
             reAnalyzePresentationUseCase(
                 presentationId = presentationId,
                 script = script,
-                scriptFilePath = scriptFile?.absolutePath,
+                scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             ).getOrThrow()
+        }.onFailure {
+            if (it is CancellationException) throw it
+        }
+
+    private fun PresentationAnalysisSubmission.resolveAudioFilePath(): String =
+        audioFileUri
+            ?.let { uri ->
+                analysisFileCache.copyUriToCache(
+                    uriString = uri,
+                    prefix = "audio",
+                ).absolutePath
+            }
+            ?: recordingFilePath
+
+    private fun PresentationAnalysisSubmission.resolveScriptFilePath(): String? =
+        scriptFileUri?.let { uri ->
+            analysisFileCache.copyUriToCache(
+                uriString = uri,
+                prefix = "script",
+            ).absolutePath
         }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
