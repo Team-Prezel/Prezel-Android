@@ -2,17 +2,17 @@ package com.team.prezel.feature.home.impl.main.component.title
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
-import com.team.prezel.core.designsystem.component.chip.chip.ChipType
-import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
@@ -34,10 +34,8 @@ internal fun PresentationHero(
         backgroundResId = presentation.category.backgroundResId(),
         modifier = modifier,
     ) {
-        PrezelChip(
+        HomeCategoryChip(
             text = stringResource(id = presentation.category.labelResId()),
-            type = ChipType.OUTLINED,
-            size = ChipSize.SMALL,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -67,6 +65,25 @@ internal fun PresentationHero(
             },
         )
     }
+}
+
+@Composable
+private fun HomeCategoryChip(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        color = PrezelTheme.colors.interactiveRegular,
+        style = PrezelTheme.typography.caption2Regular,
+        modifier = modifier
+            .clip(PrezelTheme.shapes.V4)
+            .background(PrezelTheme.colors.bgRegular)
+            .padding(
+                horizontal = PrezelTheme.spacing.V6,
+                vertical = PrezelTheme.spacing.V4,
+            ),
+    )
 }
 
 @Composable

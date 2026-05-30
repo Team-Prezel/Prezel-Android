@@ -47,7 +47,7 @@ internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary
         spellErrorCount = spellErrorCount,
         grammarErrorCount = grammarErrorCount,
         totalErrorCount = totalErrorCount,
-        growth = growthGraph.map { item -> item.toDomain() },
+        growth = growthGraph?.map { item -> item.toDomain() }.orEmpty(),
         expectedQuestions = expectedQuestions.map { item -> item.toDomain() },
         selfFeedback = reviewContent,
     )
