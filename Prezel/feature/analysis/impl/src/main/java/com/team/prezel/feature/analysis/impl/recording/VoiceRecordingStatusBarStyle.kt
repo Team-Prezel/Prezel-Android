@@ -1,6 +1,7 @@
 package com.team.prezel.feature.analysis.impl.recording
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +22,12 @@ internal fun VoiceRecordingStatusBarStyle(style: EdgeToEdgeStatusBarStyle) {
 
     LaunchedEffect(globalEventBus, style) {
         globalEventBus.emit(GlobalEvent.ChangeEdgeToEdgeStatusBarStyle(style))
+    }
+
+    DisposableEffect(globalEventBus) {
+        onDispose {
+            globalEventBus.tryEmit(GlobalEvent.ResetEdgeToEdgeStatusBarStyle)
+        }
     }
 }
 

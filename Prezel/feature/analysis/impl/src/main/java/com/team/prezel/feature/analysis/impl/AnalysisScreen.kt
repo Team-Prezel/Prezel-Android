@@ -46,8 +46,6 @@ internal fun AnalysisScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     var isScriptExpanded by rememberSaveable(uiState.step) { mutableStateOf(false) }
 
-    VoiceRecordingStatusBarStyle(style = uiState.statusBarStyle(isScriptExpanded = isScriptExpanded))
-
     BackHandler {
         viewModel.onIntent(AnalysisFlowUiIntent.Back)
     }
@@ -202,6 +200,8 @@ private fun AnalysisInputStepContent(
     onScriptExpandedChange: (Boolean) -> Unit,
 ) {
     if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+        VoiceRecordingStatusBarStyle(style = uiState.statusBarStyle(isScriptExpanded = isScriptExpanded))
+
         VoiceRecordingScreen(
             uiState = uiState,
             isScriptExpanded = isScriptExpanded,
