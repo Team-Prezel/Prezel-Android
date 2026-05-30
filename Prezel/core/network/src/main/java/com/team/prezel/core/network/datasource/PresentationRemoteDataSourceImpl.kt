@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.model.requireSuccess
 import com.team.prezel.core.network.service.PresentationService
@@ -105,6 +106,17 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         presentationService.getPracticeRecords(presentationId = presentationId).requireData()
 
     override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
+
+    override suspend fun writeSelfFeedback(
+        presentationId: Long,
+        content: String,
+    ) {
+        presentationService
+            .writeSelfFeedback(
+                presentationId = presentationId,
+                request = SelfFeedbackRequest(content = content),
+            ).requireSuccess()
+    }
 }
 
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {

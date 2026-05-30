@@ -34,6 +34,7 @@ internal fun HomeScreen(
     navigateToPracticeRecording: (presentationId: Long) -> Unit,
     navigateToFileUploadAnalysis: () -> Unit,
     navigateToVoiceRecordingAnalysis: () -> Unit,
+    navigateToFeedback: (presentationId: Long, title: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -63,7 +64,7 @@ internal fun HomeScreen(
         onClickAddPresentation = navigateToVoiceRecordingAnalysis,
         onClickPracticeRecording = { presentationId -> navigateToPracticeRecording(presentationId) },
         onClickAnalyzePresentation = { },
-        onClickWriteFeedback = { },
+        onClickWriteFeedback = { presentation -> navigateToFeedback(presentation.id, presentation.title) },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
         onClickCardGraphItemIndex = { presentationId, index ->
