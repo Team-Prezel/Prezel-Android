@@ -145,7 +145,7 @@ private fun HomePresentationPagePreview() {
                 category = Category.OFFER,
                 title = "설득하는 발표",
                 date = LocalDate(2026, 10, 1),
-                dDay = "-3",
+                dDay = "D-3",
                 practiceRecords = PracticeRecordsUiModel(
                     practicedDates = listOf(LocalDate(2026, 9, 28)),
                     startDate = LocalDate(2026, 9, 26),
@@ -168,7 +168,7 @@ private fun HomePresentationPagePastPreview() {
                 category = Category.EDUCATION,
                 title = "교육 발표",
                 date = LocalDate(2026, 9, 20),
-                dDay = "+5",
+                dDay = "D+5",
                 practiceRecords = PracticeRecordsUiModel(
                     practicedDates = listOf(LocalDate(2026, 9, 18), LocalDate(2026, 9, 19)),
                     startDate = LocalDate(2026, 9, 15),

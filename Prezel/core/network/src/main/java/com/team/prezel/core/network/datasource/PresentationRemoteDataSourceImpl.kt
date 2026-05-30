@@ -2,6 +2,7 @@ package com.team.prezel.core.network.datasource
 
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
+import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
@@ -97,10 +98,10 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
     override suspend fun getPastPresentations(): List<GetPresentationsResponse> = presentationService.getPastPresentations().requireData()
 
     override suspend fun getUpcomingPresentationDetail(presentationId: Long): PresentationSummaryResponse =
-        presentationService.getUpcomingPresentationDetail(presentationId = presentationId).requireData().analysisResult
+        presentationService.getUpcomingPresentationDetail(presentationId = presentationId).requireData().toPresentationSummaryResponse()
 
     override suspend fun getPastPresentationDetail(presentationId: Long): PresentationSummaryResponse =
-        presentationService.getPastPresentationDetail(presentationId = presentationId).requireData().analysisResult
+        presentationService.getPastPresentationDetail(presentationId = presentationId).requireData().toPresentationSummaryResponse()
 
     override suspend fun getPracticeRecords(presentationId: Long): GetPracticeRecordsResponse =
         presentationService.getPracticeRecords(presentationId = presentationId).requireData()
@@ -130,6 +131,11 @@ private fun FormBuilder.appendAudioPart(audioFilePath: String) {
         },
     )
 }
+
+private fun GetPresentationDetailResponse.toPresentationSummaryResponse(): PresentationSummaryResponse =
+    analysisResult.copy(
+        reviewContent = reviewContent ?: analysisResult.reviewContent,
+    )
 
 private fun FormBuilder.appendScriptPart(scriptFilePath: String) {
     val file = File(scriptFilePath)

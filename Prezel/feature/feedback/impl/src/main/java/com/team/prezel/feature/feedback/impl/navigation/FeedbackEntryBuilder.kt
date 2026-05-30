@@ -21,7 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureFeedbackEntryBuilder() {
         FeedbackScreen(
             title = key.title,
             navigateBack = { navigator.goBack() },
-            navigateToHome = { navigator.navigate(HomeNavKey) },
+            navigateToHome = { navigator.replaceRoot(HomeNavKey) },
             viewModel = hiltViewModel<FeedbackViewModel, FeedbackViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
             ),
