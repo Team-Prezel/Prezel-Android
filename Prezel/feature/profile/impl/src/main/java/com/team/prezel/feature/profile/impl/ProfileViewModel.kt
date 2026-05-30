@@ -41,11 +41,12 @@ internal class ProfileViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collectLatest(::validateNickname)
         }
+
+        fetchUserInfo()
     }
 
     override fun onIntent(intent: ProfileUiIntent) {
         when (intent) {
-            ProfileUiIntent.FetchData -> fetchUserInfo()
             is ProfileUiIntent.UpdateNickname -> handleNicknameChanged(intent.nickname)
             is ProfileUiIntent.UpdateProfileImage -> handleProfileImageChanged(
                 profileUrl = intent.profileUrl,

@@ -3,6 +3,8 @@
     <string name="feature_home_impl_title">홈</string>
     <string name="feature_home_impl_bottom_sheet_empty_title">지금부터 연습해보세요</string>
     <string name="feature_home_impl_bottom_sheet_content_title">지금까지 %1$d번 연습했어요</string>
+    <string name="feature_home_impl_bottom_sheet_past_graph_title">나의 발표 변화를 확인해보세요</string>
+    <string name="feature_home_impl_bottom_sheet_upcoming_keywords_title">발표 흐름을 키워드별로 정리해보세요</string>
     <string name="feature_home_impl_empty_greeting">안녕하세요 %1$s님!</string>
     <string name="feature_home_impl_empty_subtitle">어떤 발표를 앞두고 있나요?</string>
     <string name="feature_home_impl_presentation_date">%1$d년 %2$02d월 %3$02d일</string>
@@ -21,6 +23,10 @@
     <string name="feature_home_impl_category_report">업무·보고</string>
 
     <string name="feature_home_impl_practice_recording_action">연습하기</string>
+
+    <string name="feature_home_impl_empty_sheet_practice_card_message">발표를 추가하고 연습을 시작해보세요!</string>
+    <string name="feature_home_impl_empty_sheet_practice_card_button_text">연습하기</string>
+    <string name="feature_home_impl_empty_sheet_practice_card_title">지금부터 연습해보세요</string>
 
     <!-- Message  -->
     <string name="feature_home_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>

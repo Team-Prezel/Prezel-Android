@@ -43,6 +43,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format
@@ -80,7 +81,7 @@ fun PracticeCard(
     onClickAction: () -> Unit = {},
 ) {
     var startIndex by rememberSaveable(items) { mutableIntStateOf(0) }
-    val trackerItems = items.toTrackerItems(dDay = dDay)
+    val trackerItems = items.toTrackerItems(dDay = dDay.plus(1, DateTimeUnit.DAY))
     val hasPreviousPage = startIndex > 0
     val hasNextPage = startIndex + TRACKER_SIZE < trackerItems.size
 
@@ -340,14 +341,14 @@ private fun Modifier.applyDashBorder(type: StampType): Modifier {
 @BasicPreview
 @Composable
 private fun PracticeCardPreview() {
-    val baseDate = LocalDate(year = 2026, month = 3, day = 20)
-    val dDay = LocalDate(year = 2026, month = 3, day = 30)
+    val baseDate = LocalDate(year = 2026, month = 5, day = 26)
+    val dDay = LocalDate(year = 2026, month = 6, day = 2)
 
     PrezelTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             PracticeCard(
                 dDay = dDay,
-                items = List(baseDate.daysUntil(dDay)) { index ->
+                items = List(baseDate.daysUntil(dDay.plus(1, DateTimeUnit.DAY))) { index ->
                     PracticeCardItem(
                         date = baseDate.plus(DatePeriod(days = index)),
                         isPracticed = index % 2 == 0,

@@ -21,15 +21,16 @@ class AnalyzePresentationUseCase @Inject constructor(
         scriptFilePath: String?,
         audioFilePath: String,
     ): Result<Long> =
-        presentationRepository.analyzePresentation(
-            name = name,
-            date = date,
-            category = category,
-            purpose = purpose,
-            style = style,
-            audience = audience,
-            script = script,
-            scriptFilePath = scriptFilePath,
-            audioFilePath = audioFilePath,
-        )
+        presentationRepository
+            .analyzePresentation(
+                name = name,
+                date = date,
+                category = category,
+                purpose = purpose,
+                style = style,
+                audience = audience,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+            )
 }

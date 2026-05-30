@@ -55,8 +55,8 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         viewModelScope.launch {
             fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
                 .onSuccess { result ->
-                    this@AnalysisReportViewModel.presentationId = result.presentationId
-                    analysisResultId = result.analysisResultId
+                    this@AnalysisReportViewModel.presentationId = result.analysisSummary.presentationId
+                    analysisResultId = result.analysisSummary.analysisResultId
                     updateState { result.toAnalysisReportUiState(isPast = isPast) }
                 }.onFailure {
                     sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.FETCH_REPORT_FAILED))

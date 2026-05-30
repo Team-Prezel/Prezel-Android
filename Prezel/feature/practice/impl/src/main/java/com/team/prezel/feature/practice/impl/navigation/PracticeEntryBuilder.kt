@@ -16,7 +16,7 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
-    entry<PracticeNavKey> {
+    entry<PracticeNavKey> { key ->
         val navigator = LocalNavigator.current
 
         PracticeRecordingScreen(
@@ -24,6 +24,7 @@ internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
             navigateToAnalysis = { recordingFilePath, referenceText ->
                 navigator.navigate(
                     PracticeAnalysisNavKey(
+                        presentationId = key.presentationId,
                         recordingFilePath = recordingFilePath,
                         referenceText = referenceText,
                     ),
@@ -40,6 +41,7 @@ internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
             onComplete = { navigator.replaceRoot(HomeNavKey) },
             viewModel = hiltViewModel<PracticeAnalysisViewModel, PracticeAnalysisViewModel.Factory> { factory ->
                 factory.create(
+                    presentationId = key.presentationId,
                     recordingFilePath = key.recordingFilePath,
                     referenceText = key.referenceText,
                 )

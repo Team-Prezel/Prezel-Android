@@ -3,6 +3,7 @@ package com.team.prezel.ui
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -14,6 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -46,7 +50,10 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
+import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.core.ui.state.rememberAppDimmerState
+import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
@@ -59,9 +66,11 @@ fun PrezelApp(
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val appDimmerState = rememberAppDimmerState()
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
+        LocalAppDimmerState provides appDimmerState,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
         DoubleBackToExitHandler(navigationState = appState.navigationState)
@@ -81,6 +90,7 @@ private fun PrezelAppContent(
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
+    val appDimmerState = LocalAppDimmerState.current
     var statusBarStyle by remember { mutableStateOf(EdgeToEdgeStatusBarStyle.DEFAULT) }
 
     ObserveGlobalEvents(
@@ -89,15 +99,67 @@ private fun PrezelAppContent(
         onStatusBarStyleChange = { statusBarStyle = it },
     )
 
-    SharedTransitionLayout {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        SharedTransitionLayout {
             ProvideSharedTransitionScope(this@SharedTransitionLayout) {
-                val provider = remember(entryBuilders, navigator) {
-                    entryProvider {
-                        entryBuilders.forEach { builder -> this.builder() }
-                    }
-                }
+                AppNavigationContent(
+                    appState = appState,
+                    entryBuilders = entryBuilders,
+                    navigator = navigator,
+                )
+            }
+        }
 
+        AppDimmerOverlay(isVisible = appDimmerState.isVisible, onDismiss = appDimmerState::dismiss)
+    }
+}
+
+@Composable
+private fun AppNavigationContent(
+    appState: PrezelAppState,
+    entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
+    navigator: Navigator,
+) {
+    val provider = remember(entryBuilders, navigator) {
+        entryProvider {
+            entryBuilders.forEach { builder -> this.builder() }
+        }
+    }
+
+    PrezelNavigationScaffold(
+        showNavigationBar = appState.shouldShowNavigationBar,
+        snackbarHostState = LocalSnackbarHostState.current,
+        navigationItems = { AppNavigationItems(appState = appState, navigateToKey = navigator::navigate) },
+    ) { padding ->
+        NavDisplay(
+            entries = appState.navigationState.toEntries(provider),
+            onBack = navigator::goBack,
+            modifier = Modifier.padding(padding),
+            transitionSpec = { defaultPrezelNavTransition() },
+            popTransitionSpec = { defaultPrezelNavTransition() },
+            predictivePopTransitionSpec = { _: Int -> defaultPrezelNavTransition() },
+        )
+    }
+}
+
+@Composable
+private fun AppDimmerOverlay(
+    isVisible: Boolean,
+    onDismiss: () -> Unit,
+) {
+    if (!isVisible) return
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PrezelTheme.colors.scrimContainer)
+            .noRippleClickable(onClick = onDismiss),
+    )
+}
+
+private fun defaultPrezelNavTransition(): ContentTransform =
+    fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+        fadeOut(animationSpec = tween(durationMillis = 100))
                 PrezelNavigationScaffold(
                     showNavigationBar = appState.shouldShowNavigationBar,
                     snackbarHostState = LocalSnackbarHostState.current,

@@ -7,6 +7,7 @@ interface PracticeRepository {
     suspend fun fetchPracticeScript(): Result<PracticeScript>
 
     suspend fun analyzePracticeRecording(
+        presentationId: Long,
         recordingFilePath: String,
         referenceText: String,
     ): Result<PracticeRecordingAnalysisResult>

@@ -1,61 +1,37 @@
 package com.team.prezel.feature.home.impl.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
-import com.team.prezel.core.designsystem.component.actions.button.floating.PrezelFloatingMenu
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
-import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.navigation.LocalNavigator
+import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
-import com.team.prezel.core.ui.util.onHeightChanged
+import com.team.prezel.core.ui.state.rememberAppDimmerState
 import com.team.prezel.feature.home.impl.R
-import com.team.prezel.feature.home.impl.main.component.HomePageLayout
-import com.team.prezel.feature.home.impl.main.component.body.EmptyPresentationSheet
-import com.team.prezel.feature.home.impl.main.component.body.PresentationSheet
-import com.team.prezel.feature.home.impl.main.component.head.HomeHeadSection
-import com.team.prezel.feature.home.impl.main.component.title.EmptyPresentationHero
-import com.team.prezel.feature.home.impl.main.component.title.PresentationHero
+import com.team.prezel.feature.home.impl.main.component.HomeScreenContent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
 import com.team.prezel.feature.home.impl.main.contract.HomeUiIntent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiState
+import com.team.prezel.feature.home.impl.main.model.GrowthGraphData
+import com.team.prezel.feature.home.impl.main.model.GrowthGraphItemUiModel
 import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
+import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
-import com.team.prezel.feature.practice.api.PracticeNavKey
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 @Composable
 internal fun HomeScreen(
+    navigateToPracticeRecording: (presentationId: Long) -> Unit,
     navigateToFileUploadAnalysis: () -> Unit,
     navigateToVoiceRecordingAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
@@ -65,7 +41,6 @@ internal fun HomeScreen(
     val pagerState = rememberPagerState(0) { uiState.presentationCount() }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
-    val navigator = LocalNavigator.current
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)
@@ -82,296 +57,53 @@ internal fun HomeScreen(
         }
     }
 
-    HomeScreen(
+    HomeScreenContent(
         uiState = uiState,
         pagerState = pagerState,
-        onClickAddPresentation = { },
-        onClickPracticeRecording = { navigator.navigate(PracticeNavKey) },
+        onClickAddPresentation = navigateToVoiceRecordingAnalysis,
+        onClickPracticeRecording = { presentationId -> navigateToPracticeRecording(presentationId) },
         onClickAnalyzePresentation = { },
         onClickWriteFeedback = { },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
+        onClickCardGraphItemIndex = { presentationId, index ->
+            viewModel.onIntent(HomeUiIntent.ClickCardGraphItem(presentationId = presentationId, index = index))
+        },
         modifier = modifier,
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreen(
-    uiState: HomeUiState,
-    pagerState: PagerState,
-    onClickAddPresentation: () -> Unit,
-    onClickPracticeRecording: () -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-    onClickVoiceRecordingAnalysis: () -> Unit,
-    onClickFileUploadAnalysis: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val scope = rememberCoroutineScope()
-    var isFabExpanded by remember { mutableStateOf(false) }
-
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val maxScreenHeight = maxHeight
-        var headerHeight by remember { mutableStateOf(0.dp) }
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            HomeContent(
-                uiState = uiState,
-                pagerState = pagerState,
-                maxHeight = maxScreenHeight,
-                headerHeight = headerHeight,
-                onClickAddPresentation = onClickAddPresentation,
-                onClickPracticeRecording = onClickPracticeRecording,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
-            )
-
-            HomeHeadSection(
-                uiState = uiState,
-                pagerState = pagerState,
-                onClickTab = { pageIndex -> scope.launch { pagerState.scrollToPage(pageIndex) } },
-                modifier = Modifier.onHeightChanged { newHeight -> headerHeight = newHeight },
-            )
-
-            if (isFabExpanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.32f))
-                        .clickable { isFabExpanded = false },
-                )
-            }
-
-            HomeAnalysisFloatingMenu(
-                isExpanded = isFabExpanded,
-                onChangeExpanded = { isFabExpanded = it },
-                onClickVoiceRecording = {
-                    isFabExpanded = false
-                    onClickVoiceRecordingAnalysis()
-                },
-                onClickFileUpload = {
-                    isFabExpanded = false
-                    onClickFileUploadAnalysis()
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = PrezelTheme.spacing.V24, bottom = PrezelTheme.spacing.V24),
-            )
-        }
-    }
-}
-
-@Composable
-private fun HomeAnalysisFloatingMenu(
-    isExpanded: Boolean,
-    onChangeExpanded: (Boolean) -> Unit,
-    onClickVoiceRecording: () -> Unit,
-    onClickFileUpload: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    PrezelFloatingMenu(
-        isExpanded = isExpanded,
-        onChangeExpanded = onChangeExpanded,
-        iconResId = PrezelIcons.Plus,
-        openIconResId = PrezelIcons.Cancel,
-        size = ButtonSize.REGULAR,
-        hierarchy = ButtonHierarchy.PRIMARY,
-        modifier = modifier,
-    ) {
-        MenuItem(
-            label = stringResource(R.string.feature_home_impl_analysis_voice_recording),
-            iconResId = PrezelIcons.Mic,
-            onClick = onClickVoiceRecording,
-        )
-        MenuItem(
-            label = stringResource(R.string.feature_home_impl_analysis_file_upload),
-            iconResId = PrezelIcons.Folder,
-            onClick = onClickFileUpload,
-        )
-    }
-}
-
-@Composable
-private fun HomeContent(
-    uiState: HomeUiState,
-    pagerState: PagerState,
-    maxHeight: Dp,
-    headerHeight: Dp,
-    onClickAddPresentation: () -> Unit,
-    onClickPracticeRecording: () -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-) {
-    when (uiState) {
-        HomeUiState.Loading -> Unit
-        is HomeUiState.Empty -> {
-            HomeEmptyContent(
-                maxHeight = maxHeight,
-                headerHeight = headerHeight,
-                uiState = uiState,
-                onClickAddPresentation = onClickAddPresentation,
-                onClickPracticeRecording = onClickPracticeRecording,
-            )
-        }
-
-        is HomeUiState.SingleContent -> {
-            HomeSingleContent(
-                uiState = uiState,
-                maxHeight = maxHeight,
-                headerHeight = headerHeight,
-                onClickPracticeRecording = onClickPracticeRecording,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
-            )
-        }
-
-        is HomeUiState.MultipleContent -> {
-            HomeMultipleContent(
-                uiState = uiState,
-                pagerState = pagerState,
-                maxHeight = maxHeight,
-                headerHeight = headerHeight,
-                onClickPracticeRecording = onClickPracticeRecording,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
-            )
-        }
-    }
-}
-
-@Composable
-private fun HomeEmptyContent(
-    maxHeight: Dp,
-    headerHeight: Dp,
-    uiState: HomeUiState.Empty,
-    onClickAddPresentation: () -> Unit,
-    onClickPracticeRecording: () -> Unit,
-) {
-    HomePageLayout(
-        maxHeight = maxHeight,
-        headerHeight = headerHeight,
-        sheetContent = { EmptyPresentationSheet(onClickPracticeRecording = onClickPracticeRecording) },
-        heroContent = {
-            EmptyPresentationHero(
-                nickname = uiState.nickname,
-                onClickAddPresentation = onClickAddPresentation,
-            )
-        },
-    )
-}
-
-@Composable
-private fun HomeSingleContent(
-    uiState: HomeUiState.SingleContent,
-    maxHeight: Dp,
-    headerHeight: Dp,
-    onClickPracticeRecording: () -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-) {
-    val presentation = uiState.presentation
-
-    HomePageLayout(
-        maxHeight = maxHeight,
-        headerHeight = headerHeight,
-        sheetContent = {
-            PresentationSheet(
-                practiceCount = presentation.practiceCount,
-                onClickPracticeRecording = onClickPracticeRecording,
-            )
-        },
-        heroContent = {
-            PresentationHero(
-                presentation = presentation,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
-            )
-        },
-    )
-}
-
-@Composable
-private fun HomeMultipleContent(
-    uiState: HomeUiState.MultipleContent,
-    pagerState: PagerState,
-    maxHeight: Dp,
-    headerHeight: Dp,
-    onClickPracticeRecording: () -> Unit,
-    onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
-    onClickWriteFeedback: (PresentationUiModel) -> Unit,
-) {
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize(),
-        overscrollEffect = null,
-        userScrollEnabled = false,
-        key = { pageIndex -> uiState.presentations[pageIndex].id },
-    ) { pageIndex ->
-        val presentation = uiState.presentations[pageIndex]
-
-        HomePageLayout(
-            maxHeight = maxHeight,
-            headerHeight = headerHeight,
-            sheetContent = {
-                PresentationSheet(
-                    practiceCount = presentation.practiceCount,
-                    onClickPracticeRecording = onClickPracticeRecording,
-                )
-            },
-            heroContent = {
-                PresentationHero(
-                    presentation = presentation,
-                    onClickAnalyzePresentation = onClickAnalyzePresentation,
-                    onClickWriteFeedback = onClickWriteFeedback,
-                )
-            },
-        )
-    }
 }
 
 @BasicPreview
 @Composable
 private fun HomeScreenEmptyPreview() {
     val uiState = HomeUiState.Empty(nickname = "프레즐")
-    PrezelTheme {
-        HomeScreen(
-            uiState = uiState,
-            pagerState = rememberPagerState(0) { uiState.presentationCount() },
-            onClickAddPresentation = { },
-            onClickPracticeRecording = { },
-            onClickAnalyzePresentation = { },
-            onClickWriteFeedback = { },
-            onClickVoiceRecordingAnalysis = { },
-            onClickFileUploadAnalysis = { },
-        )
-    }
+    HomeScreenPreview(uiState = uiState)
 }
 
 @BasicPreview
 @Composable
 private fun HomeScreenSinglePreview() {
     val uiState = HomeUiState.SingleContent(
-        presentation = PresentationUiModel(
+        presentation = PresentationUiModel.Past(
             id = 1L,
             category = Category.OFFER,
             title = "날짜 지난 발표제목",
             date = LocalDate(2026, 4, 3),
-            dDay = -1,
+            dDay = "D+1",
+            practiceRecords = PracticeRecordsUiModel(
+                practicedDates = listOf(LocalDate(2026, 4, 1), LocalDate(2026, 4, 3)),
+                startDate = LocalDate(2026, 3, 30),
+                endDate = LocalDate(2026, 4, 3),
+            ),
+            growthGraphData = GrowthGraphData(
+                items = List(3) { index ->
+                    GrowthGraphItemUiModel(attempt = index + 1, accuracyScore = 15.0 * index, scriptMatchRate = 10.0 * index)
+                },
+                selectedItemIndex = null,
+            ),
         ),
     )
-    PrezelTheme {
-        HomeScreen(
-            uiState = uiState,
-            pagerState = rememberPagerState(0) { uiState.presentationCount() },
-            onClickAddPresentation = { },
-            onClickPracticeRecording = { },
-            onClickAnalyzePresentation = { },
-            onClickWriteFeedback = { },
-            onClickVoiceRecordingAnalysis = { },
-            onClickFileUploadAnalysis = { },
-        )
-    }
+    HomeScreenPreview(uiState = uiState)
 }
 
 @BasicPreview
@@ -379,25 +111,40 @@ private fun HomeScreenSinglePreview() {
 private fun HomeScreenMultiplePreview() {
     val uiState = HomeUiState.MultipleContent(
         List(3) { index ->
-            PresentationUiModel(
+            PresentationUiModel.Upcoming(
                 id = index.toLong(),
                 category = Category.EDUCATION,
                 title = "공백포함둘에서열글자",
                 date = LocalDate(2026, 4, 10 + index),
-                dDay = index,
+                dDay = "-$index",
+                practiceRecords = PracticeRecordsUiModel(
+                    practicedDates = listOf(LocalDate(2026, 4, 10 + index)),
+                    startDate = LocalDate(2026, 4, 7 + index),
+                    endDate = LocalDate(2026, 4, 10 + index),
+                ),
             )
         }.toPersistentList(),
     )
+    HomeScreenPreview(uiState = uiState)
+}
+
+@Composable
+private fun HomeScreenPreview(uiState: HomeUiState) {
     PrezelTheme {
-        HomeScreen(
-            uiState = uiState,
-            pagerState = rememberPagerState(0) { uiState.presentationCount() },
-            onClickAddPresentation = { },
-            onClickPracticeRecording = { },
-            onClickAnalyzePresentation = { },
-            onClickWriteFeedback = { },
-            onClickVoiceRecordingAnalysis = { },
-            onClickFileUploadAnalysis = { },
-        )
+        CompositionLocalProvider(
+            LocalAppDimmerState provides rememberAppDimmerState(),
+        ) {
+            HomeScreenContent(
+                uiState = uiState,
+                pagerState = rememberPagerState(0) { uiState.presentationCount() },
+                onClickAddPresentation = {},
+                onClickPracticeRecording = {},
+                onClickAnalyzePresentation = {},
+                onClickWriteFeedback = {},
+                onClickVoiceRecordingAnalysis = {},
+                onClickFileUploadAnalysis = {},
+                onClickCardGraphItemIndex = { _, _ -> },
+            )
+        }
     }
 }

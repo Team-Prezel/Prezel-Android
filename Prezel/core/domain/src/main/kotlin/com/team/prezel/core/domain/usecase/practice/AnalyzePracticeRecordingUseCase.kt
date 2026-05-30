@@ -8,10 +8,12 @@ class AnalyzePracticeRecordingUseCase @Inject constructor(
     private val practiceRepository: PracticeRepository,
 ) {
     suspend operator fun invoke(
+        presentationId: Long,
         recordingFilePath: String,
         referenceText: String,
     ): Result<PracticeRecordingAnalysisResult> =
         practiceRepository.analyzePracticeRecording(
+            presentationId = presentationId,
             recordingFilePath = recordingFilePath,
             referenceText = referenceText,
         )
