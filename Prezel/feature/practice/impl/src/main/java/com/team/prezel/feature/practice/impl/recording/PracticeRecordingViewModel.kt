@@ -42,6 +42,7 @@ internal class PracticeRecordingViewModel @Inject constructor(
             }
 
             is AudioSessionState.Recording -> audioController.stopRecording()
+            is AudioSessionState.PausedRecording -> audioController.stopRecording()
             is AudioSessionState.ReadyToPlay -> audioController.startPlayback()
             is AudioSessionState.Playing -> audioController.stopPlayback()
         }

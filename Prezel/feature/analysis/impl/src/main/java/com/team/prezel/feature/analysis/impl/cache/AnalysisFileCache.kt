@@ -18,4 +18,9 @@ internal interface AnalysisFileCache {
         uriString: String,
         prefix: String,
     ): File
+
+    /**
+     * [uriString]이 가리키는 텍스트 파일 내용을 읽어 반환한다.
+     */
+    fun readTextFromUri(uriString: String): String
 }

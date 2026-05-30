@@ -9,10 +9,14 @@ class ReAnalyzePresentationUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
         audioFilePath: String,
     ): Result<PresentationAnalysisSummary> =
         presentationRepository.reAnalyzePresentation(
             presentationId = presentationId,
+            script = script,
+            scriptFilePath = scriptFilePath,
             audioFilePath = audioFilePath,
         )
 }

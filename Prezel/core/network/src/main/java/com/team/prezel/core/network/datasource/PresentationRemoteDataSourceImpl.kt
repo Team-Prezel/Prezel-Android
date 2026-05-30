@@ -58,13 +58,28 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun reAnalyzePresentation(
         presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
         audioFilePath: String,
-    ): PresentationSummaryResponse =
-        presentationService
+    ): PresentationSummaryResponse {
+        require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
+
+        val multipart = MultiPartFormDataContent(
+            formData {
+                appendAudioPart(audioFilePath = audioFilePath)
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
+                }
+            },
+        )
+
+        return presentationService
             .reAnalyzePresentation(
                 presentationId = presentationId,
-                multipart = audioFilePath.toAudioMultipart(),
+                multipart = multipart,
             ).requireData()
+    }
 
     override suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse =
         presentationService.getScriptDetail(analysisResultId = analysisResultId).requireData()
@@ -92,16 +107,8 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
     override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
 }
 
-private fun String.toAudioMultipart(): MultiPartFormDataContent =
-    MultiPartFormDataContent(
-        formData {
-            appendAudioPart(this@toAudioMultipart)
-        },
-    )
-
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {
     val audioFile = File(audioFilePath)
-
     append(
         key = "audio",
         value = audioFile.toChannelProvider(),

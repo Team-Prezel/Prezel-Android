@@ -1,5 +1,6 @@
 package com.team.prezel.feature.analysis.impl.result
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -23,6 +24,7 @@ internal fun FileRecognitionFailedScreen(onRetry: () -> Unit) {
     FileRecognitionFailedStatusView(
         title = stringResource(R.string.feature_analysis_impl_file_recognition_failed_title),
         description = stringResource(R.string.feature_analysis_impl_file_recognition_failed_description),
+        visualResId = R.drawable.feature_analysis_impl_error_voice,
         onRetry = onRetry,
     )
 }
@@ -32,6 +34,17 @@ internal fun ScriptFileRecognitionFailedScreen(onRetry: () -> Unit) {
     FileRecognitionFailedStatusView(
         title = stringResource(R.string.feature_analysis_impl_script_file_recognition_failed_title),
         description = stringResource(R.string.feature_analysis_impl_script_file_recognition_failed_description),
+        visualResId = R.drawable.feature_analysis_impl_error_voice,
+        onRetry = onRetry,
+    )
+}
+
+@Composable
+internal fun AnalysisFailedScreen(onRetry: () -> Unit) {
+    FileRecognitionFailedStatusView(
+        title = stringResource(R.string.feature_analysis_impl_analysis_failed_title),
+        description = stringResource(R.string.feature_analysis_impl_analysis_failed_description),
+        visualResId = R.drawable.feature_analysis_impl_error_analysis,
         onRetry = onRetry,
     )
 }
@@ -40,6 +53,7 @@ internal fun ScriptFileRecognitionFailedScreen(onRetry: () -> Unit) {
 private fun FileRecognitionFailedStatusView(
     title: String,
     description: String,
+    @DrawableRes visualResId: Int,
     onRetry: () -> Unit,
 ) {
     StatusView(
@@ -48,7 +62,7 @@ private fun FileRecognitionFailedStatusView(
         modifier = Modifier.fillMaxSize(),
         visual = {
             Image(
-                painter = painterResource(R.drawable.feature_analysis_impl_error_voice),
+                painter = painterResource(visualResId),
                 contentDescription = null,
                 modifier = Modifier.size(120.dp),
             )
@@ -80,5 +94,13 @@ private fun FileRecognitionFailedScreenPreview() {
 private fun ScriptFileRecognitionFailedScreenPreview() {
     PrezelTheme {
         ScriptFileRecognitionFailedScreen(onRetry = {})
+    }
+}
+
+@BasicPreview
+@Composable
+private fun AnalysisFailedScreenPreview() {
+    PrezelTheme {
+        AnalysisFailedScreen(onRetry = {})
     }
 }

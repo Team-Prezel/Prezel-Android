@@ -1,12 +1,30 @@
 package com.team.prezel.feature.analysis.impl.contract
 
+import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.base.UiIntent
+import com.team.prezel.feature.analysis.api.AnalysisStartType
 
+@Immutable
 internal sealed interface AnalysisFlowUiIntent : UiIntent {
+    data class EnterStep(
+        val step: AnalysisFlowStep,
+        val startType: AnalysisStartType,
+    ) : AnalysisFlowUiIntent
+
+    data class StartReRecording(
+        val presentationId: Long,
+        val isPast: Boolean,
+    ) : AnalysisFlowUiIntent
+
+    data class StartReWritingScript(
+        val presentationId: Long,
+        val isPast: Boolean,
+    ) : AnalysisFlowUiIntent
+
     data class UpdatePresentationTitle(
         val title: String,
     ) : AnalysisFlowUiIntent
@@ -34,6 +52,12 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
     data class SelectAudioFile(
         val fileUri: String?,
     ) : AnalysisFlowUiIntent
+
+    data object ClickRecordingControl : AnalysisFlowUiIntent
+
+    data object StopRecording : AnalysisFlowUiIntent
+
+    data object ResetRecording : AnalysisFlowUiIntent
 
     data object Next : AnalysisFlowUiIntent
 

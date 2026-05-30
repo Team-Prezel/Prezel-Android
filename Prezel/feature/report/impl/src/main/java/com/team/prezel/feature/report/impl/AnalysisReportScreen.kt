@@ -31,8 +31,8 @@ import com.team.prezel.feature.report.impl.preview.ReportPreviewUpcomingUiState
 @Composable
 internal fun AnalysisReportScreen(
     onBack: () -> Unit,
-    navigateToAnalysisScript: (presentationId: Long) -> Unit,
-    navigateToAnalysisRecording: (presentationId: Long) -> Unit,
+    navigateToAnalysisScript: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToSelfFeedbackWrite: (presentationId: Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
@@ -52,8 +52,8 @@ internal fun AnalysisReportScreen(
                     )
                 }
 
-                is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId)
-                is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId)
+                is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId, effect.isPast)
+                is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId, effect.isPast)
                 is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> navigateToSelfFeedbackWrite(effect.presentationId)
             }
         }

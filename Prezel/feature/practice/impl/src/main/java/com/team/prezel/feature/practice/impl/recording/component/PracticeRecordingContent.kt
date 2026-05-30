@@ -63,6 +63,7 @@ internal fun PracticeRecordingContent(
 
                     AudioSessionState.Idle,
                     is AudioSessionState.Recording,
+                    is AudioSessionState.PausedRecording,
                     -> PrezelTheme.colors.textLarge
                 },
                 textAlign = TextAlign.Center,
