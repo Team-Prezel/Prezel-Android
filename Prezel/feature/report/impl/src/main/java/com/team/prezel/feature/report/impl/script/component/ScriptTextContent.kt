@@ -116,6 +116,7 @@ private fun buildAnnotatedText(
         var lastIndex = 0
 
         highlightCorrections.forEach { correction ->
+            if (correction.range.first < lastIndex) return@forEach
             append(script.substring(lastIndex, correction.range.first))
 
             appendCorrectionText(
