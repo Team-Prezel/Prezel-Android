@@ -29,6 +29,9 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
             navigateToVoiceRecordingAnalysis = {
                 navigator.navigate(AnalysisNavKey.Schedule(startType = AnalysisStartType.VOICE_RECORDING))
             },
+            navigateToAnalyzePresentation = { presentationId, isPast ->
+                navigator.navigate(AnalysisNavKey.ReRecording(presentationId = presentationId, isPast = isPast))
+            },
             navigateToFeedback = { presentationId, title ->
                 navigator.navigate(
                     FeedbackNavKey(
