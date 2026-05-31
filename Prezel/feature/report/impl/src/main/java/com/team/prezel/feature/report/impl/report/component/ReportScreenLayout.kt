@@ -196,6 +196,7 @@ private fun ReportScreenLayoutPreview() {
                     onReWriteScriptClick = {},
                     onReRecordingClick = {},
                     onFeedBackWriteClick = {},
+                    onScriptAnalysisClick = {},
                 )
             },
         )

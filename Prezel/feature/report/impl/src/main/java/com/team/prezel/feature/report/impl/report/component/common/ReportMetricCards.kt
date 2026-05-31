@@ -1,6 +1,7 @@
 package com.team.prezel.feature.report.impl.report.component.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,12 +27,17 @@ import kotlin.math.roundToInt
 internal fun MetricResultCard(
     title: String,
     value: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .clip(shape = PrezelTheme.shapes.V8)
-            .background(color = PrezelTheme.colors.bgMedium),
+            .background(color = PrezelTheme.colors.bgMedium)
+            .clickable(
+                indication = ripple(color = PrezelTheme.colors.bgMedium),
+                interactionSource = null,
+            ) { onClick() },
     ) {
         Column(
             modifier = Modifier.padding(
@@ -78,6 +85,7 @@ private fun MetricResultCardPreview() {
             title = "발화 정확도",
             value = "82%",
             modifier = Modifier.fillMaxWidth(),
+            onClick = {},
         )
     }
 }

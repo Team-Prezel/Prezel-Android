@@ -13,6 +13,7 @@ import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
+import com.team.prezel.core.model.presentation.ScriptErrorType
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
@@ -67,15 +68,13 @@ private fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
 
 internal fun PresentationScriptDetailResponse.toDomain(): PresentationScriptDetail =
     PresentationScriptDetail(
-        presentationId = presentationId,
-        audioUrl = audioUrl,
         originalScript = originalScript,
         scriptCorrections = scriptDetails.map { item -> item.toDomain() },
     )
 
 internal fun PresentationScriptAnalysisResponse.toDomain(): ScriptCorrection =
     ScriptCorrection(
-        errorType = errorType,
+        errorType = ScriptErrorType.from(value = errorType),
         sentence = sentence,
         originalText = originalText,
         correctedText = correctedText,

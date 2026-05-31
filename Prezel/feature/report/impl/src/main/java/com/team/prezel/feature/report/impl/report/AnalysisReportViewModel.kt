@@ -45,6 +45,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
             AnalysisReportUiIntent.ClickReRecording -> updateContent { copy(reportDialog = AnalysisReportDialog.RE_RECORDING) }
             AnalysisReportUiIntent.ClickReWriteScript -> handleReWriteScriptClick()
             AnalysisReportUiIntent.ClickFeedbackWrite -> navigateToSelfFeedbackWrite()
+            AnalysisReportUiIntent.ClickScriptAnalysis -> navigateToScriptAnalysis()
         }
     }
 
@@ -118,6 +119,11 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
 
     private fun navigateToSelfFeedbackWrite() {
         val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToSelfFeedbackWrite) ?: return
+        viewModelScope.launch { sendEffect(effect) }
+    }
+
+    private fun navigateToScriptAnalysis() {
+        val effect = analysisResultId?.let(AnalysisReportUiEffect::NavigateToScriptAnalysis) ?: return
         viewModelScope.launch { sendEffect(effect) }
     }
 

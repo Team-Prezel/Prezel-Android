@@ -30,7 +30,6 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
@@ -93,7 +92,7 @@ internal class HttpClientFactory @Inject constructor(
         install(Logging) {
             logger = KtorPrettyLogger
             level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
-            sanitizeHeader { header -> header == HttpHeaders.Authorization }
+//            sanitizeHeader { header -> header == HttpHeaders.Authorization }
         }
     }
 

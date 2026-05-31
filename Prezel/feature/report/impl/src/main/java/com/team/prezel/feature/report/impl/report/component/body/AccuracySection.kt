@@ -89,11 +89,13 @@ private fun AccuracyMetricCards(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_speech),
             value = accuracyScore.toPercentLabel(),
+            onClick = {},
         )
         MetricResultCard(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_script_match),
             value = scriptMatchRate.toPercentLabel(),
+            onClick = {},
         )
     }
 }
