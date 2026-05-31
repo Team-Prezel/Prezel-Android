@@ -41,7 +41,7 @@ internal fun ReportBodyContent(
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
 ) {
-    if (uiState.isPast) {
+    if (uiState.isPast && uiState.practiceRecords != null) {
         SelfFeedbackSection(
             selfFeedback = uiState.selfFeedback,
             onFeedBackWriteClick = onFeedBackWriteClick,

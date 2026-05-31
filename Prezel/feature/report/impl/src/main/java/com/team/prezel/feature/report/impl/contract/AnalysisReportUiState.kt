@@ -26,7 +26,7 @@ internal sealed interface AnalysisReportUiState : UiState {
         val expectedQuestions: ImmutableList<QuestionUiModel>,
         val selfFeedback: String?,
         val isPast: Boolean,
-        val practiceRecords: PracticeRecordsUiModel,
+        val practiceRecords: PracticeRecordsUiModel?,
         val reportDialog: AnalysisReportDialog? = null,
     ) : AnalysisReportUiState {
         val isScriptWritten: Boolean = accuracyScore != null && scriptMatchRate != null

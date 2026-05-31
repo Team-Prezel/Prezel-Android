@@ -39,7 +39,7 @@ internal fun PresentationDetailWithPracticeRecords.toAnalysisReportUiState(isPas
         ),
         expectedQuestions = analysisSummary.expectedQuestions.toQuestionUiModels(),
         selfFeedback = analysisSummary.selfFeedback,
-        practiceRecords = practiceRecords.toUiModel(),
+        practiceRecords = practiceRecords?.toUiModel(),
         isPast = isPast,
     )
 

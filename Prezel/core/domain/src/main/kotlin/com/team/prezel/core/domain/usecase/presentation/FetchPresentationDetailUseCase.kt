@@ -2,8 +2,6 @@ package com.team.prezel.core.domain.usecase.presentation
 
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
 import com.team.prezel.core.model.presentation.PresentationDetailWithPracticeRecords
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class FetchPresentationDetailUseCase @Inject constructor(
@@ -13,23 +11,27 @@ class FetchPresentationDetailUseCase @Inject constructor(
         presentationId: Long,
         isPast: Boolean = false,
     ): Result<PresentationDetailWithPracticeRecords> =
-        runCatching {
-            coroutineScope {
-                val presentationDetailDeferred = async {
-                    if (isPast) {
-                        presentationRepository.getPastPresentationDetail(presentationId = presentationId).getOrThrow()
-                    } else {
-                        presentationRepository.getUpcomingPresentationDetail(presentationId = presentationId).getOrThrow()
-                    }
-                }
-                val practiceRecordsDeferred = async {
-                    presentationRepository.getPracticeRecords(presentationId = presentationId).getOrThrow()
-                }
+        if (isPast) {
+            getPastPresentationDetail(presentationId = presentationId)
+        } else {
+            getUpcomingPresentationDetail(presentationId = presentationId)
+        }
 
+    private suspend fun getPastPresentationDetail(presentationId: Long): Result<PresentationDetailWithPracticeRecords> =
+        presentationRepository
+            .getPastPresentationDetail(presentationId = presentationId)
+            .mapCatching { detail ->
+                val practiceRecords = presentationRepository.getPracticeRecords(presentationId = presentationId).getOrThrow()
                 PresentationDetailWithPracticeRecords(
-                    analysisSummary = presentationDetailDeferred.await(),
-                    practiceRecords = practiceRecordsDeferred.await(),
+                    analysisSummary = detail,
+                    practiceRecords = practiceRecords,
                 )
             }
-        }
+
+    private suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationDetailWithPracticeRecords> =
+        presentationRepository
+            .getPastPresentationDetail(presentationId = presentationId)
+            .mapCatching { detail ->
+                PresentationDetailWithPracticeRecords(analysisSummary = detail, practiceRecords = null)
+            }
 }
