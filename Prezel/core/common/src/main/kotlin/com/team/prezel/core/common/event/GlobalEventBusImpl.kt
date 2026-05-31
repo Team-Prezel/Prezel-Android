@@ -19,4 +19,6 @@ class GlobalEventBusImpl @Inject constructor() : GlobalEventBus {
     override suspend fun emit(event: GlobalEvent) {
         _events.emit(event)
     }
+
+    override fun tryEmit(event: GlobalEvent): Boolean = _events.tryEmit(event)
 }

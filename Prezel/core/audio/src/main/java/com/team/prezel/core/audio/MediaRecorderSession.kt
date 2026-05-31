@@ -41,6 +41,18 @@ internal class MediaRecorderSession @Inject constructor(
             reset()
         }
 
+    override fun pause(): Result<Unit> =
+        runCatching {
+            recorder?.pause() ?: error("Recorder not initialized")
+        }
+
+    override fun resume(): Result<Unit> =
+        runCatching {
+            recorder?.resume() ?: error("Recorder not initialized")
+        }
+
+    override fun maxAmplitude(): Int = recorder?.maxAmplitude ?: 0
+
     override fun stop(elapsedSeconds: Int): Result<RecordedAudio> =
         runCatching {
             val file = currentAudioFile!!

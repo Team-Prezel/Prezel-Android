@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+.agents/
+skills-lock.json

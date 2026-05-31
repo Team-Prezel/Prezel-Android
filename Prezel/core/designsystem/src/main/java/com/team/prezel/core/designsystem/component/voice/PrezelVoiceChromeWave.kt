@@ -7,8 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +64,7 @@ fun PrezelVoiceChromeWave(
         label = "VoiceChromeWaveActivationProgress",
     )
     val volumeProgress by animateFloatAsState(
-        targetValue = if (status == VoiceChromeStatus.LISTENING) 1f else 0f,
+        targetValue = if (status == VoiceChromeStatus.IDLE) 0f else 1f,
         animationSpec = tween(durationMillis = 440),
         label = "VoiceChromeWaveVolumeProgress",
     )
@@ -90,7 +90,7 @@ private fun Modifier.drawVoiceChromeWave(
 ): Modifier {
     val colors = PrezelTheme.colors
 
-    return size(width = 360.dp, height = 60.dp).drawWithCache {
+    return fillMaxWidth().height(60.dp).drawWithCache {
         val barWidth = 2.dp.toPx()
         val barSpacing = 6.dp.toPx()
         val minBarHeight = 4.dp.toPx()
@@ -245,8 +245,8 @@ private fun DrawScope.drawVoiceChromeWaveBaseline(
 
     drawLine(
         color = color,
-        start = Offset(x = 0f, y = size.height / 2f),
-        end = Offset(x = size.width, y = size.height / 2f),
+        start = Offset(x = size.width / 2f, y = 0f),
+        end = Offset(x = size.width / 2f, y = size.height),
         strokeWidth = strokeWidth,
     )
 }
@@ -395,7 +395,7 @@ private fun VoiceChromeWavePreviewItem(
     label: String,
     content: @Composable () -> Unit,
 ) {
-    Column {
+    Column(modifier = Modifier.width(360.dp)) {
         Text(
             text = label,
             style = PrezelTheme.typography.caption1Medium,

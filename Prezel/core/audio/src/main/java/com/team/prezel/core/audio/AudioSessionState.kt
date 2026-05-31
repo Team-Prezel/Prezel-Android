@@ -10,6 +10,10 @@ sealed interface AudioSessionState {
         val elapsedSeconds: Int,
     ) : AudioSessionState
 
+    data class PausedRecording(
+        val elapsedSeconds: Int,
+    ) : AudioSessionState
+
     data class ReadyToPlay(
         val source: AudioSource,
         val positionSeconds: Int = 0,

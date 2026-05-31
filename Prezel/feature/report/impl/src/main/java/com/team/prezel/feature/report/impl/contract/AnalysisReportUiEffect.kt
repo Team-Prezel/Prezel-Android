@@ -12,10 +12,12 @@ internal sealed interface AnalysisReportUiEffect : UiEffect {
 
     data class NavigateToAnalysisScript(
         val presentationId: Long,
+        val isPast: Boolean,
     ) : AnalysisReportUiEffect
 
     data class NavigateToAnalysisRecording(
         val presentationId: Long,
+        val isPast: Boolean,
     ) : AnalysisReportUiEffect
 
     data class NavigateToSelfFeedbackWrite(

@@ -14,7 +14,7 @@
     <string name="core_designsystem_player_speech_track_desc">발화 트랙</string>
     <string name="core_designsystem_tooltip_cancel_btn_content_desc">툴팁 닫기</string>
     <string name="core_designsystem_voice_chrome_listening">듣고 있어요</string>
-    <string name="core_designsystem_voice_chrome_waiting">일시정지됨</string>
+    <string name="core_designsystem_voice_chrome_waiting">일시정지됐어요</string>
 
     <string-array name="core_designsystem_weekday_labels">
         <item>일</item>

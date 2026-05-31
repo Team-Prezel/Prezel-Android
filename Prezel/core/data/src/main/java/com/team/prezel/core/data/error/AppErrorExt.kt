@@ -44,14 +44,16 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_REQUEST,
         ServerErrorCode.REQUIRED_TERMS_DISAGREED,
         ServerErrorCode.FILE_UPLOAD_FAILED,
+        ServerErrorCode.UNSUPPORTED_FILE_FORMAT,
         -> AppError.INVALID_REQUEST
 
         ServerErrorCode.FILE_IS_EMPTY -> AppError.SCRIPT_FILE_RECOGNITION_FAILED
 
         ServerErrorCode.SERVER_ERROR,
         ServerErrorCode.SENTENCE_NOT_FOUND,
-        ServerErrorCode.VOICE_ANALYSIS_FAILED,
         -> AppError.SERVER_ERROR
+
+        ServerErrorCode.VOICE_ANALYSIS_FAILED -> AppError.VOICE_ANALYSIS_FAILED
 
         ServerErrorCode.TERMS_NOT_FOUND,
         ServerErrorCode.PRESENTATION_NOT_FOUND,

@@ -1,4 +1,4 @@
-package com.team.prezel.feature.practice.impl.recording
+package com.team.prezel.feature.analysis.impl.recording
 
 import android.Manifest
 import androidx.compose.runtime.Composable
@@ -6,7 +6,7 @@ import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.ui.util.rememberPermissionRequest
 
 @Composable
-internal fun rememberRecordAudioPermissionControlClickHandler(
+internal fun rememberAnalysisRecordAudioPermissionControlClickHandler(
     recordingState: AudioSessionState,
     onClickRecordingControl: () -> Unit,
     onPermissionDenied: () -> Unit,

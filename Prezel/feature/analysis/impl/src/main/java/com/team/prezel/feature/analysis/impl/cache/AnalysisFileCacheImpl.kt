@@ -50,6 +50,14 @@ internal class AnalysisFileCacheImpl @Inject constructor(
         }
     }
 
+    override fun readTextFromUri(uriString: String): String {
+        val uri = uriString.toUri()
+        return context.contentResolver.openInputStream(uri).use { input ->
+            requireNotNull(input) { "Cannot open uri: $uriString" }
+            input.bufferedReader(Charsets.UTF_8).use { reader -> reader.readText() }
+        }
+    }
+
     private companion object {
         const val DEFAULT_EXTENSION = "tmp"
     }

@@ -79,7 +79,11 @@ private fun PracticeRecordingTimeText(
     totalSeconds: Int,
     audioSessionState: AudioSessionState,
 ) {
-    if (audioSessionState == AudioSessionState.Idle || audioSessionState is AudioSessionState.Recording) {
+    if (
+        audioSessionState == AudioSessionState.Idle ||
+        audioSessionState is AudioSessionState.Recording ||
+        audioSessionState is AudioSessionState.PausedRecording
+    ) {
         Text(
             text = currentSeconds.toTimerText(),
             style = PrezelTheme.typography.title1Medium,
@@ -120,6 +124,8 @@ private fun AudioSessionState.action(): PracticeRecordingControlAction =
             )
 
         is AudioSessionState.Recording -> stopAction()
+
+        is AudioSessionState.PausedRecording -> stopAction()
 
         is AudioSessionState.ReadyToPlay ->
             PracticeRecordingControlAction(

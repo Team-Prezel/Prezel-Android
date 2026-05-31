@@ -1,32 +1,121 @@
 package com.team.prezel.feature.analysis.impl.navigation
 
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
+import com.team.prezel.feature.analysis.impl.AnalysisFlowViewModel
 import com.team.prezel.feature.analysis.impl.AnalysisScreen
+import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
+import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
+import java.util.UUID
 
 internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
-    entry<AnalysisNavKey.Create> {
-        val navigator = LocalNavigator.current
-
-        AnalysisScreen(
-            onBack = { navigator.goBack() },
-            navigateToReport = { presentationId ->
-                navigator.navigate(
-                    key = ReportNavKey(presentationId = presentationId),
-                    clearStack = true,
-                )
-            },
+    analysisEntry<AnalysisNavKey.Schedule> { key -> key.enterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE) }
+    analysisEntry<AnalysisNavKey.Situation> { key -> key.enterStep(AnalysisFlowStep.PRESENTATION_SITUATION) }
+    analysisEntry<AnalysisNavKey.Script> { key -> key.enterStep(AnalysisFlowStep.SCRIPT_INPUT) }
+    analysisEntry<AnalysisNavKey.AudioUpload> { key -> key.enterStep(AnalysisFlowStep.AUDIO_UPLOAD) }
+    analysisEntry<AnalysisNavKey.Recording> { key -> key.enterStep(AnalysisFlowStep.VOICE_RECORDING) }
+    analysisEntry<AnalysisNavKey.Analyzing> { key -> key.enterStep(AnalysisFlowStep.ANALYZING) }
+    analysisEntry<AnalysisNavKey.ReRecording> { key ->
+        AnalysisFlowUiIntent.StartReRecording(
+            presentationId = key.presentationId,
+            isPast = key.isPast,
+        )
+    }
+    analysisEntry<AnalysisNavKey.ReWritingScript> { key ->
+        AnalysisFlowUiIntent.StartReWritingScript(
+            presentationId = key.presentationId,
+            isPast = key.isPast,
         )
     }
 }
+
+private fun AnalysisNavKey.enterStep(step: AnalysisFlowStep): AnalysisFlowUiIntent =
+    AnalysisFlowUiIntent.EnterStep(
+        step = step,
+        startType = startType,
+    )
+
+private inline fun <reified T : AnalysisNavKey> EntryProviderScope<NavKey>.analysisEntry(crossinline enterIntent: (T) -> AnalysisFlowUiIntent) {
+    entry<T> { key ->
+        AnalysisRoute(
+            flowId = key.flowId,
+            enterIntent = enterIntent(key),
+            stepToNavKey = key::toNavKey,
+        )
+    }
+}
+
+@Composable
+private fun AnalysisRoute(
+    flowId: String,
+    enterIntent: AnalysisFlowUiIntent,
+    stepToNavKey: (AnalysisFlowStep) -> AnalysisNavKey,
+) {
+    val navigator = LocalNavigator.current
+    val viewModelStoreOwner = LocalContext.current.findViewModelStoreOwner()
+    val viewModel = hiltViewModel<AnalysisFlowViewModel>(
+        viewModelStoreOwner = viewModelStoreOwner,
+        key = flowId,
+    )
+
+    LaunchedEffect(enterIntent) {
+        viewModel.onIntent(enterIntent)
+    }
+
+    AnalysisScreen(
+        onBack = { navigator.goBack() },
+        navigateToStep = { step -> navigator.navigate(key = stepToNavKey(step)) },
+        navigateToReport = { presentationId ->
+            navigator.navigate(
+                key = ReportNavKey(
+                    presentationId = presentationId,
+                    refreshKey = newReportRefreshKey(),
+                ),
+                clearStack = true,
+            )
+        },
+        viewModel = viewModel,
+    )
+}
+
+private fun AnalysisNavKey.toNavKey(step: AnalysisFlowStep): AnalysisNavKey =
+    when (step) {
+        AnalysisFlowStep.PRESENTATION_SCHEDULE -> AnalysisNavKey.Schedule(flowId = flowId, startType = startType)
+        AnalysisFlowStep.PRESENTATION_SITUATION -> AnalysisNavKey.Situation(flowId = flowId, startType = startType)
+        AnalysisFlowStep.SCRIPT_INPUT,
+        AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
+        -> AnalysisNavKey.Script(flowId = flowId, startType = startType)
+
+        AnalysisFlowStep.AUDIO_UPLOAD -> AnalysisNavKey.AudioUpload(flowId = flowId, startType = startType)
+        AnalysisFlowStep.VOICE_RECORDING,
+        AnalysisFlowStep.ANALYSIS_FAILED,
+        AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+        -> AnalysisNavKey.Recording(flowId = flowId, startType = startType)
+
+        AnalysisFlowStep.ANALYZING -> AnalysisNavKey.Analyzing(flowId = flowId, startType = startType)
+    }
+
+private tailrec fun Context.findViewModelStoreOwner(): ViewModelStoreOwner =
+    when (this) {
+        is ViewModelStoreOwner -> this
+        is ContextWrapper -> baseContext.findViewModelStoreOwner()
+        else -> error("Context에서 ViewModelStoreOwner를 찾을 수 없습니다: $this")
+    }
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -38,3 +127,5 @@ object FeatureAnalysisModule {
             featureAnalysisEntryBuilder()
         }
 }
+
+private fun newReportRefreshKey(): String = UUID.randomUUID().toString()

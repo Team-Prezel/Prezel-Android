@@ -50,11 +50,15 @@ internal class PresentationRepositoryImpl @Inject constructor(
 
     override suspend fun reAnalyzePresentation(
         presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
         audioFilePath: String,
     ): Result<PresentationAnalysisSummary> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentation(
                 presentationId = presentationId,
+                script = script,
+                scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             )
         }.mapCatching { response ->

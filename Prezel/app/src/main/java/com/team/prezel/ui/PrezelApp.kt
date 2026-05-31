@@ -1,5 +1,8 @@
 package com.team.prezel.ui
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
@@ -8,21 +11,35 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.team.prezel.R
+import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.common.event.GlobalEvent
 import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
@@ -79,10 +96,12 @@ private fun PrezelAppContent(
 ) {
     val navigator = LocalNavigator.current
     val appDimmerState = LocalAppDimmerState.current
+    var statusBarStyle by remember { mutableStateOf(EdgeToEdgeStatusBarStyle.DEFAULT) }
 
     ObserveGlobalEvents(
         globalEventBus = globalEventBus,
         navigateToSplash = { navigator.replaceRoot(SplashNavKey) },
+        onStatusBarStyleChange = { statusBarStyle = it },
     )
 
     ObserveBadgeEvents(
@@ -102,6 +121,7 @@ private fun PrezelAppContent(
             }
         }
 
+        EdgeToEdgeStatusBarBackground(style = statusBarStyle)
         AppDimmerOverlay(isVisible = appDimmerState.isVisible, onDismiss = appDimmerState::dismiss)
     }
 }
@@ -154,18 +174,87 @@ private fun defaultPrezelNavTransition(): ContentTransform =
         fadeOut(animationSpec = tween(durationMillis = 100))
 
 @Composable
+private fun EdgeToEdgeStatusBarBackground(style: EdgeToEdgeStatusBarStyle) {
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsTopHeight(WindowInsets.statusBars)
+            .background(style.toStatusBarColor()),
+    )
+}
+
+@Composable
+private fun EdgeToEdgeStatusBarStyle.toStatusBarColor(): Color =
+    when (this) {
+        EdgeToEdgeStatusBarStyle.DEFAULT -> Color.Transparent
+        EdgeToEdgeStatusBarStyle.BG_REGULAR -> PrezelTheme.colors.bgRegular
+        EdgeToEdgeStatusBarStyle.BG_MEDIUM -> PrezelTheme.colors.bgMedium
+    }
+
+@Composable
 private fun ObserveGlobalEvents(
     globalEventBus: GlobalEventBus,
     navigateToSplash: () -> Unit,
+    onStatusBarStyleChange: (EdgeToEdgeStatusBarStyle) -> Unit,
 ) {
+    val context = LocalContext.current
+    val view = LocalView.current
+    val activity = context.findActivity()
+    val bgRegular = PrezelTheme.colors.bgRegular
+    val bgMedium = PrezelTheme.colors.bgMedium
+
     LaunchedEffect(globalEventBus) {
         globalEventBus.events.collect { event ->
             when (event) {
                 GlobalEvent.ForceLogout -> navigateToSplash()
+                is GlobalEvent.ChangeEdgeToEdgeStatusBarStyle -> {
+                    onStatusBarStyleChange(event.style)
+                    activity?.applyEdgeToEdgeStatusBarStyle(
+                        view = view,
+                        style = event.style,
+                        bgRegular = bgRegular,
+                        bgMedium = bgMedium,
+                    )
+                }
+
+                GlobalEvent.ResetEdgeToEdgeStatusBarStyle -> {
+                    onStatusBarStyleChange(EdgeToEdgeStatusBarStyle.DEFAULT)
+                    activity?.applyEdgeToEdgeStatusBarStyle(
+                        view = view,
+                        style = EdgeToEdgeStatusBarStyle.DEFAULT,
+                        bgRegular = bgRegular,
+                        bgMedium = bgMedium,
+                    )
+                }
             }
         }
     }
 }
+
+@Suppress("DEPRECATION")
+private fun Activity.applyEdgeToEdgeStatusBarStyle(
+    view: android.view.View,
+    style: EdgeToEdgeStatusBarStyle,
+    bgRegular: Color,
+    bgMedium: Color,
+) {
+    val insetsController = WindowCompat.getInsetsController(window, view)
+    val statusBarColor = when (style) {
+        EdgeToEdgeStatusBarStyle.DEFAULT -> Color.Transparent
+        EdgeToEdgeStatusBarStyle.BG_REGULAR -> bgRegular
+        EdgeToEdgeStatusBarStyle.BG_MEDIUM -> bgMedium
+    }.toArgb()
+
+    window.statusBarColor = statusBarColor
+    insetsController.isAppearanceLightStatusBars = true
+}
+
+private tailrec fun Context.findActivity(): Activity? =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
+    }
 
 @Composable
 private fun ObserveBadgeEvents(
@@ -174,7 +263,7 @@ private fun ObserveBadgeEvents(
     navigateToBadge: () -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(connectBadgeEventStreamUseCase, isAuthenticated) {
         if (!isAuthenticated) return@LaunchedEffect
@@ -187,14 +276,14 @@ private fun ObserveBadgeEvents(
                         ?: event.badgeName
                             ?.takeIf(String::isNotBlank)
                             ?.let { badgeName ->
-                                context.getString(R.string.app_badge_event_message_with_name, badgeName)
+                                resources.getString(R.string.app_badge_event_message_with_name, badgeName)
                             }
-                        ?: context.getString(R.string.app_badge_event_message)
+                        ?: resources.getString(R.string.app_badge_event_message)
 
                 snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showPrezelSnackbar(
                     message = message,
-                    actionLabel = context.getString(R.string.app_badge_event_action),
+                    actionLabel = resources.getString(R.string.app_badge_event_action),
                     onAction = navigateToBadge,
                 )
             }
