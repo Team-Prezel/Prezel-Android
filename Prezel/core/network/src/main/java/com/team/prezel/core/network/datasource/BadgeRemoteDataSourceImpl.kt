@@ -62,8 +62,8 @@ internal class BadgeRemoteDataSourceImpl @Inject constructor(
         }
 
     private companion object {
-        const val BADGE_SSE_SOCKET_TIMEOUT_MILLIS = 90_000L
-        const val BADGE_SSE_RETRY_DELAY_MILLIS = 1_000L
-        val badgeStreamUrl = "${BuildConfig.BASE_URL.trimEnd('/')}/api/stream/badges"
+        private const val BADGE_SSE_SOCKET_TIMEOUT_MILLIS = 90_000L
+        private const val BADGE_SSE_RETRY_DELAY_MILLIS = 1_000L
+        private val badgeStreamUrl = "${BuildConfig.BASE_URL.trimEnd('/')}/api/stream/badges"
     }
 }

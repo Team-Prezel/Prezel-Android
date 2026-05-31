@@ -107,6 +107,7 @@ private fun PrezelAppContent(
     ObserveBadgeEvents(
         isAuthenticated = appState.isAuthenticated,
         connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
+        shouldShowNavigationBar = appState.shouldShowNavigationBar,
         navigateToBadge = { navigator.navigate(BadgeNavKey) },
     )
 
@@ -260,12 +261,13 @@ private tailrec fun Context.findActivity(): Activity? =
 private fun ObserveBadgeEvents(
     isAuthenticated: Boolean,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
+    shouldShowNavigationBar: Boolean,
     navigateToBadge: () -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
 
-    LaunchedEffect(connectBadgeEventStreamUseCase, isAuthenticated) {
+    LaunchedEffect(isAuthenticated) {
         if (!isAuthenticated) return@LaunchedEffect
 
         connectBadgeEventStreamUseCase()
@@ -285,6 +287,7 @@ private fun ObserveBadgeEvents(
                     message = message,
                     actionLabel = resources.getString(R.string.app_badge_event_action),
                     onAction = navigateToBadge,
+                    useRaisedPosition = shouldShowNavigationBar,
                 )
             }
     }
