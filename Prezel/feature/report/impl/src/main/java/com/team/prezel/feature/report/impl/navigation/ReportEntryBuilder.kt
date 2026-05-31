@@ -37,11 +37,13 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
                     ),
                 )
             },
-            navigateToSelfFeedbackWrite = { presentationId, title ->
+            navigateToSelfFeedbackWrite = { presentationId, title, isPast ->
                 navigator.navigate(
                     FeedbackNavKey(
                         presentationId = presentationId,
                         title = title,
+                        isPast = isPast,
+                        returnToReportOnSave = true,
                     ),
                 )
             },

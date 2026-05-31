@@ -11,7 +11,4 @@ internal data class FeedbackUiState(
 ) : UiState {
     val isSaveEnabled: Boolean
         get() = content.isNotBlank() && !isSaving
-
-    val hasUnsavedContent: Boolean
-        get() = content.isNotBlank()
 }

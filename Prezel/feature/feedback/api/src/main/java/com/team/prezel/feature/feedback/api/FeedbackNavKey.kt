@@ -7,4 +7,6 @@ import kotlinx.serialization.Serializable
 data class FeedbackNavKey(
     val presentationId: Long,
     val title: String,
+    val isPast: Boolean = false,
+    val returnToReportOnSave: Boolean = false,
 ) : NavKey

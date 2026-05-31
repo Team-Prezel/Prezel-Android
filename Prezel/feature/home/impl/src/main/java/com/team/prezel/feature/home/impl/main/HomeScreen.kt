@@ -35,7 +35,7 @@ internal fun HomeScreen(
     navigateToFileUploadAnalysis: () -> Unit,
     navigateToVoiceRecordingAnalysis: () -> Unit,
     navigateToAnalyzePresentation: (presentationId: Long, isPast: Boolean) -> Unit,
-    navigateToFeedback: (presentationId: Long, title: String) -> Unit,
+    navigateToFeedback: (presentationId: Long, title: String, isPast: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -67,7 +67,13 @@ internal fun HomeScreen(
         onClickAnalyzePresentation = { presentation ->
             navigateToAnalyzePresentation(presentation.id, presentation.isPastPresentation)
         },
-        onClickWriteFeedback = { presentation -> navigateToFeedback(presentation.id, presentation.title) },
+        onClickWriteFeedback = { presentation ->
+            navigateToFeedback(
+                presentation.id,
+                presentation.title,
+                presentation.isPastPresentation,
+            )
+        },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
         onClickCardGraphItemIndex = { presentationId, index ->

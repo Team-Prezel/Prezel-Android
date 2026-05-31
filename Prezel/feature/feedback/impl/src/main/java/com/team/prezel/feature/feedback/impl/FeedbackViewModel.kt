@@ -1,6 +1,7 @@
 package com.team.prezel.feature.feedback.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.domain.usecase.presentation.WriteSelfFeedbackUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.feedback.api.FeedbackNavKey
@@ -17,11 +18,18 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = FeedbackViewModel.Factory::class)
 internal class FeedbackViewModel @AssistedInject constructor(
     @Assisted private val navKey: FeedbackNavKey,
+    private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
     private val writeSelfFeedbackUseCase: WriteSelfFeedbackUseCase,
 ) : BaseViewModel<FeedbackUiState, FeedbackUiIntent, FeedbackUiEffect>(FeedbackUiState()) {
     @AssistedFactory
     interface Factory {
         fun create(navKey: FeedbackNavKey): FeedbackViewModel
+    }
+
+    private var initialContent: String = ""
+
+    init {
+        fetchInitialContent()
     }
 
     override fun onIntent(intent: FeedbackUiIntent) {
@@ -34,18 +42,38 @@ internal class FeedbackViewModel @AssistedInject constructor(
         }
     }
 
+    private fun fetchInitialContent() {
+        viewModelScope.launch {
+            fetchPresentationDetailUseCase(
+                presentationId = navKey.presentationId,
+                isPast = navKey.isPast,
+            ).onSuccess { result ->
+                val selfFeedback = result.analysisSummary.selfFeedback
+                    .orEmpty()
+                    .take(MAX_CONTENT_COUNT)
+                initialContent = selfFeedback
+
+                if (currentState.content.isBlank()) {
+                    updateState { copy(content = selfFeedback) }
+                }
+            }
+        }
+    }
+
     private fun changeContent(content: String) {
         updateState { copy(content = content.take(MAX_CONTENT_COUNT)) }
     }
 
     private fun handleClose() {
-        if (currentState.hasUnsavedContent) {
+        if (hasUnsavedContent()) {
             updateState { copy(isExitDialogVisible = true) }
             return
         }
 
         navigateBack()
     }
+
+    private fun hasUnsavedContent(): Boolean = currentState.content != initialContent
 
     private fun save() {
         val content = currentState.content.trim()
@@ -58,7 +86,7 @@ internal class FeedbackViewModel @AssistedInject constructor(
                 presentationId = navKey.presentationId,
                 content = content,
             ).onSuccess {
-                sendEffect(FeedbackUiEffect.NavigateToHome)
+                sendEffect(FeedbackUiEffect.SaveComplete)
             }.onFailure {
                 updateState { copy(isSaving = false) }
                 sendEffect(FeedbackUiEffect.ShowMessage(FeedbackUiMessage.SAVE_FAILED))

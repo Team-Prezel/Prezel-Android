@@ -122,6 +122,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         val effect = AnalysisReportUiEffect.NavigateToSelfFeedbackWrite(
             presentationId = presentationId,
             title = title,
+            isPast = isPast,
         )
         viewModelScope.launch { sendEffect(effect) }
     }

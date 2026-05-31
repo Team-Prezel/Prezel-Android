@@ -6,7 +6,7 @@ import com.team.prezel.feature.feedback.impl.model.FeedbackUiMessage
 internal sealed interface FeedbackUiEffect : UiEffect {
     data object NavigateBack : FeedbackUiEffect
 
-    data object NavigateToHome : FeedbackUiEffect
+    data object SaveComplete : FeedbackUiEffect
 
     data class ShowMessage(
         val message: FeedbackUiMessage,

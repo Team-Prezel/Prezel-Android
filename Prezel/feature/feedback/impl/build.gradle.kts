@@ -7,8 +7,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.coreModel)
     implementation(projects.coreDomain)
 
     implementation(projects.featureFeedbackApi)
     implementation(projects.featureHomeApi)
+    implementation(projects.featureReportApi)
 }

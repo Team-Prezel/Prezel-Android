@@ -32,11 +32,12 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
             navigateToAnalyzePresentation = { presentationId, isPast ->
                 navigator.navigate(AnalysisNavKey.ReRecording(presentationId = presentationId, isPast = isPast))
             },
-            navigateToFeedback = { presentationId, title ->
+            navigateToFeedback = { presentationId, title, isPast ->
                 navigator.navigate(
                     FeedbackNavKey(
                         presentationId = presentationId,
                         title = title,
+                        isPast = isPast,
                     ),
                 )
             },
