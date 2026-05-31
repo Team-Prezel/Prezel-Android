@@ -41,7 +41,7 @@ private fun GetBadgeResponse.toDomain(): Badge =
         badgeName = badgeName,
         isUnlocked = isUnlocked,
         imageUrl = imageUrl,
-        unlockedAt = unlockedAt.takeIf(String::isNotBlank),
+        unlockedAt = unlockedAt,
     )
 
 private fun GetBadgeDetailResponse.toDomain(): BadgeDetail =
@@ -52,13 +52,15 @@ private fun GetBadgeDetailResponse.toDomain(): BadgeDetail =
         detailDescription = detailDescription,
         imageUrl = imageUrl,
         isUnlocked = isUnlocked,
-        unlockedAt = unlockedAt.takeIf(String::isNotBlank),
+        unlockedAt = unlockedAt,
     )
 
 private fun BadgeEventResponse.toDomain(): BadgeEvent =
     BadgeEvent(
         badgeCode = badgeCode,
         badgeName = badgeName,
+        introduction = introduction,
+        imageUrl = imageUrl,
         message = message,
         rawData = rawData,
     )

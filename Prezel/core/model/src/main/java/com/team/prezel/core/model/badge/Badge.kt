@@ -21,6 +21,8 @@ data class BadgeDetail(
 data class BadgeEvent(
     val badgeCode: String? = null,
     val badgeName: String? = null,
+    val introduction: String? = null,
+    val imageUrl: String? = null,
     val message: String? = null,
     val rawData: String? = null,
 )

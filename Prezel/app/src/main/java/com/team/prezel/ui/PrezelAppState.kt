@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.navigation.NavigationState
 import com.team.prezel.core.navigation.rememberNavigationState
+import com.team.prezel.feature.login.api.LoginNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_KEYS
 import com.team.prezel.navigation.TOP_LEVEL_KEYS
@@ -45,6 +46,9 @@ class PrezelAppState(
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor,
 ) {
+    val isAuthenticated
+        get() = navigationState.currentKey !in UNAUTHENTICATED_NAV_KEYS
+
     val shouldShowNavigationBar
         get() = navigationState.currentKey in MAIN_NAV_KEYS
 
@@ -57,3 +61,8 @@ class PrezelAppState(
                 initialValue = false,
             )
 }
+
+private val UNAUTHENTICATED_NAV_KEYS = setOf(
+    SplashNavKey,
+    LoginNavKey,
+)

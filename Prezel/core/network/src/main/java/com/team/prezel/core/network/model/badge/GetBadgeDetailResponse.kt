@@ -18,5 +18,5 @@ data class GetBadgeDetailResponse(
     @SerialName("isUnlocked")
     val isUnlocked: Boolean,
     @SerialName("unlockedAt")
-    val unlockedAt: String,
+    val unlockedAt: String?,
 )

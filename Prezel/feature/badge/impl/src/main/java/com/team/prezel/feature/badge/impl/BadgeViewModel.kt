@@ -11,6 +11,7 @@ import com.team.prezel.feature.badge.impl.contract.BadgeUiIntent
 import com.team.prezel.feature.badge.impl.contract.BadgeUiState
 import com.team.prezel.feature.badge.impl.model.BadgeUiMessage
 import com.team.prezel.feature.badge.impl.model.BadgeUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,6 +19,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 internal class BadgeViewModel @Inject constructor(
     private val fetchBadgesUseCase: FetchBadgesUseCase,
     private val fetchBadgeDetailUseCase: FetchBadgeDetailUseCase,

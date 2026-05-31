@@ -86,6 +86,7 @@ private fun PrezelAppContent(
     )
 
     ObserveBadgeEvents(
+        isAuthenticated = appState.isAuthenticated,
         connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
         navigateToBadge = { navigator.navigate(BadgeNavKey) },
     )
@@ -168,31 +169,35 @@ private fun ObserveGlobalEvents(
 
 @Composable
 private fun ObserveBadgeEvents(
+    isAuthenticated: Boolean,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     navigateToBadge: () -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalContext.current
 
-    LaunchedEffect(connectBadgeEventStreamUseCase) {
-        connectBadgeEventStreamUseCase().collect { event ->
-            val message =
-                event.message
-                    ?.takeIf(String::isNotBlank)
-                    ?: event.badgeName
-                        ?.takeIf(String::isNotBlank)
-                        ?.let { badgeName ->
-                            context.getString(R.string.app_badge_event_message_with_name, badgeName)
-                        }
-                    ?: context.getString(R.string.app_badge_event_message)
+    LaunchedEffect(connectBadgeEventStreamUseCase, isAuthenticated) {
+        if (!isAuthenticated) return@LaunchedEffect
 
-            snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showPrezelSnackbar(
-                message = message,
-                actionLabel = context.getString(R.string.app_badge_event_action),
-                onAction = navigateToBadge,
-            )
-        }
+        connectBadgeEventStreamUseCase()
+            .collect { event ->
+                val message =
+                    event.message
+                        ?.takeIf(String::isNotBlank)
+                        ?: event.badgeName
+                            ?.takeIf(String::isNotBlank)
+                            ?.let { badgeName ->
+                                context.getString(R.string.app_badge_event_message_with_name, badgeName)
+                            }
+                        ?: context.getString(R.string.app_badge_event_message)
+
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showPrezelSnackbar(
+                    message = message,
+                    actionLabel = context.getString(R.string.app_badge_event_action),
+                    onAction = navigateToBadge,
+                )
+            }
     }
 }
 

@@ -12,5 +12,5 @@ internal data class BadgeUiState(
     val badges: ImmutableList<BadgeUiModel> = persistentListOf(),
     val selectedBadgeCode: String? = null,
 ) : UiState {
-    val selectedBadge: BadgeUiModel = badges.first { badge -> badge.badgeCode == selectedBadgeCode }
+    val selectedBadge: BadgeUiModel? = badges.firstOrNull { badge -> badge.badgeCode == selectedBadgeCode }
 }
