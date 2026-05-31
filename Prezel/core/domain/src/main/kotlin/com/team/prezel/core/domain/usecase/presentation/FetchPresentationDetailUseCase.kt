@@ -30,7 +30,7 @@ class FetchPresentationDetailUseCase @Inject constructor(
 
     private suspend fun getUpcomingPresentationDetail(presentationId: Long): Result<PresentationDetailWithPracticeRecords> =
         presentationRepository
-            .getPastPresentationDetail(presentationId = presentationId)
+            .getUpcomingPresentationDetail(presentationId = presentationId)
             .mapCatching { detail ->
                 PresentationDetailWithPracticeRecords(analysisSummary = detail, practiceRecords = null)
             }
