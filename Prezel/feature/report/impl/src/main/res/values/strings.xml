@@ -58,6 +58,7 @@
     <string name="feature_report_impl_delete_report_dialog_description">삭제된 분석 리포트는 다시 복구하기 어렵습니다.</string>
     <string name="feature_report_impl_script_analysis_empty_state_message">대본을 입력하고\n맞춤법과 주술호응을 분석해보세요.</string>
     <string name="feature_report_impl_fetch_report_failed">리포트를 불러오지 못했습니다.</string>
+    <string name="feature_report_impl_fetch_script_detail_failed">대본 분석 결과를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_delete_report_failed">리포트를 삭제하지 못했습니다.</string>
 
     <!-- Script Correction -->

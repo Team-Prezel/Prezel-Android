@@ -17,9 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelDividerType
 import com.team.prezel.core.designsystem.component.PrezelHorizontalDivider
 import com.team.prezel.core.designsystem.component.PrezelVerticalDivider
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
-import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.component.chip.chip.ChipAccent
 import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
 import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
@@ -97,38 +94,6 @@ private fun SummaryItem(
             text = stringResource(R.string.feature_report_impl_script_count, count),
             style = PrezelTheme.typography.body2Medium,
             color = PrezelTheme.colors.textLarge,
-        )
-    }
-}
-
-@Composable
-internal fun ScriptActionBar(
-    isApplyAllEnabled: Boolean,
-    onCopyClick: () -> Unit,
-    onApplyAllClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = PrezelTheme.spacing.V20)
-            .padding(top = PrezelTheme.spacing.V4, bottom = PrezelTheme.spacing.V20),
-        horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        PrezelButton(
-            text = stringResource(R.string.feature_report_impl_script_copy_all),
-            modifier = Modifier.weight(1f),
-            type = ButtonType.GHOST,
-            hierarchy = ButtonHierarchy.SECONDARY,
-            onClick = onCopyClick,
-        )
-
-        PrezelButton(
-            text = stringResource(R.string.feature_report_impl_script_apply_all),
-            modifier = Modifier.weight(1f),
-            enabled = isApplyAllEnabled,
-            onClick = onApplyAllClick,
         )
     }
 }

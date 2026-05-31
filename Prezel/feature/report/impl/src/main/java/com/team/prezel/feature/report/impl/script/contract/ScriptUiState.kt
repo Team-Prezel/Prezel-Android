@@ -18,7 +18,7 @@ internal data class ScriptUiState(
 ) : UiState {
     val unappliedSpellingErrors: Int =
         scriptDetails.count { detail ->
-            detail.errorType == ScriptErrorType.SPELL && !detail.isApplied
+            detail.errorType == ScriptErrorType.SPELLING && !detail.isApplied
         }
 
     val unappliedGrammarErrors: Int =

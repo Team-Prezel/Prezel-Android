@@ -8,7 +8,6 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +30,7 @@ private val DEFAULT_TOP_BAR_SCROLL_THRESHOLD = 48.dp
 
 @Composable
 fun HideOnScrollTopBarLayout(
-    scrollState: ScrollState = rememberScrollState(),
+    scrollState: ScrollState,
     topBar: @Composable () -> Unit,
     body: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -47,28 +46,15 @@ fun HideOnScrollTopBarLayout(
     LaunchedEffect(scrollState, scrollThresholdPx) {
         snapshotFlow { scrollState.value }
             .map { currentScrollPosition ->
-                val isAtTop = currentScrollPosition == 0
-                val isScrollingUp = currentScrollPosition < previousScrollPosition
-                val hasExceededThreshold =
-                    abs(currentScrollPosition - topBarToggleAnchorPosition) >= scrollThresholdPx
-
-                previousScrollPosition = currentScrollPosition
-
-                when {
-                    isAtTop -> {
-                        topBarToggleAnchorPosition = currentScrollPosition
-                        true
-                    }
-                    hasExceededThreshold && isScrollingUp -> {
-                        topBarToggleAnchorPosition = currentScrollPosition
-                        true
-                    }
-                    hasExceededThreshold && !isScrollingUp -> {
-                        topBarToggleAnchorPosition = currentScrollPosition
-                        false
-                    }
-                    else -> isTopBarVisible
-                }
+                calculateTopBarVisibility(
+                    currentScrollPosition = currentScrollPosition,
+                    previousScrollPosition = previousScrollPosition,
+                    topBarToggleAnchorPosition = topBarToggleAnchorPosition,
+                    scrollThresholdPx = scrollThresholdPx,
+                    isTopBarVisible = isTopBarVisible,
+                    onScrollPositionChanged = { previousScrollPosition = it },
+                    onAnchorChanged = { topBarToggleAnchorPosition = it },
+                )
             }.distinctUntilChanged()
             .collect { visible ->
                 isTopBarVisible = visible
@@ -93,5 +79,37 @@ fun HideOnScrollTopBarLayout(
         }
 
         bottomBar()
+    }
+}
+
+private fun calculateTopBarVisibility(
+    currentScrollPosition: Int,
+    previousScrollPosition: Int,
+    topBarToggleAnchorPosition: Int,
+    scrollThresholdPx: Int,
+    isTopBarVisible: Boolean,
+    onScrollPositionChanged: (Int) -> Unit,
+    onAnchorChanged: (Int) -> Unit,
+): Boolean {
+    val isAtTop = currentScrollPosition == 0
+    val isScrollingUp = currentScrollPosition < previousScrollPosition
+    val hasExceededThreshold = abs(currentScrollPosition - topBarToggleAnchorPosition) >= scrollThresholdPx
+
+    onScrollPositionChanged(currentScrollPosition)
+
+    return when {
+        isAtTop -> {
+            onAnchorChanged(0)
+            true
+        }
+        hasExceededThreshold && isScrollingUp -> {
+            onAnchorChanged(currentScrollPosition)
+            true
+        }
+        hasExceededThreshold && !isScrollingUp -> {
+            onAnchorChanged(currentScrollPosition)
+            false
+        }
+        else -> isTopBarVisible
     }
 }

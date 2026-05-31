@@ -140,7 +140,7 @@ private fun AnnotatedString.Builder.appendCorrectionText(
     grammarHighlightStyle: SpanStyle,
 ) {
     val style = when (correctionMap[correction.correctionId]?.errorType) {
-        ScriptErrorType.SPELL -> spellHighlightStyle
+        ScriptErrorType.SPELLING -> spellHighlightStyle
         ScriptErrorType.GRAMMAR -> grammarHighlightStyle
         null -> null
     }
@@ -218,7 +218,7 @@ private fun ScriptTextContentPreview() {
             corrections = listOf(
                 ScriptCorrectionUiModel(
                     id = 0L,
-                    errorType = ScriptErrorType.SPELL,
+                    errorType = ScriptErrorType.SPELLING,
                     sentence = "안녕하세요 자신의 말로 자신있게 세상을 설득할 수 있는 날을 기달리는 팀 손가락입니다.",
                     originalText = "기달리는",
                     correctedText = "기다리는",

@@ -17,7 +17,7 @@ enum class ScriptErrorType(
     val value: String,
 ) {
     GRAMMAR("GRAMMAR"),
-    SPELL("SPELL"),
+    SPELLING("SPELLING"),
     ;
 
     companion object {
