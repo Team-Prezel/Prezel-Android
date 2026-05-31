@@ -16,7 +16,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.badge.BadgeType
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.my.impl.component.BadgeSection
 import com.team.prezel.feature.my.impl.component.MyTopAppBar
@@ -106,15 +105,13 @@ private fun MyScreenPreview() {
             uiState = MyUiState(
                 profileImageUrl = null,
                 nickname = "닉네임",
-                badges = listOf(
-                    BadgeType.FIRST_PRESENTATION,
-                    BadgeType.SECOND_ANALYSIS,
-                    BadgeType.FIRST_PRACTICE,
-                    BadgeType.RETROSPECT_COMPLETED,
-                    BadgeType.PERFECT_SCORE,
-                    BadgeType.TEN_ANALYSIS,
-                ).mapIndexed { index, type ->
-                    BadgeUiModel(type = type, isAchieved = index % 2 == 0)
+                badges = List(6) { index ->
+                    BadgeUiModel(
+                        code = index.toString(),
+                        title = index.toString(),
+                        imageUrl = "",
+                        isAchieved = index % 2 == 0,
+                    )
                 }.toImmutableList(),
             ),
             onClickEditProfile = {},

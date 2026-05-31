@@ -3,6 +3,7 @@ package com.team.prezel.feature.my.impl.navigation
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
+import com.team.prezel.feature.badge.api.BadgeNavKey
 import com.team.prezel.feature.my.api.MyNavKey
 import com.team.prezel.feature.my.impl.MyScreen
 import com.team.prezel.feature.profile.api.ProfileNavKey
@@ -20,7 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureMyEntryBuilder() {
         MyScreen(
             navigateToEditProfile = { navigator.navigate(ProfileNavKey.Edit) },
             navigateToSetting = { navigator.navigate(SettingNavKey) },
-            navigateToBadge = { /* navigator.navigate(ProfileNavKey.Badge) */ },
+            navigateToBadge = { navigator.navigate(BadgeNavKey) },
         )
     }
 }

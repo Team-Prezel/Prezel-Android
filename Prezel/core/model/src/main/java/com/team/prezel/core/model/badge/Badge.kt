@@ -1,15 +1,26 @@
 package com.team.prezel.core.model.badge
 
 data class Badge(
-    val type: BadgeType,
-    val isAchieved: Boolean,
+    val badgeCode: String,
+    val badgeName: String,
+    val isUnlocked: Boolean,
+    val imageUrl: String,
+    val unlockedAt: String? = null,
 )
 
-enum class BadgeType {
-    FIRST_PRESENTATION,
-    SECOND_ANALYSIS,
-    FIRST_PRACTICE,
-    RETROSPECT_COMPLETED,
-    PERFECT_SCORE,
-    TEN_ANALYSIS,
-}
+data class BadgeDetail(
+    val badgeCode: String,
+    val badgeName: String,
+    val conditionText: String,
+    val detailDescription: String,
+    val imageUrl: String,
+    val isUnlocked: Boolean,
+    val unlockedAt: String? = null,
+)
+
+data class BadgeEvent(
+    val badgeCode: String? = null,
+    val badgeName: String? = null,
+    val message: String? = null,
+    val rawData: String? = null,
+)

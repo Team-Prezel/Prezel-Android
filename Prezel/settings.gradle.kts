@@ -56,6 +56,8 @@ includeAuto(
     ":feature:practice:impl",
     ":feature:analysis:api",
     ":feature:analysis:impl",
+    ":feature:badge:api",
+    ":feature:badge:impl",
     ":feature:history:api",
     ":feature:history:impl",
     ":feature:my:api",

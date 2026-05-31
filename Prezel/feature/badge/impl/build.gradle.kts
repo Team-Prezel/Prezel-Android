@@ -3,17 +3,14 @@ plugins {
 }
 
 android {
-    namespace = "com.team.prezel.feature.my.impl"
+    namespace = "com.team.prezel.feature.badge.impl"
 }
 
 dependencies {
-    implementation(projects.coreDomain)
     implementation(projects.coreModel)
+    implementation(projects.coreDomain)
 
     implementation(projects.featureBadgeApi)
-    implementation(projects.featureMyApi)
-    implementation(projects.featureSettingApi)
-    implementation(projects.featureProfileApi)
 
     implementation(libs.kotlinx.collections.immutable)
 }
