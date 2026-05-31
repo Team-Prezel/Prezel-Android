@@ -1,7 +1,6 @@
 package com.team.prezel.feature.report.impl.report.component.common
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +19,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.util.noRippleClickable
 import kotlin.math.roundToInt
 
 @Composable
@@ -34,10 +33,7 @@ internal fun MetricResultCard(
         modifier = modifier
             .clip(shape = PrezelTheme.shapes.V8)
             .background(color = PrezelTheme.colors.bgMedium)
-            .clickable(
-                indication = ripple(color = PrezelTheme.colors.bgMedium),
-                interactionSource = null,
-            ) { onClick() },
+            .noRippleClickable(onClick = onClick),
     ) {
         Column(
             modifier = Modifier.padding(
