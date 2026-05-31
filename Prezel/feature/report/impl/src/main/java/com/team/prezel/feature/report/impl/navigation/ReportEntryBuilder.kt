@@ -6,8 +6,8 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
-import com.team.prezel.feature.report.impl.AnalysisReportScreen
-import com.team.prezel.feature.report.impl.AnalysisReportViewModel
+import com.team.prezel.feature.report.impl.report.AnalysisReportScreen
+import com.team.prezel.feature.report.impl.report.AnalysisReportViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
