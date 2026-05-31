@@ -2,10 +2,25 @@ plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
+
+val androidVersionCodeProvider = providers
+    .gradleProperty("ANDROID_VERSION_CODE")
+    .orElse(providers.environmentVariable("ANDROID_VERSION_CODE"))
+    .orElse("1")
+val androidVersionNameProvider = providers
+    .gradleProperty("ANDROID_VERSION_NAME")
+    .orElse(providers.environmentVariable("ANDROID_VERSION_NAME"))
+    .orElse("0.1.0")
 
 android {
     namespace = "com.team.prezel"
+
+    defaultConfig {
+        versionCode = androidVersionCodeProvider.get().toInt()
+        versionName = androidVersionNameProvider.get()
+    }
 
     buildTypes {
         debug {

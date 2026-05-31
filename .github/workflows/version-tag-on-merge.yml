@@ -1,0 +1,83 @@
+name: Version Tag On Merge
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+    types: [ "closed" ]
+
+permissions:
+  contents: write
+
+jobs:
+  tag-version:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Determine next version tag
+        env:
+          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          TARGET_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+
+          existing_tag="$(git tag --points-at "$TARGET_SHA" --list 'v*' | sort -V | tail -n 1)"
+          if [ -n "$existing_tag" ]; then
+            echo "TAG_NAME=$existing_tag" >> "$GITHUB_ENV"
+            echo "TAG_ALREADY_EXISTS=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          bump="patch"
+          if [[ "$PR_LABELS_JSON" == *'"major"'* ]]; then
+            bump="major"
+          elif [[ "$PR_LABELS_JSON" == *'"minor"'* ]]; then
+            bump="minor"
+          elif [[ "$PR_LABELS_JSON" == *'"patch"'* ]]; then
+            bump="patch"
+          fi
+
+          latest_tag="$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)"
+          latest_tag="${latest_tag:-v0.0.0}"
+          version="${latest_tag#v}"
+
+          IFS='.' read -r major minor patch <<< "$version"
+
+          case "$bump" in
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+          esac
+
+          echo "TAG_NAME=v${major}.${minor}.${patch}" >> "$GITHUB_ENV"
+          echo "TAG_ALREADY_EXISTS=false" >> "$GITHUB_ENV"
+          echo "BUMP_TYPE=$bump" >> "$GITHUB_ENV"
+
+      - name: Create version tag
+        if: ${{ env.TAG_ALREADY_EXISTS == 'false' }}
+        env:
+          TARGET_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$TAG_NAME" "$TARGET_SHA" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
