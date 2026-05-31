@@ -64,3 +64,52 @@ jobs:
             Actor: ${{ github.actor }}
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           file: ./Prezel/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Send Discord Notification
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISTRIBUTION_DISCORD_HOOK_URL }}
+          STATUS_TITLE: ${{ job.status == 'success' && '✅ Firebase Debug 배포 성공' || '❌ Firebase Debug 배포 실패' }}
+          STATUS_COLOR: ${{ job.status == 'success' && '3066993' || '15158332' }}
+          BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT_TIMESTAMP: ${{ github.event.head_commit.timestamp || github.event.repository.pushed_at }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISTRIBUTION_DISCORD_HOOK_URL is not set. Skipping Discord notification."
+            exit 0
+          fi
+
+          curl -H "Content-Type: application/json" -X POST -d "$(cat <<EOF
+          {
+            "embeds": [
+              {
+                "title": "$STATUS_TITLE",
+                "description": "Firebase Distribution Debug APK 배포가 완료되었습니다.",
+                "color": $STATUS_COLOR,
+                "fields": [
+                  {
+                    "name": "🏷 Tag",
+                    "value": "${{ github.ref_name }}"
+                  },
+                  {
+                    "name": "📦 Version",
+                    "value": "${{ env.ANDROID_VERSION_NAME }} ・ #${{ github.run_number }} <${{ env.ANDROID_VERSION_CODE }}>"
+                  },
+                  {
+                    "name": "👥 Tester Group",
+                    "value": "${{ vars.FIREBASE_APP_DISTRIBUTION_GROUPS }}"
+                  },
+                  {
+                    "name": "🔗 Action Log",
+                    "value": "[바로가기]($BUILD_URL)"
+                  }
+                ],
+                "footer": {
+                  "text": "Prezel Firebase Distribution"
+                },
+                "timestamp": "$EVENT_TIMESTAMP"
+              }
+            ]
+          }
+          EOF
+          )" "$DISCORD_WEBHOOK"
