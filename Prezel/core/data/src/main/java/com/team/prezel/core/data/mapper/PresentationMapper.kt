@@ -15,6 +15,7 @@ import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
+import com.team.prezel.core.model.presentation.WordAnalysisStatus
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
@@ -92,7 +93,7 @@ internal fun PresentationWordDetailResponse.toDomain(): PresentationWordDetail =
 internal fun PresentationWordAnalysisResponse.toDomain(): WordAnalysisDetail =
     WordAnalysisDetail(
         word = word,
-        status = status,
+        status = WordAnalysisStatus.from(value = status),
         description = description,
         accuracy = accuracy,
         startTimeMs = startTimeMs,

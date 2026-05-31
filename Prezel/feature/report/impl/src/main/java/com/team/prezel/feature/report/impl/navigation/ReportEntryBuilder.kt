@@ -6,8 +6,11 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
-import com.team.prezel.feature.report.impl.AnalysisReportScreen
-import com.team.prezel.feature.report.impl.AnalysisReportViewModel
+import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailScreen
+import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailTab
+import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailViewModel
+import com.team.prezel.feature.report.impl.report.AnalysisReportScreen
+import com.team.prezel.feature.report.impl.report.AnalysisReportViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +18,11 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
+    reportEntry()
+    accuracyDetailEntry()
+}
+
+private fun EntryProviderScope<NavKey>.reportEntry() {
     entry<ReportNavKey> { key ->
         val navigator = LocalNavigator.current
 
@@ -37,8 +45,38 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
                 )
             },
             navigateToSelfFeedbackWrite = {},
+            navigateToSpeechAccuracy = { analysisResultId ->
+                navigator.navigate(
+                    ReportInnerNavKey.AccuracyDetail(
+                        analysisResultId = analysisResultId,
+                        initialTab = AccuracyDetailTab.SPEECH,
+                    ),
+                )
+            },
+            navigateToScriptMatch = { analysisResultId ->
+                navigator.navigate(
+                    ReportInnerNavKey.AccuracyDetail(
+                        analysisResultId = analysisResultId,
+                        initialTab = AccuracyDetailTab.SCRIPT_MATCH,
+                    ),
+                )
+            },
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
+            ),
+        )
+    }
+}
+
+private fun EntryProviderScope<NavKey>.accuracyDetailEntry() {
+    entry<ReportInnerNavKey.AccuracyDetail> { key ->
+        val navigator = LocalNavigator.current
+
+        AccuracyDetailScreen(
+            onClose = { navigator.goBack() },
+            initialTab = key.initialTab,
+            viewModel = hiltViewModel<AccuracyDetailViewModel, AccuracyDetailViewModel.Factory>(
+                creationCallback = { factory -> factory.create(analysisResultId = key.analysisResultId) },
             ),
         )
     }
