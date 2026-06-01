@@ -57,13 +57,17 @@ private fun ServerErrorCode.toDomainError(): AppError =
 
         ServerErrorCode.TERMS_NOT_FOUND,
         ServerErrorCode.PRESENTATION_NOT_FOUND,
+        ServerErrorCode.PRESENTATION_REVIEW_NOT_FOUND,
         ServerErrorCode.ANALYSIS_RESULT_NOT_FOUND,
         -> AppError.NOT_FOUND
 
-        ServerErrorCode.DUPLICATE_NICKNAME -> AppError.DUPLICATE
+        ServerErrorCode.DUPLICATE_NICKNAME,
+        ServerErrorCode.SELF_FEEDBACK_ALREADY_WRITTEN,
+        -> AppError.DUPLICATE
 
         ServerErrorCode.UNAUTHORIZED,
         ServerErrorCode.FORBIDDEN,
+        ServerErrorCode.PRESENTATION_REVIEW_FORBIDDEN,
         ServerErrorCode.INVALID_TOKEN,
         ServerErrorCode.TOKEN_STOLEN,
         ServerErrorCode.USER_NOT_FOUND,

@@ -63,6 +63,14 @@ internal fun FeedbackScreen(
                 FeedbackUiEffect.SaveComplete -> onSaveComplete()
                 is FeedbackUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
+                        FeedbackUiMessage.FETCH_FEEDBACK_FAILED ->
+                            R.string.feature_feedback_impl_fetch_feedback_failed
+                        FeedbackUiMessage.PRESENTATION_FORBIDDEN ->
+                            R.string.feature_feedback_impl_presentation_forbidden
+                        FeedbackUiMessage.PRESENTATION_NOT_FOUND ->
+                            R.string.feature_feedback_impl_presentation_not_found
+                        FeedbackUiMessage.SELF_FEEDBACK_ALREADY_WRITTEN ->
+                            R.string.feature_feedback_impl_self_feedback_already_written
                         FeedbackUiMessage.SAVE_FAILED -> R.string.feature_feedback_impl_save_failed
                     }
                     snackbarHostState.showPrezelSnackbar(

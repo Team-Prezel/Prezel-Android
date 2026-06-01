@@ -1,6 +1,8 @@
 package com.team.prezel.feature.feedback.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.common.error.AppError
+import com.team.prezel.core.common.error.AppException
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.domain.usecase.presentation.WriteSelfFeedbackUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
@@ -14,6 +16,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FeedbackViewModel.Factory::class)
 internal class FeedbackViewModel @AssistedInject constructor(
@@ -50,18 +53,20 @@ internal class FeedbackViewModel @AssistedInject constructor(
             ).onSuccess { result ->
                 val selfFeedback = result.analysisSummary.selfFeedback
                     .orEmpty()
-                    .take(MAX_CONTENT_COUNT)
                 initialContent = selfFeedback
 
                 if (currentState.content.isBlank()) {
                     updateState { copy(content = selfFeedback) }
                 }
+            }.onFailure { throwable ->
+                sendEffect(FeedbackUiEffect.ShowMessage(FeedbackUiMessage.FETCH_FEEDBACK_FAILED))
+                Timber.e(throwable)
             }
         }
     }
 
     private fun changeContent(content: String) {
-        updateState { copy(content = content.take(MAX_CONTENT_COUNT)) }
+        updateState { copy(content = content) }
     }
 
     private fun handleClose() {
@@ -87,9 +92,10 @@ internal class FeedbackViewModel @AssistedInject constructor(
                 content = content,
             ).onSuccess {
                 sendEffect(FeedbackUiEffect.SaveComplete)
-            }.onFailure {
+            }.onFailure { throwable ->
                 updateState { copy(isSaving = false) }
-                sendEffect(FeedbackUiEffect.ShowMessage(FeedbackUiMessage.SAVE_FAILED))
+                sendEffect(FeedbackUiEffect.ShowMessage(throwable.toFeedbackUiMessage()))
+                Timber.e(throwable)
             }
         }
     }
@@ -97,8 +103,23 @@ internal class FeedbackViewModel @AssistedInject constructor(
     private fun navigateBack() {
         viewModelScope.launch { sendEffect(FeedbackUiEffect.NavigateBack) }
     }
+}
 
-    companion object {
-        private const val MAX_CONTENT_COUNT = 200
+private fun Throwable.toFeedbackUiMessage(): FeedbackUiMessage {
+    val error = (this as? AppException)?.error
+
+    return when (error) {
+        AppError.UNAUTHORIZED -> FeedbackUiMessage.PRESENTATION_FORBIDDEN
+        AppError.NOT_FOUND -> FeedbackUiMessage.PRESENTATION_NOT_FOUND
+        AppError.DUPLICATE -> FeedbackUiMessage.SELF_FEEDBACK_ALREADY_WRITTEN
+        AppError.INVALID_REQUEST,
+        AppError.SERVER_ERROR,
+        AppError.VOICE_RECOGNITION_FAILED,
+        AppError.VOICE_ANALYSIS_FAILED,
+        AppError.SCRIPT_FILE_RECOGNITION_FAILED,
+        AppError.NETWORK,
+        AppError.UNKNOWN,
+        null,
+        -> FeedbackUiMessage.SAVE_FAILED
     }
 }
