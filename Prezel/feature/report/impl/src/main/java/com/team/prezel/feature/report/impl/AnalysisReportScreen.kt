@@ -42,6 +42,10 @@ internal fun AnalysisReportScreen(
     val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
+        viewModel.onIntent(AnalysisReportUiIntent.FetchData)
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()

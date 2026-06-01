@@ -43,7 +43,6 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
                         presentationId = presentationId,
                         title = title,
                         isPast = isPast,
-                        returnToReportOnSave = true,
                     ),
                 )
             },
