@@ -64,7 +64,6 @@ internal class BadgeViewModel @Inject constructor(
             copy(
                 selectedBadgeCode = selectedBadge.badgeCode,
                 selectedBadgeDetail = cachedDetail,
-                isBadgeDetailLoading = cachedDetail == null,
             )
         }
 
@@ -77,12 +76,7 @@ internal class BadgeViewModel @Inject constructor(
                     badgeDetailCache[badgeCode] = detailUiModel
 
                     if (currentState.selectedBadgeCode == badgeCode) {
-                        updateState {
-                            copy(
-                                selectedBadgeDetail = detailUiModel,
-                                isBadgeDetailLoading = false,
-                            )
-                        }
+                        updateState { copy(selectedBadgeDetail = detailUiModel) }
                     }
                 }.onFailure {
                     if (currentState.selectedBadgeCode == badgeCode) {
@@ -98,7 +92,6 @@ internal class BadgeViewModel @Inject constructor(
             copy(
                 selectedBadgeCode = null,
                 selectedBadgeDetail = null,
-                isBadgeDetailLoading = false,
             )
         }
     }

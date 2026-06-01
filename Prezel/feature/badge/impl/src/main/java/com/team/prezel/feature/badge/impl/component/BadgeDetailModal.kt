@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
+import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
+import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
+import com.team.prezel.core.designsystem.component.chip.chip.ChipState
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -32,7 +35,6 @@ import com.team.prezel.feature.badge.impl.model.BadgeUiModel
 internal fun BadgeDetailModal(
     badge: BadgeUiModel,
     badgeDetail: BadgeDetailUiModel?,
-    isLoading: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -42,6 +44,7 @@ internal fun BadgeDetailModal(
         modifier = modifier
             .background(PrezelTheme.colors.bgRegular)
             .noRippleClickable { /* 클릭 이벤트 소비를 위함 */ },
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PrezelTopAppBar(
             trailingIcons = {
@@ -54,44 +57,80 @@ internal fun BadgeDetailModal(
             },
         )
 
-        Spacer(Modifier.weight(72f))
+        Spacer(modifier = Modifier.weight(72f))
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(376f),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
-            BadgeDetailImage(
-                imageUrl = badge.imageUrl,
-                isUnlocked = badge.isUnlocked,
+            Column(
                 modifier = Modifier.fillMaxWidth(0.65f),
-            )
-
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-
-            Text(
-                text = badge.badgeName,
-                style = PrezelTheme.typography.title1Bold,
-                color = PrezelTheme.colors.textLarge,
-                textAlign = TextAlign.Center,
-            )
-
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
-
-            if (isLoading) {
-                CircularProgressIndicator(
-                    color = PrezelTheme.colors.interactiveRegular,
-                    modifier = Modifier.padding(top = PrezelTheme.spacing.V12),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                BadgeDetailImage(
+                    imageUrl = badge.imageUrl,
+                    isUnlocked = badge.isUnlocked,
+                    modifier = Modifier.fillMaxWidth(),
                 )
-            } else {
+
+                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
+                Text(
+                    text = badge.badgeName,
+                    style = PrezelTheme.typography.title1Bold,
+                    color = PrezelTheme.colors.textLarge,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+
                 badgeDetail?.let { detail ->
-                    BadgeDetailInfo(detail = detail)
+                    BadgeDetailChip(detail = detail)
                 }
             }
+
+            badgeDetail?.let { detail ->
+                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
+                BadgeDetailDescription(
+                    detail = detail,
+                    modifier = Modifier.padding(horizontal = PrezelTheme.spacing.V24),
+                )
+            }
         }
-        Spacer(Modifier.weight(180f))
+
+        Spacer(modifier = Modifier.weight(180f))
     }
+}
+
+@Composable
+private fun BadgeDetailChip(
+    detail: BadgeDetailUiModel,
+    modifier: Modifier = Modifier,
+) {
+    PrezelChip(
+        text = detail.badgeName,
+        size = ChipSize.SMALL,
+        hierarchy = ChipHierarchy.PRIMARY,
+        state = ChipState.ACTIVE,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun BadgeDetailDescription(
+    detail: BadgeDetailUiModel,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = detail.detailDescription,
+        style = PrezelTheme.typography.body2Regular,
+        color = PrezelTheme.colors.textLarge,
+        textAlign = TextAlign.Center,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @BasicPreview
@@ -101,7 +140,6 @@ private fun BadgeDetailModalPreview() {
         BadgeDetailModal(
             badge = badgePreviewBadges().first(),
             badgeDetail = badgePreviewDetail(),
-            isLoading = false,
             onDismiss = {},
             modifier = Modifier.fillMaxSize(),
         )

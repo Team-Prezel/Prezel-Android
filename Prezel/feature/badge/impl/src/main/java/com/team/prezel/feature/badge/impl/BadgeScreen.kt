@@ -76,7 +76,6 @@ internal fun BadgeScreenScreen(
             BadgeDetailModal(
                 badge = badge,
                 badgeDetail = uiState.selectedBadgeDetail,
-                isLoading = uiState.isBadgeDetailLoading,
                 onDismiss = onDismissBadgeDetail,
                 modifier = Modifier.fillMaxSize(),
             )
