@@ -65,32 +65,7 @@ internal fun BadgeDetailModal(
                 .weight(376f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.65f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                BadgeDetailImage(
-                    imageUrl = badge.imageUrl,
-                    isUnlocked = badge.isUnlocked,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-
-                Text(
-                    text = badge.badgeName,
-                    style = PrezelTheme.typography.title1Bold,
-                    color = PrezelTheme.colors.textLarge,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
-
-                badgeDetail?.let { detail ->
-                    BadgeDetailChip(detail = detail)
-                }
-            }
+            BadgeHeader(badge = badge, badgeDetail = badgeDetail)
 
             badgeDetail?.let { detail ->
                 Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
@@ -102,6 +77,39 @@ internal fun BadgeDetailModal(
         }
 
         Spacer(modifier = Modifier.weight(180f))
+    }
+}
+
+@Composable
+private fun BadgeHeader(
+    badge: BadgeUiModel,
+    badgeDetail: BadgeDetailUiModel?,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(0.65f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        BadgeDetailImage(
+            imageUrl = badge.imageUrl,
+            isUnlocked = badge.isUnlocked,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
+        Text(
+            text = badge.badgeName,
+            style = PrezelTheme.typography.title1Bold,
+            color = PrezelTheme.colors.textLarge,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+
+        badgeDetail?.let { detail ->
+            BadgeDetailChip(detail = detail)
+        }
     }
 }
 
