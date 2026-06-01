@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.analysis.api.AnalysisStartType
+import com.team.prezel.feature.feedback.api.FeedbackNavKey
 import com.team.prezel.feature.home.api.HomeNavKey
 import com.team.prezel.feature.home.impl.main.HomeScreen
 import com.team.prezel.feature.practice.api.PracticeNavKey
@@ -27,6 +28,18 @@ internal fun EntryProviderScope<NavKey>.featureHomeEntryBuilder() {
             },
             navigateToVoiceRecordingAnalysis = {
                 navigator.navigate(AnalysisNavKey.Schedule(startType = AnalysisStartType.VOICE_RECORDING))
+            },
+            navigateToAnalyzePresentation = { presentationId, isPast ->
+                navigator.navigate(AnalysisNavKey.ReRecording(presentationId = presentationId, isPast = isPast))
+            },
+            navigateToFeedback = { presentationId, title, isPast ->
+                navigator.navigate(
+                    FeedbackNavKey(
+                        presentationId = presentationId,
+                        title = title,
+                        isPast = isPast,
+                    ),
+                )
             },
         )
     }

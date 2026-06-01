@@ -21,7 +21,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
-import java.util.UUID
 
 internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
     analysisEntry<AnalysisNavKey.Schedule> { key -> key.enterStep(AnalysisFlowStep.PRESENTATION_SCHEDULE) }
@@ -84,7 +83,6 @@ private fun AnalysisRoute(
             navigator.navigate(
                 key = ReportNavKey(
                     presentationId = presentationId,
-                    refreshKey = newReportRefreshKey(),
                 ),
                 clearStack = true,
             )
@@ -127,5 +125,3 @@ object FeatureAnalysisModule {
             featureAnalysisEntryBuilder()
         }
 }
-
-private fun newReportRefreshKey(): String = UUID.randomUUID().toString()

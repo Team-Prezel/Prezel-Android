@@ -44,4 +44,9 @@ interface PresentationRemoteDataSource {
     suspend fun getPracticeRecords(presentationId: Long): GetPracticeRecordsResponse
 
     suspend fun getMainData(): List<GetMainDataResponse>
+
+    suspend fun writeSelfFeedback(
+        presentationId: Long,
+        content: String,
+    )
 }

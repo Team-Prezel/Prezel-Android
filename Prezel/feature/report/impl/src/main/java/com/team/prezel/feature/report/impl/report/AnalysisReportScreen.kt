@@ -34,14 +34,18 @@ internal fun AnalysisReportScreen(
     onBack: () -> Unit,
     navigateToAnalysisScript: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
-    navigateToSelfFeedbackWrite: (presentationId: Long) -> Unit,
     navigateToScriptAnalysis: (analysisResultId: Long) -> Unit,
+    navigateToSelfFeedbackWrite: (presentationId: Long, title: String, isPast: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
+
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(AnalysisReportUiIntent.FetchData)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -56,8 +60,10 @@ internal fun AnalysisReportScreen(
 
                 is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId, effect.isPast)
                 is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId, effect.isPast)
-                is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> navigateToSelfFeedbackWrite(effect.presentationId)
                 is AnalysisReportUiEffect.NavigateToScriptAnalysis -> navigateToScriptAnalysis(effect.analysisResultId)
+                is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> {
+                    navigateToSelfFeedbackWrite(effect.presentationId, effect.title, effect.isPast)
+                }
             }
         }
     }

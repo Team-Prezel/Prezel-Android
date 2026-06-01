@@ -3,6 +3,8 @@ package com.team.prezel.feature.report.impl.report.contract
 import com.team.prezel.core.ui.base.UiIntent
 
 internal sealed interface AnalysisReportUiIntent : UiIntent {
+    data object FetchData : AnalysisReportUiIntent
+
     data object ClickDelete : AnalysisReportUiIntent
 
     data class ClickGrowthGraphItem(

@@ -2,10 +2,12 @@ package com.team.prezel.core.network.datasource
 
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
+import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.model.requireSuccess
 import com.team.prezel.core.network.service.PresentationService
@@ -96,15 +98,26 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
     override suspend fun getPastPresentations(): List<GetPresentationsResponse> = presentationService.getPastPresentations().requireData()
 
     override suspend fun getUpcomingPresentationDetail(presentationId: Long): PresentationSummaryResponse =
-        presentationService.getUpcomingPresentationDetail(presentationId = presentationId).requireData().analysisResult
+        presentationService.getUpcomingPresentationDetail(presentationId = presentationId).requireData().toPresentationSummaryResponse()
 
     override suspend fun getPastPresentationDetail(presentationId: Long): PresentationSummaryResponse =
-        presentationService.getPastPresentationDetail(presentationId = presentationId).requireData().analysisResult
+        presentationService.getPastPresentationDetail(presentationId = presentationId).requireData().toPresentationSummaryResponse()
 
     override suspend fun getPracticeRecords(presentationId: Long): GetPracticeRecordsResponse =
         presentationService.getPracticeRecords(presentationId = presentationId).requireData()
 
     override suspend fun getMainData(): List<GetMainDataResponse> = presentationService.getMainData().requireData()
+
+    override suspend fun writeSelfFeedback(
+        presentationId: Long,
+        content: String,
+    ) {
+        presentationService
+            .writeSelfFeedback(
+                presentationId = presentationId,
+                request = SelfFeedbackRequest(content = content),
+            ).requireSuccess()
+    }
 }
 
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {
@@ -118,6 +131,11 @@ private fun FormBuilder.appendAudioPart(audioFilePath: String) {
         },
     )
 }
+
+private fun GetPresentationDetailResponse.toPresentationSummaryResponse(): PresentationSummaryResponse =
+    analysisResult.copy(
+        reviewContent = reviewContent ?: analysisResult.reviewContent,
+    )
 
 private fun FormBuilder.appendScriptPart(scriptFilePath: String) {
     val file = File(scriptFilePath)

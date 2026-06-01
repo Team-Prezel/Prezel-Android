@@ -28,16 +28,14 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         fun create(navKey: ReportNavKey): AnalysisReportViewModel
     }
 
+    private val requestedPresentationId: Long = navKey.presentationId
     private var presentationId: Long? = null
     private var analysisResultId: Long? = null
     private val isPast: Boolean = navKey.isPast
 
-    init {
-        fetchData(presentationId = navKey.presentationId, isPast = navKey.isPast)
-    }
-
     override fun onIntent(intent: AnalysisReportUiIntent) {
         when (intent) {
+            AnalysisReportUiIntent.FetchData -> fetchData()
             AnalysisReportUiIntent.ClickDelete -> updateContent { copy(reportDialog = AnalysisReportDialog.DELETE_REPORT) }
             is AnalysisReportUiIntent.ClickGrowthGraphItem -> updateGrowthGraphSelectedItem(index = intent.index)
             AnalysisReportUiIntent.ClickDialogConform -> handleClickDialogConform()
@@ -49,12 +47,9 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
         }
     }
 
-    private fun fetchData(
-        presentationId: Long,
-        isPast: Boolean,
-    ) {
+    private fun fetchData() {
         viewModelScope.launch {
-            fetchPresentationDetailUseCase(presentationId = presentationId, isPast = isPast)
+            fetchPresentationDetailUseCase(presentationId = requestedPresentationId, isPast = isPast)
                 .onSuccess { result ->
                     this@AnalysisReportViewModel.presentationId = result.analysisSummary.presentationId
                     analysisResultId = result.analysisSummary.analysisResultId
@@ -118,7 +113,13 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     }
 
     private fun navigateToSelfFeedbackWrite() {
-        val effect = presentationId?.let(AnalysisReportUiEffect::NavigateToSelfFeedbackWrite) ?: return
+        val presentationId = presentationId ?: return
+        val title = contentState?.presentationInfo?.title ?: return
+        val effect = AnalysisReportUiEffect.NavigateToSelfFeedbackWrite(
+            presentationId = presentationId,
+            title = title,
+            isPast = isPast,
+        )
         viewModelScope.launch { sendEffect(effect) }
     }
 

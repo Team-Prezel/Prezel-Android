@@ -8,6 +8,7 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
@@ -65,4 +66,10 @@ interface PresentationService {
 
     @GET("main")
     suspend fun getMainData(): BaseResponse<List<GetMainDataResponse>>
+
+    @POST("recording/{presentationId}/review")
+    suspend fun writeSelfFeedback(
+        @Path("presentationId") presentationId: Long,
+        @Body request: SelfFeedbackRequest,
+    ): BaseResponse<Unit>
 }
