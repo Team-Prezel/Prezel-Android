@@ -1,5 +1,6 @@
 package com.team.prezel.feature.my.impl
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +76,7 @@ private fun MyScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(PrezelTheme.colors.bgRegular),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MyTopAppBar(onClickSetting = onClickSetting)

@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -23,7 +27,10 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
 import com.team.prezel.feature.splash.impl.contract.SplashUiIntent
+import kotlinx.coroutines.delay
 import com.team.prezel.core.designsystem.R as DSR
+
+private const val SPLASH_NAVIGATION_DELAY_MILLIS = 500L
 
 @Composable
 internal fun SharedTransitionScope.SplashScreen(
@@ -37,6 +44,13 @@ internal fun SharedTransitionScope.SplashScreen(
 ) {
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    var screenVisibility by remember { mutableStateOf(true) }
+
+    suspend fun navigateWithDelay(navigate: () -> Unit) {
+        delay(SPLASH_NAVIGATION_DELAY_MILLIS)
+        screenVisibility = false
+        navigate()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(SplashUiIntent.CheckLoginStatus)
@@ -45,10 +59,10 @@ internal fun SharedTransitionScope.SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                SplashUiEffect.NavigateToHome -> navigateToHome()
-                SplashUiEffect.NavigateToLogin -> navigateToLogin()
-                SplashUiEffect.NavigateToTerms -> navigateToTerms()
-                SplashUiEffect.NavigateToCreateProfile -> navigateToCreateProfile()
+                SplashUiEffect.NavigateToHome -> navigateWithDelay(navigateToHome)
+                SplashUiEffect.NavigateToLogin -> navigateWithDelay(navigateToLogin)
+                SplashUiEffect.NavigateToTerms -> navigateWithDelay(navigateToTerms)
+                SplashUiEffect.NavigateToCreateProfile -> navigateWithDelay(navigateToCreateProfile)
                 SplashUiEffect.ShowRetryableFailureMessage -> {
                     snackbarHostState.showPrezelSnackbar(
                         resources.getString(R.string.feature_splash_impl_retryable_failure),
@@ -58,10 +72,12 @@ internal fun SharedTransitionScope.SplashScreen(
         }
     }
 
-    SplashScreen(
-        animatedVisibilityScope = animatedVisibilityScope,
-        modifier = modifier,
-    )
+    if (screenVisibility) {
+        SplashScreen(
+            animatedVisibilityScope = animatedVisibilityScope,
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
