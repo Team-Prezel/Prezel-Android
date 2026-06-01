@@ -51,7 +51,7 @@ jobs:
 
       - name: Create Android release keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./app/release-keystore.jks
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./app/keystore.jks
 
       - name: Prepare version metadata
         run: |
