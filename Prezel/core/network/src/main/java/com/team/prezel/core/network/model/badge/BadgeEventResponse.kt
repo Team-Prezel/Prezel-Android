@@ -15,5 +15,6 @@ data class BadgeEventResponse(
     val imageUrl: String? = null,
     @SerialName("message")
     val message: String? = null,
+    @SerialName("rawData")
     val rawData: String? = null,
 )

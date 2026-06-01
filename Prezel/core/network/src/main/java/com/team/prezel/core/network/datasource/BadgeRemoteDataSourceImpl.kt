@@ -12,10 +12,15 @@ import io.ktor.client.plugins.timeout
 import io.ktor.client.request.accept
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -29,35 +34,40 @@ internal class BadgeRemoteDataSourceImpl @Inject constructor(
 
     override fun connectBadgeEventStream(): Flow<BadgeEventResponse> =
         callbackFlow {
-            val streamJob =
-                launch {
-                    try {
-                        httpClient.serverSentEvents(
-                            urlString = badgeStreamUrl,
-                            request = {
-                                accept(ContentType.Text.EventStream)
-                                timeout {
-                                    socketTimeoutMillis = BADGE_SSE_SOCKET_TIMEOUT_MILLIS
-                                }
-                            },
-                            reconnectionTime = BADGE_SSE_RETRY_DELAY_MILLIS.milliseconds,
-                        ) {
-                            incoming.collect { event ->
-                                BadgeSseEventParser
-                                    .parse(eventName = event.event, data = event.data)
-                                    ?.let { badgeEvent -> trySend(badgeEvent) }
-                            }
-                        }
-                        close()
-                    } catch (throwable: CancellationException) {
-                        throw throwable
-                    } catch (throwable: Throwable) {
-                        close(throwable)
-                    }
-                }
+            val streamJob = createStreamJob()
 
             awaitClose {
                 streamJob.cancel()
+            }
+        }
+
+    private fun ProducerScope<BadgeEventResponse>.createStreamJob(): Job =
+        launch {
+            while (isActive) {
+                try {
+                    httpClient.serverSentEvents(
+                        urlString = badgeStreamUrl,
+                        reconnectionTime = BADGE_SSE_RETRY_DELAY_MILLIS.milliseconds,
+                        request = {
+                            accept(ContentType.Text.EventStream)
+                            timeout { socketTimeoutMillis = BADGE_SSE_SOCKET_TIMEOUT_MILLIS }
+                        },
+                    ) {
+                        incoming.collect { event ->
+                            BadgeSseEventParser
+                                .parse(
+                                    eventName = event.event,
+                                    data = event.data,
+                                )?.let { badgeEvent -> trySend(badgeEvent) }
+                        }
+                    }
+                    close()
+                } catch (throwable: CancellationException) {
+                    throw throwable
+                } catch (throwable: Throwable) {
+                    Timber.e(throwable)
+                    delay(BADGE_SSE_RETRY_DELAY_MILLIS)
+                }
             }
         }
 

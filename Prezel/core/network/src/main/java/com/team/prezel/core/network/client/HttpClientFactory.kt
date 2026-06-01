@@ -118,8 +118,8 @@ internal class HttpClientFactory @Inject constructor(
 
     internal fun HttpClientConfig<*>.installSse() {
         install(SSE) {
-            maxReconnectionAttempts = Int.MAX_VALUE
-            reconnectionTime = 1.seconds
+            maxReconnectionAttempts = 10
+            reconnectionTime = 5.seconds
         }
     }
 
