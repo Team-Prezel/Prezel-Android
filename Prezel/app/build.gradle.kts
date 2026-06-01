@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
@@ -22,6 +24,17 @@ android {
         versionName = androidVersionNameProvider.get()
     }
 
+    signingConfigs {
+        create("release") {
+            val localProperties = gradleLocalProperties(rootDir, providers)
+
+            storeFile = rootProject.file(localProperties.getProperty("signed.store.file"))
+            storePassword = localProperties.getProperty("signed.store.password")
+            keyAlias = localProperties.getProperty("signed.key.alias")
+            keyPassword = localProperties.getProperty("signed.key.password")
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -30,8 +43,9 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
