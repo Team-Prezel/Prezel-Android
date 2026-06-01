@@ -7,8 +7,10 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.feedback.api.FeedbackNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
-import com.team.prezel.feature.report.impl.AnalysisReportScreen
-import com.team.prezel.feature.report.impl.AnalysisReportViewModel
+import com.team.prezel.feature.report.impl.report.AnalysisReportScreen
+import com.team.prezel.feature.report.impl.report.AnalysisReportViewModel
+import com.team.prezel.feature.report.impl.script.ScriptScreen
+import com.team.prezel.feature.report.impl.script.ScriptViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,8 +48,21 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisReportEntryBuilder() {
                     ),
                 )
             },
+            navigateToScriptAnalysis = { analysisResultId ->
+                navigator.navigate(ReportInnerNavKey.ScriptCorrection(analysisResultId = analysisResultId))
+            },
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
+            ),
+        )
+    }
+    entry<ReportInnerNavKey.ScriptCorrection> { key ->
+        val navigator = LocalNavigator.current
+
+        ScriptScreen(
+            onClose = { navigator.goBack() },
+            viewModel = hiltViewModel<ScriptViewModel, ScriptViewModel.Factory>(
+                creationCallback = { factory -> factory.create(analysisResultId = key.analysisResultId) },
             ),
         )
     }
