@@ -1,11 +1,15 @@
 name: Firebase App Distribution
 
 on:
-  push:
-    tags: [ "v*" ]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Distribution tag to build from
+        required: true
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ inputs.tag_name || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,6 +25,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag_name }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -44,13 +49,21 @@ jobs:
           ${{ secrets.GOOGLE_SERVICES_JSON }}
           EOF
 
+      - name: Create Android release keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./prezel.jks
+
       - name: Prepare version metadata
         run: |
+          DISTRIBUTION_TAG="${{ inputs.tag_name }}"
+          echo "DISTRIBUTION_TAG=$DISTRIBUTION_TAG" >> "$GITHUB_ENV"
           echo "ANDROID_VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
-          echo "ANDROID_VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          echo "ANDROID_VERSION_NAME=${DISTRIBUTION_TAG#v}" >> "$GITHUB_ENV"
+          echo "APP_APPLICATION_ID=com.team.prezel.dev" >> "$GITHUB_ENV"
+          echo "APP_NAME=Prezel (Internal)" >> "$GITHUB_ENV"
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --build-cache --parallel
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --build-cache --parallel
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -59,17 +72,17 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: ${{ vars.FIREBASE_APP_DISTRIBUTION_GROUPS }}
           releaseNotes: |
-            Tag: ${{ github.ref_name }}
+            Tag: ${{ env.DISTRIBUTION_TAG }}
             Commit: ${{ github.sha }}
             Actor: ${{ github.actor }}
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          file: ./Prezel/app/build/outputs/apk/debug/app-debug.apk
+          file: ./Prezel/app/build/outputs/apk/release/app-release.apk
 
       - name: Send Discord Notification
         if: always()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISTRIBUTION_DISCORD_HOOK_URL }}
-          STATUS_TITLE: ${{ job.status == 'success' && '✅ Firebase Debug 배포 성공' || '❌ Firebase Debug 배포 실패' }}
+          STATUS_TITLE: ${{ job.status == 'success' && '✅ Firebase Release 배포 성공' || '❌ Firebase Release 배포 실패' }}
           STATUS_COLOR: ${{ job.status == 'success' && '3066993' || '15158332' }}
           BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           EVENT_TIMESTAMP: ${{ github.event.head_commit.timestamp || github.event.repository.pushed_at }}
@@ -84,12 +97,12 @@ jobs:
             "embeds": [
               {
                 "title": "$STATUS_TITLE",
-                "description": "Firebase Distribution Debug APK 배포가 완료되었습니다.",
+                "description": "Firebase Distribution Release APK 배포가 완료되었습니다.",
                 "color": $STATUS_COLOR,
                 "fields": [
                   {
                     "name": "🏷 Tag",
-                    "value": "${{ github.ref_name }}"
+                    "value": "${{ env.DISTRIBUTION_TAG }}"
                   },
                   {
                     "name": "📦 Version",

@@ -6,11 +6,12 @@ on:
     types: [ "closed" ]
 
 permissions:
+  actions: write
   contents: write
 
 jobs:
   tag-version:
-    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop' }}
+    if: ${{ github.event_name == 'push' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -21,8 +22,8 @@ jobs:
 
       - name: Determine next version tag
         env:
-          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
-          TARGET_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_LABELS_JSON: ${{ github.event_name == 'pull_request' && toJson(github.event.pull_request.labels.*.name) || '[]' }}
+          TARGET_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.sha }}
         run: |
           set -euo pipefail
 
@@ -72,7 +73,7 @@ jobs:
       - name: Create version tag
         if: ${{ env.TAG_ALREADY_EXISTS == 'false' }}
         env:
-          TARGET_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          TARGET_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.sha }}
         run: |
           set -euo pipefail
 
@@ -81,3 +82,17 @@ jobs:
 
           git tag -a "$TAG_NAME" "$TARGET_SHA" -m "Release $TAG_NAME"
           git push origin "$TAG_NAME"
+
+      - name: Dispatch Firebase distribution workflow
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "firebase-app-distribution.yml",
+              ref: context.ref.replace("refs/heads/", ""),
+              inputs: {
+                tag_name: process.env.TAG_NAME,
+              },
+            });
