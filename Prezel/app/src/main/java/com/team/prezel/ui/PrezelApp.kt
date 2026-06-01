@@ -25,11 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
@@ -37,12 +39,15 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.team.prezel.R
 import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.common.event.GlobalEvent
 import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.designsystem.component.PrezelNavigationScope
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.domain.usecase.badge.ConnectBadgeEventStreamUseCase
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
@@ -51,6 +56,7 @@ import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.state.rememberAppDimmerState
 import com.team.prezel.core.ui.util.noRippleClickable
+import com.team.prezel.feature.badge.api.BadgeNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
 import kotlinx.collections.immutable.ImmutableSet
@@ -59,6 +65,7 @@ import kotlinx.collections.immutable.ImmutableSet
 fun PrezelApp(
     appState: PrezelAppState,
     globalEventBus: GlobalEventBus,
+    connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
@@ -75,6 +82,7 @@ fun PrezelApp(
         PrezelAppContent(
             appState = appState,
             globalEventBus = globalEventBus,
+            connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
             entryBuilders = entryBuilders,
         )
     }
@@ -84,6 +92,7 @@ fun PrezelApp(
 private fun PrezelAppContent(
     appState: PrezelAppState,
     globalEventBus: GlobalEventBus,
+    connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
 ) {
     val navigator = LocalNavigator.current
@@ -94,6 +103,13 @@ private fun PrezelAppContent(
         globalEventBus = globalEventBus,
         navigateToSplash = { navigator.replaceRoot(SplashNavKey) },
         onStatusBarStyleChange = { statusBarStyle = it },
+    )
+
+    ObserveBadgeEvents(
+        isAuthenticated = appState.isAuthenticated,
+        connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
+        shouldShowNavigationBar = appState.shouldShowNavigationBar,
+        navigateToBadge = { navigator.navigate(BadgeNavKey) },
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -241,6 +257,43 @@ private tailrec fun Context.findActivity(): Activity? =
         is ContextWrapper -> baseContext.findActivity()
         else -> null
     }
+
+@Composable
+private fun ObserveBadgeEvents(
+    isAuthenticated: Boolean,
+    connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
+    shouldShowNavigationBar: Boolean,
+    navigateToBadge: () -> Unit,
+) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    val resources = LocalResources.current
+    val currentShouldShowNavigationBar by rememberUpdatedState(shouldShowNavigationBar)
+
+    LaunchedEffect(isAuthenticated) {
+        if (!isAuthenticated) return@LaunchedEffect
+
+        connectBadgeEventStreamUseCase()
+            .collect { event ->
+                val message =
+                    event.message
+                        ?.takeIf(String::isNotBlank)
+                        ?: event.badgeName
+                            ?.takeIf(String::isNotBlank)
+                            ?.let { badgeName ->
+                                resources.getString(R.string.app_badge_event_message_with_name, badgeName)
+                            }
+                        ?: resources.getString(R.string.app_badge_event_message)
+
+                snackbarHostState.currentSnackbarData?.dismiss()
+                snackbarHostState.showPrezelSnackbar(
+                    message = message,
+                    actionLabel = resources.getString(R.string.app_badge_event_action),
+                    onAction = navigateToBadge,
+                    useRaisedPosition = currentShouldShowNavigationBar,
+                )
+            }
+    }
+}
 
 @Composable
 private fun PrezelNavigationScope.AppNavigationItems(

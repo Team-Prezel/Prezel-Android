@@ -73,6 +73,7 @@ dependencies {
     implementation(projects.coreData)
     implementation(projects.coreDesignsystem)
     implementation(projects.coreDomain)
+    implementation(projects.coreModel)
     implementation(projects.coreNavigation)
     implementation(projects.coreUi)
     implementation(projects.coreCommon)
@@ -87,6 +88,8 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
     implementation(projects.featureMyImpl)
+    implementation(projects.featureBadgeApi)
+    implementation(projects.featureBadgeImpl)
     implementation(projects.featureFeedbackApi)
     implementation(projects.featureFeedbackImpl)
 
