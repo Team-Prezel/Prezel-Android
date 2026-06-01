@@ -6,6 +6,7 @@ import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiEffect
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiIntent
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiState
+import com.team.prezel.feature.report.impl.accuracydetail.model.AccuracyDetailUiMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -37,6 +38,7 @@ internal class AccuracyDetailViewModel @AssistedInject constructor(
                     wordDetail = fetchPresentationWordDetailUseCase(analysisResultId).getOrThrow(),
                 )
             }.getOrElse {
+                sendEffect(AccuracyDetailUiEffect.ShowMessage(AccuracyDetailUiMessage.FetchDetailFailed))
                 AccuracyDetailUiState.Error
             }
             updateState { nextState }

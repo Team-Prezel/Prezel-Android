@@ -24,9 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.component.player.PrezelPlayerItem
@@ -37,6 +39,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
+import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailPlayerSheet
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailTopAppBar
@@ -44,6 +47,7 @@ import com.team.prezel.feature.report.impl.accuracydetail.component.ScriptDetail
 import com.team.prezel.feature.report.impl.accuracydetail.component.isScriptMatchIssue
 import com.team.prezel.feature.report.impl.accuracydetail.component.isSpeechAccuracySheetIssue
 import com.team.prezel.feature.report.impl.accuracydetail.component.toMarkerType
+import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiEffect
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -66,6 +70,21 @@ internal fun AccuracyDetailScreen(
     viewModel: AccuracyDetailViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = LocalSnackbarHostState.current
+    val resources = LocalResources.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is AccuracyDetailUiEffect.ShowMessage -> {
+                    snackbarHostState.showPrezelSnackbar(
+                        message = resources.getString(R.string.feature_report_impl_script_detail_load_failed),
+                        useRaisedPosition = false,
+                    )
+                }
+            }
+        }
+    }
 
     when (val state = uiState) {
         AccuracyDetailUiState.Loading -> Unit
