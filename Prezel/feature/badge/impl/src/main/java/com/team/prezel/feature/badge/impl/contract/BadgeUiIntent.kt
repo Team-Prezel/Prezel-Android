@@ -6,4 +6,6 @@ internal sealed interface BadgeUiIntent : UiIntent {
     data class ClickBadge(
         val badgeCode: String,
     ) : BadgeUiIntent
+
+    data object DismissBadgeDetail : BadgeUiIntent
 }
