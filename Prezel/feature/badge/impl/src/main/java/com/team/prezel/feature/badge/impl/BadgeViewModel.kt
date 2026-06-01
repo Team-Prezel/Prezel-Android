@@ -81,8 +81,8 @@ internal class BadgeViewModel @Inject constructor(
                 }.onFailure {
                     if (currentState.selectedBadgeCode == badgeCode) {
                         dismissBadgeDetail()
+                        sendEffect(BadgeUiEffect.ShowMessage(BadgeUiMessage.FETCH_BADGE_DETAIL_FAILED))
                     }
-                    sendEffect(BadgeUiEffect.ShowMessage(BadgeUiMessage.FETCH_BADGE_DETAIL_FAILED))
                 }
         }
     }
