@@ -10,6 +10,7 @@ dependencies {
     implementation(projects.coreDomain)
     implementation(projects.coreModel)
 
+    implementation(projects.featureBadgeApi)
     implementation(projects.featureMyApi)
     implementation(projects.featureSettingApi)
     implementation(projects.featureProfileApi)

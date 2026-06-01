@@ -40,10 +40,11 @@ internal fun ReportBodyContent(
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
+    onScriptAnalysisClick: () -> Unit,
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
 ) {
-    if (uiState.isPast) {
+    if (uiState.isPast && uiState.practiceRecords != null) {
         SelfFeedbackSection(
             selfFeedback = uiState.selfFeedback,
             onFeedBackWriteClick = onFeedBackWriteClick,
@@ -68,6 +69,7 @@ internal fun ReportBodyContent(
         isWrittenScript = uiState.isScriptWritten,
         scriptAnalysisGraphData = uiState.scriptAnalysisGraphData,
         onReWriteScriptClick = onReWriteScriptClick,
+        onScriptAnalysisClick = onScriptAnalysisClick,
     )
     ExpectedQuestionsSection(questions = uiState.expectedQuestions)
 
@@ -100,6 +102,7 @@ private fun ReportBodyContentPreview() {
                 onReWriteScriptClick = {},
                 onReRecordingClick = {},
                 onFeedBackWriteClick = {},
+                onScriptAnalysisClick = {},
                 onSpeechAccuracyClick = {},
                 onScriptMatchClick = {},
             )

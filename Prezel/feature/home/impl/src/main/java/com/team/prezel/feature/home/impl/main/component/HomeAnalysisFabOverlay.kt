@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -104,7 +105,7 @@ private fun HomeAnalysisFabPopup(
     collapsedFabBounds: Rect?,
     expandedMenuBounds: Rect?,
     fabEndPaddingPx: Int,
-    density: androidx.compose.ui.unit.Density,
+    density: Density,
     isFabExpanded: Boolean,
     onChangeExpanded: (Boolean) -> Unit,
     onClickVoiceRecordingAnalysis: () -> Unit,

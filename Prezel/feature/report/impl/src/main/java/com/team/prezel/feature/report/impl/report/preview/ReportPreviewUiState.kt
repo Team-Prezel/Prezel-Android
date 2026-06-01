@@ -60,7 +60,7 @@ private val ReportPreviewBaseUiState: AnalysisReportUiState.Content = AnalysisRe
         ),
     ),
     selfFeedback = "아 발표 드디어 끝났다",
-    isPast = false,
+    isPast = true,
     practiceRecords = PracticeRecordsUiModel(
         practicedDates = listOf(
             LocalDate(2026, 5, 10),
@@ -72,6 +72,10 @@ private val ReportPreviewBaseUiState: AnalysisReportUiState.Content = AnalysisRe
     ),
 )
 
-internal val ReportPreviewPastUiState: AnalysisReportUiState.Content = ReportPreviewBaseUiState.copy(isPast = true)
+internal val ReportPreviewPastUiState: AnalysisReportUiState.Content = ReportPreviewBaseUiState
 
-internal val ReportPreviewUpcomingUiState: AnalysisReportUiState.Content = ReportPreviewPastUiState
+internal val ReportPreviewUpcomingUiState: AnalysisReportUiState.Content = ReportPreviewBaseUiState.copy(
+    isPast = false,
+    selfFeedback = null,
+    practiceRecords = null,
+)

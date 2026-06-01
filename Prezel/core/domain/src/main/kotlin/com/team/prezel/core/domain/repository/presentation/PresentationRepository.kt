@@ -48,4 +48,9 @@ interface PresentationRepository {
     suspend fun getPracticeRecords(presentationId: Long): Result<PracticeRecords>
 
     suspend fun getMainData(): Result<List<MainData>>
+
+    suspend fun writeSelfFeedback(
+        presentationId: Long,
+        content: String,
+    ): Result<Unit>
 }

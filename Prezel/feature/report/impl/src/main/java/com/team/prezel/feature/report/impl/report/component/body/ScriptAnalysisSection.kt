@@ -36,6 +36,7 @@ internal fun ScriptAnalysisSection(
     isWrittenScript: Boolean,
     scriptAnalysisGraphData: ScriptAnalysisGraphData,
     onReWriteScriptClick: () -> Unit,
+    onScriptAnalysisClick: () -> Unit,
 ) {
     ReportSection(
         title = {
@@ -46,7 +47,10 @@ internal fun ScriptAnalysisSection(
         },
     ) {
         if (isWrittenScript) {
-            ScriptAnalysisContent(scriptAnalysisGraphData = scriptAnalysisGraphData)
+            ScriptAnalysisContent(
+                scriptAnalysisGraphData = scriptAnalysisGraphData,
+                onClick = onScriptAnalysisClick,
+            )
             return@ReportSection
         }
 
@@ -101,14 +105,20 @@ private fun ScriptAnalysisSectionTitle(
 }
 
 @Composable
-private fun ScriptAnalysisContent(scriptAnalysisGraphData: ScriptAnalysisGraphData) {
+private fun ScriptAnalysisContent(
+    scriptAnalysisGraphData: ScriptAnalysisGraphData,
+    onClick: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
         verticalAlignment = Alignment.Bottom,
     ) {
         ScriptAnalysisGraph(graphData = scriptAnalysisGraphData.toStickGraphData())
-        TotalErrorCard(totalErrorCount = scriptAnalysisGraphData.totalErrorCount)
+        TotalErrorCard(
+            totalErrorCount = scriptAnalysisGraphData.totalErrorCount,
+            onClick = onClick,
+        )
     }
 }
 
@@ -123,12 +133,17 @@ private fun RowScope.ScriptAnalysisGraph(graphData: ImmutableMap<StickGraphItemT
 }
 
 @Composable
-private fun RowScope.TotalErrorCard(totalErrorCount: Int) {
-    Box(modifier = Modifier.weight(1f)) {
+private fun RowScope.TotalErrorCard(
+    totalErrorCount: Int,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(modifier = modifier.weight(1f)) {
         MetricResultCard(
             title = stringResource(R.string.feature_report_impl_label_total_errors),
             value = totalErrorCount.toString(),
             modifier = Modifier.fillMaxWidth(),
+            onClick = onClick,
         )
     }
 }
@@ -150,6 +165,7 @@ private fun ScriptAnalysisSectionPreview() {
             isWrittenScript = true,
             scriptAnalysisGraphData = ReportPreviewUpcomingUiState.scriptAnalysisGraphData,
             onReWriteScriptClick = {},
+            onScriptAnalysisClick = {},
         )
     }
 }
@@ -162,6 +178,7 @@ private fun EmptyScriptAnalysisSectionPreview() {
             isWrittenScript = false,
             scriptAnalysisGraphData = ReportPreviewUpcomingUiState.scriptAnalysisGraphData,
             onReWriteScriptClick = {},
+            onScriptAnalysisClick = {},
         )
     }
 }

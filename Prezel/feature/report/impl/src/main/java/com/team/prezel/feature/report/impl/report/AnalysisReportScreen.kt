@@ -34,7 +34,8 @@ internal fun AnalysisReportScreen(
     onBack: () -> Unit,
     navigateToAnalysisScript: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
-    navigateToSelfFeedbackWrite: (presentationId: Long) -> Unit,
+    navigateToScriptAnalysis: (analysisResultId: Long) -> Unit,
+    navigateToSelfFeedbackWrite: (presentationId: Long, title: String, isPast: Boolean) -> Unit,
     navigateToSpeechAccuracy: (analysisResultId: Long) -> Unit,
     navigateToScriptMatch: (analysisResultId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -43,6 +44,10 @@ internal fun AnalysisReportScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
+
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(AnalysisReportUiIntent.FetchData)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -57,7 +62,10 @@ internal fun AnalysisReportScreen(
 
                 is AnalysisReportUiEffect.NavigateToAnalysisScript -> navigateToAnalysisScript(effect.presentationId, effect.isPast)
                 is AnalysisReportUiEffect.NavigateToAnalysisRecording -> navigateToAnalysisRecording(effect.presentationId, effect.isPast)
-                is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> navigateToSelfFeedbackWrite(effect.presentationId)
+                is AnalysisReportUiEffect.NavigateToScriptAnalysis -> navigateToScriptAnalysis(effect.analysisResultId)
+                is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> {
+                    navigateToSelfFeedbackWrite(effect.presentationId, effect.title, effect.isPast)
+                }
                 is AnalysisReportUiEffect.NavigateToSpeechAccuracy -> navigateToSpeechAccuracy(effect.analysisResultId)
                 is AnalysisReportUiEffect.NavigateToScriptMatch -> navigateToScriptMatch(effect.analysisResultId)
             }
@@ -74,6 +82,7 @@ internal fun AnalysisReportScreen(
         onReWriteScriptClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReWriteScript) },
         onReRecordingClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReRecording) },
         onFeedBackWriteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickFeedbackWrite) },
+        onScriptAnalysisClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickScriptAnalysis) },
         onSpeechAccuracyClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickSpeechAccuracy) },
         onScriptMatchClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickScriptMatch) },
         modifier = modifier,
@@ -91,6 +100,7 @@ internal fun AnalysisReportScreen(
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
+    onScriptAnalysisClick: () -> Unit,
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -108,6 +118,7 @@ internal fun AnalysisReportScreen(
                 onReWriteScriptClick = onReWriteScriptClick,
                 onReRecordingClick = onReRecordingClick,
                 onFeedBackWriteClick = onFeedBackWriteClick,
+                onScriptAnalysisClick = onScriptAnalysisClick,
                 onSpeechAccuracyClick = onSpeechAccuracyClick,
                 onScriptMatchClick = onScriptMatchClick,
             )
@@ -128,6 +139,7 @@ private fun AnalysisReportScreenContent(
     onReWriteScriptClick: () -> Unit,
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
+    onScriptAnalysisClick: () -> Unit,
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
     modifier: Modifier,
@@ -167,6 +179,7 @@ private fun AnalysisReportScreenContent(
                 onFeedBackWriteClick = onFeedBackWriteClick,
                 onSpeechAccuracyClick = onSpeechAccuracyClick,
                 onScriptMatchClick = onScriptMatchClick,
+                onScriptAnalysisClick = onScriptAnalysisClick,
             )
         },
         modifier = modifier,
@@ -193,6 +206,7 @@ private fun UpcomingAnalysisReportScreenPreview() {
             onReWriteScriptClick = {},
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
+            onScriptAnalysisClick = {},
             onSpeechAccuracyClick = {},
             onScriptMatchClick = {},
         )
@@ -213,6 +227,7 @@ private fun PastAnalysisReportScreenPreview() {
             onReWriteScriptClick = { },
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
+            onScriptAnalysisClick = {},
             onSpeechAccuracyClick = {},
             onScriptMatchClick = {},
         )
@@ -233,6 +248,7 @@ private fun AnalysisReportScreenLoadingPreview() {
             onReWriteScriptClick = { },
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
+            onScriptAnalysisClick = {},
             onSpeechAccuracyClick = {},
             onScriptMatchClick = {},
         )

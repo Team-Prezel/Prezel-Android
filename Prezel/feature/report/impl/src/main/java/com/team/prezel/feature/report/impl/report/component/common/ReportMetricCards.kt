@@ -19,15 +19,16 @@ import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.util.noRippleClickable
 import kotlin.math.roundToInt
 
 @Composable
 internal fun MetricResultCard(
     title: String,
     value: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = false,
-    onClick: () -> Unit = {},
 ) {
     PrezelTouchArea(
         modifier = modifier
@@ -86,6 +87,7 @@ private fun MetricResultCardPreview() {
             title = "발화 정확도",
             value = "82%",
             modifier = Modifier.fillMaxWidth(),
+            onClick = {},
         )
     }
 }

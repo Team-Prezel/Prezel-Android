@@ -3,6 +3,7 @@ package com.team.prezel.feature.report.impl.report.component
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -127,7 +128,7 @@ private fun ReportDetailTopAppBar(
 
 @Composable
 private fun ReportDetailScrollContent(
-    scrollState: androidx.compose.foundation.ScrollState,
+    scrollState: ScrollState,
     onHeaderMeasured: (Float) -> Unit,
     headerContent: @Composable ColumnScope.(Modifier) -> Unit,
     bodyContent: @Composable ColumnScope.() -> Unit,
@@ -195,6 +196,7 @@ private fun ReportScreenLayoutPreview() {
                     onReWriteScriptClick = {},
                     onReRecordingClick = {},
                     onFeedBackWriteClick = {},
+                    onScriptAnalysisClick = {},
                     onSpeechAccuracyClick = {},
                     onScriptMatchClick = {},
                 )

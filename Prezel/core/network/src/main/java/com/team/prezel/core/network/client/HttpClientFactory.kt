@@ -27,6 +27,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -38,6 +39,7 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 @Singleton
 internal class HttpClientFactory @Inject constructor(
@@ -59,6 +61,7 @@ internal class HttpClientFactory @Inject constructor(
             installUserAgent()
             installLogging()
             installAuth()
+            installSse()
         },
     ): HttpClient = HttpClient(OkHttp) { block() }
 
@@ -110,6 +113,13 @@ internal class HttpClientFactory @Inject constructor(
                     request.attributes.getOrNull(AuthRequestAttributes.SkipAuthKey) != true
                 }
             }
+        }
+    }
+
+    internal fun HttpClientConfig<*>.installSse() {
+        install(SSE) {
+            maxReconnectionAttempts = 10
+            reconnectionTime = 5.seconds
         }
     }
 

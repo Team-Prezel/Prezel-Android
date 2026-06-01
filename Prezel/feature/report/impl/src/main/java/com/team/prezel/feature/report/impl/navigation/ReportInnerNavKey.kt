@@ -12,5 +12,7 @@ internal sealed interface ReportInnerNavKey : NavKey {
     data class AccuracyDetail(
         override val analysisResultId: Long,
         val initialTab: AccuracyDetailTab,
+    data class ScriptCorrection(
+        val analysisResultId: Long,
     ) : ReportInnerNavKey
 }

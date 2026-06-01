@@ -27,4 +27,8 @@ data class PresentationScriptAnalysisResponse(
     val correctedText: String,
     @SerialName("reason")
     val reason: String,
+    @SerialName("startIndex")
+    val startIndex: Int,
+    @SerialName("endIndex")
+    val endIndex: Int,
 )

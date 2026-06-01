@@ -13,6 +13,7 @@ import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
+import com.team.prezel.core.model.presentation.ScriptErrorType
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
@@ -48,7 +49,7 @@ internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary
         spellErrorCount = spellErrorCount,
         grammarErrorCount = grammarErrorCount,
         totalErrorCount = totalErrorCount,
-        growth = growthGraph.map { item -> item.toDomain() },
+        growth = growthGraph?.map { item -> item.toDomain() }.orEmpty(),
         expectedQuestions = expectedQuestions.map { item -> item.toDomain() },
         selfFeedback = reviewContent,
     )
@@ -68,19 +69,19 @@ private fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
 
 internal fun PresentationScriptDetailResponse.toDomain(): PresentationScriptDetail =
     PresentationScriptDetail(
-        presentationId = presentationId,
-        audioUrl = audioUrl,
         originalScript = originalScript,
         scriptCorrections = scriptDetails.map { item -> item.toDomain() },
     )
 
 internal fun PresentationScriptAnalysisResponse.toDomain(): ScriptCorrection =
     ScriptCorrection(
-        errorType = errorType,
+        errorType = ScriptErrorType.from(value = errorType),
         sentence = sentence,
         originalText = originalText,
         correctedText = correctedText,
         reason = reason,
+        startIndex = startIndex,
+        endIndex = endIndex,
     )
 
 internal fun PresentationWordDetailResponse.toDomain(): PresentationWordDetail =

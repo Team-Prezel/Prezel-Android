@@ -1,0 +1,11 @@
+package com.team.prezel.feature.badge.impl.model
+
+import androidx.compose.runtime.Immutable
+
+@Immutable
+internal data class BadgeUiModel(
+    val badgeCode: String,
+    val badgeName: String,
+    val imageUrl: String,
+    val isUnlocked: Boolean,
+)

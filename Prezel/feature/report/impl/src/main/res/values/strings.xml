@@ -41,6 +41,7 @@
     <string name="feature_report_impl_write_feedback">피드백 작성하기</string>
     <string name="feature_report_impl_empty_growth_graph">대본을 입력하고 실제 발화를 비교해\n발음과 대본 일치율을 분석해보세요.</string>
     <string name="feature_report_impl_empty_questions">대본을 입력하고 예상 질문을 받아보세요.</string>
+    <string name="feature_report_impl_empty_practice_history">연습 기록이 아직 없어요.</string>
 
     <!--  Dialog  -->
     <string name="feature_report_impl_dialog_cancel_action">취소</string>
@@ -57,6 +58,7 @@
     <string name="feature_report_impl_delete_report_dialog_description">삭제된 분석 리포트는 다시 복구하기 어렵습니다.</string>
     <string name="feature_report_impl_script_analysis_empty_state_message">대본을 입력하고\n맞춤법과 주술호응을 분석해보세요.</string>
     <string name="feature_report_impl_fetch_report_failed">리포트를 불러오지 못했습니다.</string>
+    <string name="feature_report_impl_fetch_script_detail_failed">대본 분석 결과를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_delete_report_failed">리포트를 삭제하지 못했습니다.</string>
     <string name="feature_report_impl_close">닫기</string>
     <string name="feature_report_impl_script_detail_load_failed">정확도 상세를 불러오지 못했습니다.</string>
@@ -68,4 +70,12 @@
     <string name="feature_report_impl_script_detail_status_insertion">불필요한 표현</string>
     <string name="feature_report_impl_script_detail_status_omission">누락</string>
     <string name="feature_report_impl_script_detail_status_mismatch">불일치</string>
+
+    <!-- Script Correction -->
+    <string name="feature_report_impl_script_spelling">맞춤법</string>
+    <string name="feature_report_impl_script_grammar">주술호응</string>
+    <string name="feature_report_impl_script_count">%1$d개</string>
+    <string name="feature_report_impl_script_copy_all">전체 복사</string>
+    <string name="feature_report_impl_script_apply_all">일괄 수정</string>
+    <string name="feature_report_impl_script_apply">수정</string>
 </resources>

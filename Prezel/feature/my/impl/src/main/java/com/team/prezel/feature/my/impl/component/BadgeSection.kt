@@ -22,10 +22,7 @@ import com.team.prezel.core.designsystem.component.list.PrezelListSize
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.badge.BadgeType
 import com.team.prezel.core.ui.component.PrezelBadge
-import com.team.prezel.core.ui.component.drawableResId
-import com.team.prezel.core.ui.component.title
 import com.team.prezel.feature.my.impl.model.BadgeUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -90,10 +87,10 @@ private fun BadgeList(
             horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             overscrollEffect = null,
         ) {
-            items(items = badges, key = { badge -> badge.type }) { badge ->
+            items(items = badges, key = { badge -> badge.code }) { badge ->
                 PrezelBadge(
-                    title = badge.type.title(),
-                    badgeResId = badge.type.drawableResId(),
+                    title = badge.title,
+                    url = badge.imageUrl,
                     isAchieved = badge.isAchieved,
                     modifier = Modifier.width(itemSize),
                 )
@@ -107,15 +104,13 @@ private fun BadgeList(
 private fun BadgeSectionPreview() {
     PrezelTheme {
         BadgeSection(
-            badges = listOf(
-                BadgeType.FIRST_PRESENTATION,
-                BadgeType.SECOND_ANALYSIS,
-                BadgeType.FIRST_PRACTICE,
-                BadgeType.RETROSPECT_COMPLETED,
-                BadgeType.PERFECT_SCORE,
-                BadgeType.TEN_ANALYSIS,
-            ).mapIndexed { index, type ->
-                BadgeUiModel(type = type, isAchieved = index % 2 == 0)
+            badges = List(6) { index ->
+                BadgeUiModel(
+                    code = index.toString(),
+                    title = index.toString(),
+                    imageUrl = "",
+                    isAchieved = index % 2 == 0,
+                )
             }.toImmutableList(),
             onClickBadge = {},
         )

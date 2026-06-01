@@ -38,6 +38,12 @@ jobs:
       - name: Create local.properties
         run: echo "${{ secrets.LOCAL_PROPERTIES_CONTENTS }}" > ./local.properties
 
+      - name: Create google-services.json
+        run: |
+          cat <<'EOF' > ./app/google-services.json
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+
       - name: Run Ktlint
         run: ./gradlew ktlintCheck --build-cache --parallel
 

@@ -6,4 +6,7 @@
     <string name="bottom_nav_profile">프로필</string>
 
     <string name="double_back_to_exit_snackbar_message">한 번 더 누르면 앱을 종료합니다.</string>
+    <string name="app_badge_event_message">새 배지를 획득했어요.</string>
+    <string name="app_badge_event_message_with_name">%1$s 배지를 획득했어요.</string>
+    <string name="app_badge_event_action">보러가기</string>
 </resources>

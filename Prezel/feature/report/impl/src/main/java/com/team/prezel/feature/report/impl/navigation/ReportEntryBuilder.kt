@@ -5,7 +5,12 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
+import com.team.prezel.feature.feedback.api.FeedbackNavKey
 import com.team.prezel.feature.report.api.ReportNavKey
+import com.team.prezel.feature.report.impl.report.AnalysisReportScreen
+import com.team.prezel.feature.report.impl.report.AnalysisReportViewModel
+import com.team.prezel.feature.report.impl.script.ScriptScreen
+import com.team.prezel.feature.report.impl.script.ScriptViewModel
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailScreen
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailTab
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailViewModel
@@ -44,7 +49,6 @@ private fun EntryProviderScope<NavKey>.reportEntry() {
                     ),
                 )
             },
-            navigateToSelfFeedbackWrite = {},
             navigateToSpeechAccuracy = { analysisResultId ->
                 navigator.navigate(
                     ReportInnerNavKey.AccuracyDetail(
@@ -61,8 +65,30 @@ private fun EntryProviderScope<NavKey>.reportEntry() {
                     ),
                 )
             },
+            navigateToSelfFeedbackWrite = { presentationId, title, isPast ->
+                navigator.navigate(
+                    FeedbackNavKey(
+                        presentationId = presentationId,
+                        title = title,
+                        isPast = isPast,
+                    ),
+                )
+            },
+            navigateToScriptAnalysis = { analysisResultId ->
+                navigator.navigate(ReportInnerNavKey.ScriptCorrection(analysisResultId = analysisResultId))
+            },
             viewModel = hiltViewModel<AnalysisReportViewModel, AnalysisReportViewModel.Factory>(
                 creationCallback = { factory -> factory.create(key) },
+            ),
+        )
+    }
+    entry<ReportInnerNavKey.ScriptCorrection> { key ->
+        val navigator = LocalNavigator.current
+
+        ScriptScreen(
+            onClose = { navigator.goBack() },
+            viewModel = hiltViewModel<ScriptViewModel, ScriptViewModel.Factory>(
+                creationCallback = { factory -> factory.create(analysisResultId = key.analysisResultId) },
             ),
         )
     }

@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.common.event.GlobalEventBus
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.domain.usecase.badge.ConnectBadgeEventStreamUseCase
 import com.team.prezel.ui.PrezelApp
 import com.team.prezel.ui.rememberPrezelAppState
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +25,9 @@ class MainActivity : ComponentActivity() {
     lateinit var globalEventBus: GlobalEventBus
 
     @Inject
+    lateinit var connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase
+
+    @Inject
     lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +41,7 @@ class MainActivity : ComponentActivity() {
                 PrezelApp(
                     appState = appState,
                     globalEventBus = globalEventBus,
+                    connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
                     entryBuilders = entryBuilders.toImmutableSet(),
                 )
             }
