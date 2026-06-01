@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +19,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelAsyncImage
-import com.team.prezel.core.designsystem.component.image.PrezelImage
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -27,9 +27,14 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 internal fun BadgeDetailImage(
     imageUrl: String,
     isUnlocked: Boolean,
+    onError: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isError by remember(imageUrl) { mutableStateOf(false) }
+    var hasReportedError by remember(imageUrl) { mutableStateOf(false) }
+
+    LaunchedEffect(imageUrl) {
+        hasReportedError = false
+    }
 
     Box(
         modifier = modifier
@@ -41,18 +46,13 @@ internal fun BadgeDetailImage(
             contentDescription = "",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            onError = { isError = true },
-            onSuccess = { isError = false },
+            onError = {
+                if (!hasReportedError) {
+                    hasReportedError = true
+                    onError()
+                }
+            },
         )
-
-        if (isError) {
-            PrezelImage(
-                resId = PrezelIcons.WarningCircleOutlined,
-                contentDescription = "",
-                modifier = Modifier.fillMaxSize(),
-            )
-            return@Box
-        }
 
         if (!isUnlocked) {
             Box(
@@ -79,6 +79,7 @@ private fun BadgeDetailImagePreview() {
         BadgeDetailImage(
             imageUrl = "",
             isUnlocked = false,
+            onError = {},
         )
     }
 }

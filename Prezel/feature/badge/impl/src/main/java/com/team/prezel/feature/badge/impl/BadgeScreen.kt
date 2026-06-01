@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -22,6 +23,7 @@ import com.team.prezel.feature.badge.impl.contract.BadgeUiEffect
 import com.team.prezel.feature.badge.impl.contract.BadgeUiIntent
 import com.team.prezel.feature.badge.impl.contract.BadgeUiState
 import com.team.prezel.feature.badge.impl.model.BadgeUiMessage
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun BadgeScreen(
@@ -31,8 +33,10 @@ internal fun BadgeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
     val fetchDataFailedMessage = stringResource(R.string.feature_badge_impl_message_fetch_badges_failed)
     val fetchBadgeDetailFailedMessage = stringResource(R.string.feature_badge_impl_message_fetch_badge_detail_failed)
+    val badgeImageLoadFailedMessage = stringResource(R.string.feature_badge_impl_message_badge_image_load_failed)
 
     LaunchedEffect(viewModel, fetchDataFailedMessage, fetchBadgeDetailFailedMessage) {
         viewModel.uiEffect.collect { effect ->
@@ -53,6 +57,11 @@ internal fun BadgeScreen(
         onBack = onBack,
         onBadgeClick = { badgeCode -> viewModel.onIntent(BadgeUiIntent.ClickBadge(badgeCode = badgeCode)) },
         onDismissBadgeDetail = { viewModel.onIntent(BadgeUiIntent.DismissBadgeDetail) },
+        onBadgeImageLoadFailure = {
+            coroutineScope.launch {
+                snackbarHostState.showPrezelSnackbar(message = badgeImageLoadFailedMessage)
+            }
+        },
         modifier = modifier,
     )
 }
@@ -63,6 +72,7 @@ internal fun BadgeScreenScreen(
     onBack: () -> Unit,
     onBadgeClick: (badgeCode: String) -> Unit,
     onDismissBadgeDetail: () -> Unit,
+    onBadgeImageLoadFailure: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -81,6 +91,7 @@ internal fun BadgeScreenScreen(
                 badge = badge,
                 badgeDetail = uiState.selectedBadgeDetail,
                 onDismiss = onDismissBadgeDetail,
+                onImageLoadFailure = onBadgeImageLoadFailure,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -96,6 +107,7 @@ private fun BadgeScreenPreview() {
             onBack = {},
             onBadgeClick = {},
             onDismissBadgeDetail = {},
+            onBadgeImageLoadFailure = {},
         )
     }
 }

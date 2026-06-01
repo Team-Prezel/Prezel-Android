@@ -38,6 +38,7 @@ internal fun BadgeDetailModal(
     badge: BadgeUiModel,
     badgeDetail: BadgeDetailUiModel?,
     onDismiss: () -> Unit,
+    onImageLoadFailure: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onDismiss)
@@ -67,7 +68,11 @@ internal fun BadgeDetailModal(
                 .weight(376f),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            BadgeHeader(badge = badge, badgeDetail = badgeDetail)
+            BadgeHeader(
+                badge = badge,
+                badgeDetail = badgeDetail,
+                onImageLoadFailure = onImageLoadFailure,
+            )
 
             badgeDetail?.let { detail ->
                 Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
@@ -86,6 +91,7 @@ internal fun BadgeDetailModal(
 private fun BadgeHeader(
     badge: BadgeUiModel,
     badgeDetail: BadgeDetailUiModel?,
+    onImageLoadFailure: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(0.65f),
@@ -95,6 +101,7 @@ private fun BadgeHeader(
         BadgeDetailImage(
             imageUrl = badge.imageUrl,
             isUnlocked = badge.isUnlocked,
+            onError = onImageLoadFailure,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -110,18 +117,18 @@ private fun BadgeHeader(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
         badgeDetail?.let { detail ->
-            BadgeDetailChip(detail = detail)
+            BadgeDetailChip(badgeCondition = detail.conditionText)
         }
     }
 }
 
 @Composable
 private fun BadgeDetailChip(
-    detail: BadgeDetailUiModel,
+    badgeCondition: String,
     modifier: Modifier = Modifier,
 ) {
     PrezelChip(
-        text = detail.badgeName,
+        text = badgeCondition,
         size = ChipSize.SMALL,
         hierarchy = ChipHierarchy.PRIMARY,
         state = ChipState.ACTIVE,
@@ -151,6 +158,7 @@ private fun BadgeDetailModalPreview() {
             badge = badgePreviewBadges().first(),
             badgeDetail = badgePreviewDetail(),
             onDismiss = {},
+            onImageLoadFailure = {},
             modifier = Modifier.fillMaxSize(),
         )
     }

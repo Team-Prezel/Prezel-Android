@@ -7,4 +7,5 @@
     <!-- Message -->
     <string name="feature_badge_impl_message_fetch_badges_failed">뱃지 목록을 불러오지 못했어요.</string>
     <string name="feature_badge_impl_message_fetch_badge_detail_failed">뱃지 상세 정보를 불러오지 못했어요.</string>
+    <string name="feature_badge_impl_message_badge_image_load_failed">뱃지 이미지를 불러오지 못했어요.</string>
 </resources>
