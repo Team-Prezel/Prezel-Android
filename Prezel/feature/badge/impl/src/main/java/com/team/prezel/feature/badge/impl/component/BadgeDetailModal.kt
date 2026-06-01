@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
@@ -27,6 +28,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
+import com.team.prezel.feature.badge.impl.R
 import com.team.prezel.feature.badge.impl.model.BadgeDetailUiModel
 import com.team.prezel.feature.badge.impl.model.BadgeUiModel
 
@@ -51,7 +53,7 @@ internal fun BadgeDetailModal(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         painter = painterResource(PrezelIcons.Cancel),
-                        contentDescription = "닫기",
+                        contentDescription = stringResource(R.string.feature_badge_impl_close),
                     )
                 }
             },

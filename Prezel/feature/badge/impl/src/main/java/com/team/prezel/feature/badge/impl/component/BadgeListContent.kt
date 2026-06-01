@@ -17,11 +17,13 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.PrezelBadge
+import com.team.prezel.feature.badge.impl.R
 import com.team.prezel.feature.badge.impl.model.BadgeUiModel
 import kotlinx.collections.immutable.ImmutableList
 
@@ -35,12 +37,12 @@ internal fun BadgeListContent(
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(
-            title = { Text(text = "나의 뱃지") },
+            title = { Text(text = stringResource(R.string.feature_badge_impl_title)) },
             leadingIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
                         painter = painterResource(PrezelIcons.ChevronLeft),
-                        contentDescription = "뒤로가기",
+                        contentDescription = stringResource(R.string.feature_badge_impl_back),
                     )
                 }
             },

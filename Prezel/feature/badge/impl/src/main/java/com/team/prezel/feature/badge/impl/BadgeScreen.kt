@@ -7,12 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.feature.badge.impl.R
 import com.team.prezel.feature.badge.impl.component.BadgeDetailModal
 import com.team.prezel.feature.badge.impl.component.BadgeListContent
 import com.team.prezel.feature.badge.impl.component.badgeScreenPreviewState
@@ -29,14 +31,16 @@ internal fun BadgeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val fetchDataFailedMessage = stringResource(R.string.feature_badge_impl_message_fetch_badges_failed)
+    val fetchBadgeDetailFailedMessage = stringResource(R.string.feature_badge_impl_message_fetch_badge_detail_failed)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel, fetchDataFailedMessage, fetchBadgeDetailFailedMessage) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is BadgeUiEffect.ShowMessage -> {
                     val message = when (effect.message) {
-                        BadgeUiMessage.FETCH_DATA_FAILED -> "뱃지 목록을 불러오지 못했어요."
-                        BadgeUiMessage.FETCH_BADGE_DETAIL_FAILED -> "뱃지 상세 정보를 불러오지 못했어요."
+                        BadgeUiMessage.FETCH_DATA_FAILED -> fetchDataFailedMessage
+                        BadgeUiMessage.FETCH_BADGE_DETAIL_FAILED -> fetchBadgeDetailFailedMessage
                     }
                     snackbarHostState.showPrezelSnackbar(message = message)
                 }
