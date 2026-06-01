@@ -121,6 +121,6 @@ private fun Throwable.toFeedbackUiMessage(): FeedbackUiMessage {
         AppError.NETWORK,
         AppError.UNKNOWN,
         null,
-            -> FeedbackUiMessage.SAVE_FAILED
+        -> FeedbackUiMessage.SAVE_FAILED
     }
 }
