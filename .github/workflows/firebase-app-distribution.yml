@@ -59,7 +59,7 @@ jobs:
           echo "DISTRIBUTION_TAG=$DISTRIBUTION_TAG" >> "$GITHUB_ENV"
           echo "ANDROID_VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           echo "ANDROID_VERSION_NAME=${DISTRIBUTION_TAG#v}" >> "$GITHUB_ENV"
-          echo "APP_APPLICATION_ID=com.team.prezel.internal" >> "$GITHUB_ENV"
+          echo "APP_APPLICATION_ID=com.team.prezel.dev" >> "$GITHUB_ENV"
           echo "APP_NAME=Prezel (Internal)" >> "$GITHUB_ENV"
 
       - name: Build Release APK
