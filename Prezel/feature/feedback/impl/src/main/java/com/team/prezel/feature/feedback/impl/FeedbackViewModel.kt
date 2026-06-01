@@ -91,6 +91,7 @@ internal class FeedbackViewModel @AssistedInject constructor(
                 presentationId = navKey.presentationId,
                 content = content,
             ).onSuccess {
+                updateState { copy(isSaving = false) }
                 sendEffect(FeedbackUiEffect.SaveComplete)
             }.onFailure { throwable ->
                 updateState { copy(isSaving = false) }
@@ -120,6 +121,6 @@ private fun Throwable.toFeedbackUiMessage(): FeedbackUiMessage {
         AppError.NETWORK,
         AppError.UNKNOWN,
         null,
-        -> FeedbackUiMessage.SAVE_FAILED
+            -> FeedbackUiMessage.SAVE_FAILED
     }
 }
