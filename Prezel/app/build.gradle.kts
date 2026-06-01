@@ -87,6 +87,8 @@ dependencies {
     implementation(projects.featureHistoryImpl)
     implementation(projects.featureMyApi)
     implementation(projects.featureMyImpl)
+    implementation(projects.featureFeedbackApi)
+    implementation(projects.featureFeedbackImpl)
 
     implementation(projects.featureTermsImpl)
     implementation(projects.featurePracticeImpl)

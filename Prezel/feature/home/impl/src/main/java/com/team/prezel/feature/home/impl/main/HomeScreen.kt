@@ -34,6 +34,8 @@ internal fun HomeScreen(
     navigateToPracticeRecording: (presentationId: Long) -> Unit,
     navigateToFileUploadAnalysis: () -> Unit,
     navigateToVoiceRecordingAnalysis: () -> Unit,
+    navigateToAnalyzePresentation: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToFeedback: (presentationId: Long, title: String, isPast: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -62,8 +64,16 @@ internal fun HomeScreen(
         pagerState = pagerState,
         onClickAddPresentation = navigateToVoiceRecordingAnalysis,
         onClickPracticeRecording = { presentationId -> navigateToPracticeRecording(presentationId) },
-        onClickAnalyzePresentation = { },
-        onClickWriteFeedback = { },
+        onClickAnalyzePresentation = { presentation ->
+            navigateToAnalyzePresentation(presentation.id, presentation.isPastPresentation)
+        },
+        onClickWriteFeedback = { presentation ->
+            navigateToFeedback(
+                presentation.id,
+                presentation.title,
+                presentation.isPastPresentation,
+            )
+        },
         onClickVoiceRecordingAnalysis = navigateToVoiceRecordingAnalysis,
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
         onClickCardGraphItemIndex = { presentationId, index ->

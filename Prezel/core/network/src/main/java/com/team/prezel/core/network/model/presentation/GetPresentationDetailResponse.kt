@@ -7,4 +7,6 @@ import kotlinx.serialization.Serializable
 data class GetPresentationDetailResponse(
     @SerialName("analysisResult")
     val analysisResult: PresentationSummaryResponse,
+    @SerialName("reviewContent")
+    val reviewContent: String? = null,
 )

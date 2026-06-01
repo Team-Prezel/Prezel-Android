@@ -1,0 +1,16 @@
+<resources>
+    <string name="feature_feedback_impl_top_app_bar_title">셀프 피드백</string>
+    <string name="feature_feedback_impl_close">닫기</string>
+    <string name="feature_feedback_impl_question">\'%1$s\'는 어떠셨나요?</string>
+    <string name="feature_feedback_impl_placeholder">다음 발표에는 어떤 부분을 신경쓰고 싶나요?</string>
+    <string name="feature_feedback_impl_save">저장하기</string>
+    <string name="feature_feedback_impl_fetch_feedback_failed">셀프 피드백을 불러오지 못했어요.</string>
+    <string name="feature_feedback_impl_presentation_forbidden">해당 데이터에 접근할 권한이 없습니다.</string>
+    <string name="feature_feedback_impl_presentation_not_found">존재하지 않는 발표입니다.</string>
+    <string name="feature_feedback_impl_self_feedback_already_written">이미 회고를 작성한 발표입니다.</string>
+    <string name="feature_feedback_impl_save_failed">셀프 피드백 저장에 실패했어요.</string>
+    <string name="feature_feedback_impl_exit_dialog_title">저장하지 않고 나가시겠어요?</string>
+    <string name="feature_feedback_impl_exit_dialog_description">작성된 셀프 피드백이 모두 삭제됩니다.</string>
+    <string name="feature_feedback_impl_exit_dialog_cancel">닫기</string>
+    <string name="feature_feedback_impl_exit_dialog_confirm">나가기</string>
+</resources>
