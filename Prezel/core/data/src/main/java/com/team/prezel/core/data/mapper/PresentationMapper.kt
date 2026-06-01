@@ -79,6 +79,8 @@ internal fun PresentationScriptAnalysisResponse.toDomain(): ScriptCorrection =
         originalText = originalText,
         correctedText = correctedText,
         reason = reason,
+        startIndex = startIndex,
+        endIndex = endIndex,
     )
 
 internal fun PresentationWordDetailResponse.toDomain(): PresentationWordDetail =

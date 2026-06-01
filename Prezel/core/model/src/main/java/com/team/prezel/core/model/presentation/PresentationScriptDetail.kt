@@ -11,6 +11,8 @@ data class ScriptCorrection(
     val originalText: String,
     val correctedText: String,
     val reason: String,
+    val startIndex: Int,
+    val endIndex: Int,
 )
 
 enum class ScriptErrorType(

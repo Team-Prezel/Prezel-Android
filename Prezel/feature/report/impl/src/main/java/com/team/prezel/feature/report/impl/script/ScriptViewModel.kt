@@ -3,6 +3,7 @@ package com.team.prezel.feature.report.impl.script
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationScriptDetailUseCase
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
+import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.report.impl.script.contract.ScriptUiEffect
 import com.team.prezel.feature.report.impl.script.contract.ScriptUiIntent
@@ -141,35 +142,6 @@ internal class ScriptViewModel @AssistedInject constructor(
         }
     }
 
-    private fun PresentationScriptDetail.toCorrectionUiModels(): ImmutableList<ScriptCorrectionUiModel> {
-        return scriptCorrections
-            .mapIndexedNotNull { index, correction ->
-                val sentenceStartIndex = originalScript.indexOf(correction.sentence)
-
-                if (sentenceStartIndex == -1) return@mapIndexedNotNull null
-
-                val sentenceEndIndex = sentenceStartIndex + correction.sentence.length
-
-                val correctionStartIndex = originalScript.indexOf(
-                    string = correction.originalText,
-                    startIndex = sentenceStartIndex,
-                )
-
-                if (correctionStartIndex == -1) return@mapIndexedNotNull null
-                if (correctionStartIndex >= sentenceEndIndex) return@mapIndexedNotNull null
-
-                ScriptCorrectionUiModel(
-                    id = index.toLong(),
-                    errorType = correction.errorType,
-                    sentence = correction.sentence,
-                    originalText = correction.originalText,
-                    correctedText = correction.correctedText,
-                    reason = correction.reason,
-                    originalRange = correctionStartIndex until correctionStartIndex + correction.originalText.length,
-                )
-            }.toImmutableList()
-    }
-
     private fun rebuildScript(
         originalScript: String,
         corrections: List<ScriptCorrectionUiModel>,
@@ -196,4 +168,35 @@ internal class ScriptViewModel @AssistedInject constructor(
 
         return builder.toString()
     }
+}
+
+internal fun PresentationScriptDetail.toCorrectionUiModels(): ImmutableList<ScriptCorrectionUiModel> {
+    return scriptCorrections
+        .mapIndexedNotNull { index, correction ->
+            val originalRange = correction.resolveOriginalRangeIn(originalScript) ?: return@mapIndexedNotNull null
+
+            ScriptCorrectionUiModel(
+                id = index.toLong(),
+                errorType = correction.errorType,
+                sentence = correction.sentence,
+                originalText = correction.originalText,
+                correctedText = correction.correctedText,
+                reason = correction.reason,
+                originalRange = originalRange,
+            )
+        }.toImmutableList()
+}
+
+private fun ScriptCorrection.resolveOriginalRangeIn(script: String): IntRange? {
+    if (startIndex !in 0..endIndex) return null
+
+    if (endIndex <= script.length && script.substring(startIndex, endIndex) == originalText) {
+        return startIndex until endIndex
+    }
+
+    if (endIndex < script.length && script.substring(startIndex, endIndex + 1) == originalText) {
+        return startIndex..endIndex
+    }
+
+    return null
 }
