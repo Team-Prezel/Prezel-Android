@@ -29,6 +29,7 @@ kotlinxSerialization = "1.9.0"
 kakao = "2.23.2"
 lottie = "6.6.7"
 balloonCompose = "1.7.6"
+googleGmsGoogleServices = "4.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -113,6 +114,7 @@ prezel-android-feature-impl = { id = "prezel.android.feature.impl" }
 prezel-android-feature-api = { id = "prezel.android.feature.api" }
 prezel-hilt = { id = "prezel.hilt" }
 prezel-jvm-library = { id = "prezel.jvm.library" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 
 [bundles]
 android-compose = [
