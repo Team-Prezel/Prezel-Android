@@ -189,9 +189,9 @@ private fun HomeMultipleContent(
         modifier = Modifier.fillMaxSize(),
         overscrollEffect = null,
         userScrollEnabled = false,
-        key = { pageIndex -> uiState.presentations[pageIndex].id },
+        key = { pageIndex -> uiState.presentations.getOrNull(pageIndex)?.id ?: pageIndex },
     ) { pageIndex ->
-        val presentation = uiState.presentations[pageIndex]
+        val presentation = uiState.presentations.getOrNull(pageIndex) ?: return@HorizontalPager
 
         HomePresentationContent(
             presentation = presentation,

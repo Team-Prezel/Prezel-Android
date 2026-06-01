@@ -58,6 +58,8 @@ includeAuto(
     ":feature:analysis:impl",
     ":feature:history:api",
     ":feature:history:impl",
+    ":feature:feedback:api",
+    ":feature:feedback:impl",
     ":feature:my:api",
     ":feature:my:impl",
     ":feature:setting:api",

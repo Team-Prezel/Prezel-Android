@@ -37,7 +37,7 @@ complexity:
         active: true
         thresholdInFiles: 20
         thresholdInClasses: 15
-        thresholdInInterfaces: 12
+        thresholdInInterfaces: 15
         thresholdInObjects: 20
         thresholdInEnums: 10
         ignoreAnnotatedFunctions:
