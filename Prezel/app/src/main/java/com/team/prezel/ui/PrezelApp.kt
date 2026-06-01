@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -266,6 +267,7 @@ private fun ObserveBadgeEvents(
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
+    val currentShouldShowNavigationBar by rememberUpdatedState(shouldShowNavigationBar)
 
     LaunchedEffect(isAuthenticated) {
         if (!isAuthenticated) return@LaunchedEffect
@@ -287,7 +289,7 @@ private fun ObserveBadgeEvents(
                     message = message,
                     actionLabel = resources.getString(R.string.app_badge_event_action),
                     onAction = navigateToBadge,
-                    useRaisedPosition = shouldShowNavigationBar,
+                    useRaisedPosition = currentShouldShowNavigationBar,
                 )
             }
     }
