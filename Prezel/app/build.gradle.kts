@@ -15,11 +15,20 @@ val androidVersionNameProvider = providers
     .gradleProperty("ANDROID_VERSION_NAME")
     .orElse(providers.environmentVariable("ANDROID_VERSION_NAME"))
     .orElse("0.1.0")
+val appApplicationIdProvider = providers
+    .gradleProperty("APP_APPLICATION_ID")
+    .orElse(providers.environmentVariable("APP_APPLICATION_ID"))
+    .orElse("com.team.prezel")
+val appNameProvider = providers
+    .gradleProperty("APP_NAME")
+    .orElse(providers.environmentVariable("APP_NAME"))
+    .orElse("Prezel")
 
 android {
     namespace = "com.team.prezel"
 
     defaultConfig {
+        applicationId = appApplicationIdProvider.get()
         versionCode = androidVersionCodeProvider.get().toInt()
         versionName = androidVersionNameProvider.get()
     }
@@ -45,6 +54,7 @@ android {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
+            resValue("string", "app_name", appNameProvider.get())
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

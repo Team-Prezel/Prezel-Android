@@ -51,7 +51,7 @@ jobs:
 
       - name: Create Android release keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./app/keystore.jks
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./keystore.jks
 
       - name: Prepare version metadata
         run: |
@@ -59,6 +59,8 @@ jobs:
           echo "DISTRIBUTION_TAG=$DISTRIBUTION_TAG" >> "$GITHUB_ENV"
           echo "ANDROID_VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           echo "ANDROID_VERSION_NAME=${DISTRIBUTION_TAG#v}" >> "$GITHUB_ENV"
+          echo "APP_APPLICATION_ID=com.team.prezel.internal" >> "$GITHUB_ENV"
+          echo "APP_NAME=Prezel (Internal)" >> "$GITHUB_ENV"
 
       - name: Build Release APK
         run: ./gradlew assembleRelease --build-cache --parallel
