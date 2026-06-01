@@ -1,11 +1,48 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.prezel.android.application.compose)
     alias(libs.plugins.prezel.hilt)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
+
+val androidVersionCodeProvider = providers
+    .gradleProperty("ANDROID_VERSION_CODE")
+    .orElse(providers.environmentVariable("ANDROID_VERSION_CODE"))
+    .orElse("1")
+val androidVersionNameProvider = providers
+    .gradleProperty("ANDROID_VERSION_NAME")
+    .orElse(providers.environmentVariable("ANDROID_VERSION_NAME"))
+    .orElse("0.1.0")
+val appApplicationIdProvider = providers
+    .gradleProperty("APP_APPLICATION_ID")
+    .orElse(providers.environmentVariable("APP_APPLICATION_ID"))
+    .orElse("com.team.prezel")
+val appNameProvider = providers
+    .gradleProperty("APP_NAME")
+    .orElse(providers.environmentVariable("APP_NAME"))
+    .orElse("Prezel")
 
 android {
     namespace = "com.team.prezel"
+
+    defaultConfig {
+        applicationId = appApplicationIdProvider.get()
+        versionCode = androidVersionCodeProvider.get().toInt()
+        versionName = androidVersionNameProvider.get()
+    }
+
+    signingConfigs {
+        create("release") {
+            val localProperties = gradleLocalProperties(rootDir, providers)
+
+            storeFile = rootProject.file(localProperties.getProperty("signed.store.file"))
+            storePassword = localProperties.getProperty("signed.store.password")
+            keyAlias = localProperties.getProperty("signed.key.alias")
+            keyPassword = localProperties.getProperty("signed.key.password")
+        }
+    }
 
     buildTypes {
         debug {
@@ -15,8 +52,10 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            resValue("string", "app_name", appNameProvider.get())
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -51,6 +90,8 @@ dependencies {
     implementation(projects.featureMyImpl)
     implementation(projects.featureBadgeApi)
     implementation(projects.featureBadgeImpl)
+    implementation(projects.featureFeedbackApi)
+    implementation(projects.featureFeedbackImpl)
 
     implementation(projects.featureTermsImpl)
     implementation(projects.featurePracticeImpl)

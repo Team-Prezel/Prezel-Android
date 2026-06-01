@@ -125,4 +125,15 @@ internal class PresentationRepositoryImpl @Inject constructor(
         }.mapCatching { response ->
             response.map(GetMainDataResponse::toDomain)
         }.mapDomainFailure()
+
+    override suspend fun writeSelfFeedback(
+        presentationId: Long,
+        content: String,
+    ): Result<Unit> =
+        runCatching {
+            presentationRemoteDataSource.writeSelfFeedback(
+                presentationId = presentationId,
+                content = content,
+            )
+        }.mapDomainFailure()
 }

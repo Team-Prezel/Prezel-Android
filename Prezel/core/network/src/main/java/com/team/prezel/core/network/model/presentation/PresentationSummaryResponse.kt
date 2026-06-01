@@ -42,7 +42,7 @@ data class PresentationSummaryResponse(
     @SerialName("totalErrorCount")
     val totalErrorCount: Int,
     @SerialName("growthGraph")
-    val growthGraph: List<PresentationGrowthResponse>,
+    val growthGraph: List<PresentationGrowthResponse>? = null,
     @SerialName("expectedQuestions")
     val expectedQuestions: List<PresentationExpectedQuestionResponse>,
     @SerialName("reviewContent")
