@@ -37,25 +37,23 @@ import com.team.prezel.core.designsystem.component.player.rememberPrezelPlayerSt
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.model.presentation.PresentationWordDetail
-import com.team.prezel.core.model.presentation.WordAnalysisDetail
+import com.team.prezel.core.model.presentation.SentenceAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailPlayerSheet
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailTopAppBar
 import com.team.prezel.feature.report.impl.accuracydetail.component.ScriptDetailList
-import com.team.prezel.feature.report.impl.accuracydetail.component.isScriptMatchIssue
-import com.team.prezel.feature.report.impl.accuracydetail.component.isSpeechAccuracySheetIssue
 import com.team.prezel.feature.report.impl.accuracydetail.component.toMarkerType
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiEffect
 import com.team.prezel.feature.report.impl.accuracydetail.contract.AccuracyDetailUiState
+import com.team.prezel.feature.report.impl.accuracydetail.model.SentenceAnalysisUiModel
+import com.team.prezel.feature.report.impl.accuracydetail.model.toUiModels
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
-
-private const val PLAYER_TICK_MILLIS = 250L
-private val AccuracyDetailSheetPeekHeight = 276.dp
 
 @Serializable
 internal enum class AccuracyDetailTab {
@@ -131,17 +129,25 @@ private fun AccuracyDetailScreenContent(
     ).toImmutableList()
     val pagerState = rememberPagerState(initialPage = initialTab.ordinal) { tabs.size }
     val selectedTab = tabs[pagerState.currentPage]
-    val wordDetails = uiState.wordDetail.wordDetails
-    val playerMarkerWordDetails = remember(selectedTab, wordDetails) {
-        wordDetails.playerMarkerDetailsFor(selectedTab)
+    val sentenceDetails = remember(uiState.wordDetail.sentenceDetails) {
+        uiState.wordDetail.sentenceDetails.toUiModels()
+    }
+    val playerMarkerSentenceDetails = remember(selectedTab, sentenceDetails) {
+        when (selectedTab) {
+            AccuracyDetailTab.SPEECH -> sentenceDetails.filter { detail -> detail.isSpeechAccuracyIssue }
+            AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.filter { detail -> detail.isScriptMatchIssue }
+        }.toImmutableList()
     }
     val playerState = rememberDetailPlayerState(
-        wordDetails = wordDetails,
-        markerWordDetails = playerMarkerWordDetails,
+        selectedTab = selectedTab,
+        sentenceDetails = sentenceDetails,
+        markerSentenceDetails = playerMarkerSentenceDetails,
     )
     val playbackState = rememberRemoteAudioPlaybackState(audioUrl = uiState.wordDetail.audioUrl)
-    val selectedWord = remember(wordDetails, playerState.currentMillis) {
-        wordDetails.currentDetailOrNull(currentMillis = playerState.currentMillis)
+    val selectedSentence = remember(sentenceDetails, playerState.currentMillis) {
+        sentenceDetails.firstOrNull { detail ->
+            playerState.currentMillis in detail.startTimeMs..detail.endTimeMs
+        }
     }
     val scaffoldState = rememberDetailScaffoldState(expandedSheet = expandedSheet)
     val isSheetExpanded = scaffoldState.isSheetExpanded
@@ -154,8 +160,8 @@ private fun AccuracyDetailScreenContent(
     AccuracyDetailScaffold(
         scaffoldState = scaffoldState,
         selectedTab = selectedTab,
-        selectedWord = selectedWord,
-        wordDetails = wordDetails,
+        selectedSentence = selectedSentence,
+        sentenceDetails = sentenceDetails,
         playerState = playerState,
         expanded = isSheetExpanded,
         onClose = onClose,
@@ -176,18 +182,22 @@ private fun rememberAccuracyDetailTabs(): List<AccuracyDetailTab> =
 
 @Composable
 private fun rememberDetailPlayerState(
-    wordDetails: List<WordAnalysisDetail>,
-    markerWordDetails: List<WordAnalysisDetail>,
+    selectedTab: AccuracyDetailTab,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
+    markerSentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
 ) = rememberPrezelPlayerState(
-    durationMillis = remember(wordDetails) {
-        wordDetails.maxOfOrNull { it.endTimeMs }?.coerceAtLeast(1L) ?: 1L
+    durationMillis = remember(sentenceDetails) {
+        sentenceDetails.maxOfOrNull { it.endTimeMs }?.coerceAtLeast(1L) ?: 1L
     },
-    initialItems = remember(markerWordDetails) {
-        markerWordDetails
+    initialItems = remember(markerSentenceDetails) {
+        markerSentenceDetails
             .map { detail ->
                 PrezelPlayerItem.Marker(
                     timeMillis = detail.startTimeMs,
-                    markerType = detail.toMarkerType(),
+                    markerType = when (selectedTab) {
+                        AccuracyDetailTab.SPEECH -> detail.speechAccuracyStatus.toMarkerType()
+                        AccuracyDetailTab.SCRIPT_MATCH -> detail.scriptMatchStatus.toMarkerType()
+                    },
                 )
             }.toImmutableList()
     },
@@ -226,7 +236,7 @@ private fun PlaybackEffect(
 
     LaunchedEffect(playerState.playing) {
         while (playerState.playing) {
-            delay(PLAYER_TICK_MILLIS)
+            delay(250L)
             playbackState.currentPositionMillis
                 .takeIf { it > 0 }
                 ?.let { playerState.updateCurrentMillis(it.toLong()) }
@@ -239,8 +249,8 @@ private fun PlaybackEffect(
 private fun AccuracyDetailScaffold(
     scaffoldState: BottomSheetScaffoldState,
     selectedTab: AccuracyDetailTab,
-    selectedWord: WordAnalysisDetail?,
-    wordDetails: List<WordAnalysisDetail>,
+    selectedSentence: SentenceAnalysisUiModel?,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
     onClose: () -> Unit,
@@ -251,15 +261,15 @@ private fun AccuracyDetailScaffold(
     BottomSheetScaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
-        sheetPeekHeight = AccuracyDetailSheetPeekHeight,
+        sheetPeekHeight = 276.dp,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContainerColor = PrezelTheme.colors.solidWhite,
         sheetShadowElevation = 12.dp,
         sheetContent = {
             AccuracyDetailPlayerSheet(
                 selectedTab = selectedTab,
-                selectedWord = selectedWord,
-                wordDetails = wordDetails,
+                selectedSentence = selectedSentence,
+                sentenceDetails = sentenceDetails,
                 playerState = playerState,
                 expanded = expanded,
             )
@@ -281,8 +291,8 @@ private fun AccuracyDetailScaffold(
             )
             ScriptDetailList(
                 selectedTab = selectedTab,
-                selectedWord = selectedWord,
-                wordDetails = wordDetails,
+                selectedSentence = selectedSentence,
+                sentenceDetails = sentenceDetails,
             )
         }
     }
@@ -350,15 +360,6 @@ private class RemoteAudioPlaybackState(
             ?.also { mediaPlayer = it }
 }
 
-private fun List<WordAnalysisDetail>.currentDetailOrNull(currentMillis: Long): WordAnalysisDetail? =
-    lastOrNull { detail -> currentMillis >= detail.startTimeMs } ?: firstOrNull()
-
-private fun List<WordAnalysisDetail>.playerMarkerDetailsFor(tab: AccuracyDetailTab): List<WordAnalysisDetail> =
-    when (tab) {
-        AccuracyDetailTab.SPEECH -> filter { detail -> detail.isSpeechAccuracySheetIssue }
-        AccuracyDetailTab.SCRIPT_MATCH -> filter { detail -> detail.isScriptMatchIssue }
-    }
-
 @BasicPreview
 @Composable
 private fun AccuracyDetailSpeechPreview() {
@@ -400,30 +401,36 @@ private val AccuracyDetailPreviewUiState = AccuracyDetailUiState.Content(
     wordDetail = PresentationWordDetail(
         presentationId = 1L,
         audioUrl = "https://example.com/audio.mp3",
-        wordDetails = listOf(
-            WordAnalysisDetail(
-                word = "문장의 흐름이 깔끔했어요",
+        sentenceDetails = persistentListOf(
+            SentenceAnalysisDetail(
+                sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
                 status = WordAnalysisStatus.EXCELLENT,
-                description = "지금처럼 또렷한 말하기를 유지해주세요.",
+                mainFeedback = "문장의 흐름이 깔끔했어요",
+                subFeedback = "지금처럼 또렷한 말하기를 유지해주세요.",
                 accuracy = 96.0,
                 startTimeMs = 0L,
                 endTimeMs = 1_800L,
+                wordDetails = persistentListOf(),
             ),
-            WordAnalysisDetail(
-                word = "같은 말을 반복하고 있어요.",
+            SentenceAnalysisDetail(
+                sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
                 status = WordAnalysisStatus.INSERTION,
-                description = "앞에서 했던 말은 반복하지 않는 것이 좋아요.",
+                mainFeedback = "같은 말을 반복하고 있어요.",
+                subFeedback = "앞에서 했던 말은 반복하지 않는 것이 좋아요.",
                 accuracy = 42.0,
                 startTimeMs = 7_230L,
                 endTimeMs = 8_700L,
+                wordDetails = persistentListOf(),
             ),
-            WordAnalysisDetail(
-                word = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+            SentenceAnalysisDetail(
+                sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
                 status = WordAnalysisStatus.OMISSION,
-                description = "대본에 있으나 읽지 않은 구간이에요.",
+                mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+                subFeedback = "대본에 있으나 읽지 않은 구간이에요.",
                 accuracy = 0.0,
                 startTimeMs = 9_400L,
                 endTimeMs = 11_300L,
+                wordDetails = persistentListOf(),
             ),
         ),
     ),

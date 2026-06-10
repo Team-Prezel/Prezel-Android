@@ -25,17 +25,20 @@ import com.team.prezel.core.designsystem.component.player.PrezelPlayerState
 import com.team.prezel.core.designsystem.component.player.rememberPrezelPlayerState
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailTab
+import com.team.prezel.feature.report.impl.accuracydetail.model.SentenceAnalysisUiModel
+import com.team.prezel.feature.report.impl.accuracydetail.model.WordAnalysisUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun AccuracyDetailPlayerSheet(
     selectedTab: AccuracyDetailTab,
-    selectedWord: WordAnalysisDetail?,
-    wordDetails: List<WordAnalysisDetail>,
+    selectedSentence: SentenceAnalysisUiModel?,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
 ) {
@@ -47,8 +50,8 @@ internal fun AccuracyDetailPlayerSheet(
         SheetHandle()
         SheetDetailContent(
             selectedTab = selectedTab,
-            selectedWord = selectedWord,
-            wordDetails = wordDetails,
+            selectedSentence = selectedSentence,
+            sentenceDetails = sentenceDetails,
             expanded = expanded,
             modifier = if (expanded) Modifier.weight(1f) else Modifier,
         )
@@ -79,8 +82,8 @@ internal fun SheetHandle() {
 @Composable
 private fun SheetDetailContent(
     selectedTab: AccuracyDetailTab,
-    selectedWord: WordAnalysisDetail?,
-    wordDetails: List<WordAnalysisDetail>,
+    selectedSentence: SentenceAnalysisUiModel?,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     expanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -94,14 +97,14 @@ private fun SheetDetailContent(
     ) {
         when (selectedTab) {
             AccuracyDetailTab.SPEECH -> SpeechDetailContent(
-                selectedWord = selectedWord,
-                wordDetails = wordDetails,
+                selectedSentence = selectedSentence,
+                sentenceDetails = sentenceDetails,
                 expanded = expanded,
             )
 
             AccuracyDetailTab.SCRIPT_MATCH -> ScriptMatchDetailContent(
-                selectedWord = selectedWord,
-                wordDetails = wordDetails,
+                selectedSentence = selectedSentence,
+                sentenceDetails = sentenceDetails,
                 expanded = expanded,
             )
         }
@@ -111,26 +114,28 @@ private fun SheetDetailContent(
 
 @Composable
 private fun SpeechDetailContent(
-    selectedWord: WordAnalysisDetail?,
-    wordDetails: List<WordAnalysisDetail>,
+    selectedSentence: SentenceAnalysisUiModel?,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     expanded: Boolean,
 ) {
-    val accuracyDetails = wordDetails.filter { it.isSpeechAccuracySheetIssue }
+    val accuracyDetails = sentenceDetails.filter { it.isSpeechAccuracyIssue }.toImmutableList()
     val visibleAccuracyDetails = if (expanded) {
         accuracyDetails
     } else {
-        listOfNotNull(selectedWord?.takeIf { it.isSpeechAccuracySheetIssue } ?: accuracyDetails.firstOrNull())
+        listOfNotNull(selectedSentence?.takeIf { it.isSpeechAccuracyIssue } ?: accuracyDetails.firstOrNull())
     }
 
     if (visibleAccuracyDetails.isEmpty()) {
         EmptyDetailText(text = stringResource(R.string.feature_report_impl_accuracy_detail_sheet_empty_speech))
     } else {
         visibleAccuracyDetails.forEach { detail ->
-            WordDetailCard(
+            SentenceAnalysisCard(
                 detail = detail,
-                highlighted = detail == selectedWord,
-                text = detail.description,
+                highlighted = detail == selectedSentence,
+                text = detail.mainFeedback,
+                subText = detail.subFeedback,
                 useStatusTextColor = false,
+                status = detail.speechAccuracyStatus,
             )
         }
     }
@@ -138,12 +143,12 @@ private fun SpeechDetailContent(
 
 @Composable
 private fun ScriptMatchDetailContent(
-    selectedWord: WordAnalysisDetail?,
-    wordDetails: List<WordAnalysisDetail>,
+    selectedSentence: SentenceAnalysisUiModel?,
+    sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     expanded: Boolean,
 ) {
-    val visibleMismatchDetails = wordDetails.visibleScriptMatchDetails(
-        selectedWord = selectedWord,
+    val visibleMismatchDetails = sentenceDetails.visibleScriptMatchDetails(
+        selectedSentence = selectedSentence,
         expanded = expanded,
     )
 
@@ -152,24 +157,26 @@ private fun ScriptMatchDetailContent(
     }
 
     visibleMismatchDetails.forEach { detail ->
-        WordDetailCard(
+        SentenceAnalysisCard(
             detail = detail,
-            highlighted = detail == selectedWord,
-            text = detail.description,
+            highlighted = detail == selectedSentence,
+            text = detail.mainFeedback,
+            subText = detail.subFeedback,
             useStatusTextColor = false,
+            status = detail.scriptMatchStatus,
         )
     }
 }
 
-private fun List<WordAnalysisDetail>.visibleScriptMatchDetails(
-    selectedWord: WordAnalysisDetail?,
+private fun ImmutableList<SentenceAnalysisUiModel>.visibleScriptMatchDetails(
+    selectedSentence: SentenceAnalysisUiModel?,
     expanded: Boolean,
-): List<WordAnalysisDetail> {
-    val mismatchDetails = filter { it.isScriptMatchIssue }
+): ImmutableList<SentenceAnalysisUiModel> {
+    val mismatchDetails = filter { it.isScriptMatchIssue }.toImmutableList()
     return if (expanded) {
         mismatchDetails
     } else {
-        listOfNotNull(selectedWord?.takeIf { it.isScriptMatchIssue } ?: mismatchDetails.firstOrNull())
+        listOfNotNull(selectedSentence?.takeIf { it.isScriptMatchIssue } ?: mismatchDetails.firstOrNull()).toImmutableList()
     }
 }
 
@@ -179,8 +186,8 @@ private fun AccuracyDetailPlayerSheetSpeechPreview() {
     PrezelTheme {
         AccuracyDetailPlayerSheet(
             selectedTab = AccuracyDetailTab.SPEECH,
-            selectedWord = PreviewWordDetails.first(),
-            wordDetails = PreviewWordDetails,
+            selectedSentence = PreviewSentenceDetails.first(),
+            sentenceDetails = PreviewSentenceDetails,
             playerState = rememberPreviewPlayerState(),
             expanded = false,
         )
@@ -193,8 +200,8 @@ private fun AccuracyDetailPlayerSheetScriptMatchPreview() {
     PrezelTheme {
         AccuracyDetailPlayerSheet(
             selectedTab = AccuracyDetailTab.SCRIPT_MATCH,
-            selectedWord = PreviewWordDetails[1],
-            wordDetails = PreviewWordDetails,
+            selectedSentence = PreviewSentenceDetails[1],
+            sentenceDetails = PreviewSentenceDetails,
             playerState = rememberPreviewPlayerState(),
             expanded = false,
         )
@@ -207,8 +214,8 @@ private fun AccuracyDetailPlayerSheetExpandedPreview() {
     PrezelTheme {
         AccuracyDetailPlayerSheet(
             selectedTab = AccuracyDetailTab.SPEECH,
-            selectedWord = PreviewWordDetails[1],
-            wordDetails = PreviewWordDetails,
+            selectedSentence = PreviewSentenceDetails[1],
+            sentenceDetails = PreviewSentenceDetails,
             playerState = rememberPreviewPlayerState(currentMillis = 7_230L),
             expanded = true,
         )
@@ -220,38 +227,68 @@ private fun rememberPreviewPlayerState(currentMillis: Long = 0L): PrezelPlayerSt
     rememberPrezelPlayerState(
         durationMillis = 11_300L,
         currentMillis = currentMillis,
-        initialItems = PreviewWordDetails
+        initialItems = PreviewSentenceDetails
             .map { detail ->
                 PrezelPlayerItem.Marker(
                     timeMillis = detail.startTimeMs,
-                    markerType = detail.toMarkerType(),
+                    markerType = detail.speechAccuracyStatus.toMarkerType(),
                 )
             }.toImmutableList(),
     )
 
-private val PreviewWordDetails = listOf(
-    WordAnalysisDetail(
-        word = "문장의 흐름이 깔끔했어요",
+private val PreviewSentenceDetails = persistentListOf(
+    SentenceAnalysisUiModel(
+        sentence = "문장의 흐름이 깔끔했어요",
         status = WordAnalysisStatus.EXCELLENT,
-        description = "지금처럼 또렷한 말하기를 유지해주세요.",
+        mainFeedback = "문장의 흐름이 깔끔했어요",
+        subFeedback = "지금처럼 또렷한 말하기를 유지해주세요.",
         accuracy = 96.0,
         startTimeMs = 0L,
         endTimeMs = 1_800L,
+        wordDetails = persistentListOf(
+            WordAnalysisUiModel(
+                word = "흐름이",
+                status = WordAnalysisStatus.EXCELLENT,
+                accuracy = 96.0,
+                startTimeMs = 320L,
+                endTimeMs = 780L,
+            ),
+        ),
     ),
-    WordAnalysisDetail(
-        word = "같은 말을 반복하고 있어요.",
+    SentenceAnalysisUiModel(
+        sentence = "같은 말을 반복하고 있어요.",
         status = WordAnalysisStatus.INSERTION,
-        description = "앞에서 했던 말은 반복하지 않는 것이 좋아요.",
+        mainFeedback = "같은 말을 반복하고 있어요.",
+        subFeedback = "앞에서 했던 말은 반복하지 않는 것이 좋아요.",
         accuracy = 42.0,
         startTimeMs = 7_230L,
         endTimeMs = 8_700L,
+        wordDetails = persistentListOf(
+            WordAnalysisUiModel(
+                word = "반복하고",
+                status = WordAnalysisStatus.INSERTION,
+                accuracy = 42.0,
+                startTimeMs = 7_230L,
+                endTimeMs = 7_900L,
+            ),
+        ),
     ),
-    WordAnalysisDetail(
-        word = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+    SentenceAnalysisUiModel(
+        sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.OMISSION,
-        description = "대본에 있으나 읽지 않은 구간이에요.",
+        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        subFeedback = "대본에 있으나 읽지 않은 구간이에요.",
         accuracy = 0.0,
         startTimeMs = 9_400L,
         endTimeMs = 11_300L,
+        wordDetails = persistentListOf(
+            WordAnalysisUiModel(
+                word = "오늘도",
+                status = WordAnalysisStatus.OMISSION,
+                accuracy = 0.0,
+                startTimeMs = 9_400L,
+                endTimeMs = 10_100L,
+            ),
+        ),
     ),
 )

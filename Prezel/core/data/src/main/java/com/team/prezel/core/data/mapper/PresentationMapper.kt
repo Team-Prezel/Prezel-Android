@@ -14,6 +14,7 @@ import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.model.presentation.ScriptErrorType
+import com.team.prezel.core.model.presentation.SentenceAnalysisDetail
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
@@ -24,9 +25,11 @@ import com.team.prezel.core.network.model.presentation.PresentationExpectedQuest
 import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptAnalysisResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
+import com.team.prezel.core.network.model.presentation.PresentationSentenceAnalysisResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordAnalysisResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary =
@@ -88,14 +91,25 @@ internal fun PresentationWordDetailResponse.toDomain(): PresentationWordDetail =
     PresentationWordDetail(
         presentationId = presentationId,
         audioUrl = audioUrl,
-        wordDetails = wordDetails.map { item -> item.toDomain() },
+        sentenceDetails = sentenceDetails.map { sentence -> sentence.toDomain() }.toImmutableList(),
+    )
+
+internal fun PresentationSentenceAnalysisResponse.toDomain(): SentenceAnalysisDetail =
+    SentenceAnalysisDetail(
+        sentence = sentence,
+        status = WordAnalysisStatus.from(value = status),
+        mainFeedback = mainFeedback,
+        subFeedback = subFeedback,
+        accuracy = accuracy,
+        startTimeMs = startTimeMs,
+        endTimeMs = endTimeMs,
+        wordDetails = wordDetails.map { word -> word.toDomain() }.toImmutableList(),
     )
 
 internal fun PresentationWordAnalysisResponse.toDomain(): WordAnalysisDetail =
     WordAnalysisDetail(
         word = word,
         status = WordAnalysisStatus.from(value = status),
-        description = description,
         accuracy = accuracy,
         startTimeMs = startTimeMs,
         endTimeMs = endTimeMs,
