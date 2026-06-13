@@ -19,16 +19,19 @@ internal data class SentenceAnalysisUiModel(
     val wordDetails: ImmutableList<WordAnalysisUiModel>,
 ) {
     val isScriptMatchIssue: Boolean
-        get() = wordDetails.any { word -> word.status.isScriptMatchIssue }
+        get() = status.isScriptMatchIssue || wordDetails.any { word -> word.status.isScriptMatchIssue }
 
     val isSpeechAccuracyIssue: Boolean
-        get() = wordDetails.any { word -> word.status.isSpeechAccuracyIssue }
+        get() = status.isSpeechAccuracyIssue || wordDetails.any { word -> word.status.isSpeechAccuracyIssue }
+
+    val hasSpeechAccuracyStatus: Boolean
+        get() = status.isSpeechAccuracyStatus || wordDetails.any { word -> word.status.isSpeechAccuracyStatus }
 
     val scriptMatchStatus: WordAnalysisStatus
         get() = wordDetails.firstOrNull { word -> word.status.isScriptMatchIssue }?.status ?: status
 
     val speechAccuracyStatus: WordAnalysisStatus
-        get() = wordDetails.firstOrNull { word -> word.status.isSpeechAccuracyIssue }?.status ?: status
+        get() = wordDetails.firstOrNull { word -> word.status.isSpeechAccuracyStatus }?.status ?: status
 }
 
 @Immutable
@@ -46,6 +49,9 @@ private val WordAnalysisStatus.isScriptMatchIssue: Boolean
         this == WordAnalysisStatus.MISPRONUNCIATION
 
 private val WordAnalysisStatus.isSpeechAccuracyIssue: Boolean
+    get() = this == WordAnalysisStatus.STUTTER
+
+private val WordAnalysisStatus.isSpeechAccuracyStatus: Boolean
     get() = this == WordAnalysisStatus.EXCELLENT ||
         this == WordAnalysisStatus.GOOD ||
         this == WordAnalysisStatus.STUTTER

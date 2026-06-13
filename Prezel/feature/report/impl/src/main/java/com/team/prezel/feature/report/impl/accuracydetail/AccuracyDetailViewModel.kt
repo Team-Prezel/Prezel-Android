@@ -33,15 +33,13 @@ internal class AccuracyDetailViewModel @AssistedInject constructor(
 
     private fun fetchDetails() {
         viewModelScope.launch {
-            val nextState = runCatching {
-                AccuracyDetailUiState.Content(
-                    wordDetail = fetchPresentationWordDetailUseCase(analysisResultId).getOrThrow(),
-                )
-            }.getOrElse {
-                sendEffect(AccuracyDetailUiEffect.ShowMessage(AccuracyDetailUiMessage.FetchDetailFailed))
-                AccuracyDetailUiState.Error
-            }
-            updateState { nextState }
+            fetchPresentationWordDetailUseCase(analysisResultId)
+                .onSuccess { wordDetail ->
+                    updateState { AccuracyDetailUiState.Content(wordDetail = wordDetail) }
+                }.onFailure {
+                    sendEffect(AccuracyDetailUiEffect.ShowMessage(AccuracyDetailUiMessage.FetchDetailFailed))
+                    updateState { AccuracyDetailUiState.Error }
+                }
         }
     }
 }

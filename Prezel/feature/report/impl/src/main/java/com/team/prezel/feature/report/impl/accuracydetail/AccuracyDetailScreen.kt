@@ -1,6 +1,5 @@
 package com.team.prezel.feature.report.impl.accuracydetail
 
-import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,16 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
@@ -54,6 +51,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
+import kotlin.math.absoluteValue
 
 @Serializable
 internal enum class AccuracyDetailTab {
@@ -138,6 +136,7 @@ private fun AccuracyDetailScreenContent(
             AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.filter { detail -> detail.isScriptMatchIssue }
         }.toImmutableList()
     }
+    val sheetPeekHeight = rememberPlayerSheetPeekHeight(markerSentenceDetails = playerMarkerSentenceDetails)
     val playerState = rememberDetailPlayerState(
         selectedTab = selectedTab,
         sentenceDetails = sentenceDetails,
@@ -164,6 +163,7 @@ private fun AccuracyDetailScreenContent(
         sentenceDetails = sentenceDetails,
         playerState = playerState,
         expanded = isSheetExpanded,
+        sheetPeekHeight = sheetPeekHeight,
         onClose = onClose,
         tabLabels = tabLabels,
         onClickTab = { index -> pagerState.requestScrollToPage(index) },
@@ -178,6 +178,16 @@ private fun rememberAccuracyDetailTabs(): List<AccuracyDetailTab> =
             AccuracyDetailTab.SPEECH,
             AccuracyDetailTab.SCRIPT_MATCH,
         )
+    }
+
+@Composable
+private fun rememberPlayerSheetPeekHeight(markerSentenceDetails: ImmutableList<SentenceAnalysisUiModel>): Dp =
+    remember(markerSentenceDetails) {
+        if (markerSentenceDetails.isEmpty()) {
+            AccuracyDetailPlayerSheetDefaultPeekHeight
+        } else {
+            AccuracyDetailPlayerSheetLargePeekHeight
+        }
     }
 
 @Composable
@@ -234,6 +244,15 @@ private fun PlaybackEffect(
         }
     }
 
+    LaunchedEffect(playerState.currentMillis, playerState.playing) {
+        if (!playerState.playing) return@LaunchedEffect
+
+        val positionGap = (playerState.currentMillis - playbackState.currentPositionMillis).absoluteValue
+        if (positionGap > SEEK_SYNC_THRESHOLD_MILLIS) {
+            playbackState.seekTo(positionMillis = playerState.currentMillis.toInt())
+        }
+    }
+
     LaunchedEffect(playerState.playing) {
         while (playerState.playing) {
             delay(250L)
@@ -241,6 +260,10 @@ private fun PlaybackEffect(
                 .takeIf { it > 0 }
                 ?.let { playerState.updateCurrentMillis(it.toLong()) }
         }
+    }
+
+    LaunchedEffect(playbackState.playbackError) {
+        if (playbackState.playbackError) playerState.pause()
     }
 }
 
@@ -253,6 +276,7 @@ private fun AccuracyDetailScaffold(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
+    sheetPeekHeight: Dp,
     onClose: () -> Unit,
     tabLabels: ImmutableList<String>,
     onClickTab: (Int) -> Unit,
@@ -261,7 +285,7 @@ private fun AccuracyDetailScaffold(
     BottomSheetScaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 276.dp,
+        sheetPeekHeight = sheetPeekHeight,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetContainerColor = PrezelTheme.colors.solidWhite,
         sheetShadowElevation = 12.dp,
@@ -298,67 +322,9 @@ private fun AccuracyDetailScaffold(
     }
 }
 
-@Composable
-private fun rememberRemoteAudioPlaybackState(audioUrl: String): RemoteAudioPlaybackState {
-    val state = remember(audioUrl) { RemoteAudioPlaybackState(audioUrl = audioUrl) }
-
-    DisposableEffect(state) {
-        onDispose { state.release() }
-    }
-
-    return state
-}
-
-private class RemoteAudioPlaybackState(
-    private val audioUrl: String,
-) {
-    private var mediaPlayer: MediaPlayer? = null
-
-    private var lastKnownPositionMillis by mutableIntStateOf(0)
-
-    val currentPositionMillis: Int
-        get() = mediaPlayer
-            ?.currentPosition
-            ?.coerceAtLeast(0)
-            ?: lastKnownPositionMillis
-
-    fun play(startPositionMillis: Int) {
-        val player = mediaPlayer ?: preparePlayer() ?: return
-
-        runCatching {
-            player.seekTo(startPositionMillis.coerceAtLeast(0))
-            player.start()
-            lastKnownPositionMillis = player.currentPosition.coerceAtLeast(0)
-        }.onFailure {
-            release()
-        }
-    }
-
-    fun pause() {
-        mediaPlayer?.runCatching {
-            if (isPlaying) pause()
-            lastKnownPositionMillis = currentPosition.coerceAtLeast(0)
-        }
-    }
-
-    fun release() {
-        mediaPlayer?.release()
-        mediaPlayer = null
-        lastKnownPositionMillis = 0
-    }
-
-    private fun preparePlayer(): MediaPlayer? =
-        runCatching {
-            MediaPlayer().apply {
-                setDataSource(audioUrl)
-                prepare()
-                setOnCompletionListener {
-                    lastKnownPositionMillis = duration.coerceAtLeast(0)
-                }
-            }
-        }.getOrNull()
-            ?.also { mediaPlayer = it }
-}
+private const val SEEK_SYNC_THRESHOLD_MILLIS = 750L
+private val AccuracyDetailPlayerSheetDefaultPeekHeight = 220.dp
+private val AccuracyDetailPlayerSheetLargePeekHeight = 336.dp
 
 @BasicPreview
 @Composable

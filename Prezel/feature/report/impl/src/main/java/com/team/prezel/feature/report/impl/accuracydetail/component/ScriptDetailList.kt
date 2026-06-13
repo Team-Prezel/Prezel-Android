@@ -57,7 +57,7 @@ internal fun ScriptDetailList(
 
 private fun SentenceAnalysisUiModel.showsStatusChip(selectedTab: AccuracyDetailTab): Boolean =
     when (selectedTab) {
-        AccuracyDetailTab.SPEECH -> isSpeechAccuracyIssue
+        AccuracyDetailTab.SPEECH -> hasSpeechAccuracyStatus
         AccuracyDetailTab.SCRIPT_MATCH -> isScriptMatchIssue
     }
 

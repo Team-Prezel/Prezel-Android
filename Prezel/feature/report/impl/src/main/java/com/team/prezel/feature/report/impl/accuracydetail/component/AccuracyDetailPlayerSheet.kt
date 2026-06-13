@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +44,7 @@ internal fun AccuracyDetailPlayerSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .then(if (expanded) Modifier.fillMaxHeight() else Modifier),
+            .fillMaxHeight(),
     ) {
         SheetHandle()
         SheetDetailContent(
@@ -90,7 +89,6 @@ private fun SheetDetailContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (expanded) Modifier else Modifier.heightIn(max = 96.dp))
             .padding(horizontal = PrezelTheme.spacing.V20)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
@@ -259,7 +257,7 @@ private val PreviewSentenceDetails = persistentListOf(
         sentence = "같은 말을 반복하고 있어요.",
         status = WordAnalysisStatus.INSERTION,
         mainFeedback = "같은 말을 반복하고 있어요.",
-        subFeedback = "앞에서 했던 말은 반복하지 않는 것이 좋아요.",
+        subFeedback = "앞에서 했던 말은 반복하지 않는 것이 좋아요. 다시 한 번 또박또박 연습해보세요.",
         accuracy = 42.0,
         startTimeMs = 7_230L,
         endTimeMs = 8_700L,
