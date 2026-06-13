@@ -70,6 +70,7 @@
     <string name="feature_report_impl_script_detail_status_insertion">불필요한 표현</string>
     <string name="feature_report_impl_script_detail_status_omission">누락</string>
     <string name="feature_report_impl_script_detail_status_mismatch">불일치</string>
+    <string name="feature_report_impl_script_detail_status_unknown">알 수 없음</string>
 
     <!-- Script Correction -->
     <string name="feature_report_impl_script_spelling">맞춤법</string>

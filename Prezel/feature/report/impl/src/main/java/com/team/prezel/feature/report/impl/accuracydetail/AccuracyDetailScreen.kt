@@ -199,7 +199,7 @@ private fun rememberDetailPlayerState(
     durationMillis = remember(sentenceDetails) {
         sentenceDetails.maxOfOrNull { it.endTimeMs }?.coerceAtLeast(1L) ?: 1L
     },
-    initialItems = remember(markerSentenceDetails) {
+    initialItems = remember(selectedTab, markerSentenceDetails) {
         markerSentenceDetails
             .map { detail ->
                 PrezelPlayerItem.Marker(

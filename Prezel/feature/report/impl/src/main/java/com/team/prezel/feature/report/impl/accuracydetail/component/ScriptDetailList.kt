@@ -50,10 +50,16 @@ internal fun ScriptDetailList(
                 )
             }
         } else {
-            EmptyDetailText(text = stringResource(R.string.feature_report_impl_script_detail_empty_speech))
+            EmptyDetailText(text = stringResource(selectedTab.emptyDetailTextResId))
         }
     }
 }
+
+private val AccuracyDetailTab.emptyDetailTextResId: Int
+    get() = when (this) {
+        AccuracyDetailTab.SPEECH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_speech
+        AccuracyDetailTab.SCRIPT_MATCH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_script
+    }
 
 private fun SentenceAnalysisUiModel.showsStatusChip(selectedTab: AccuracyDetailTab): Boolean =
     when (selectedTab) {

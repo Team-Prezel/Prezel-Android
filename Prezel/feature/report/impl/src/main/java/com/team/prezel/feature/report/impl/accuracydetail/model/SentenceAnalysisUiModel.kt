@@ -45,11 +45,11 @@ internal data class WordAnalysisUiModel(
 
 private val WordAnalysisStatus.isScriptMatchIssue: Boolean
     get() = this == WordAnalysisStatus.INSERTION ||
-        this == WordAnalysisStatus.OMISSION ||
-        this == WordAnalysisStatus.MISPRONUNCIATION
+        this == WordAnalysisStatus.OMISSION
 
 private val WordAnalysisStatus.isSpeechAccuracyIssue: Boolean
-    get() = this == WordAnalysisStatus.STUTTER
+    get() = this == WordAnalysisStatus.STUTTER ||
+        this == WordAnalysisStatus.MISPRONUNCIATION
 
 private val WordAnalysisStatus.isSpeechAccuracyStatus: Boolean
     get() = this == WordAnalysisStatus.EXCELLENT ||

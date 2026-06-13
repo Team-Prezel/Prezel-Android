@@ -188,7 +188,7 @@ private fun WordAnalysisStatus.statusLabel(): String =
         WordAnalysisStatus.INSERTION -> stringResource(R.string.feature_report_impl_script_detail_status_insertion)
         WordAnalysisStatus.OMISSION -> stringResource(R.string.feature_report_impl_script_detail_status_omission)
         WordAnalysisStatus.MISPRONUNCIATION -> stringResource(R.string.feature_report_impl_script_detail_status_mismatch)
-        WordAnalysisStatus.UNKNOWN -> value
+        WordAnalysisStatus.UNKNOWN -> stringResource(R.string.feature_report_impl_script_detail_status_unknown)
     }
 
 @Composable

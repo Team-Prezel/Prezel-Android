@@ -85,9 +85,11 @@ internal class RemoteAudioPlaybackState(
         lastKnownPositionMillis = 0
     }
 
-    private fun preparePlayer(): MediaPlayer? =
-        runCatching {
-            MediaPlayer().apply {
+    private fun preparePlayer(): MediaPlayer? {
+        val player = MediaPlayer()
+
+        return runCatching {
+            player.apply {
                 setOnPreparedListener { player ->
                     prepared = true
                     val positionMillis = pendingPositionMillis ?: lastKnownPositionMillis
@@ -110,9 +112,11 @@ internal class RemoteAudioPlaybackState(
                 }
             }
         }.onFailure {
+            runCatching { player.release() }
             handlePlaybackFailure()
         }.getOrNull()
             ?.also { mediaPlayer = it }
+    }
 
     private fun startPreparedPlayer(
         player: MediaPlayer,
