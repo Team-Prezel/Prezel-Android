@@ -29,4 +29,12 @@ internal sealed interface AnalysisReportUiEffect : UiEffect {
     data class NavigateToScriptAnalysis(
         val analysisResultId: Long,
     ) : AnalysisReportUiEffect
+
+    data class NavigateToSpeechAccuracy(
+        val analysisResultId: Long,
+    ) : AnalysisReportUiEffect
+
+    data class NavigateToScriptMatch(
+        val analysisResultId: Long,
+    ) : AnalysisReportUiEffect
 }

@@ -9,6 +9,26 @@ data class PresentationWordDetailResponse(
     val presentationId: Long,
     @SerialName("audioUrl")
     val audioUrl: String,
+    @SerialName("sentenceDetails")
+    val sentenceDetails: List<PresentationSentenceAnalysisResponse>,
+)
+
+@Serializable
+data class PresentationSentenceAnalysisResponse(
+    @SerialName("sentence")
+    val sentence: String,
+    @SerialName("status")
+    val status: String,
+    @SerialName("mainFeedback")
+    val mainFeedback: String,
+    @SerialName("subFeedback")
+    val subFeedback: String,
+    @SerialName("accuracy")
+    val accuracy: Double,
+    @SerialName("startTimeMs")
+    val startTimeMs: Long,
+    @SerialName("endTimeMs")
+    val endTimeMs: Long,
     @SerialName("wordDetails")
     val wordDetails: List<PresentationWordAnalysisResponse>,
 )
@@ -19,8 +39,6 @@ data class PresentationWordAnalysisResponse(
     val word: String,
     @SerialName("status")
     val status: String,
-    @SerialName("description")
-    val description: String,
     @SerialName("accuracy")
     val accuracy: Double,
     @SerialName("startTimeMs")

@@ -1,7 +1,6 @@
 package com.team.prezel.feature.report.impl.report.component.common
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,10 +15,10 @@ import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButt
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
+import com.team.prezel.core.designsystem.component.base.PrezelTouchArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.util.noRippleClickable
 import kotlin.math.roundToInt
 
 @Composable
@@ -28,19 +27,24 @@ internal fun MetricResultCard(
     value: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = false,
 ) {
-    Box(
+    PrezelTouchArea(
         modifier = modifier
             .clip(shape = PrezelTheme.shapes.V8)
-            .background(color = PrezelTheme.colors.bgMedium)
-            .noRippleClickable(onClick = onClick),
+            .background(color = PrezelTheme.colors.bgMedium),
+        enabled = enabled,
+        shape = PrezelTheme.shapes.V8,
+        onClick = onClick,
     ) {
         Column(
-            modifier = Modifier.padding(
-                start = PrezelTheme.spacing.V12,
-                bottom = PrezelTheme.spacing.V12,
-                top = PrezelTheme.spacing.V14,
-            ),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(
+                    start = PrezelTheme.spacing.V12,
+                    bottom = PrezelTheme.spacing.V12,
+                    top = PrezelTheme.spacing.V14,
+                ),
         ) {
             Text(
                 text = title,
@@ -62,8 +66,9 @@ internal fun MetricResultCard(
             size = ButtonSize.SMALL,
             hierarchy = ButtonHierarchy.SECONDARY,
             modifier = Modifier.align(Alignment.TopEnd),
-            enabled = false,
-            onClick = { },
+            enabled = enabled,
+            isUseRipple = false,
+            onClick = onClick,
         )
     }
 }

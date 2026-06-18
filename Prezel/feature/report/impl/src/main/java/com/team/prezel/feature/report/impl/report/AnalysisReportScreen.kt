@@ -36,6 +36,8 @@ internal fun AnalysisReportScreen(
     navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToScriptAnalysis: (analysisResultId: Long) -> Unit,
     navigateToSelfFeedbackWrite: (presentationId: Long, title: String, isPast: Boolean) -> Unit,
+    navigateToSpeechAccuracy: (analysisResultId: Long) -> Unit,
+    navigateToScriptMatch: (analysisResultId: Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
@@ -64,6 +66,8 @@ internal fun AnalysisReportScreen(
                 is AnalysisReportUiEffect.NavigateToSelfFeedbackWrite -> {
                     navigateToSelfFeedbackWrite(effect.presentationId, effect.title, effect.isPast)
                 }
+                is AnalysisReportUiEffect.NavigateToSpeechAccuracy -> navigateToSpeechAccuracy(effect.analysisResultId)
+                is AnalysisReportUiEffect.NavigateToScriptMatch -> navigateToScriptMatch(effect.analysisResultId)
             }
         }
     }
@@ -79,6 +83,8 @@ internal fun AnalysisReportScreen(
         onReRecordingClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickReRecording) },
         onFeedBackWriteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickFeedbackWrite) },
         onScriptAnalysisClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickScriptAnalysis) },
+        onSpeechAccuracyClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickSpeechAccuracy) },
+        onScriptMatchClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickScriptMatch) },
         modifier = modifier,
     )
 }
@@ -95,6 +101,8 @@ internal fun AnalysisReportScreen(
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
     onScriptAnalysisClick: () -> Unit,
+    onSpeechAccuracyClick: () -> Unit,
+    onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
@@ -111,6 +119,8 @@ internal fun AnalysisReportScreen(
                 onReRecordingClick = onReRecordingClick,
                 onFeedBackWriteClick = onFeedBackWriteClick,
                 onScriptAnalysisClick = onScriptAnalysisClick,
+                onSpeechAccuracyClick = onSpeechAccuracyClick,
+                onScriptMatchClick = onScriptMatchClick,
             )
         }
 
@@ -130,6 +140,8 @@ private fun AnalysisReportScreenContent(
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
     onScriptAnalysisClick: () -> Unit,
+    onSpeechAccuracyClick: () -> Unit,
+    onScriptMatchClick: () -> Unit,
     modifier: Modifier,
 ) {
     uiState.reportDialog?.let { type ->
@@ -165,6 +177,8 @@ private fun AnalysisReportScreenContent(
                 onReWriteScriptClick = onReWriteScriptClick,
                 onReRecordingClick = onReRecordingClick,
                 onFeedBackWriteClick = onFeedBackWriteClick,
+                onSpeechAccuracyClick = onSpeechAccuracyClick,
+                onScriptMatchClick = onScriptMatchClick,
                 onScriptAnalysisClick = onScriptAnalysisClick,
             )
         },
@@ -193,6 +207,8 @@ private fun UpcomingAnalysisReportScreenPreview() {
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
             onScriptAnalysisClick = {},
+            onSpeechAccuracyClick = {},
+            onScriptMatchClick = {},
         )
     }
 }
@@ -212,6 +228,8 @@ private fun PastAnalysisReportScreenPreview() {
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
             onScriptAnalysisClick = {},
+            onSpeechAccuracyClick = {},
+            onScriptMatchClick = {},
         )
     }
 }
@@ -231,6 +249,8 @@ private fun AnalysisReportScreenLoadingPreview() {
             onReRecordingClick = {},
             onFeedBackWriteClick = {},
             onScriptAnalysisClick = {},
+            onSpeechAccuracyClick = {},
+            onScriptMatchClick = {},
         )
     }
 }

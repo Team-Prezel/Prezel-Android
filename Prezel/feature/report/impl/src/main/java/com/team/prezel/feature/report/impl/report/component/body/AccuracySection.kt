@@ -35,6 +35,8 @@ internal fun AccuracySection(
     accuracyScore: Double?,
     scriptMatchRate: Double?,
     speedGraphData: SpeedGraphData,
+    onSpeechAccuracyClick: () -> Unit,
+    onScriptMatchClick: () -> Unit,
 ) {
     ReportSection(
         title = { AccuracySectionTitle() },
@@ -44,6 +46,8 @@ internal fun AccuracySection(
         AccuracyMetricCards(
             accuracyScore = accuracyScore,
             scriptMatchRate = scriptMatchRate,
+            onSpeechAccuracyClick = onSpeechAccuracyClick,
+            onScriptMatchClick = onScriptMatchClick,
         )
     }
 }
@@ -80,6 +84,8 @@ private fun SpeedMetricRow(speedGraphData: SpeedGraphData) {
 private fun AccuracyMetricCards(
     accuracyScore: Double?,
     scriptMatchRate: Double?,
+    onSpeechAccuracyClick: () -> Unit,
+    onScriptMatchClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -89,13 +95,15 @@ private fun AccuracyMetricCards(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_speech),
             value = accuracyScore.toPercentLabel(),
-            onClick = {},
+            enabled = accuracyScore != null,
+            onClick = onSpeechAccuracyClick,
         )
         MetricResultCard(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_script_match),
             value = scriptMatchRate.toPercentLabel(),
-            onClick = {},
+            enabled = scriptMatchRate != null,
+            onClick = onScriptMatchClick,
         )
     }
 }
@@ -166,6 +174,8 @@ private fun AccuracySectionPreview() {
             accuracyScore = ReportPreviewUpcomingUiState.accuracyScore,
             scriptMatchRate = ReportPreviewUpcomingUiState.scriptMatchRate,
             speedGraphData = ReportPreviewUpcomingUiState.speedGraphData,
+            onSpeechAccuracyClick = {},
+            onScriptMatchClick = {},
         )
     }
 }

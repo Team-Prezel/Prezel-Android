@@ -197,6 +197,8 @@ private fun ReportScreenLayoutPreview() {
                     onReRecordingClick = {},
                     onFeedBackWriteClick = {},
                     onScriptAnalysisClick = {},
+                    onSpeechAccuracyClick = {},
+                    onScriptMatchClick = {},
                 )
             },
         )

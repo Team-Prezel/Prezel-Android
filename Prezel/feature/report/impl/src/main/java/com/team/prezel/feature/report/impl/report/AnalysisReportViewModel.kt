@@ -44,6 +44,8 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
             AnalysisReportUiIntent.ClickReWriteScript -> handleReWriteScriptClick()
             AnalysisReportUiIntent.ClickFeedbackWrite -> navigateToSelfFeedbackWrite()
             AnalysisReportUiIntent.ClickScriptAnalysis -> navigateToScriptAnalysis()
+            AnalysisReportUiIntent.ClickSpeechAccuracy -> navigateToSpeechAccuracy()
+            AnalysisReportUiIntent.ClickScriptMatch -> navigateToScriptMatch()
         }
     }
 
@@ -125,6 +127,16 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
 
     private fun navigateToScriptAnalysis() {
         val effect = analysisResultId?.let(AnalysisReportUiEffect::NavigateToScriptAnalysis) ?: return
+        viewModelScope.launch { sendEffect(effect) }
+    }
+
+    private fun navigateToSpeechAccuracy() {
+        val effect = analysisResultId?.let(AnalysisReportUiEffect::NavigateToSpeechAccuracy) ?: return
+        viewModelScope.launch { sendEffect(effect) }
+    }
+
+    private fun navigateToScriptMatch() {
+        val effect = analysisResultId?.let(AnalysisReportUiEffect::NavigateToScriptMatch) ?: return
         viewModelScope.launch { sendEffect(effect) }
     }
 

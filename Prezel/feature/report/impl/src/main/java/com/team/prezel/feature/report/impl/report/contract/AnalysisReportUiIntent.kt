@@ -22,4 +22,8 @@ internal sealed interface AnalysisReportUiIntent : UiIntent {
     data object ClickFeedbackWrite : AnalysisReportUiIntent
 
     data object ClickScriptAnalysis : AnalysisReportUiIntent
+
+    data object ClickSpeechAccuracy : AnalysisReportUiIntent
+
+    data object ClickScriptMatch : AnalysisReportUiIntent
 }

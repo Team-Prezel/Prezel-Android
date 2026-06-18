@@ -60,9 +60,19 @@
     <string name="feature_report_impl_fetch_report_failed">리포트를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_fetch_script_detail_failed">대본 분석 결과를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_delete_report_failed">리포트를 삭제하지 못했습니다.</string>
+    <string name="feature_report_impl_close">닫기</string>
+    <string name="feature_report_impl_script_detail_load_failed">정확도 상세를 불러오지 못했습니다.</string>
+    <string name="feature_report_impl_script_detail_empty_speech">발화 분석 상세가 없어요.</string>
+    <string name="feature_report_impl_accuracy_detail_sheet_empty_speech">모든 단어가 정확하게 발음되었어요.</string>
+    <string name="feature_report_impl_accuracy_detail_sheet_empty_script">대본과 일치하지 않는 부분이 없어요.</string>
+    <string name="feature_report_impl_script_detail_player_track_desc">정확도 상세 오디오 트랙</string>
+    <string name="feature_report_impl_script_detail_status_pronunciation">발음</string>
+    <string name="feature_report_impl_script_detail_status_insertion">불필요한 표현</string>
+    <string name="feature_report_impl_script_detail_status_omission">누락</string>
+    <string name="feature_report_impl_script_detail_status_mismatch">불일치</string>
+    <string name="feature_report_impl_script_detail_status_unknown">알 수 없음</string>
 
     <!-- Script Correction -->
-    <string name="feature_report_impl_close">닫기</string>
     <string name="feature_report_impl_script_spelling">맞춤법</string>
     <string name="feature_report_impl_script_grammar">주술호응</string>
     <string name="feature_report_impl_script_count">%1$d개</string>

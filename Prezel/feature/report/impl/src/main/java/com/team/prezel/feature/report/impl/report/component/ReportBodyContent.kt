@@ -41,6 +41,8 @@ internal fun ReportBodyContent(
     onReRecordingClick: () -> Unit,
     onFeedBackWriteClick: () -> Unit,
     onScriptAnalysisClick: () -> Unit,
+    onSpeechAccuracyClick: () -> Unit,
+    onScriptMatchClick: () -> Unit,
 ) {
     if (uiState.isPast && uiState.practiceRecords != null) {
         SelfFeedbackSection(
@@ -55,6 +57,8 @@ internal fun ReportBodyContent(
         accuracyScore = uiState.accuracyScore,
         scriptMatchRate = uiState.scriptMatchRate,
         speedGraphData = uiState.speedGraphData,
+        onSpeechAccuracyClick = onSpeechAccuracyClick,
+        onScriptMatchClick = onScriptMatchClick,
     )
     GrowthGraphSection(
         growthGraphData = uiState.growthGraphData,
@@ -99,6 +103,8 @@ private fun ReportBodyContentPreview() {
                 onReRecordingClick = {},
                 onFeedBackWriteClick = {},
                 onScriptAnalysisClick = {},
+                onSpeechAccuracyClick = {},
+                onScriptMatchClick = {},
             )
         }
     }
