@@ -17,11 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -174,6 +176,8 @@ private fun FeedbackContent(
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
+    val placeholders = stringArrayResource(R.array.feature_feedback_impl_placeholders)
+    val placeholder = remember(placeholders.contentHashCode()) { placeholders.random() }
 
     Column(
         modifier = modifier
@@ -193,7 +197,7 @@ private fun FeedbackContent(
         PrezelTextArea(
             value = content,
             onValueChange = onContentChanged,
-            placeholder = stringResource(R.string.feature_feedback_impl_placeholder),
+            placeholder = placeholder,
             maxLength = 200,
             showCount = true,
         )
