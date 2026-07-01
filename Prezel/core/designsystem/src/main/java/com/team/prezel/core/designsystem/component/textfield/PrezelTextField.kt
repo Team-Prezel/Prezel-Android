@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldPlaceholder
@@ -52,18 +55,28 @@ fun PrezelTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     var focused by remember { mutableStateOf(false) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
+
+    LaunchedEffect(value) {
+        if (value != textFieldValue.text) {
+            textFieldValue = TextFieldValue(text = value, selection = TextRange(value.length))
+        }
+    }
 
     val state = rememberPrezelTextFieldState(
-        value = value,
+        value = textFieldValue.text,
         enabled = enabled,
         focused = focused,
     ).let { state -> PrezelTextFieldStyle(state = state, status = status) }
 
     PrezelTextField(
-        value = value,
+        value = textFieldValue,
         onValueChange = { newValue ->
-            val applied = applyPrezelTextInputPolicy(newValue, maxLength)
-            if (applied != value) onValueChange(applied)
+            val applied = applyPrezelTextInputPolicy(currentValue = textFieldValue, newValue = newValue, maxLength = maxLength)
+            if (applied != textFieldValue) {
+                textFieldValue = applied
+                if (applied.text != value) onValueChange(applied.text)
+            }
         },
         placeholder = placeholder,
         style = state,
@@ -80,8 +93,8 @@ fun PrezelTextField(
 
 @Composable
 private fun PrezelTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     placeholder: String,
     style: PrezelTextFieldStyle,
     focused: Boolean,
@@ -115,7 +128,7 @@ private fun PrezelTextField(
             decorationBox = { innerTextField ->
                 PrezelTextFieldDecorationBox(
                     innerTextField = innerTextField,
-                    showPlaceholder = !focused && value.isEmpty(),
+                    showPlaceholder = !focused && value.text.isEmpty(),
                     placeholder = placeholder,
                     trailingIcon = trailingIcon,
                     state = style,
@@ -296,7 +309,7 @@ private fun PreviewTextFieldItem(
     focused: Boolean = false,
 ) {
     PrezelTextField(
-        value = value,
+        value = TextFieldValue(text = value, selection = TextRange(value.length)),
         onValueChange = {},
         placeholder = "Placeholder",
         label = label,

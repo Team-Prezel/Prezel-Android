@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.foundation.color.PrezelColors
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -223,11 +224,11 @@ internal fun rememberPrezelTextFieldState(
     )
 
 internal fun applyPrezelTextInputPolicy(
-    value: String,
+    currentValue: TextFieldValue,
+    newValue: TextFieldValue,
     maxLength: Int,
-): String {
-    require(maxLength >= 0) { "maxLength must be >= 0" }
-    return value
-        .replace("\n", "")
-        .take(maxLength)
+): TextFieldValue {
+    require(maxLength >= 0) { "maxLength는 0 이상이어야 합니다." }
+
+    return if (newValue.text.length > maxLength) currentValue else newValue
 }
