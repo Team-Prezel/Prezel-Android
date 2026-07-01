@@ -32,29 +32,29 @@ internal fun PracticeActionCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    PrezelTouchArea(
-        onClick = onClick,
-        shape = PrezelTheme.shapes.V8,
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape = PrezelTheme.shapes.V8)
+            .border(
+                width = PrezelTheme.stroke.V1,
+                shape = PrezelTheme.shapes.V8,
+                color = PrezelTheme.colors.borderSmall,
+            ).background(color = PrezelTheme.colors.bgRegular)
+            .padding(horizontal = PrezelTheme.spacing.V16, vertical = PrezelTheme.spacing.V12),
     ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .clip(shape = PrezelTheme.shapes.V8)
-                .border(
-                    width = PrezelTheme.stroke.V1,
-                    shape = PrezelTheme.shapes.V8,
-                    color = PrezelTheme.colors.borderSmall,
-                ).background(color = PrezelTheme.colors.bgRegular)
-                .padding(horizontal = PrezelTheme.spacing.V16, vertical = PrezelTheme.spacing.V12),
+        Text(
+            text = title,
+            color = titleColor,
+            style = PrezelTheme.typography.body2Bold,
+        )
+
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
+
+        PrezelTouchArea(
+            onClick = onClick,
+            shape = PrezelTheme.shapes.V4,
         ) {
-            Text(
-                text = title,
-                color = titleColor,
-                style = PrezelTheme.typography.body2Bold,
-            )
-
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = actionText,

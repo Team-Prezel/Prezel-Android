@@ -30,7 +30,13 @@ internal fun PresentationSheet(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = PrezelTheme.spacing.V32, horizontal = PrezelTheme.spacing.V20),
     ) {
-        HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_content_title, presentation.practiceCount))
+        HomeBottomSheetTitle(
+            title = if (presentation.practiceCount == 0) {
+                stringResource(R.string.feature_home_impl_empty_sheet_practice_card_title)
+            } else {
+                stringResource(R.string.feature_home_impl_bottom_sheet_content_title, presentation.practiceCount)
+            },
+        )
         PracticeCard(
             dDay = presentation.practiceRecords.endDate,
             items = presentation.practiceRecords.practices,
