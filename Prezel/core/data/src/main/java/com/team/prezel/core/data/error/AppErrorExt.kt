@@ -17,6 +17,8 @@ private fun Throwable.toDomainThrowable(): Throwable =
     when (this) {
         is CancellationException -> this
 
+        is AppException -> this
+
         is ApiException ->
             AppException(
                 error = errorCode.toDomainError(),
