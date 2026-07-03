@@ -51,11 +51,12 @@ internal fun AnalysisStepLayout(
     onTrailingTextClick: (() -> Unit)? = null,
     subButtonText: String? = null,
     onSubButtonClick: (() -> Unit)? = null,
+    contentScrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
     val showButtonAreaDivider by remember {
-        derivedStateOf { contentScrollState.maxValue > 0 }
+        derivedStateOf { contentScrollable && contentScrollState.maxValue > 0 }
     }
 
     Column(
@@ -85,6 +86,7 @@ internal fun AnalysisStepLayout(
 
         AnalysisStepContent(
             scrollState = contentScrollState,
+            scrollable = contentScrollable,
             content = content,
         )
 
@@ -122,12 +124,13 @@ private fun AnalysisStepTrailingText(
 @Composable
 private fun ColumnScope.AnalysisStepContent(
     scrollState: ScrollState,
+    scrollable: Boolean,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .verticalScroll(scrollState)
+            .then(if (scrollable) Modifier.verticalScroll(scrollState) else Modifier)
             .padding(horizontal = PrezelTheme.spacing.V20)
             .padding(top = PrezelTheme.spacing.V40),
     ) {

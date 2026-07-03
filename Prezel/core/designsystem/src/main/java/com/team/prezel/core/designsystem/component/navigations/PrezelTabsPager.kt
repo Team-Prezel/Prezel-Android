@@ -100,7 +100,7 @@ private fun PrezelMediumTabPreview() {
         PrezelTabsPager(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.MEDIUM,
+            size = PrezelTabSize.SMALL,
             modifier = Modifier,
         ) { page ->
             Box(

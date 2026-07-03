@@ -127,7 +127,7 @@ private fun HistoryContent(
     PrezelTabsPager(
         tabs = tabs,
         pagerState = pagerState,
-        size = PrezelTabSize.MEDIUM,
+        size = PrezelTabSize.SMALL,
         modifier = Modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),

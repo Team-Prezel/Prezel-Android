@@ -68,11 +68,11 @@ private fun PrezelTab(
     Tab(
         selected = selected,
         onClick = onClick,
-        modifier = modifier.height(if (size == PrezelTabSize.REGULAR) 36.dp else 48.dp),
+        modifier = modifier.height(if (size == PrezelTabSize.SMALL) 36.dp else 48.dp),
         text = {
             Text(
                 text = label,
-                style = if (size == PrezelTabSize.REGULAR) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
+                style = if (size == PrezelTabSize.SMALL) PrezelTextStyles.Body3Medium.toTextStyle() else PrezelTextStyles.Body2Bold.toTextStyle(),
             )
         },
         selectedContentColor = PrezelTheme.colors.solidBlack,

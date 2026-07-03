@@ -145,7 +145,7 @@ private fun AudioUploadScreen(
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.MEDIUM,
+            size = PrezelTabSize.SMALL,
             onClickTab = {},
         )
 
