@@ -75,6 +75,8 @@ private fun VoiceRecordingScreen(
     onScriptExpandedChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
+    var showButtonAreaDivider by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -100,12 +102,16 @@ private fun VoiceRecordingScreen(
                 onScriptExpandedChange(!isScriptExpanded)
             },
             onClickRecordingControl = onClickRecordingControl,
+            onScriptScrollableChange = { scrollable ->
+                showButtonAreaDivider = scrollable
+            },
             modifier = Modifier.weight(1f),
         )
 
         VoiceRecordingButtonArea(
             recordingState = recordingState,
             analyzeEnabled = analyzeEnabled,
+            showDivider = showButtonAreaDivider,
             onClickRecordingControl = onClickRecordingControl,
             onStopRecording = onStopRecording,
             onResetRecording = onResetRecording,
