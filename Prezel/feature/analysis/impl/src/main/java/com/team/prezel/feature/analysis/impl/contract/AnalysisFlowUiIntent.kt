@@ -70,13 +70,13 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
     data object Back : AnalysisFlowUiIntent
 
     companion object {
-        fun selectSituationOption(category: Category): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.CategoryOption(category))
+        fun selectSituationOption(category: Category?): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.CategoryOption(category))
 
-        fun selectSituationOption(purpose: Purpose): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.PurposeOption(purpose))
+        fun selectSituationOption(purpose: Purpose?): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.PurposeOption(purpose))
 
-        fun selectSituationOption(style: Style): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.StyleOption(style))
+        fun selectSituationOption(style: Style?): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.StyleOption(style))
 
-        fun selectSituationOption(audience: Audience): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.AudienceOption(audience))
+        fun selectSituationOption(audience: Audience?): AnalysisFlowUiIntent = SelectSituationOption(AnalysisSituationOption.AudienceOption(audience))
     }
 }
 
@@ -87,18 +87,18 @@ internal enum class AnalysisUploadType {
 
 internal sealed interface AnalysisSituationOption {
     data class CategoryOption(
-        val category: Category,
+        val category: Category?,
     ) : AnalysisSituationOption
 
     data class PurposeOption(
-        val purpose: Purpose,
+        val purpose: Purpose?,
     ) : AnalysisSituationOption
 
     data class StyleOption(
-        val style: Style,
+        val style: Style?,
     ) : AnalysisSituationOption
 
     data class AudienceOption(
-        val audience: Audience,
+        val audience: Audience?,
     ) : AnalysisSituationOption
 }
