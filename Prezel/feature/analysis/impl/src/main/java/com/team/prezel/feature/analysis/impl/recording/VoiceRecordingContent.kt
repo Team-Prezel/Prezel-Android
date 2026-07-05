@@ -329,6 +329,10 @@ private fun RecordingTimer(
 ) {
     val timerText = when (recordingState) {
         is AudioSessionState.ReadyToPlay -> buildAnnotatedString {
+            withStyle(SpanStyle(color = PrezelTheme.colors.textDisabled)) {
+                append(currentSeconds.toTimerText())
+                append("/")
+            }
             withStyle(SpanStyle(color = PrezelTheme.colors.textLarge)) {
                 append(totalSeconds.toTimerText())
             }
