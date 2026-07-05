@@ -35,8 +35,12 @@ internal sealed interface ProfileUiState : UiState {
 
         val isProfileImageChanged: Boolean = editing.profileImageUrl != original.profileImageUrl
 
-        val submitButtonEnabled: Boolean =
-            isProfileImageChanged || (isNicknameChanged && editing.nicknameValidation == NicknameValidationState.Available)
+        val hasAnyChanges: Boolean = isProfileImageChanged || isNicknameChanged
+
+        val isNicknameSubmittable: Boolean =
+            !isNicknameChanged || editing.nicknameValidation == NicknameValidationState.Available
+
+        val submitButtonEnabled: Boolean = hasAnyChanges && isNicknameSubmittable
 
         companion object {
             fun User.toUiState(): ProfileUiState =
