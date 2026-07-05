@@ -12,6 +12,7 @@ import com.team.prezel.feature.profile.impl.contract.ProfileUiState
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Content.Companion.toUiState
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
+import com.team.prezel.feature.profile.impl.model.ProfileUpdateResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -110,7 +111,13 @@ internal class ProfileViewModel @Inject constructor(
                 nickname = uiState.editing.nickname,
                 profileImageFile = uiState.editing.profileImageFile,
             ).onSuccess {
-                if (uiState.isRegistered) return@launch sendEffect(ProfileUiEffect.NavigateToBack)
+                if (uiState.isRegistered) {
+                    return@launch sendEffect(
+                        ProfileUiEffect.NavigateToBack(
+                            result = uiState.toProfileUpdateResult(),
+                        ),
+                    )
+                }
                 sendEffect(ProfileUiEffect.NavigateToHome)
             }.onFailure { throwable ->
                 Timber.e(throwable)
@@ -172,6 +179,13 @@ internal class ProfileViewModel @Inject constructor(
 
     private fun ProfileUiState.Content.updateNicknameValidation(validationState: NicknameValidationState): ProfileUiState.Content =
         copy(editing = editing.copy(nicknameValidation = validationState))
+
+    private fun ProfileUiState.Content.toProfileUpdateResult(): ProfileUpdateResult =
+        when {
+            isProfileImageChanged && isNicknameChanged -> ProfileUpdateResult.Profile
+            isProfileImageChanged -> ProfileUpdateResult.Image
+            else -> ProfileUpdateResult.Nickname
+        }
 
     private companion object {
         const val NICKNAME_VALIDATION_DEBOUNCE_MILLIS = 300L
