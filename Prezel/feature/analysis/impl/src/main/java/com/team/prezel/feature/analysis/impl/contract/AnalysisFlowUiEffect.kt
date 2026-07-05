@@ -8,6 +8,7 @@ internal sealed interface AnalysisFlowUiEffect : UiEffect {
 
     data class NavigateToStep(
         val step: AnalysisFlowStep,
+        val clearStack: Boolean = false,
     ) : AnalysisFlowUiEffect
 
     data class NavigateToReport(

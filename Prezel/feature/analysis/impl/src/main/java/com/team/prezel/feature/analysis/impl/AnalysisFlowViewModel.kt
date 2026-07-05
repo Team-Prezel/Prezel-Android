@@ -1,7 +1,6 @@
 package com.team.prezel.feature.analysis.impl
 
 import androidx.lifecycle.viewModelScope
-import com.team.prezel.core.audio.AudioSessionEffect
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
@@ -20,12 +19,15 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
+
+private const val ANALYSIS_TIMEOUT_MILLIS = 15_000L
+private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
 
 @HiltViewModel
 internal class AnalysisFlowViewModel @Inject constructor(
@@ -52,8 +54,8 @@ internal class AnalysisFlowViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            audioController.audioSessionEffect.collect { effect ->
-                sendEffect(AnalysisFlowUiEffect.ShowMessage(effect.toUiMessage()))
+            audioController.audioSessionEffect.collect {
+                updateState { copy(step = AnalysisFlowStep.ANALYSIS_FAILED) }
             }
         }
     }
@@ -82,6 +84,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
             )
 
             is AnalysisFlowUiIntent.SelectScriptFile -> selectScriptFile(intent.fileUri)
+            is AnalysisFlowUiIntent.SelectAudioFile -> selectAudioFile(
+                fileUri = intent.fileUri,
+                fileName = intent.fileName,
+            )
             AnalysisFlowUiIntent.ClickRecordingControl -> audioController.handleControlClick(currentState.recordingState)
             AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
             AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
@@ -90,6 +96,25 @@ internal class AnalysisFlowViewModel @Inject constructor(
             AnalysisFlowUiIntent.SkipScript -> skipScript()
             AnalysisFlowUiIntent.Back -> moveBack()
             else -> Unit
+        }
+    }
+
+    private fun selectAudioFile(
+        fileUri: String?,
+        fileName: String?,
+    ) {
+        if (!fileName.isSupportedAudioFileName()) {
+            updateState {
+                copy(
+                    step = AnalysisFlowStep.FILE_RECOGNITION_FAILED,
+                    form = form.copy(audioFileUri = null),
+                )
+            }
+            return
+        }
+
+        updateState {
+            copy(form = form.copy(audioFileUri = fileUri))
         }
     }
 
@@ -280,7 +305,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
     }
 
     private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
-        runCatching {
+        runAnalysisCatching {
             val audioFilePath = resolveAudioFilePath(analysisFileCache)
             val scriptFilePath = resolveScriptFilePath(analysisFileCache)
             analyzePresentationUseCase(
@@ -294,12 +319,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             ).getOrThrow()
-        }.onFailure {
-            if (it is CancellationException) throw it
         }
 
     private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(presentationId: Long): Result<PresentationAnalysisSummary> =
-        runCatching {
+        runAnalysisCatching {
             val audioFilePath = resolveAudioFilePath(analysisFileCache)
             val scriptFilePath = resolveScriptFilePath(analysisFileCache)
             reAnalyzePresentationUseCase(
@@ -308,8 +331,13 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             ).getOrThrow()
-        }.onFailure {
-            if (it is CancellationException) throw it
+        }
+
+    private suspend fun <T> runAnalysisCatching(block: suspend () -> T): Result<T> =
+        try {
+            Result.success(withTimeout(ANALYSIS_TIMEOUT_MILLIS) { block() })
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
         }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
@@ -358,22 +386,24 @@ internal class AnalysisFlowViewModel @Inject constructor(
             }
 
             AnalysisUploadType.AUDIO -> {
-                val isAnalysisFailed = currentState.step == AnalysisFlowStep.ANALYSIS_FAILED
-                val retryStep = if (isAnalysisFailed) {
-                    AnalysisFlowStep.PRESENTATION_SCHEDULE
-                } else {
-                    currentState.audioInputStep
-                }
+                val retryStep = currentState.audioRetryStep
                 updateState {
                     copy(
                         step = retryStep,
                         form = form.copy(audioFileUri = null),
                     )
                 }
-                if (retryStep == AnalysisFlowStep.VOICE_RECORDING || isAnalysisFailed) {
+                if (retryStep == AnalysisFlowStep.VOICE_RECORDING) {
                     audioController.reset()
                 }
-                viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = retryStep)) }
+                viewModelScope.launch {
+                    sendEffect(
+                        AnalysisFlowUiEffect.NavigateToStep(
+                            step = retryStep,
+                            clearStack = true,
+                        ),
+                    )
+                }
             }
         }
     }
@@ -422,6 +452,17 @@ private val AnalysisFlowUiState.audioInputStep: AnalysisFlowStep
         AnalysisStartType.VOICE_RECORDING -> AnalysisFlowStep.VOICE_RECORDING
     }
 
+private val AnalysisFlowUiState.audioRetryStep: AnalysisFlowStep
+    get() = when (step) {
+        AnalysisFlowStep.ANALYSIS_FAILED -> AnalysisFlowStep.VOICE_RECORDING
+        AnalysisFlowStep.FILE_RECOGNITION_FAILED -> when (startType) {
+            AnalysisStartType.FILE_UPLOAD -> AnalysisFlowStep.SCRIPT_INPUT
+            AnalysisStartType.VOICE_RECORDING -> AnalysisFlowStep.VOICE_RECORDING
+        }
+
+        else -> audioInputStep
+    }
+
 private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
     fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
 ): Result<String?> {
@@ -451,12 +492,14 @@ private fun PresentationAnalysisSubmission.resolveScriptFilePath(analysisFileCac
             ).absolutePath
     }
 
-private fun AudioSessionEffect.toUiMessage(): AnalysisUiMessage =
-    when (this) {
-        AudioSessionEffect.RecordingStartFailed -> AnalysisUiMessage.RECORDING_START_FAILED
-        AudioSessionEffect.RecordingStopFailed -> AnalysisUiMessage.RECORDING_STOP_FAILED
-        AudioSessionEffect.PlaybackStartFailed -> AnalysisUiMessage.PLAYBACK_START_FAILED
-    }
+private fun String?.isSupportedAudioFileName(): Boolean {
+    if (this == null) return true
+
+    val extension = substringAfterLast('.', missingDelimiterValue = "")
+        .lowercase()
+
+    return extension in SUPPORTED_AUDIO_FILE_EXTENSIONS
+}
 
 private fun RecordingAudioController.handleControlClick(recordingState: AudioSessionState) {
     when (recordingState) {

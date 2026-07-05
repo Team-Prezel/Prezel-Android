@@ -45,7 +45,7 @@ private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
 @Composable
 internal fun AnalysisScreen(
     onBack: () -> Unit,
-    navigateToStep: (AnalysisFlowStep) -> Unit,
+    navigateToStep: (step: AnalysisFlowStep, clearStack: Boolean) -> Unit,
     navigateToReport: (presentationId: Long) -> Unit,
     viewModel: AnalysisFlowViewModel,
 ) {
@@ -62,7 +62,7 @@ internal fun AnalysisScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
-                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step)
+                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
                 is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toStringRes()))
@@ -300,7 +300,14 @@ private fun AnalysisFormInputStepContent(
 
         AnalysisFlowStep.AUDIO_UPLOAD -> AudioUploadScreen(
             uiState = uiState,
-            onAudioFileSelected = { onIntent(AnalysisFlowUiIntent.SelectAudioFile(it)) },
+            onAudioFileSelected = { fileUri, fileName ->
+                onIntent(
+                    AnalysisFlowUiIntent.SelectAudioFile(
+                        fileUri = fileUri,
+                        fileName = fileName,
+                    ),
+                )
+            },
             onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )

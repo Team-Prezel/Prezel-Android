@@ -51,6 +51,7 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
 
     data class SelectAudioFile(
         val fileUri: String?,
+        val fileName: String? = null,
     ) : AnalysisFlowUiIntent
 
     data object ClickRecordingControl : AnalysisFlowUiIntent
