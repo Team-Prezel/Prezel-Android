@@ -149,6 +149,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
         val submission = currentState.toPresentationAnalysisSubmissionOrNull() ?: return
         val reAnalyzePresentationId = currentState.reRecordingPresentationId
             ?: currentState.reWritingScriptPresentationId
+        audioController.stopPlayback()
 
         if (reAnalyzePresentationId != null) {
             reAnalyzePresentation(

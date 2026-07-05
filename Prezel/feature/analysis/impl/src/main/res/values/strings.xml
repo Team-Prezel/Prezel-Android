@@ -74,6 +74,8 @@
     <string name="feature_analysis_impl_voice_recording_failed">녹음을 시작하지 못했어요. 다시 시도해 주세요.</string>
     <string name="feature_analysis_impl_voice_recording_stop_failed">녹음을 저장하지 못했어요. 다시 시도해 주세요.</string>
     <string name="feature_analysis_impl_voice_recording_playback_failed">녹음을 재생하지 못했어요.</string>
+    <string name="feature_analysis_impl_voice_recording_speak_louder_feedback">조금 더 크게 말해볼까요?</string>
+    <string name="feature_analysis_impl_voice_recording_ready_to_continue_feedback">준비되면 이어서 말해주세요</string>
 
     <string name="feature_analysis_impl_upload_title">파일 업로드</string>
     <string name="feature_analysis_impl_direct_input_title">직접 입력</string>

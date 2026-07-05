@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
@@ -33,6 +34,13 @@ import com.team.prezel.feature.analysis.impl.schedule.PresentationScheduleScreen
 import com.team.prezel.feature.analysis.impl.script.ScriptInputScreen
 import com.team.prezel.feature.analysis.impl.situation.PresentationSituationScreen
 import kotlinx.coroutines.launch
+
+private const val RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS = 50
+private const val VOICE_RECORDING_FEEDBACK_DURATION_MILLIS = 3_000
+private const val VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT =
+    VOICE_RECORDING_FEEDBACK_DURATION_MILLIS / RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS
+private const val SILENCE_VOLUME_THRESHOLD = 0.12f
+private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
 
 @Composable
 internal fun AnalysisScreen(
@@ -106,6 +114,7 @@ private fun AnalysisScreen(
 ) {
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val voiceRecordingFeedback = uiState.voiceRecordingFeedback
 
     LaunchedEffect(uiState.step) {
         if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
@@ -113,6 +122,14 @@ private fun AnalysisScreen(
                 message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
             )
         }
+    }
+
+    LaunchedEffect(voiceRecordingFeedback) {
+        voiceRecordingFeedback ?: return@LaunchedEffect
+        snackbarHostState.currentSnackbarData?.dismiss()
+        snackbarHostState.showPrezelSnackbar(
+            message = resources.getString(voiceRecordingFeedback.messageResId),
+        )
     }
 
     val onClickRecordingControl = rememberVoiceRecordingControlClick(
@@ -128,6 +145,32 @@ private fun AnalysisScreen(
         onScriptExpandedChange = onScriptExpandedChange,
     )
 }
+
+private enum class VoiceRecordingFeedback(
+    @param:StringRes val messageResId: Int,
+) {
+    READY_TO_CONTINUE(R.string.feature_analysis_impl_voice_recording_ready_to_continue_feedback),
+    SPEAK_LOUDER(R.string.feature_analysis_impl_voice_recording_speak_louder_feedback),
+}
+
+private val AnalysisFlowUiState.voiceRecordingFeedback: VoiceRecordingFeedback?
+    get() {
+        if (step != AnalysisFlowStep.VOICE_RECORDING || recordingState !is AudioSessionState.Recording) return null
+
+        val recentVolumes = recordingVolumes.takeLast(VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT)
+        if (recentVolumes.size < VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT) return null
+
+        if (recentVolumes.all { volume -> volume <= SILENCE_VOLUME_THRESHOLD }) {
+            return VoiceRecordingFeedback.READY_TO_CONTINUE
+        }
+
+        val averageVolume = recentVolumes.average().toFloat()
+        return if (averageVolume <= LOW_AVERAGE_VOLUME_THRESHOLD) {
+            VoiceRecordingFeedback.SPEAK_LOUDER
+        } else {
+            null
+        }
+    }
 
 @Composable
 private fun rememberVoiceRecordingControlClick(
