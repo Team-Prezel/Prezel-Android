@@ -23,6 +23,8 @@ value class Nickname private constructor(
     companion object {
         const val MAX_LENGTH = 10
         private const val MIN_LENGTH = 2
+        private const val DIGIT_START = '0'.code
+        private const val DIGIT_END = '9'.code
         private const val LATIN_UPPERCASE_START = 'A'.code
         private const val LATIN_UPPERCASE_END = 'Z'.code
         private const val LATIN_LOWERCASE_START = 'a'.code
@@ -46,7 +48,8 @@ value class Nickname private constructor(
         }
 
         private fun isAllowedCodePoint(codePoint: Int): Boolean =
-            codePoint in LATIN_UPPERCASE_START..LATIN_UPPERCASE_END ||
+            codePoint in DIGIT_START..DIGIT_END ||
+                codePoint in LATIN_UPPERCASE_START..LATIN_UPPERCASE_END ||
                 codePoint in LATIN_LOWERCASE_START..LATIN_LOWERCASE_END ||
                 Character.UnicodeScript.of(codePoint) == Character.UnicodeScript.HANGUL
     }
