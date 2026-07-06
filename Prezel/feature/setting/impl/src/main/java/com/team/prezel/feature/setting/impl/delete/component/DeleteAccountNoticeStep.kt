@@ -3,19 +3,15 @@ package com.team.prezel.feature.setting.impl.delete.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -24,10 +20,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
-import com.team.prezel.core.designsystem.component.PrezelCheckbox
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.setting.impl.R
 
 private const val HIGHLIGHT_START_TAG = "<highlight>"
@@ -63,7 +57,7 @@ internal fun DeleteAccountNoticeStep(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V36))
 
-        DeletionAgreement(isChecked = isChecked, onCheckedChange = onCheckedChange)
+//        DeletionAgreement(isChecked = isChecked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -79,34 +73,6 @@ private fun DeleteAccountNoticeHeader(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
 
         DeleteAccountNoticeDescription()
-    }
-}
-
-@Composable
-private fun DeletionAgreement(
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .noRippleClickable { onCheckedChange(!isChecked) },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        PrezelCheckbox(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            extraTouchPadding = PaddingValues(),
-        )
-
-        Spacer(modifier = Modifier.width(PrezelTheme.spacing.V8))
-
-        Text(
-            text = stringResource(R.string.feature_setting_impl_delete_account_notice_check),
-            style = PrezelTheme.typography.body3Regular,
-            color = PrezelTheme.colors.textRegular,
-        )
     }
 }
 
