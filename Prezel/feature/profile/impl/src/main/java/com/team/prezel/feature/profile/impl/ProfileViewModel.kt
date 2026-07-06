@@ -2,6 +2,7 @@ package com.team.prezel.feature.profile.impl
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
+import com.team.prezel.core.domain.usecase.user.GetUserNicknameUseCase
 import com.team.prezel.core.domain.usecase.user.PatchUserProfileUseCase
 import com.team.prezel.core.domain.usecase.user.ValidateNicknameUseCase
 import com.team.prezel.core.model.profile.Nickname
@@ -9,6 +10,7 @@ import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.profile.impl.contract.ProfileUiEffect
 import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
+import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Content.Companion.fromCachedNickname
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState.Content.Companion.toUiState
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
@@ -29,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ProfileViewModel @Inject constructor(
     private val fetchUserInfoUseCase: FetchUserInfoUseCase,
+    private val getUserNicknameUseCase: GetUserNicknameUseCase,
     private val patchUserProfileUseCase: PatchUserProfileUseCase,
     private val validateNicknameUseCase: ValidateNicknameUseCase,
 ) : BaseViewModel<ProfileUiState, ProfileUiIntent, ProfileUiEffect>(ProfileUiState.Loading) {
@@ -43,7 +46,10 @@ internal class ProfileViewModel @Inject constructor(
                 .collectLatest(::validateNickname)
         }
 
-        fetchUserInfo()
+        viewModelScope.launch {
+            prefillNickname()
+            fetchUserInfo()
+        }
     }
 
     override fun onIntent(intent: ProfileUiIntent) {
@@ -63,15 +69,23 @@ internal class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun fetchUserInfo() {
-        viewModelScope.launch {
-            fetchUserInfoUseCase()
-                .onSuccess { user -> updateState { user.toUiState() } }
-                .onFailure { throwable ->
-                    sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.FETCH_USER_INFO_FAILED))
-                    Timber.e(throwable)
-                }
-        }
+    private suspend fun fetchUserInfo() {
+        fetchUserInfoUseCase()
+            .onSuccess { user -> updateState { user.toUiState() } }
+            .onFailure { throwable ->
+                sendEffect(ProfileUiEffect.ShowMessage(ProfileUiMessage.FETCH_USER_INFO_FAILED))
+                Timber.e(throwable)
+            }
+    }
+
+    private suspend fun prefillNickname() {
+        getUserNicknameUseCase()
+            .onSuccess { nickname ->
+                if (nickname.isBlank()) return@onSuccess
+                updateState { fromCachedNickname(nickname = nickname) }
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+            }
     }
 
     private fun handleNicknameChanged(nickname: String) {
