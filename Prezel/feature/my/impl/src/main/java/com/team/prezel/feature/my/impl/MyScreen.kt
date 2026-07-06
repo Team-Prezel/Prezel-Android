@@ -129,7 +129,10 @@ private fun MyScreen(
                 items = uiState.badges,
                 key = { badge -> badge.code },
             ) { badge ->
-                BadgeGridItem(badge = badge)
+                BadgeGridItem(
+                    badge = badge,
+                    modifier = modifier.noRippleClickable(onClick = navigateToBadge),
+                )
             }
         }
     }
