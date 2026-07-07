@@ -63,14 +63,15 @@ private val PracticeAnalysisErrorType.titleResId: Int
     @StringRes
     get() = when (this) {
         PracticeAnalysisErrorType.ANALYSIS_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_failed_title
-        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_voice_recognition_failed_title
+        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED ->
+            R.string.feature_practice_impl_practice_recording_voice_recognition_failed_title
     }
 
 private val PracticeAnalysisErrorType.descriptionResId: Int
     @StringRes
     get() = when (this) {
         PracticeAnalysisErrorType.ANALYSIS_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_failed_description
-        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_voice_recognition_failed_description
+        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> R.string.feature_practice_impl_practice_recording_voice_recognition_failed_description
     }
 
 @BasicPreview
