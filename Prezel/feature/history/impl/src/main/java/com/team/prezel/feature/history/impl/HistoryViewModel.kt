@@ -26,7 +26,10 @@ internal class HistoryViewModel @Inject constructor(
     override fun onIntent(intent: HistoryUiIntent) {
         when (intent) {
             HistoryUiIntent.FetchData -> fetchData()
-            is HistoryUiIntent.ClickItem -> handleClickItem(presentationId = intent.presentationId)
+            is HistoryUiIntent.ClickItem -> handleClickItem(
+                presentationId = intent.presentationId,
+                pageType = intent.pageType,
+            )
         }
     }
 
@@ -61,12 +64,19 @@ internal class HistoryViewModel @Inject constructor(
         }
     }
 
-    private fun handleClickItem(presentationId: Long) {
-        val pastItems = (currentState as? HistoryUiState.Content)?.currentPageItem(type = HistoryPageType.COMPLETED).orEmpty()
-        val isPast = pastItems.any { history -> history.presentationId == presentationId }
+    private fun handleClickItem(
+        presentationId: Long,
+        pageType: HistoryPageType,
+    ) {
+        val isPast = pageType == HistoryPageType.COMPLETED
 
         viewModelScope.launch {
-            sendEffect(HistoryUiEffect.NavigateToReport(presentationId = presentationId, isPast = isPast))
+            sendEffect(
+                HistoryUiEffect.NavigateToReport(
+                    presentationId = presentationId,
+                    isPast = isPast,
+                ),
+            )
         }
     }
 }

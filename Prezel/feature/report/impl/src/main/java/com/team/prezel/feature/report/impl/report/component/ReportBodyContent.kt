@@ -35,7 +35,6 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 internal fun ReportBodyContent(
     uiState: AnalysisReportUiState.Content,
-    showEditActions: Boolean = true,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (Int) -> Unit,
     onReWriteScriptClick: () -> Unit,
@@ -63,14 +62,14 @@ internal fun ReportBodyContent(
     )
     GrowthGraphSection(
         growthGraphData = uiState.growthGraphData,
-        showReRecordingButton = showEditActions,
+        showReRecordingButton = !uiState.isPast,
         onCardIndexChange = onImprovementCardIndexChange,
         onReRecordingClick = onReRecordingClick,
     )
     ScriptAnalysisSection(
         isWrittenScript = uiState.isScriptWritten,
         scriptAnalysisGraphData = uiState.scriptAnalysisGraphData,
-        showReWriteScriptButton = showEditActions,
+        showReWriteScriptButton = !uiState.isPast,
         onReWriteScriptClick = onReWriteScriptClick,
         onScriptAnalysisClick = onScriptAnalysisClick,
     )

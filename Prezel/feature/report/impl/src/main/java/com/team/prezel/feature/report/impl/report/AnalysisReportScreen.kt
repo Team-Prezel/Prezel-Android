@@ -40,7 +40,6 @@ internal fun AnalysisReportScreen(
     navigateToScriptMatch: (analysisResultId: Long) -> Unit,
     modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
-    showEditActions: Boolean = true,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,7 +76,6 @@ internal fun AnalysisReportScreen(
     AnalysisReportScreen(
         uiState = uiState,
         showBackButton = showBackButton,
-        showEditActions = showEditActions,
         onBackClick = onBack,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
@@ -109,14 +107,12 @@ internal fun AnalysisReportScreen(
     onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
-    showEditActions: Boolean = true,
 ) {
     when (uiState) {
         is AnalysisReportUiState.Content -> {
             AnalysisReportScreenContent(
                 uiState = uiState,
                 showBackButton = showBackButton,
-                showEditActions = showEditActions,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
@@ -140,7 +136,6 @@ internal fun AnalysisReportScreen(
 private fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState.Content,
     showBackButton: Boolean,
-    showEditActions: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -186,7 +181,6 @@ private fun AnalysisReportScreenContent(
         bodyContent = {
             ReportBodyContent(
                 uiState = uiState,
-                showEditActions = showEditActions,
                 onDeleteClick = onDeleteClick,
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
                 onReWriteScriptClick = onReWriteScriptClick,
