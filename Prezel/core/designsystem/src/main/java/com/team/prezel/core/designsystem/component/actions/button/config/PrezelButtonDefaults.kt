@@ -28,6 +28,7 @@ data class PrezelButtonDefault(
     val contentPadding: PaddingValues,
     val iconSpacing: Dp,
     val iconSize: Dp,
+    val textButtonHeight: Dp?,
 ) {
     val hasBorder: Boolean = borderWidth > 0.dp
 
@@ -66,6 +67,7 @@ object PrezelButtonDefaults {
         contentPadding: PaddingValues = getContentPadding(size = size, isIconOnly = isIconOnly),
         iconSpacing: Dp = getIconSpacing(size = size),
         iconSize: Dp = getIconSize(size = size),
+        textButtonHeight: Dp? = if (isIconOnly) null else getTextButtonHeight(size = size),
     ) = PrezelButtonDefault(
         contentColor = contentColor,
         disabledContentColor = disabledContentColor,
@@ -79,7 +81,16 @@ object PrezelButtonDefaults {
         contentPadding = contentPadding,
         iconSpacing = iconSpacing,
         iconSize = iconSize,
+        textButtonHeight = textButtonHeight,
     )
+
+    @Composable
+    private fun getTextButtonHeight(size: ButtonSize): Dp =
+        when (size) {
+            ButtonSize.XSMALL -> 28.dp
+            ButtonSize.SMALL -> 36.dp
+            ButtonSize.REGULAR -> 48.dp
+        }
 
     @Composable
     private fun getContentColor(

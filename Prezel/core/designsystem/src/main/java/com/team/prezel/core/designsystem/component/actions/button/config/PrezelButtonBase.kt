@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -132,7 +133,9 @@ private fun Modifier.buttonContainer(
     config: PrezelButtonDefault,
 ): Modifier =
     this
-        .clip(shape = config.shape)
+        .then(
+            config.textButtonHeight?.let { Modifier.height(it) } ?: Modifier,
+        ).clip(shape = config.shape)
         .background(color = config.backgroundColor(enabled = enabled))
         .then(
             if (config.hasBorder) {
