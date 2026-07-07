@@ -96,8 +96,6 @@ internal fun AnalysisReportScreen(
 @Composable
 internal fun AnalysisReportScreen(
     uiState: AnalysisReportUiState,
-    showBackButton: Boolean = false,
-    showEditActions: Boolean = true,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -110,6 +108,8 @@ internal fun AnalysisReportScreen(
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showBackButton: Boolean = false,
+    showEditActions: Boolean = true,
 ) {
     when (uiState) {
         is AnalysisReportUiState.Content -> {
