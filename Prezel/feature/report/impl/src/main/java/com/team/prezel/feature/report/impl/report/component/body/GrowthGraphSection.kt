@@ -46,11 +46,17 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 internal fun GrowthGraphSection(
     growthGraphData: GrowthGraphData,
+    showReRecordingButton: Boolean = true,
     onCardIndexChange: (Int) -> Unit,
     onReRecordingClick: () -> Unit,
 ) {
     ReportSection(
-        title = { GrowthGraphSectionTitle(onReRecordingClick = onReRecordingClick) },
+        title = {
+            GrowthGraphSectionTitle(
+                showReRecordingButton = showReRecordingButton,
+                onReRecordingClick = onReRecordingClick,
+            )
+        },
     ) {
         GrowthGraphContent(
             growthGraphData = growthGraphData,
@@ -62,7 +68,10 @@ internal fun GrowthGraphSection(
 }
 
 @Composable
-private fun GrowthGraphSectionTitle(onReRecordingClick: () -> Unit) {
+private fun GrowthGraphSectionTitle(
+    showReRecordingButton: Boolean,
+    onReRecordingClick: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -86,15 +95,17 @@ private fun GrowthGraphSectionTitle(onReRecordingClick: () -> Unit) {
                 )
             }
         }
-        PrezelButton(
-            text = stringResource(R.string.feature_report_impl_re_recording),
-            iconResId = PrezelIcons.Mic,
-            type = ButtonType.OUTLINED,
-            size = ButtonSize.XSMALL,
-            hierarchy = ButtonHierarchy.SECONDARY,
-            isRounded = true,
-            onClick = onReRecordingClick,
-        )
+        if (showReRecordingButton) {
+            PrezelButton(
+                text = stringResource(R.string.feature_report_impl_re_recording),
+                iconResId = PrezelIcons.Mic,
+                type = ButtonType.OUTLINED,
+                size = ButtonSize.XSMALL,
+                hierarchy = ButtonHierarchy.SECONDARY,
+                isRounded = true,
+                onClick = onReRecordingClick,
+            )
+        }
     }
 }
 
