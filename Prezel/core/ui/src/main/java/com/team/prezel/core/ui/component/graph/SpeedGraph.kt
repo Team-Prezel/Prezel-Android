@@ -27,7 +27,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import kotlin.math.max
 import kotlin.math.min
 
-private const val DEFAULT_LOWER_BOUND = 180
+private const val DEFAULT_LOWER_BOUND = 190
 private const val DEFAULT_UPPER_BOUND = 280
 private const val DEFAULT_GOOD_LOWER_BOUND = 210
 private const val DEFAULT_GOOD_UPPER_BOUND = 260
