@@ -10,6 +10,7 @@ sealed interface TermsNavKey : NavKey {
 
     @Serializable
     data class Detail(
-        val document: TermsDocumentType,
+        val title: String,
+        val url: String,
     ) : TermsNavKey
 }

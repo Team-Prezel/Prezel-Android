@@ -28,7 +28,7 @@ internal class BadgeRemoteDataSourceImpl @Inject constructor(
     private val badgeService: BadgeService,
     private val httpClient: HttpClient,
 ) : BadgeRemoteDataSource {
-    override suspend fun getBadges(): List<GetBadgeResponse> = badgeService.getBadges().requireData()
+    override suspend fun getBadges(sort: String): List<GetBadgeResponse> = badgeService.getBadges(sort = sort).requireData()
 
     override suspend fun getBadgeDetail(badgeCode: String): GetBadgeDetailResponse = badgeService.getBadgeDetail(badgeCode = badgeCode).requireData()
 

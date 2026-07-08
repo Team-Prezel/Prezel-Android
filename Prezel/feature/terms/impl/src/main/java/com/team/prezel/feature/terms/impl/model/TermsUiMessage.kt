@@ -1,6 +1,9 @@
 package com.team.prezel.feature.terms.impl.model
 
 internal enum class TermsUiMessage {
+    FETCH_TERMS_FAILED_NETWORK,
+    FETCH_TERMS_FAILED_SERVER,
+    FETCH_TERMS_FAILED_UNKNOWN,
     AGREE_TERMS_FAILED_INVALID_REQUEST,
     AGREE_TERMS_FAILED_NETWORK,
     AGREE_TERMS_FAILED_SERVER,

@@ -49,13 +49,15 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.terms.impl.contract.TermsUiEffect
 import com.team.prezel.feature.terms.impl.contract.TermsUiIntent
 import com.team.prezel.feature.terms.impl.contract.TermsUiState
+import com.team.prezel.feature.terms.impl.model.TermsAgreementUiModel
 import com.team.prezel.feature.terms.impl.model.TermsUiMessage
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun TermsScreen(
     navigateBack: () -> Unit,
-    navigateToTermsOfServiceDetail: () -> Unit,
-    navigateToPrivacyPolicyDetail: () -> Unit,
+    navigateToTermsDetail: (String, String) -> Unit,
     navigateToProfile: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TermsViewModel = hiltViewModel(),
@@ -65,12 +67,17 @@ internal fun TermsScreen(
     val snackbarHostState = LocalSnackbarHostState.current
 
     LaunchedEffect(Unit) {
+        viewModel.onIntent(TermsUiIntent.FetchTerms)
+
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 TermsUiEffect.NavigateToProfile -> navigateToProfile()
 
                 is TermsUiEffect.ShowMessage -> {
                     val resId = when (effect.message) {
+                        TermsUiMessage.FETCH_TERMS_FAILED_NETWORK -> R.string.feature_terms_impl_fetch_terms_failed_network
+                        TermsUiMessage.FETCH_TERMS_FAILED_SERVER -> R.string.feature_terms_impl_fetch_terms_failed_server
+                        TermsUiMessage.FETCH_TERMS_FAILED_UNKNOWN -> R.string.feature_terms_impl_fetch_terms_failed_unknown
                         TermsUiMessage.AGREE_TERMS_FAILED_INVALID_REQUEST -> R.string.feature_terms_impl_agree_terms_failed_invalid_request
                         TermsUiMessage.AGREE_TERMS_FAILED_NETWORK -> R.string.feature_terms_impl_agree_terms_failed_network
                         TermsUiMessage.AGREE_TERMS_FAILED_SERVER -> R.string.feature_terms_impl_agree_terms_failed_server
@@ -86,11 +93,8 @@ internal fun TermsScreen(
         uiState = uiState,
         onBack = navigateBack,
         onToggleAll = { viewModel.onIntent(TermsUiIntent.ToggleAll) },
-        onToggleTermsOfService = { viewModel.onIntent(TermsUiIntent.ToggleTermsOfService) },
-        onTogglePrivacyPolicy = { viewModel.onIntent(TermsUiIntent.TogglePrivacyPolicy) },
-        onToggleMarketingConsent = { viewModel.onIntent(TermsUiIntent.ToggleMarketingConsent) },
-        onClickTermsOfServiceDetail = navigateToTermsOfServiceDetail,
-        onClickPrivacyPolicyDetail = navigateToPrivacyPolicyDetail,
+        onToggleTerm = { termsId -> viewModel.onIntent(TermsUiIntent.ToggleTerm(termsId)) },
+        onClickTermsDetail = navigateToTermsDetail,
         onContinue = { viewModel.onIntent(TermsUiIntent.ClickContinue) },
         modifier = modifier,
     )
@@ -102,11 +106,8 @@ private fun TermsScreenScreen(
     uiState: TermsUiState,
     onBack: () -> Unit,
     onToggleAll: () -> Unit,
-    onToggleTermsOfService: () -> Unit,
-    onTogglePrivacyPolicy: () -> Unit,
-    onToggleMarketingConsent: () -> Unit,
-    onClickTermsOfServiceDetail: () -> Unit,
-    onClickPrivacyPolicyDetail: () -> Unit,
+    onToggleTerm: (Long) -> Unit,
+    onClickTermsDetail: (String, String) -> Unit,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -117,20 +118,17 @@ private fun TermsScreenScreen(
             modifier = Modifier.weight(1f),
             uiState = uiState,
             onToggleAll = onToggleAll,
-            onToggleTermsOfService = onToggleTermsOfService,
-            onClickTermsOfServiceDetail = onClickTermsOfServiceDetail,
-            onTogglePrivacyPolicy = onTogglePrivacyPolicy,
-            onClickPrivacyPolicyDetail = onClickPrivacyPolicyDetail,
-            onToggleMarketingConsent = onToggleMarketingConsent,
+            onToggleTerm = onToggleTerm,
+            onClickTermsDetail = onClickTermsDetail,
         )
 
         PrezelButtonArea(
-            mainButton = { modifier ->
+            mainButton = { buttonModifier ->
                 PrezelButton(
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     text = stringResource(R.string.feature_terms_impl_terms_continue_button_text),
                     onClick = onContinue,
-                    enabled = uiState.isRequiredChecked && !uiState.isLoading,
+                    enabled = uiState.isRequiredChecked && !uiState.isLoading && !uiState.isTermsLoading,
                     type = ButtonType.FILLED,
                     hierarchy = ButtonHierarchy.PRIMARY,
                 )
@@ -165,19 +163,15 @@ private fun TermsScreenTopAppBar(
 private fun TermsAgreementContent(
     uiState: TermsUiState,
     onToggleAll: () -> Unit,
-    onToggleTermsOfService: () -> Unit,
-    onClickTermsOfServiceDetail: () -> Unit,
-    onTogglePrivacyPolicy: () -> Unit,
-    onClickPrivacyPolicyDetail: () -> Unit,
-    onToggleMarketingConsent: () -> Unit,
+    onToggleTerm: (Long) -> Unit,
+    onClickTermsDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(
-                horizontal = PrezelTheme.spacing.V20,
-                vertical = PrezelTheme.spacing.V16,
-            ),
+        modifier = modifier.padding(
+            horizontal = PrezelTheme.spacing.V20,
+            vertical = PrezelTheme.spacing.V16,
+        ),
     ) {
         TermsSelectAllRow(
             isAllChecked = uiState.isAllChecked,
@@ -187,30 +181,13 @@ private fun TermsAgreementContent(
         PrezelHorizontalDivider(type = PrezelDividerType.THICK)
 
         TermsAgreementSection {
-            TermsAgreementRow(
-                checked = uiState.isTermsOfServiceChecked,
-                title = stringResource(R.string.feature_terms_impl_terms_of_service),
-                summary = stringResource(R.string.feature_terms_impl_terms_of_service_summary),
-                isShowDetailButton = true,
-                onCheckedChange = { onToggleTermsOfService() },
-                onClickDetail = onClickTermsOfServiceDetail,
-            )
-            TermsAgreementRow(
-                checked = uiState.isPrivacyPolicyChecked,
-                title = stringResource(R.string.feature_terms_impl_privacy_policy),
-                summary = stringResource(R.string.feature_terms_impl_privacy_policy_summary),
-                isShowDetailButton = true,
-                onCheckedChange = { onTogglePrivacyPolicy() },
-                onClickDetail = onClickPrivacyPolicyDetail,
-            )
-            TermsAgreementRow(
-                checked = uiState.isMarketingConsentChecked,
-                title = stringResource(R.string.feature_terms_impl_marketing_consent),
-                summary = stringResource(R.string.feature_terms_impl_marketing_consent_summary),
-                isShowDetailButton = false,
-                onCheckedChange = { onToggleMarketingConsent() },
-                onClickDetail = {},
-            )
+            uiState.terms.forEach { term ->
+                TermsAgreementRow(
+                    term = term,
+                    onCheckedChange = { onToggleTerm(term.termsId) },
+                    onClickDetail = { onClickTermsDetail(term.titleWithRequirement(), term.contentUrl) },
+                )
+            }
         }
     }
 }
@@ -262,28 +239,25 @@ private fun TermsAgreementSection(
 
 @Composable
 private fun TermsAgreementRow(
-    checked: Boolean,
-    title: String,
-    summary: String,
-    isShowDetailButton: Boolean,
+    term: TermsAgreementUiModel,
     onCheckedChange: (Boolean) -> Unit,
     onClickDetail: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     PrezelAccordion(
         modifier = modifier,
-        title = title,
+        title = term.titleWithRequirement(),
         nested = true,
         leadingContent = {
             PrezelCheckbox(
-                checked = checked,
+                checked = term.isChecked,
                 size = CheckboxSize.REGULAR,
                 onCheckedChange = onCheckedChange,
                 extraTouchPadding = PaddingValues(),
             )
         },
         trailingContent = {
-            if (isShowDetailButton) {
+            if (term.contentUrl.isNotBlank()) {
                 PrezelHyperlinkButton(
                     text = stringResource(R.string.feature_terms_impl_terms_detail_button_text),
                     onClick = onClickDetail,
@@ -299,7 +273,7 @@ private fun TermsAgreementRow(
                 .padding(all = PrezelTheme.spacing.V12),
         ) {
             Text(
-                text = summary,
+                text = term.summary,
                 style = PrezelTheme.typography.caption2Regular,
                 color = PrezelTheme.colors.textLarge,
             )
@@ -307,10 +281,37 @@ private fun TermsAgreementRow(
     }
 }
 
+private fun TermsAgreementUiModel.titleWithRequirement(): String =
+    buildString {
+        append(if (isRequired) "(필수) " else "(선택) ")
+        append(title)
+    }
+
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun TermsScreenPreview() {
-    var uiState by remember { mutableStateOf(TermsUiState()) }
+    var uiState by remember {
+        mutableStateOf(
+            TermsUiState(
+                terms = persistentListOf(
+                    TermsAgreementUiModel(
+                        termsId = 6L,
+                        title = "이용약관",
+                        summary = "서비스 이용과 관련한 기본적인 권리·의무 및 책임사항을 규정합니다.",
+                        contentUrl = "https://example.com/terms",
+                        isRequired = true,
+                    ),
+                    TermsAgreementUiModel(
+                        termsId = 7L,
+                        title = "개인정보처리방침",
+                        summary = "서비스 제공을 위한 음성 녹음 및 분석 등 개인정보 수집·이용 안내입니다.",
+                        contentUrl = "https://example.com/privacy",
+                        isRequired = true,
+                    ),
+                ),
+            ),
+        )
+    }
 
     PrezelTheme {
         TermsScreenScreen(
@@ -319,16 +320,18 @@ private fun TermsScreenPreview() {
             onToggleAll = {
                 val next = !uiState.isAllChecked
                 uiState = uiState.copy(
-                    isTermsOfServiceChecked = next,
-                    isPrivacyPolicyChecked = next,
-                    isMarketingConsentChecked = next,
+                    terms = uiState.terms.map { term -> term.copy(isChecked = next) }.toImmutableList(),
                 )
             },
-            onToggleTermsOfService = { uiState = uiState.copy(isTermsOfServiceChecked = !uiState.isTermsOfServiceChecked) },
-            onTogglePrivacyPolicy = { uiState = uiState.copy(isPrivacyPolicyChecked = !uiState.isPrivacyPolicyChecked) },
-            onToggleMarketingConsent = { uiState = uiState.copy(isMarketingConsentChecked = !uiState.isMarketingConsentChecked) },
-            onClickTermsOfServiceDetail = {},
-            onClickPrivacyPolicyDetail = {},
+            onToggleTerm = { termsId ->
+                uiState = uiState.copy(
+                    terms = uiState.terms
+                        .map { term ->
+                            if (term.termsId == termsId) term.copy(isChecked = !term.isChecked) else term
+                        }.toImmutableList(),
+                )
+            },
+            onClickTermsDetail = { _, _ -> },
             onContinue = {},
         )
     }

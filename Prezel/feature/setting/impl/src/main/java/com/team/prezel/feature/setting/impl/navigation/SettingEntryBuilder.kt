@@ -8,7 +8,6 @@ import com.team.prezel.feature.setting.api.SettingNavKey
 import com.team.prezel.feature.setting.impl.delete.DeleteAccountScreen
 import com.team.prezel.feature.setting.impl.setting.SettingScreen
 import com.team.prezel.feature.splash.api.SplashNavKey
-import com.team.prezel.feature.terms.api.TermsDocumentType
 import com.team.prezel.feature.terms.api.TermsNavKey
 import dagger.Module
 import dagger.Provides
@@ -24,11 +23,8 @@ internal fun EntryProviderScope<NavKey>.featureSettingEntryBuilder() {
             navigateBack = { navigator.goBack() },
             navigateToDeleteAccount = { navigator.navigate(DeleteAccountNavKey) },
             navigateToSplash = { navigator.replaceRoot(SplashNavKey) },
-            navigateToTermsOfService = {
-                navigator.navigate(TermsNavKey.Detail(TermsDocumentType.TERMS_OF_SERVICE))
-            },
-            navigateToPrivacyPolicy = {
-                navigator.navigate(TermsNavKey.Detail(TermsDocumentType.PRIVACY_POLICY))
+            navigateToTermsDetail = { title, url ->
+                navigator.navigate(TermsNavKey.Detail(title = title, url = url))
             },
         )
     }
