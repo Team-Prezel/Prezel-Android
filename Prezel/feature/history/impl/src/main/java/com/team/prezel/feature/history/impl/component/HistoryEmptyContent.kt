@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
+import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.component.StatusView
@@ -42,6 +43,7 @@ internal fun HistoryEmptyContent(
                 {
                     PrezelButton(
                         text = stringResource(R.string.feature_history_impl_add_presentation),
+                        iconResId = PrezelIcons.Plus,
                         type = ButtonType.OUTLINED,
                         size = ButtonSize.SMALL,
                         isRounded = true,
