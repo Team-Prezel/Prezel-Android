@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
+import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
 import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -151,7 +152,10 @@ private fun PracticeAnalysisMetricRow(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             PracticeAnalysisMetricLabel(text = stringResource(R.string.feature_practice_impl_practice_recording_analysis_speed))
-            PrezelChip(text = stringResource(speed.labelResId))
+            PrezelChip(
+                text = stringResource(speed.labelResId),
+                hierarchy = ChipHierarchy.SECONDARY,
+            )
         }
     }
 }

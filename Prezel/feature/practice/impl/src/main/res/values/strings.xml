@@ -12,8 +12,8 @@
     <string name="feature_practice_impl_practice_recording_playback_failed">녹음을 재생하지 못했습니다.</string>
     <string name="feature_practice_impl_practice_recording_analysis_loading_title">분석중</string>
     <string name="feature_practice_impl_practice_recording_analysis_loading_description">잠시만 기다려주세요</string>
-    <string name="feature_practice_impl_practice_recording_analysis_error_title">분석에 실패했어요</string>
-    <string name="feature_practice_impl_practice_recording_analysis_error_description">음성이 작거나 주변 소음이 많았을 수 있어요.\n조용한 환경에서 다시 시도해 주세요.</string>
+    <string name="feature_practice_impl_practice_recording_analysis_failed_title">분석 중 문제가 발생했어요.</string>
+    <string name="feature_practice_impl_practice_recording_analysis_failed_description">일시적인 오류로 분석을 완료하지 못했어요.\n잠시 후 다시 시도해 주세요.</string>
     <string name="feature_practice_impl_practice_recording_analysis_retry">다시 시도하기</string>
     <string name="feature_practice_impl_practice_recording_analysis_complete">완료</string>
     <string name="feature_practice_impl_practice_recording_analysis_pronunciation">발화</string>
@@ -24,4 +24,6 @@
     <string name="feature_practice_impl_practice_recording_analysis_card_perfect">perfect</string>
     <string name="feature_practice_impl_practice_recording_analysis_card_good">good</string>
     <string name="feature_practice_impl_practice_recording_analysis_card_try">try</string>
+    <string name="feature_practice_impl_practice_recording_voice_recognition_failed_title">분석할 음성을 인식하지 못했어요.</string>
+    <string name="feature_practice_impl_practice_recording_voice_recognition_failed_description">음성이 작거나 주변 소음이 많았을 수 있어요.\n조용한 환경에서 다시 녹음해 주세요.</string>
 </resources>

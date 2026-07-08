@@ -17,6 +17,8 @@ private fun Throwable.toDomainThrowable(): Throwable =
     when (this) {
         is CancellationException -> this
 
+        is AppException -> this
+
         is ApiException ->
             AppException(
                 error = errorCode.toDomainError(),
@@ -74,7 +76,9 @@ private fun ServerErrorCode.toDomainError(): AppError =
         ServerErrorCode.INVALID_ID_TOKEN,
         -> AppError.UNAUTHORIZED
 
-        ServerErrorCode.VOICE_RECOGNITION_FAILED -> AppError.VOICE_RECOGNITION_FAILED
+        ServerErrorCode.VOICE_RECOGNITION_FAILED,
+        ServerErrorCode.VOICE_RECORDING_EMPTY_OR_SILENT,
+        -> AppError.VOICE_RECOGNITION_FAILED
 
         ServerErrorCode.UNKNOWN -> AppError.UNKNOWN
     }

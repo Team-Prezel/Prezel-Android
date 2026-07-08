@@ -1,5 +1,6 @@
 package com.team.prezel.feature.practice.impl.navigation
 
+import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -14,30 +15,30 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
+import kotlinx.serialization.Serializable
 
 internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
     entry<PracticeNavKey> { key ->
-        val navigator = LocalNavigator.current
+        PracticeRecordingRoute(presentationId = key.presentationId)
+    }
 
-        PracticeRecordingScreen(
-            onBack = navigator::goBack,
-            navigateToAnalysis = { recordingFilePath, referenceText ->
-                navigator.navigate(
-                    PracticeAnalysisNavKey(
-                        presentationId = key.presentationId,
-                        recordingFilePath = recordingFilePath,
-                        referenceText = referenceText,
-                    ),
-                )
-            },
-        )
+    entry<PracticeRecordingRetryNavKey> { key ->
+        PracticeRecordingRoute(presentationId = key.presentationId)
     }
 
     entry<PracticeAnalysisNavKey> { key ->
         val navigator = LocalNavigator.current
 
         PracticeAnalysisScreen(
-            onRetry = navigator::goBack,
+            onRetry = {
+                navigator.navigate(
+                    key = PracticeRecordingRetryNavKey(
+                        presentationId = key.presentationId,
+                        recordingFilePath = key.recordingFilePath,
+                    ),
+                    clearStack = true,
+                )
+            },
             onComplete = { navigator.replaceRoot(HomeNavKey) },
             viewModel = hiltViewModel<PracticeAnalysisViewModel, PracticeAnalysisViewModel.Factory> { factory ->
                 factory.create(
@@ -49,6 +50,30 @@ internal fun EntryProviderScope<NavKey>.featurePracticeEntryBuilder() {
         )
     }
 }
+
+@Composable
+private fun PracticeRecordingRoute(presentationId: Long) {
+    val navigator = LocalNavigator.current
+
+    PracticeRecordingScreen(
+        onBack = navigator::goBack,
+        navigateToAnalysis = { recordingFilePath, referenceText ->
+            navigator.navigate(
+                PracticeAnalysisNavKey(
+                    presentationId = presentationId,
+                    recordingFilePath = recordingFilePath,
+                    referenceText = referenceText,
+                ),
+            )
+        },
+    )
+}
+
+@Serializable
+private data class PracticeRecordingRetryNavKey(
+    val presentationId: Long,
+    val recordingFilePath: String,
+) : NavKey
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
