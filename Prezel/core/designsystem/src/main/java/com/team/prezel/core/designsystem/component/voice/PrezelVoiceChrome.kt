@@ -33,11 +33,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.team.prezel.core.designsystem.R
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.LargeDevicePreview
 import com.team.prezel.core.designsystem.preview.PreviewColumn
@@ -166,13 +164,13 @@ private fun VoiceChromeTitle(
         )
 
         VoiceChromeStatus.LISTENING -> Text(
-            text = stringResource(R.string.core_designsystem_voice_chrome_listening),
+            text = titleText,
             style = baseStyle,
             color = color,
         )
 
         VoiceChromeStatus.WAITING -> Text(
-            text = stringResource(R.string.core_designsystem_voice_chrome_waiting),
+            text = titleText,
             style = baseStyle,
             color = color,
         )

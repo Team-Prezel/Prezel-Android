@@ -11,8 +11,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.analysis.impl.audio.AudioUploadScreen
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
@@ -21,6 +24,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
+import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingChromeUi
 import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingScreen
 import com.team.prezel.feature.analysis.impl.recording.VoiceRecordingStatusBarStyle
 import com.team.prezel.feature.analysis.impl.recording.isCompleted
@@ -34,10 +38,17 @@ import com.team.prezel.feature.analysis.impl.script.ScriptInputScreen
 import com.team.prezel.feature.analysis.impl.situation.PresentationSituationScreen
 import kotlinx.coroutines.launch
 
+private const val RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS = 50
+private const val VOICE_RECORDING_FEEDBACK_DURATION_MILLIS = 3_000
+private const val VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT =
+    VOICE_RECORDING_FEEDBACK_DURATION_MILLIS / RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS
+private const val SILENCE_VOLUME_THRESHOLD = 0.12f
+private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
+
 @Composable
 internal fun AnalysisScreen(
     onBack: () -> Unit,
-    navigateToStep: (AnalysisFlowStep) -> Unit,
+    navigateToStep: (step: AnalysisFlowStep, clearStack: Boolean) -> Unit,
     navigateToReport: (presentationId: Long) -> Unit,
     viewModel: AnalysisFlowViewModel,
 ) {
@@ -54,7 +65,7 @@ internal fun AnalysisScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
-                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step)
+                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
                 is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toStringRes()))
@@ -106,12 +117,20 @@ private fun AnalysisScreen(
 ) {
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val voiceRecordingFeedback = uiState.voiceRecordingFeedback
+    val voiceRecordingChromeUi = voiceRecordingFeedback?.toChromeUi()
 
     LaunchedEffect(uiState.step) {
         if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
             snackbarHostState.showPrezelSnackbar(
                 message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
             )
+        }
+    }
+
+    LaunchedEffect(voiceRecordingFeedback) {
+        if (voiceRecordingFeedback != null) {
+            snackbarHostState.currentSnackbarData?.dismiss()
         }
     }
 
@@ -123,11 +142,50 @@ private fun AnalysisScreen(
     AnalysisStepContent(
         uiState = uiState,
         isScriptExpanded = isScriptExpanded,
+        voiceRecordingChromeUi = voiceRecordingChromeUi,
         onIntent = onIntent,
         onClickRecordingControl = onClickRecordingControl,
         onScriptExpandedChange = onScriptExpandedChange,
     )
 }
+
+private enum class VoiceRecordingFeedback {
+    READY_TO_CONTINUE,
+    SPEAK_LOUDER,
+}
+
+private fun VoiceRecordingFeedback.toChromeUi(): VoiceRecordingChromeUi =
+    when (this) {
+        VoiceRecordingFeedback.READY_TO_CONTINUE -> VoiceRecordingChromeUi(
+            titleResId = R.string.feature_analysis_impl_voice_recording_ready_to_continue_feedback,
+            status = VoiceChromeStatus.LISTENING,
+            gradient = VoiceChromeGradient.NONE,
+            hideWaveform = true,
+        )
+
+        VoiceRecordingFeedback.SPEAK_LOUDER -> VoiceRecordingChromeUi(
+            titleResId = R.string.feature_analysis_impl_voice_recording_speak_louder_feedback,
+        )
+    }
+
+private val AnalysisFlowUiState.voiceRecordingFeedback: VoiceRecordingFeedback?
+    get() {
+        if (step != AnalysisFlowStep.VOICE_RECORDING || recordingState !is AudioSessionState.Recording) return null
+
+        val recentVolumes = recordingVolumes.takeLast(VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT)
+        if (recentVolumes.size < VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT) return null
+
+        if (recentVolumes.all { volume -> volume <= SILENCE_VOLUME_THRESHOLD }) {
+            return VoiceRecordingFeedback.READY_TO_CONTINUE
+        }
+
+        val averageVolume = recentVolumes.average().toFloat()
+        return if (averageVolume <= LOW_AVERAGE_VOLUME_THRESHOLD) {
+            VoiceRecordingFeedback.SPEAK_LOUDER
+        } else {
+            null
+        }
+    }
 
 @Composable
 private fun rememberVoiceRecordingControlClick(
@@ -162,6 +220,7 @@ private fun rememberVoiceRecordingControlClick(
 private fun AnalysisStepContent(
     uiState: AnalysisFlowUiState,
     isScriptExpanded: Boolean,
+    voiceRecordingChromeUi: VoiceRecordingChromeUi?,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
@@ -175,6 +234,7 @@ private fun AnalysisStepContent(
         -> AnalysisInputStepContent(
             uiState = uiState,
             isScriptExpanded = isScriptExpanded,
+            voiceRecordingChromeUi = voiceRecordingChromeUi,
             onIntent = onIntent,
             onClickRecordingControl = onClickRecordingControl,
             onScriptExpandedChange = onScriptExpandedChange,
@@ -195,6 +255,7 @@ private fun AnalysisStepContent(
 private fun AnalysisInputStepContent(
     uiState: AnalysisFlowUiState,
     isScriptExpanded: Boolean,
+    voiceRecordingChromeUi: VoiceRecordingChromeUi?,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onClickRecordingControl: () -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
@@ -205,6 +266,7 @@ private fun AnalysisInputStepContent(
         VoiceRecordingScreen(
             uiState = uiState,
             isScriptExpanded = isScriptExpanded,
+            voiceChromeUi = voiceRecordingChromeUi,
             onClickRecordingControl = onClickRecordingControl,
             onStopRecording = { onIntent(AnalysisFlowUiIntent.StopRecording) },
             onResetRecording = { onIntent(AnalysisFlowUiIntent.ResetRecording) },
@@ -257,7 +319,14 @@ private fun AnalysisFormInputStepContent(
 
         AnalysisFlowStep.AUDIO_UPLOAD -> AudioUploadScreen(
             uiState = uiState,
-            onAudioFileSelected = { onIntent(AnalysisFlowUiIntent.SelectAudioFile(it)) },
+            onAudioFileSelected = { fileUri, fileName ->
+                onIntent(
+                    AnalysisFlowUiIntent.SelectAudioFile(
+                        fileUri = fileUri,
+                        fileName = fileName,
+                    ),
+                )
+            },
             onAnalyze = { onIntent(AnalysisFlowUiIntent.Next) },
             onBack = { onIntent(AnalysisFlowUiIntent.Back) },
         )

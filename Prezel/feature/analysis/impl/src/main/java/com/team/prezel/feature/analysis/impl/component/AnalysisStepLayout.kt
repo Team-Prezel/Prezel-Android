@@ -1,5 +1,6 @@
 package com.team.prezel.feature.analysis.impl.component
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,12 +13,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,8 +51,14 @@ internal fun AnalysisStepLayout(
     onTrailingTextClick: (() -> Unit)? = null,
     subButtonText: String? = null,
     onSubButtonClick: (() -> Unit)? = null,
+    contentScrollable: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val contentScrollState = rememberScrollState()
+    val showButtonAreaDivider by remember {
+        derivedStateOf { contentScrollable && contentScrollState.maxValue > 0 }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -73,11 +84,16 @@ internal fun AnalysisStepLayout(
 
         ProgressBar(progress = progress)
 
-        AnalysisStepContent(content = content)
+        AnalysisStepContent(
+            scrollState = contentScrollState,
+            scrollable = contentScrollable,
+            content = content,
+        )
 
         AnalysisStepButtonArea(
             buttonText = buttonText,
             buttonEnabled = buttonEnabled,
+            showDivider = showButtonAreaDivider,
             onButtonClick = onButtonClick,
             subButtonText = subButtonText,
             onSubButtonClick = onSubButtonClick,
@@ -106,11 +122,15 @@ private fun AnalysisStepTrailingText(
 }
 
 @Composable
-private fun ColumnScope.AnalysisStepContent(content: @Composable ColumnScope.() -> Unit) {
+private fun ColumnScope.AnalysisStepContent(
+    scrollState: ScrollState,
+    scrollable: Boolean,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .verticalScroll(rememberScrollState())
+            .then(if (scrollable) Modifier.verticalScroll(scrollState) else Modifier)
             .padding(horizontal = PrezelTheme.spacing.V20)
             .padding(top = PrezelTheme.spacing.V40),
     ) {
@@ -122,12 +142,14 @@ private fun ColumnScope.AnalysisStepContent(content: @Composable ColumnScope.() 
 private fun AnalysisStepButtonArea(
     buttonText: String,
     buttonEnabled: Boolean,
+    showDivider: Boolean,
     onButtonClick: () -> Unit,
     subButtonText: String?,
     onSubButtonClick: (() -> Unit)?,
 ) {
     PrezelButtonArea(
-        showBackground = true,
+        modifier = Modifier.background(PrezelTheme.colors.bgRegular),
+        showBackground = showDivider,
         mainButton = { modifier ->
             PrezelButton(
                 modifier = modifier,
@@ -184,7 +206,13 @@ private fun ProgressBar(progress: Float) {
             modifier = Modifier
                 .fillMaxWidth(progress.coerceIn(0f, 1f))
                 .height(4.dp)
-                .background(PrezelTheme.colors.interactiveRegular),
+                .background(
+                    color = PrezelTheme.colors.interactiveRegular,
+                    shape = RoundedCornerShape(
+                        topEnd = PrezelTheme.radius.V1000,
+                        bottomEnd = PrezelTheme.radius.V1000,
+                    ),
+                ),
         )
     }
 }

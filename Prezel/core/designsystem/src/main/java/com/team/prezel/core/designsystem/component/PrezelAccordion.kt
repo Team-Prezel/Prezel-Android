@@ -49,13 +49,22 @@ fun PrezelAccordion(
     title: String,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
+    expanded: Boolean? = null,
+    onExpandedChange: ((Boolean) -> Unit)? = null,
     nested: Boolean = false,
     showDivider: Boolean = false,
     leadingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
     content: @Composable (() -> Unit),
 ) {
-    var expanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
+    var internalExpanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
+    val currentExpanded = expanded ?: internalExpanded
+    val updateExpanded: (Boolean) -> Unit = { nextExpanded ->
+        if (expanded == null) {
+            internalExpanded = nextExpanded
+        }
+        onExpandedChange?.invoke(nextExpanded)
+    }
 
     Column(
         modifier = modifier
@@ -71,26 +80,26 @@ fun PrezelAccordion(
                     .clickable(
                         interactionSource = null,
                         indication = null,
-                        onClick = { expanded = !expanded },
+                        onClick = { updateExpanded(!currentExpanded) },
                     ),
                 size = if (nested) PrezelListSize.SMALL else PrezelListSize.REGULAR,
                 nested = nested,
                 leadingContent = leadingContent,
                 trailingContent = {
                     trailingContent?.invoke()
-                    PrezelAccordionChevron(expanded = expanded)
+                    PrezelAccordionChevron(expanded = currentExpanded)
                 },
             )
         }
 
-        if (showDivider && !expanded) {
+        if (showDivider && !currentExpanded) {
             PrezelHorizontalDivider(
                 type = PrezelDividerType.THICK,
             )
         }
 
         PrezelAccordionContent(
-            expanded = expanded,
+            expanded = currentExpanded,
             content = content,
         )
     }

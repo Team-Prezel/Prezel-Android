@@ -89,7 +89,7 @@ fun PrezelDatePicker(
         }
 
         DatePickerFooter(
-            enabled = initialSelectedDate != selectedDate,
+            enabled = selectedDate != null,
             onClick = { selectedDate?.let(onConfirm) },
         )
     }

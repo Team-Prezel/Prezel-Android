@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -46,6 +48,7 @@ fun PrezelTextArea(
     status: PrezelTextFieldStatus = PrezelTextFieldStatus.DEFAULT,
     enabled: Boolean = true,
     showCount: Boolean = false,
+    fillContainerHeight: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
@@ -82,6 +85,7 @@ fun PrezelTextArea(
         label = label,
         enabled = enabled,
         showCount = showCount,
+        fillContainerHeight = fillContainerHeight,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
     )
@@ -99,6 +103,7 @@ private fun PrezelTextArea(
     label: String?,
     enabled: Boolean,
     showCount: Boolean,
+    fillContainerHeight: Boolean,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     modifier: Modifier = Modifier,
@@ -115,8 +120,13 @@ private fun PrezelTextArea(
             enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 72.dp)
-                .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
+                .then(
+                    if (fillContainerHeight) {
+                        Modifier.weight(1f)
+                    } else {
+                        Modifier.heightIn(min = 72.dp)
+                    },
+                ).onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
             textStyle = PrezelTheme.typography.body2Regular.copy(color = style.textColor()),
             cursorBrush = SolidColor(PrezelTheme.colors.interactiveRegular),
             keyboardOptions = keyboardOptions,
@@ -133,7 +143,8 @@ private fun PrezelTextArea(
                             Counter(currentLength = value.text.length, maxLength = maxLength, state = style)
                         }
                     },
-                    modifier = Modifier.heightIn(min = 72.dp),
+                    modifier = if (fillContainerHeight) Modifier.fillMaxHeight() else Modifier.heightIn(min = 72.dp),
+                    fillContainerHeight = fillContainerHeight,
                 )
             },
         )
@@ -170,6 +181,7 @@ private fun PrezelTextAreaDecorationBox(
     state: PrezelTextFieldStyle,
     showCounter: Boolean,
     modifier: Modifier = Modifier,
+    fillContainerHeight: Boolean = false,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -180,12 +192,12 @@ private fun PrezelTextAreaDecorationBox(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .then(if (fillContainerHeight) Modifier.fillMaxSize() else Modifier.fillMaxWidth())
                 .padding(PrezelTheme.spacing.V12),
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .then(if (fillContainerHeight) Modifier.fillMaxSize() else Modifier.fillMaxWidth())
                     .padding(bottom = if (showCounter) PrezelTheme.spacing.V24 else 0.dp),
             ) {
                 innerTextField()
@@ -335,6 +347,7 @@ private fun PrezelTextAreaPreviewItem(
         onFocusChange = {},
         enabled = enabled,
         showCount = true,
+        fillContainerHeight = false,
         keyboardOptions = KeyboardOptions.Default,
         keyboardActions = KeyboardActions.Default,
     )

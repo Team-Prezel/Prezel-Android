@@ -61,10 +61,11 @@ private const val AUDIO_UPLOAD_TAB_COUNT = 1
 @Composable
 internal fun AudioUploadScreen(
     uiState: AnalysisFlowUiState,
-    onAudioFileSelected: (String?) -> Unit,
+    onAudioFileSelected: (fileUri: String?, fileName: String?) -> Unit,
     onAnalyze: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val context = LocalContext.current
     var pendingAudioFileUri by remember { mutableStateOf<String?>(null) }
     val uploadProgress by animateFloatAsState(
         targetValue = if (pendingAudioFileUri != null) 1f else 0f,
@@ -84,7 +85,7 @@ internal fun AudioUploadScreen(
     LaunchedEffect(pendingAudioFileUri) {
         val fileUri = pendingAudioFileUri ?: return@LaunchedEffect
         delay(AUDIO_UPLOAD_PROGRESS_DURATION_MILLIS.toLong())
-        onAudioFileSelected(fileUri)
+        onAudioFileSelected(fileUri, fileUri.toFileName(context))
     }
 
     LaunchedEffect(uiState.form.audioFileUri, pendingAudioFileUri) {
@@ -104,7 +105,7 @@ internal fun AudioUploadScreen(
             if (pendingAudioFileUri != null) {
                 pendingAudioFileUri = null
             } else {
-                onAudioFileSelected(null)
+                onAudioFileSelected(null, null)
             }
         },
         onAnalyze = onAnalyze,
@@ -145,7 +146,7 @@ private fun AudioUploadScreen(
         PrezelTabs(
             tabs = tabs,
             pagerState = pagerState,
-            size = PrezelTabSize.MEDIUM,
+            size = PrezelTabSize.SMALL,
             onClickTab = {},
         )
 
@@ -352,7 +353,7 @@ private fun AudioUploadScreenPreview() {
     PrezelTheme {
         AudioUploadScreen(
             uiState = AnalysisFlowUiState(step = AnalysisFlowStep.AUDIO_UPLOAD),
-            onAudioFileSelected = {},
+            onAudioFileSelected = { _, _ -> },
             onAnalyze = {},
             onBack = {},
         )
@@ -386,7 +387,7 @@ private fun AudioUploadScreenSelectedPreview() {
                 step = AnalysisFlowStep.AUDIO_UPLOAD,
                 form = AnalysisForm(audioFileUri = "content://prezel/sample.m4a"),
             ),
-            onAudioFileSelected = {},
+            onAudioFileSelected = { _, _ -> },
             onAnalyze = {},
             onBack = {},
         )

@@ -310,7 +310,7 @@ private fun AccuracyDetailScaffold(
             PrezelTabs(
                 tabs = tabLabels,
                 pagerState = pagerState,
-                size = PrezelTabSize.MEDIUM,
+                size = PrezelTabSize.SMALL,
                 onClickTab = onClickTab,
             )
             ScriptDetailList(

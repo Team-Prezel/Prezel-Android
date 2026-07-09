@@ -19,6 +19,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -49,10 +53,10 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 internal fun PresentationSituationScreen(
     uiState: AnalysisFlowUiState,
-    onSelectCategory: (Category) -> Unit,
-    onSelectPurpose: (Purpose) -> Unit,
-    onSelectStyle: (Style) -> Unit,
-    onSelectAudience: (Audience) -> Unit,
+    onSelectCategory: (Category?) -> Unit,
+    onSelectPurpose: (Purpose?) -> Unit,
+    onSelectStyle: (Style?) -> Unit,
+    onSelectAudience: (Audience?) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -74,10 +78,10 @@ private fun PresentationSituationScreen(
     form: AnalysisForm,
     progress: Float,
     buttonEnabled: Boolean,
-    onSelectCategory: (Category) -> Unit,
-    onSelectPurpose: (Purpose) -> Unit,
-    onSelectStyle: (Style) -> Unit,
-    onSelectAudience: (Audience) -> Unit,
+    onSelectCategory: (Category?) -> Unit,
+    onSelectPurpose: (Purpose?) -> Unit,
+    onSelectStyle: (Style?) -> Unit,
+    onSelectAudience: (Audience?) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -111,57 +115,159 @@ private fun PresentationSituationScreen(
 @Composable
 private fun SituationAccordions(
     form: AnalysisForm,
-    onSelectCategory: (Category) -> Unit,
-    onSelectPurpose: (Purpose) -> Unit,
-    onSelectStyle: (Style) -> Unit,
-    onSelectAudience: (Audience) -> Unit,
+    onSelectCategory: (Category?) -> Unit,
+    onSelectPurpose: (Purpose?) -> Unit,
+    onSelectStyle: (Style?) -> Unit,
+    onSelectAudience: (Audience?) -> Unit,
 ) {
+    var expandedType by rememberSaveable { mutableStateOf<SituationAccordionType?>(null) }
     val categoryOptions = categoryOptions()
     val purposeOptions = purposeOptions()
     val styleOptions = styleOptions()
     val audienceOptions = audienceOptions()
 
+    CategorySituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        categoryOptions = categoryOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectCategory = onSelectCategory,
+    )
+    PurposeSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        purposeOptions = purposeOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectPurpose = onSelectPurpose,
+    )
+    StyleSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        styleOptions = styleOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectStyle = onSelectStyle,
+    )
+    AudienceSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        audienceOptions = audienceOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectAudience = onSelectAudience,
+    )
+}
+
+@Composable
+private fun CategorySituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    categoryOptions: ImmutableList<SituationCategoryOption>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectCategory: (Category?) -> Unit,
+) {
     SituationAccordion(
+        type = SituationAccordionType.CATEGORY,
+        expandedType = expandedType,
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_category_label),
         selectedText = categoryOptions.firstOrNull { it.value == form.category }?.title,
     ) {
         CategoryOptionGrid(
             selectedValue = form.category,
             options = categoryOptions,
-            onSelect = onSelectCategory,
+            onSelect = { selectedCategory ->
+                onSelectCategory(selectedCategory)
+                onExpandedTypeChange(selectedCategory.nextExpandedType(SituationAccordionType.CATEGORY))
+            },
         )
     }
+}
+
+@Composable
+private fun PurposeSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    purposeOptions: ImmutableList<SituationChipOption<Purpose>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectPurpose: (Purpose?) -> Unit,
+) {
     SituationAccordion(
+        type = SituationAccordionType.PURPOSE,
+        expandedType = expandedType,
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_purpose_label),
         selectedText = purposeOptions.firstOrNull { it.value == form.purpose }?.text,
     ) {
         ChipOptionsContent(
             options = purposeOptions.toChipContentOptions(form.purpose),
-            onSelect = { index -> onSelectPurpose(purposeOptions[index].value) },
+            onSelect = { index ->
+                val selectedPurpose = purposeOptions[index].value
+                val nextPurpose = selectedPurpose.toggleIfSelected(form.purpose)
+                onSelectPurpose(nextPurpose)
+                onExpandedTypeChange(nextPurpose.nextExpandedType(SituationAccordionType.PURPOSE))
+            },
         )
     }
+}
+
+@Composable
+private fun StyleSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    styleOptions: ImmutableList<SituationChipOption<Style>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectStyle: (Style?) -> Unit,
+) {
     SituationAccordion(
+        type = SituationAccordionType.STYLE,
+        expandedType = expandedType,
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_style_label),
         selectedText = styleOptions.firstOrNull { it.value == form.style }?.text,
     ) {
         ChipOptionsContent(
             options = styleOptions.toChipContentOptions(form.style),
-            onSelect = { index -> onSelectStyle(styleOptions[index].value) },
+            onSelect = { index ->
+                val selectedStyle = styleOptions[index].value
+                val nextStyle = selectedStyle.toggleIfSelected(form.style)
+                onSelectStyle(nextStyle)
+                onExpandedTypeChange(nextStyle.nextExpandedType(SituationAccordionType.STYLE))
+            },
         )
     }
+}
+
+@Composable
+private fun AudienceSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    audienceOptions: ImmutableList<SituationChipOption<Audience>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectAudience: (Audience?) -> Unit,
+) {
     SituationAccordion(
+        type = SituationAccordionType.AUDIENCE,
+        expandedType = expandedType,
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
         selectedText = audienceOptions.firstOrNull { it.value == form.audience }?.text,
     ) {
         ChipOptionsContent(
             options = audienceOptions.toChipContentOptions(form.audience),
-            onSelect = { index -> onSelectAudience(audienceOptions[index].value) },
+            onSelect = { index ->
+                val selectedAudience = audienceOptions[index].value
+                val nextAudience = selectedAudience.toggleIfSelected(form.audience)
+                onSelectAudience(nextAudience)
+                onExpandedTypeChange(nextAudience.nextExpandedType(SituationAccordionType.AUDIENCE))
+            },
         )
     }
 }
 
 @Composable
 private fun SituationAccordion(
+    type: SituationAccordionType,
+    expandedType: SituationAccordionType?,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
     title: String,
     selectedText: String?,
     content: @Composable () -> Unit,
@@ -171,6 +277,10 @@ private fun SituationAccordion(
     ) {
         PrezelAccordion(
             title = title,
+            expanded = expandedType == type,
+            onExpandedChange = { expanded ->
+                onExpandedTypeChange(if (expanded) type else null)
+            },
             showDivider = true,
             trailingContent = selectedText?.let { text ->
                 {
@@ -190,7 +300,7 @@ private fun SituationAccordion(
 private fun CategoryOptionGrid(
     selectedValue: Category?,
     options: ImmutableList<SituationCategoryOption>,
-    onSelect: (Category) -> Unit,
+    onSelect: (Category?) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16)) {
         options.chunked(2).forEach { rowOptions ->
@@ -202,7 +312,7 @@ private fun CategoryOptionGrid(
                     CategoryOptionCard(
                         option = option,
                         selected = selectedValue == option.value,
-                        onClick = { onSelect(option.value) },
+                        onClick = { onSelect(option.value.toggleIfSelected(selectedValue)) },
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f),
@@ -215,6 +325,26 @@ private fun CategoryOptionGrid(
         }
     }
 }
+
+private enum class SituationAccordionType {
+    CATEGORY,
+    PURPOSE,
+    STYLE,
+    AUDIENCE,
+    ;
+
+    val next: SituationAccordionType?
+        get() = when (this) {
+            CATEGORY -> PURPOSE
+            PURPOSE -> STYLE
+            STYLE -> AUDIENCE
+            AUDIENCE -> null
+        }
+}
+
+private fun <T> T.toggleIfSelected(selectedValue: T?): T? = if (this == selectedValue) null else this
+
+private fun Any?.nextExpandedType(currentType: SituationAccordionType): SituationAccordionType? = if (this == null) currentType else currentType.next
 
 @Composable
 private fun CategoryOptionCard(

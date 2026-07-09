@@ -89,10 +89,11 @@ private fun PresentationScheduleScreen(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
         PrezelTextField(
-            label = stringResource(R.string.feature_analysis_impl_presentation_name_label),
             value = form.presentationTitle,
             onValueChange = onTitleChange,
             placeholder = stringResource(R.string.feature_analysis_impl_presentation_name_placeholder),
+            label = stringResource(R.string.feature_analysis_impl_presentation_name_label),
+            maxLength = 10,
         )
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))

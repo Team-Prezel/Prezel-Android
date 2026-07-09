@@ -78,7 +78,12 @@ private fun AnalysisRoute(
 
     AnalysisScreen(
         onBack = { navigator.goBack() },
-        navigateToStep = { step -> navigator.navigate(key = stepToNavKey(step)) },
+        navigateToStep = { step, clearStack ->
+            navigator.navigate(
+                key = stepToNavKey(step),
+                clearStack = clearStack,
+            )
+        },
         navigateToReport = { presentationId ->
             navigator.navigate(
                 key = ReportNavKey(

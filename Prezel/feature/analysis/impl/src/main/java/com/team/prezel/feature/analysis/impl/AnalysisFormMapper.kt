@@ -36,7 +36,6 @@ internal fun AnalysisFlowUiIntent.reduceFormOrNull(form: AnalysisForm): Analysis
             scriptFileUri = null,
         )
         is AnalysisFlowUiIntent.UpdateScript -> form.copy(script = script)
-        is AnalysisFlowUiIntent.SelectAudioFile -> form.copy(audioFileUri = fileUri)
         is AnalysisFlowUiIntent.SelectSituationOption -> form.selectSituationOption(option)
         else -> null
     }

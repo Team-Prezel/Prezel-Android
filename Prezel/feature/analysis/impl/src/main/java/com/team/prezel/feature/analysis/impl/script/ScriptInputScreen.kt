@@ -6,7 +6,10 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -25,7 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
-import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
+import com.team.prezel.core.designsystem.component.feedback.dialog.PrezelDialog
+import com.team.prezel.core.designsystem.component.feedback.dialog.PrezelDialogScope.ActionType
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextArea
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -95,6 +99,7 @@ internal fun ScriptInputScreen(
         progress = uiState.progress,
         buttonEnabled = uiState.canMoveNext,
         onSelectInputType = onSelectInputType,
+        onClearPendingScriptFile = { pendingScriptFileUri = null },
         onScriptChange = onScriptChange,
         onScriptFileUploadClick = { scriptPicker.launch(SCRIPT_FILE_MIME_TYPES) },
         onScriptFileClear = {
@@ -118,6 +123,7 @@ private fun ScriptInputScreen(
     progress: Float,
     buttonEnabled: Boolean,
     onSelectInputType: (ScriptInputType) -> Unit,
+    onClearPendingScriptFile: () -> Unit,
     onScriptChange: (String) -> Unit,
     onScriptFileUploadClick: () -> Unit,
     onScriptFileClear: () -> Unit,
@@ -125,6 +131,20 @@ private fun ScriptInputScreen(
     onSkip: () -> Unit,
     onBack: () -> Unit,
 ) {
+    var pendingInputTypeChange by remember { mutableStateOf<ScriptInputType?>(null) }
+
+    pendingInputTypeChange?.let { inputType ->
+        ScriptInputTypeChangeDialog(
+            targetInputType = inputType,
+            onDismiss = { pendingInputTypeChange = null },
+            onConfirm = {
+                onClearPendingScriptFile()
+                onSelectInputType(inputType)
+                pendingInputTypeChange = null
+            },
+        )
+    }
+
     AnalysisStepLayout(
         title = stringResource(R.string.feature_analysis_impl_script_title),
         progress = progress,
@@ -134,6 +154,7 @@ private fun ScriptInputScreen(
         onBack = onBack,
         trailingText = stringResource(R.string.feature_analysis_impl_skip),
         onTrailingTextClick = onSkip,
+        contentScrollable = false,
     ) {
         AnalysisStepTitle(
             title = stringResource(R.string.feature_analysis_impl_script_headline),
@@ -142,31 +163,102 @@ private fun ScriptInputScreen(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        ScriptInputTabs(
-            selectedType = form.scriptInputType,
-            onSelect = onSelectInputType,
+        ScriptInputContent(
+            form = form,
+            pendingScriptFileUri = pendingScriptFileUri,
+            uploadProgress = uploadProgress,
+            onSelectInputType = onSelectInputType,
+            onRequestInputTypeChange = { inputType ->
+                pendingInputTypeChange = inputType
+            },
+            onScriptChange = onScriptChange,
+            onScriptFileUploadClick = onScriptFileUploadClick,
+            onScriptFileClear = onScriptFileClear,
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.ScriptInputContent(
+    form: AnalysisForm,
+    pendingScriptFileUri: String?,
+    uploadProgress: Float,
+    onSelectInputType: (ScriptInputType) -> Unit,
+    onRequestInputTypeChange: (ScriptInputType) -> Unit,
+    onScriptChange: (String) -> Unit,
+    onScriptFileUploadClick: () -> Unit,
+    onScriptFileClear: () -> Unit,
+) {
+    ScriptInputTabs(
+        selectedType = form.scriptInputType,
+        onSelect = { inputType ->
+            if (inputType == form.scriptInputType) return@ScriptInputTabs
+
+            if (form.hasScriptInputHistory || pendingScriptFileUri != null) {
+                onRequestInputTypeChange(inputType)
+            } else {
+                onSelectInputType(inputType)
+            }
+        },
+    )
+
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
+    when (form.scriptInputType) {
+        ScriptInputType.FILE_UPLOAD -> ScriptUploadCard(
+            fileUri = pendingScriptFileUri ?: form.scriptFileUri,
+            uploadProgress = if (pendingScriptFileUri != null) uploadProgress else null,
+            onClick = onScriptFileUploadClick,
+            onClear = onScriptFileClear,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
         )
 
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+        ScriptInputType.DIRECT_INPUT -> DirectScriptInput(
+            script = form.script,
+            onScriptChange = onScriptChange,
+        )
+    }
+}
 
-        when (form.scriptInputType) {
-            ScriptInputType.FILE_UPLOAD -> ScriptUploadCard(
-                fileUri = pendingScriptFileUri ?: form.scriptFileUri,
-                uploadProgress = if (pendingScriptFileUri != null) uploadProgress else null,
-                onClick = onScriptFileUploadClick,
-                onClear = onScriptFileClear,
-            )
+@Composable
+private fun ColumnScope.DirectScriptInput(
+    script: String,
+    onScriptChange: (String) -> Unit,
+) {
+    PrezelTextArea(
+        value = script,
+        onValueChange = onScriptChange,
+        placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
+        maxLength = SCRIPT_MAX_LENGTH,
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f),
+        fillContainerHeight = true,
+    )
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+}
 
-            ScriptInputType.DIRECT_INPUT -> {
-                PrezelTextArea(
-                    value = form.script,
-                    onValueChange = onScriptChange,
-                    placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
-                    maxLength = SCRIPT_MAX_LENGTH,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-            }
+@Composable
+private fun ScriptInputTypeChangeDialog(
+    targetInputType: ScriptInputType,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    PrezelDialog(
+        title = stringResource(targetInputType.changeDialogTitleResId),
+        description = stringResource(targetInputType.changeDialogDescriptionResId),
+        onDismiss = onDismiss,
+    ) {
+        Action(label = stringResource(R.string.feature_analysis_impl_script_input_type_change_dialog_cancel)) {
+            onDismiss()
+        }
+        Action(
+            label = stringResource(targetInputType.changeDialogConfirmResId),
+            type = ActionType.BAD,
+        ) {
+            onConfirm()
         }
     }
 }
@@ -192,13 +284,32 @@ private fun ScriptInputTabs(
     PrezelTabs(
         tabs = tabs,
         pagerState = pagerState,
-        size = PrezelTabSize.MEDIUM,
         onClickTab = { page ->
-            pagerState.requestScrollToPage(page)
             onSelect(page.toScriptInputType())
         },
     )
 }
+
+private val AnalysisForm.hasScriptInputHistory: Boolean
+    get() = script.isNotBlank() || scriptFileUri != null
+
+private val ScriptInputType.changeDialogTitleResId: Int
+    get() = when (this) {
+        ScriptInputType.FILE_UPLOAD -> R.string.feature_analysis_impl_script_upload_change_dialog_title
+        ScriptInputType.DIRECT_INPUT -> R.string.feature_analysis_impl_script_direct_change_dialog_title
+    }
+
+private val ScriptInputType.changeDialogDescriptionResId: Int
+    get() = when (this) {
+        ScriptInputType.FILE_UPLOAD -> R.string.feature_analysis_impl_script_upload_change_dialog_description
+        ScriptInputType.DIRECT_INPUT -> R.string.feature_analysis_impl_script_direct_change_dialog_description
+    }
+
+private val ScriptInputType.changeDialogConfirmResId: Int
+    get() = when (this) {
+        ScriptInputType.FILE_UPLOAD -> R.string.feature_analysis_impl_script_upload_change_dialog_confirm
+        ScriptInputType.DIRECT_INPUT -> R.string.feature_analysis_impl_script_direct_change_dialog_confirm
+    }
 
 private fun ScriptInputType.toTabPage(): Int =
     when (this) {
@@ -218,26 +329,33 @@ private fun ScriptUploadCard(
     uploadProgress: Float?,
     onClick: () -> Unit,
     onClear: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (fileUri == null) {
-        EmptyScriptUploadContent(onClick = onClick)
-    } else {
-        UploadedScriptFileCard(
-            fileUri = fileUri,
-            uploadProgress = uploadProgress,
-            onClear = onClear,
+        EmptyScriptUploadContent(
+            onClick = onClick,
+            modifier = modifier,
         )
+    } else {
+        Box(modifier = modifier.fillMaxSize()) {
+            UploadedScriptFileCard(
+                fileUri = fileUri,
+                uploadProgress = uploadProgress,
+                onClear = onClear,
+            )
+        }
     }
 }
 
 @Composable
-private fun EmptyScriptUploadContent(onClick: () -> Unit) {
+private fun EmptyScriptUploadContent(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     StatusView(
         title = stringResource(R.string.feature_analysis_impl_script_file_placeholder),
         description = stringResource(R.string.feature_analysis_impl_script_file_format),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(420.dp),
+        modifier = modifier,
         visual = {
             Image(
                 painter = painterResource(R.drawable.feature_analysis_impl_no_script),
@@ -306,6 +424,7 @@ private fun ScriptInputUploadProgressScreenPreview() {
             progress = AnalysisFlowUiState(step = AnalysisFlowStep.SCRIPT_INPUT).progress,
             buttonEnabled = false,
             onSelectInputType = {},
+            onClearPendingScriptFile = {},
             onScriptChange = {},
             onScriptFileUploadClick = {},
             onScriptFileClear = {},

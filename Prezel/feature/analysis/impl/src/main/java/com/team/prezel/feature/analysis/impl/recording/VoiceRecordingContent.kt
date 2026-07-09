@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -45,6 +47,7 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.analysis.impl.R
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -56,6 +59,9 @@ internal fun VoiceRecordingContent(
     onToggleScriptExpanded: () -> Unit,
     onClickRecordingControl: () -> Unit,
     modifier: Modifier = Modifier,
+    voiceChromeUi: VoiceRecordingChromeUi? = null,
+    useMinimumScriptHeight: Boolean = false,
+    onScriptScrollableChange: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -74,13 +80,19 @@ internal fun VoiceRecordingContent(
 
         VoiceRecordingScriptBody(
             script = script,
-            modifier = Modifier.weight(1f),
+            modifier = if (useMinimumScriptHeight) {
+                Modifier.heightIn(min = 84.dp)
+            } else {
+                Modifier.weight(1f)
+            },
+            onScrollableChange = onScriptScrollableChange,
         )
 
         if (recordingState !is AudioSessionState.Idle) {
             VoiceRecordingStatusArea(
                 recordingState = recordingState,
                 recordingVolumes = recordingVolumes,
+                voiceChromeUi = voiceChromeUi,
                 onClickRecordingControl = onClickRecordingControl,
             )
         }
@@ -120,13 +132,21 @@ private fun VoiceRecordingScriptHeader(
 private fun VoiceRecordingScriptBody(
     script: String,
     modifier: Modifier = Modifier,
+    onScrollableChange: (Boolean) -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
+    val scrollable by remember {
+        derivedStateOf { scrollState.maxValue > 0 }
+    }
     val showTopGradient by remember {
         derivedStateOf { scrollState.value > 0 }
     }
     val showBottomGradient by remember {
         derivedStateOf { scrollState.value < scrollState.maxValue }
+    }
+
+    LaunchedEffect(scrollable) {
+        onScrollableChange(scrollable)
     }
 
     Box(
@@ -136,10 +156,8 @@ private fun VoiceRecordingScriptBody(
     ) {
         val backgroundColor = PrezelTheme.colors.bgRegular
 
-        Text(
-            text = script.ifBlank { stringResource(R.string.feature_analysis_impl_voice_recording_no_script) },
-            color = PrezelTheme.colors.textLarge,
-            style = PrezelTheme.typography.body2Regular,
+        VoiceRecordingScriptText(
+            script = script,
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState),
@@ -166,6 +184,29 @@ private fun VoiceRecordingScriptBody(
 }
 
 @Composable
+private fun VoiceRecordingScriptText(
+    script: String,
+    modifier: Modifier = Modifier,
+) {
+    val isScriptBlank = script.isBlank()
+
+    Text(
+        text = if (isScriptBlank) {
+            stringResource(R.string.feature_analysis_impl_voice_recording_no_script)
+        } else {
+            script
+        },
+        color = if (isScriptBlank) {
+            PrezelTheme.colors.textRegular
+        } else {
+            PrezelTheme.colors.textLarge
+        },
+        style = PrezelTheme.typography.body2Regular,
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun VoiceRecordingScriptGradient(
     brush: Brush,
     modifier: Modifier = Modifier,
@@ -182,12 +223,14 @@ private fun VoiceRecordingScriptGradient(
 private fun VoiceRecordingStatusArea(
     recordingState: AudioSessionState,
     recordingVolumes: ImmutableList<Float>,
+    voiceChromeUi: VoiceRecordingChromeUi?,
     onClickRecordingControl: () -> Unit,
 ) {
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
     RecordingWaveform(
         recordingState = recordingState,
         recordingVolumes = recordingVolumes,
+        voiceChromeUi = voiceChromeUi,
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(recordingState.recordingStatusSpacing))
@@ -239,16 +282,22 @@ private fun ScriptZoomButton(
 private fun RecordingWaveform(
     recordingState: AudioSessionState,
     recordingVolumes: ImmutableList<Float>,
+    voiceChromeUi: VoiceRecordingChromeUi?,
     modifier: Modifier = Modifier,
 ) {
     val playbackProgress = recordingState.playbackProgress()
-
-    PrezelVoiceChromeWave(
-        status = recordingState.toVoiceChromeStatus(),
-        volumes = recordingState.visibleRecordingVolumes(
+    val visibleVolumes = if (voiceChromeUi?.hideWaveform == true) {
+        persistentListOf()
+    } else {
+        recordingState.visibleRecordingVolumes(
             recordingVolumes = recordingVolumes,
             playbackProgress = playbackProgress,
-        ),
+        )
+    }
+
+    PrezelVoiceChromeWave(
+        status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
+        volumes = visibleVolumes,
         showBaseline = false,
         modifier = modifier,
     )
@@ -318,6 +367,10 @@ private fun RecordingTimer(
 ) {
     val timerText = when (recordingState) {
         is AudioSessionState.ReadyToPlay -> buildAnnotatedString {
+            withStyle(SpanStyle(color = PrezelTheme.colors.textDisabled)) {
+                append(currentSeconds.toTimerText())
+                append("/")
+            }
             withStyle(SpanStyle(color = PrezelTheme.colors.textLarge)) {
                 append(totalSeconds.toTimerText())
             }

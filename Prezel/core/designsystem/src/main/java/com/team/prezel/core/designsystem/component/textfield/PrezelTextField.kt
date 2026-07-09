@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
@@ -27,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,6 +59,9 @@ fun PrezelTextField(
 ) {
     var focused by remember { mutableStateOf(false) }
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
+    val density = LocalDensity.current
+    val imeVisible = WindowInsets.ime.getBottom(density) > 0
+    val typing = focused && imeVisible
 
     LaunchedEffect(value) {
         if (value != textFieldValue.text) {
@@ -66,7 +72,7 @@ fun PrezelTextField(
     val state = rememberPrezelTextFieldState(
         value = textFieldValue.text,
         enabled = enabled,
-        focused = focused,
+        focused = typing,
     ).let { state -> PrezelTextFieldStyle(state = state, status = status) }
 
     PrezelTextField(
@@ -80,7 +86,7 @@ fun PrezelTextField(
         },
         placeholder = placeholder,
         style = state,
-        focused = focused,
+        focused = typing,
         onFocusChange = { isFocused -> focused = isFocused },
         modifier = modifier,
         label = label,
