@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -162,49 +163,81 @@ private fun ScriptInputScreen(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V32))
 
-        ScriptInputTabs(
-            selectedType = form.scriptInputType,
-            onSelect = { inputType ->
-                if (inputType == form.scriptInputType) return@ScriptInputTabs
-
-                if (form.hasScriptInputHistory || pendingScriptFileUri != null) {
-                    pendingInputTypeChange = inputType
-                } else {
-                    onSelectInputType(inputType)
-                }
+        ScriptInputContent(
+            form = form,
+            pendingScriptFileUri = pendingScriptFileUri,
+            uploadProgress = uploadProgress,
+            onSelectInputType = onSelectInputType,
+            onRequestInputTypeChange = { inputType ->
+                pendingInputTypeChange = inputType
             },
+            onScriptChange = onScriptChange,
+            onScriptFileUploadClick = onScriptFileUploadClick,
+            onScriptFileClear = onScriptFileClear,
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.ScriptInputContent(
+    form: AnalysisForm,
+    pendingScriptFileUri: String?,
+    uploadProgress: Float,
+    onSelectInputType: (ScriptInputType) -> Unit,
+    onRequestInputTypeChange: (ScriptInputType) -> Unit,
+    onScriptChange: (String) -> Unit,
+    onScriptFileUploadClick: () -> Unit,
+    onScriptFileClear: () -> Unit,
+) {
+    ScriptInputTabs(
+        selectedType = form.scriptInputType,
+        onSelect = { inputType ->
+            if (inputType == form.scriptInputType) return@ScriptInputTabs
+
+            if (form.hasScriptInputHistory || pendingScriptFileUri != null) {
+                onRequestInputTypeChange(inputType)
+            } else {
+                onSelectInputType(inputType)
+            }
+        },
+    )
+
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+
+    when (form.scriptInputType) {
+        ScriptInputType.FILE_UPLOAD -> ScriptUploadCard(
+            fileUri = pendingScriptFileUri ?: form.scriptFileUri,
+            uploadProgress = if (pendingScriptFileUri != null) uploadProgress else null,
+            onClick = onScriptFileUploadClick,
+            onClear = onScriptFileClear,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
         )
 
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-
-        when (form.scriptInputType) {
-            ScriptInputType.FILE_UPLOAD -> {
-                ScriptUploadCard(
-                    fileUri = pendingScriptFileUri ?: form.scriptFileUri,
-                    uploadProgress = if (pendingScriptFileUri != null) uploadProgress else null,
-                    onClick = onScriptFileUploadClick,
-                    onClear = onScriptFileClear,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                )
-            }
-
-            ScriptInputType.DIRECT_INPUT -> {
-                PrezelTextArea(
-                    value = form.script,
-                    onValueChange = onScriptChange,
-                    placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
-                    maxLength = SCRIPT_MAX_LENGTH,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    fillContainerHeight = true,
-                )
-                Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-            }
-        }
+        ScriptInputType.DIRECT_INPUT -> DirectScriptInput(
+            script = form.script,
+            onScriptChange = onScriptChange,
+        )
     }
+}
+
+@Composable
+private fun ColumnScope.DirectScriptInput(
+    script: String,
+    onScriptChange: (String) -> Unit,
+) {
+    PrezelTextArea(
+        value = script,
+        onValueChange = onScriptChange,
+        placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
+        maxLength = SCRIPT_MAX_LENGTH,
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f),
+        fillContainerHeight = true,
+    )
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 }
 
 @Composable

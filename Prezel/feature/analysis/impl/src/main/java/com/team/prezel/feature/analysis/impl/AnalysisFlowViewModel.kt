@@ -65,6 +65,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
             updateState { copy(form = nextForm) }
             return
         }
+        if (intent.handleRecordingIntent(audioController, currentState.recordingState)) return
 
         when (intent) {
             is AnalysisFlowUiIntent.EnterStep -> updateState {
@@ -88,9 +89,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 fileUri = intent.fileUri,
                 fileName = intent.fileName,
             )
-            AnalysisFlowUiIntent.ClickRecordingControl -> audioController.handleControlClick(currentState.recordingState)
-            AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
-            AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
             is AnalysisFlowUiIntent.RetryFileUpload -> retryFileUpload(intent.uploadType)
             AnalysisFlowUiIntent.Next -> moveNext()
             AnalysisFlowUiIntent.SkipScript -> skipScript()
@@ -190,7 +188,10 @@ internal class AnalysisFlowViewModel @Inject constructor(
         analyzeJob = viewModelScope.launch {
             sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
 
-            val analysisResult = submission.analyzePresentationRecording()
+            val analysisResult = submission.analyzePresentationRecording(
+                analysisFileCache = analysisFileCache,
+                analyzePresentationUseCase = analyzePresentationUseCase,
+            )
 
             analysisResult.fold(
                 onSuccess = { result ->
@@ -216,7 +217,11 @@ internal class AnalysisFlowViewModel @Inject constructor(
         analyzeJob = viewModelScope.launch {
             sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
 
-            val reAnalyzeResult = submission.reAnalyzePresentationRecording(presentationId)
+            val reAnalyzeResult = submission.reAnalyzePresentationRecording(
+                presentationId = presentationId,
+                analysisFileCache = analysisFileCache,
+                reAnalyzePresentationUseCase = reAnalyzePresentationUseCase,
+            )
 
             reAnalyzeResult.fold(
                 onSuccess = { result ->
@@ -303,42 +308,6 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 }
         }
     }
-
-    private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(): Result<Long> =
-        runAnalysisCatching {
-            val audioFilePath = resolveAudioFilePath(analysisFileCache)
-            val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-            analyzePresentationUseCase(
-                name = name,
-                date = date.toRequestDate(),
-                category = category,
-                purpose = purpose,
-                style = style,
-                audience = audience,
-                script = script,
-                scriptFilePath = scriptFilePath,
-                audioFilePath = audioFilePath,
-            ).getOrThrow()
-        }
-
-    private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(presentationId: Long): Result<PresentationAnalysisSummary> =
-        runAnalysisCatching {
-            val audioFilePath = resolveAudioFilePath(analysisFileCache)
-            val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-            reAnalyzePresentationUseCase(
-                presentationId = presentationId,
-                script = script,
-                scriptFilePath = scriptFilePath,
-                audioFilePath = audioFilePath,
-            ).getOrThrow()
-        }
-
-    private suspend fun <T> runAnalysisCatching(block: suspend () -> T): Result<T> =
-        try {
-            Result.success(withTimeout(ANALYSIS_TIMEOUT_MILLIS) { block() })
-        } catch (throwable: Throwable) {
-            Result.failure(throwable)
-        }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
         when (action) {
@@ -472,6 +441,49 @@ private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
         .map { it.originalScript }
 }
 
+private suspend fun <T> runAnalysisCatching(block: suspend () -> T): Result<T> =
+    try {
+        Result.success(withTimeout(ANALYSIS_TIMEOUT_MILLIS) { block() })
+    } catch (throwable: Throwable) {
+        Result.failure(throwable)
+    }
+
+private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
+    analysisFileCache: AnalysisFileCache,
+    analyzePresentationUseCase: AnalyzePresentationUseCase,
+): Result<Long> =
+    runAnalysisCatching {
+        val audioFilePath = resolveAudioFilePath(analysisFileCache)
+        val scriptFilePath = resolveScriptFilePath(analysisFileCache)
+        analyzePresentationUseCase(
+            name = name,
+            date = date.toRequestDate(),
+            category = category,
+            purpose = purpose,
+            style = style,
+            audience = audience,
+            script = script,
+            scriptFilePath = scriptFilePath,
+            audioFilePath = audioFilePath,
+        ).getOrThrow()
+    }
+
+private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(
+    presentationId: Long,
+    analysisFileCache: AnalysisFileCache,
+    reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
+): Result<PresentationAnalysisSummary> =
+    runAnalysisCatching {
+        val audioFilePath = resolveAudioFilePath(analysisFileCache)
+        val scriptFilePath = resolveScriptFilePath(analysisFileCache)
+        reAnalyzePresentationUseCase(
+            presentationId = presentationId,
+            script = script,
+            scriptFilePath = scriptFilePath,
+            audioFilePath = audioFilePath,
+        ).getOrThrow()
+    }
+
 private fun PresentationAnalysisSubmission.resolveAudioFilePath(analysisFileCache: AnalysisFileCache): String =
     audioFileUri
         ?.let { uri ->
@@ -499,6 +511,19 @@ private fun String?.isSupportedAudioFileName(): Boolean {
         .lowercase()
 
     return extension in SUPPORTED_AUDIO_FILE_EXTENSIONS
+}
+
+private fun AnalysisFlowUiIntent.handleRecordingIntent(
+    audioController: RecordingAudioController,
+    recordingState: AudioSessionState,
+): Boolean {
+    when (this) {
+        AnalysisFlowUiIntent.ClickRecordingControl -> audioController.handleControlClick(recordingState)
+        AnalysisFlowUiIntent.StopRecording -> audioController.stopRecording()
+        AnalysisFlowUiIntent.ResetRecording -> audioController.reset()
+        else -> return false
+    }
+    return true
 }
 
 private fun RecordingAudioController.handleControlClick(recordingState: AudioSessionState) {

@@ -126,10 +126,48 @@ private fun SituationAccordions(
     val styleOptions = styleOptions()
     val audienceOptions = audienceOptions()
 
+    CategorySituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        categoryOptions = categoryOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectCategory = onSelectCategory,
+    )
+    PurposeSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        purposeOptions = purposeOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectPurpose = onSelectPurpose,
+    )
+    StyleSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        styleOptions = styleOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectStyle = onSelectStyle,
+    )
+    AudienceSituationAccordion(
+        form = form,
+        expandedType = expandedType,
+        audienceOptions = audienceOptions,
+        onExpandedTypeChange = { expandedType = it },
+        onSelectAudience = onSelectAudience,
+    )
+}
+
+@Composable
+private fun CategorySituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    categoryOptions: ImmutableList<SituationCategoryOption>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectCategory: (Category?) -> Unit,
+) {
     SituationAccordion(
         type = SituationAccordionType.CATEGORY,
         expandedType = expandedType,
-        onExpandedTypeChange = { expandedType = it },
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_category_label),
         selectedText = categoryOptions.firstOrNull { it.value == form.category }?.title,
     ) {
@@ -138,14 +176,24 @@ private fun SituationAccordions(
             options = categoryOptions,
             onSelect = { selectedCategory ->
                 onSelectCategory(selectedCategory)
-                expandedType = selectedCategory.nextExpandedType(SituationAccordionType.CATEGORY)
+                onExpandedTypeChange(selectedCategory.nextExpandedType(SituationAccordionType.CATEGORY))
             },
         )
     }
+}
+
+@Composable
+private fun PurposeSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    purposeOptions: ImmutableList<SituationChipOption<Purpose>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectPurpose: (Purpose?) -> Unit,
+) {
     SituationAccordion(
         type = SituationAccordionType.PURPOSE,
         expandedType = expandedType,
-        onExpandedTypeChange = { expandedType = it },
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_purpose_label),
         selectedText = purposeOptions.firstOrNull { it.value == form.purpose }?.text,
     ) {
@@ -155,14 +203,24 @@ private fun SituationAccordions(
                 val selectedPurpose = purposeOptions[index].value
                 val nextPurpose = selectedPurpose.toggleIfSelected(form.purpose)
                 onSelectPurpose(nextPurpose)
-                expandedType = nextPurpose.nextExpandedType(SituationAccordionType.PURPOSE)
+                onExpandedTypeChange(nextPurpose.nextExpandedType(SituationAccordionType.PURPOSE))
             },
         )
     }
+}
+
+@Composable
+private fun StyleSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    styleOptions: ImmutableList<SituationChipOption<Style>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectStyle: (Style?) -> Unit,
+) {
     SituationAccordion(
         type = SituationAccordionType.STYLE,
         expandedType = expandedType,
-        onExpandedTypeChange = { expandedType = it },
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_style_label),
         selectedText = styleOptions.firstOrNull { it.value == form.style }?.text,
     ) {
@@ -172,14 +230,24 @@ private fun SituationAccordions(
                 val selectedStyle = styleOptions[index].value
                 val nextStyle = selectedStyle.toggleIfSelected(form.style)
                 onSelectStyle(nextStyle)
-                expandedType = nextStyle.nextExpandedType(SituationAccordionType.STYLE)
+                onExpandedTypeChange(nextStyle.nextExpandedType(SituationAccordionType.STYLE))
             },
         )
     }
+}
+
+@Composable
+private fun AudienceSituationAccordion(
+    form: AnalysisForm,
+    expandedType: SituationAccordionType?,
+    audienceOptions: ImmutableList<SituationChipOption<Audience>>,
+    onExpandedTypeChange: (SituationAccordionType?) -> Unit,
+    onSelectAudience: (Audience?) -> Unit,
+) {
     SituationAccordion(
         type = SituationAccordionType.AUDIENCE,
         expandedType = expandedType,
-        onExpandedTypeChange = { expandedType = it },
+        onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
         selectedText = audienceOptions.firstOrNull { it.value == form.audience }?.text,
     ) {
@@ -189,7 +257,7 @@ private fun SituationAccordions(
                 val selectedAudience = audienceOptions[index].value
                 val nextAudience = selectedAudience.toggleIfSelected(form.audience)
                 onSelectAudience(nextAudience)
-                expandedType = nextAudience.nextExpandedType(SituationAccordionType.AUDIENCE)
+                onExpandedTypeChange(nextAudience.nextExpandedType(SituationAccordionType.AUDIENCE))
             },
         )
     }

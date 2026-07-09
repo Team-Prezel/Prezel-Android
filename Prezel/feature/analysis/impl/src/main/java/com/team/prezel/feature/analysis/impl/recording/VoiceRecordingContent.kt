@@ -155,20 +155,9 @@ private fun VoiceRecordingScriptBody(
             .padding(horizontal = PrezelTheme.spacing.V20),
     ) {
         val backgroundColor = PrezelTheme.colors.bgRegular
-        val isScriptBlank = script.isBlank()
 
-        Text(
-            text = if (isScriptBlank) {
-                stringResource(R.string.feature_analysis_impl_voice_recording_no_script)
-            } else {
-                script
-            },
-            color = if (isScriptBlank) {
-                PrezelTheme.colors.textRegular
-            } else {
-                PrezelTheme.colors.textLarge
-            },
-            style = PrezelTheme.typography.body2Regular,
+        VoiceRecordingScriptText(
+            script = script,
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState),
@@ -192,6 +181,29 @@ private fun VoiceRecordingScriptBody(
             )
         }
     }
+}
+
+@Composable
+private fun VoiceRecordingScriptText(
+    script: String,
+    modifier: Modifier = Modifier,
+) {
+    val isScriptBlank = script.isBlank()
+
+    Text(
+        text = if (isScriptBlank) {
+            stringResource(R.string.feature_analysis_impl_voice_recording_no_script)
+        } else {
+            script
+        },
+        color = if (isScriptBlank) {
+            PrezelTheme.colors.textRegular
+        } else {
+            PrezelTheme.colors.textLarge
+        },
+        style = PrezelTheme.typography.body2Regular,
+        modifier = modifier,
+    )
 }
 
 @Composable

@@ -90,19 +90,19 @@ private fun VoiceRecordingScreen(
             .background(PrezelTheme.colors.bgRegular),
     ) {
         if (!isScriptExpanded) {
-            if (recordingState.isCompleted) {
-                VoiceRecordingCompletedTopBar(onBack = onBack)
-            } else {
-                VoiceRecordingChromeTopBar(
-                    titleResId = voiceChromeUi?.titleResId ?: recordingState.titleResId,
-                    status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
-                    gradient = voiceChromeUi?.gradient ?: VoiceChromeGradient.MIN,
-                    expandChrome = useEmptyScriptLayout,
-                    onBack = onBack,
-                )
-            }
+            VoiceRecordingTopBar(
+                recordingState = recordingState,
+                voiceChromeUi = voiceChromeUi,
+                expandChrome = useEmptyScriptLayout,
+                onBack = onBack,
+            )
         }
 
+        val contentModifier = if (useEmptyScriptLayout) {
+            Modifier.fillMaxWidth()
+        } else {
+            Modifier.weight(1f)
+        }
         VoiceRecordingContent(
             script = script,
             recordingState = recordingState,
@@ -117,11 +117,7 @@ private fun VoiceRecordingScreen(
             onScriptScrollableChange = { scrollable ->
                 showButtonAreaDivider = scrollable
             },
-            modifier = if (useEmptyScriptLayout) {
-                Modifier.fillMaxWidth()
-            } else {
-                Modifier.weight(1f)
-            },
+            modifier = contentModifier,
         )
 
         VoiceRecordingButtonArea(
@@ -134,6 +130,27 @@ private fun VoiceRecordingScreen(
             onAnalyze = onAnalyze,
         )
     }
+}
+
+@Composable
+private fun ColumnScope.VoiceRecordingTopBar(
+    recordingState: AudioSessionState,
+    voiceChromeUi: VoiceRecordingChromeUi?,
+    expandChrome: Boolean,
+    onBack: () -> Unit,
+) {
+    if (recordingState.isCompleted) {
+        VoiceRecordingCompletedTopBar(onBack = onBack)
+        return
+    }
+
+    VoiceRecordingChromeTopBar(
+        titleResId = voiceChromeUi?.titleResId ?: recordingState.titleResId,
+        status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
+        gradient = voiceChromeUi?.gradient ?: VoiceChromeGradient.MIN,
+        expandChrome = expandChrome,
+        onBack = onBack,
+    )
 }
 
 @Composable
