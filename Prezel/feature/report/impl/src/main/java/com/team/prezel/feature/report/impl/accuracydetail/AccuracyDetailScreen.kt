@@ -136,7 +136,7 @@ private fun AccuracyDetailScreenContent(
             AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.filter { detail -> detail.isScriptMatchIssue }
         }.toImmutableList()
     }
-    val sheetPeekHeight = rememberPlayerSheetPeekHeight(markerSentenceDetails = playerMarkerSentenceDetails)
+    val sheetPeekHeight = AccuracyDetailPlayerSheetPeekHeight
     val playerState = rememberDetailPlayerState(
         selectedTab = selectedTab,
         sentenceDetails = sentenceDetails,
@@ -178,16 +178,6 @@ private fun rememberAccuracyDetailTabs(): List<AccuracyDetailTab> =
             AccuracyDetailTab.SPEECH,
             AccuracyDetailTab.SCRIPT_MATCH,
         )
-    }
-
-@Composable
-private fun rememberPlayerSheetPeekHeight(markerSentenceDetails: ImmutableList<SentenceAnalysisUiModel>): Dp =
-    remember(markerSentenceDetails) {
-        if (markerSentenceDetails.isEmpty()) {
-            AccuracyDetailPlayerSheetDefaultPeekHeight
-        } else {
-            AccuracyDetailPlayerSheetLargePeekHeight
-        }
     }
 
 @Composable
@@ -323,8 +313,7 @@ private fun AccuracyDetailScaffold(
 }
 
 private const val SEEK_SYNC_THRESHOLD_MILLIS = 750L
-private val AccuracyDetailPlayerSheetDefaultPeekHeight = 220.dp
-private val AccuracyDetailPlayerSheetLargePeekHeight = 336.dp
+private val AccuracyDetailPlayerSheetPeekHeight = 252.dp
 
 @BasicPreview
 @Composable
