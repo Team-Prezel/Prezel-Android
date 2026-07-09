@@ -1,13 +1,22 @@
 package com.team.prezel.feature.analysis.impl.recording
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
 import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.feature.analysis.impl.R
 import java.util.Locale
+
+internal data class VoiceRecordingChromeUi(
+    @param:StringRes val titleResId: Int? = null,
+    val status: VoiceChromeStatus? = null,
+    val gradient: VoiceChromeGradient? = null,
+    val hideWaveform: Boolean = false,
+)
 
 internal val AudioSessionState.currentSeconds: Int
     get() = when (this) {

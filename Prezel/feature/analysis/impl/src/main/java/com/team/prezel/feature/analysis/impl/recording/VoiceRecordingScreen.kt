@@ -1,8 +1,10 @@
 package com.team.prezel.feature.analysis.impl.recording
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +27,7 @@ import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.AudioSource
 import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChrome
 import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
+import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -35,10 +38,13 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 
+private val DefaultVoiceChromeHeight = 160.dp
+
 @Composable
 internal fun VoiceRecordingScreen(
     uiState: AnalysisFlowUiState,
     isScriptExpanded: Boolean,
+    voiceChromeUi: VoiceRecordingChromeUi? = null,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
@@ -50,6 +56,7 @@ internal fun VoiceRecordingScreen(
         script = uiState.form.script,
         recordingState = uiState.recordingState,
         recordingVolumes = uiState.recordingVolumes,
+        voiceChromeUi = voiceChromeUi,
         analyzeEnabled = uiState.canMoveNext,
         isScriptExpanded = isScriptExpanded,
         onClickRecordingControl = onClickRecordingControl,
@@ -66,6 +73,7 @@ private fun VoiceRecordingScreen(
     script: String,
     recordingState: AudioSessionState,
     recordingVolumes: ImmutableList<Float>,
+    voiceChromeUi: VoiceRecordingChromeUi? = null,
     analyzeEnabled: Boolean,
     isScriptExpanded: Boolean,
     onClickRecordingControl: () -> Unit,
@@ -76,6 +84,7 @@ private fun VoiceRecordingScreen(
     onBack: () -> Unit,
 ) {
     var showButtonAreaDivider by remember { mutableStateOf(false) }
+    val useEmptyScriptLayout = script.isBlank() && !isScriptExpanded && !recordingState.isCompleted
 
     Column(
         modifier = Modifier
@@ -88,6 +97,10 @@ private fun VoiceRecordingScreen(
             } else {
                 VoiceRecordingChromeTopBar(
                     recordingState = recordingState,
+                    titleResId = voiceChromeUi?.titleResId ?: recordingState.titleResId,
+                    status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
+                    gradient = voiceChromeUi?.gradient ?: VoiceChromeGradient.MIN,
+                    expandChrome = useEmptyScriptLayout,
                     onBack = onBack,
                 )
             }
@@ -97,15 +110,21 @@ private fun VoiceRecordingScreen(
             script = script,
             recordingState = recordingState,
             recordingVolumes = recordingVolumes,
+            voiceChromeUi = voiceChromeUi,
             isScriptExpanded = isScriptExpanded,
             onToggleScriptExpanded = {
                 onScriptExpandedChange(!isScriptExpanded)
             },
             onClickRecordingControl = onClickRecordingControl,
+            useMinimumScriptHeight = useEmptyScriptLayout,
             onScriptScrollableChange = { scrollable ->
                 showButtonAreaDivider = scrollable
             },
-            modifier = Modifier.weight(1f),
+            modifier = if (useEmptyScriptLayout) {
+                Modifier.fillMaxWidth()
+            } else {
+                Modifier.weight(1f)
+            },
         )
 
         VoiceRecordingButtonArea(
@@ -138,13 +157,18 @@ private fun VoiceRecordingCompletedTopBar(onBack: () -> Unit) {
 }
 
 @Composable
-private fun VoiceRecordingChromeTopBar(
+private fun ColumnScope.VoiceRecordingChromeTopBar(
     recordingState: AudioSessionState,
+    @StringRes titleResId: Int,
+    status: VoiceChromeStatus,
+    gradient: VoiceChromeGradient,
+    expandChrome: Boolean,
     onBack: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (expandChrome) Modifier.weight(1f) else Modifier)
             .background(PrezelTheme.colors.bgMedium),
     ) {
         Box(
@@ -159,10 +183,18 @@ private fun VoiceRecordingChromeTopBar(
         }
 
         PrezelVoiceChrome(
-            titleText = stringResource(recordingState.titleResId),
-            status = recordingState.toVoiceChromeStatus(),
-            gradient = VoiceChromeGradient.MIN,
-            modifier = Modifier.fillMaxWidth(),
+            titleText = stringResource(titleResId),
+            status = status,
+            gradient = gradient,
+            modifier = if (expandChrome) {
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            } else {
+                Modifier
+                    .height(DefaultVoiceChromeHeight)
+                    .fillMaxWidth()
+            },
         )
     }
 }
@@ -203,6 +235,17 @@ private fun VoiceRecordingScreenRecordingPreview() {
 
 @BasicPreview
 @Composable
+private fun VoiceRecordingScreenEmptyScriptPreview() {
+    PrezelTheme {
+        VoiceRecordingScreenPreviewContent(
+            recordingState = AudioSessionState.Idle,
+            script = "",
+        )
+    }
+}
+
+@BasicPreview
+@Composable
 private fun VoiceRecordingScreenPausedPreview() {
     PrezelTheme {
         VoiceRecordingScreenPreviewContent(AudioSessionState.PausedRecording(elapsedSeconds = 754))
@@ -237,11 +280,14 @@ private fun VoiceRecordingScreenPlayingPreview() {
 }
 
 @Composable
-private fun VoiceRecordingScreenPreviewContent(recordingState: AudioSessionState) {
+private fun VoiceRecordingScreenPreviewContent(
+    recordingState: AudioSessionState,
+    script: String = "한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+) {
     VoiceRecordingScreen(
         uiState = AnalysisFlowUiState(
             step = AnalysisFlowStep.VOICE_RECORDING,
-            form = AnalysisForm(script = "한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다."),
+            form = AnalysisForm(script = script),
             recordingState = recordingState,
         ),
         isScriptExpanded = false,
