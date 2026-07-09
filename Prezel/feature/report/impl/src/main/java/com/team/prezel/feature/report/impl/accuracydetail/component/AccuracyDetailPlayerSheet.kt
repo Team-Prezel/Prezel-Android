@@ -44,13 +44,16 @@ internal fun AccuracyDetailPlayerSheet(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = if (expanded) {
-            Modifier.fillMaxSize()
-        } else {
-            Modifier.fillMaxWidth()
-        },
+        modifier = modifier.then(
+            if (expanded) {
+                Modifier.fillMaxSize()
+            } else {
+                Modifier.fillMaxWidth()
+            },
+        ),
     ) {
         SheetHandle()
         SheetDetailContent(
