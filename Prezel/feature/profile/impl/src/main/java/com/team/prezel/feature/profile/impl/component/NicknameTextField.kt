@@ -13,6 +13,7 @@ import com.team.prezel.core.designsystem.component.textfield.PrezelTextField
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldStatus
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.profile.Nickname
 import com.team.prezel.feature.profile.impl.R
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 
@@ -29,6 +30,7 @@ internal fun NicknameTextField(
         label = stringResource(R.string.feature_profile_impl_nickname_text_field_label),
         placeholder = stringResource(R.string.feature_profile_impl_nickname_text_field_placeholder),
         status = nicknameValidationState.toNicknameStatus(),
+        maxLength = Nickname.MAX_LENGTH,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
         ),

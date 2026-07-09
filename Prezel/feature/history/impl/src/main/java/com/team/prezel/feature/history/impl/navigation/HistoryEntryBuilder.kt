@@ -19,7 +19,13 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
 
         HistoryScreen(
             navigateToReport = { presentationId, isPast ->
-                navigator.navigate(ReportNavKey(presentationId = presentationId, isPast = isPast))
+                navigator.navigate(
+                    ReportNavKey(
+                        presentationId = presentationId,
+                        isPast = isPast,
+                        showBackButton = true,
+                    ),
+                )
             },
             navigateToAnalysis = {
                 navigator.navigate(AnalysisNavKey.Schedule())

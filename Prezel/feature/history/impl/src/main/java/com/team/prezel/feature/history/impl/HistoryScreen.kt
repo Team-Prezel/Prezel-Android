@@ -79,7 +79,14 @@ internal fun HistoryScreen(
         uiState = uiState,
         modifier = modifier,
         pagerState = pagerState,
-        onClickHistoryItem = { viewModel.onIntent(HistoryUiIntent.ClickItem(presentationId = it.presentationId)) },
+        onClickHistoryItem = { item, pageType ->
+            viewModel.onIntent(
+                HistoryUiIntent.ClickItem(
+                    presentationId = item.presentationId,
+                    pageType = pageType,
+                ),
+            )
+        },
         onClickAddPresentation = navigateToAnalysis,
     )
 }
@@ -89,7 +96,7 @@ internal fun HistoryScreen(
 internal fun HistoryScreen(
     uiState: HistoryUiState,
     pagerState: PagerState,
-    onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickHistoryItem: (HistoryUiModel, HistoryPageType) -> Unit,
     onClickAddPresentation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -116,7 +123,7 @@ internal fun HistoryScreen(
 private fun HistoryContent(
     uiState: HistoryUiState,
     pagerState: PagerState,
-    onClickHistoryItem: (HistoryUiModel) -> Unit,
+    onClickHistoryItem: (HistoryUiModel, HistoryPageType) -> Unit,
     onClickAddPresentation: () -> Unit,
 ) {
     val tabs = persistentListOf(
@@ -158,7 +165,7 @@ private fun HistoryContent(
                     } else {
                         HistoryItemList(
                             items = items.toImmutableList(),
-                            onClickItem = onClickHistoryItem,
+                            onClickItem = { item -> onClickHistoryItem(item, pageType) },
                             modifier = Modifier.fillMaxSize(),
                         )
                     }
@@ -216,7 +223,7 @@ private fun HistoryScreenPreview() {
         HistoryScreen(
             uiState = previewState,
             pagerState = pagerState,
-            onClickHistoryItem = { },
+            onClickHistoryItem = { _, _ -> },
             onClickAddPresentation = {},
         )
     }

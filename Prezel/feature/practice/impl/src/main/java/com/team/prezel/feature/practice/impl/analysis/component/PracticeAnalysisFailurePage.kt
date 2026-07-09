@@ -1,6 +1,7 @@
 package com.team.prezel.feature.practice.impl.analysis.component
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -27,8 +28,8 @@ internal fun PracticeAnalysisFailurePage(
     modifier: Modifier = Modifier,
 ) {
     StatusView(
-        title = stringResource(R.string.feature_practice_impl_practice_recording_analysis_error_title),
-        description = stringResource(R.string.feature_practice_impl_practice_recording_analysis_error_description),
+        title = stringResource(errorType.titleResId),
+        description = stringResource(errorType.descriptionResId),
         modifier = modifier,
         visual = {
             Image(
@@ -56,6 +57,21 @@ private val PracticeAnalysisErrorType.drawableResId: Int
     get() = when (this) {
         PracticeAnalysisErrorType.ANALYSIS_FAILED -> CoreUiR.drawable.core_ui_error_analyze
         PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> CoreUiR.drawable.core_ui_error_voice
+    }
+
+private val PracticeAnalysisErrorType.titleResId: Int
+    @StringRes
+    get() = when (this) {
+        PracticeAnalysisErrorType.ANALYSIS_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_failed_title
+        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED ->
+            R.string.feature_practice_impl_practice_recording_voice_recognition_failed_title
+    }
+
+private val PracticeAnalysisErrorType.descriptionResId: Int
+    @StringRes
+    get() = when (this) {
+        PracticeAnalysisErrorType.ANALYSIS_FAILED -> R.string.feature_practice_impl_practice_recording_analysis_failed_description
+        PracticeAnalysisErrorType.VOICE_RECOGNITION_FAILED -> R.string.feature_practice_impl_practice_recording_voice_recognition_failed_description
     }
 
 @BasicPreview

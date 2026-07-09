@@ -120,7 +120,7 @@ private fun ProfileScreen(
         )
 
         PrezelButtonArea(
-            showBackground = true,
+            showBackground = false,
             modifier = Modifier.advancedImePadding(),
             mainButton = { modifier ->
                 PrezelButton(

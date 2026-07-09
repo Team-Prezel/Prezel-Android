@@ -62,12 +62,14 @@ internal fun ReportBodyContent(
     )
     GrowthGraphSection(
         growthGraphData = uiState.growthGraphData,
+        showReRecordingButton = !uiState.isPast,
         onCardIndexChange = onImprovementCardIndexChange,
         onReRecordingClick = onReRecordingClick,
     )
     ScriptAnalysisSection(
         isWrittenScript = uiState.isScriptWritten,
         scriptAnalysisGraphData = uiState.scriptAnalysisGraphData,
+        showReWriteScriptButton = !uiState.isPast,
         onReWriteScriptClick = onReWriteScriptClick,
         onScriptAnalysisClick = onScriptAnalysisClick,
     )

@@ -35,13 +35,14 @@ import kotlinx.collections.immutable.toPersistentMap
 internal fun ScriptAnalysisSection(
     isWrittenScript: Boolean,
     scriptAnalysisGraphData: ScriptAnalysisGraphData,
+    showReWriteScriptButton: Boolean = true,
     onReWriteScriptClick: () -> Unit,
     onScriptAnalysisClick: () -> Unit,
 ) {
     ReportSection(
         title = {
             ScriptAnalysisSectionTitle(
-                showReWriteButton = isWrittenScript,
+                showReWriteButton = isWrittenScript && showReWriteScriptButton,
                 onReWriteScriptClick = onReWriteScriptClick,
             )
         },
@@ -54,24 +55,32 @@ internal fun ScriptAnalysisSection(
             return@ReportSection
         }
 
-        EmptyStateContent(onReWriteScriptClick = onReWriteScriptClick)
+        EmptyStateContent(
+            showWriteScriptButton = showReWriteScriptButton,
+            onReWriteScriptClick = onReWriteScriptClick,
+        )
     }
 }
 
 @Composable
-private fun EmptyStateContent(onReWriteScriptClick: () -> Unit) {
+private fun EmptyStateContent(
+    showWriteScriptButton: Boolean,
+    onReWriteScriptClick: () -> Unit,
+) {
     EmptyStateCard(text = stringResource(R.string.feature_report_impl_script_analysis_empty_state_message))
 
-    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+    if (showWriteScriptButton) {
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 
-    PrezelTextButton(
-        text = stringResource(R.string.feature_report_impl_write_script),
-        size = ButtonSize.REGULAR,
-        type = ButtonType.FILLED,
-        hierarchy = ButtonHierarchy.SECONDARY,
-        onClick = onReWriteScriptClick,
-        modifier = Modifier.fillMaxWidth(),
-    )
+        PrezelTextButton(
+            text = stringResource(R.string.feature_report_impl_write_script),
+            size = ButtonSize.REGULAR,
+            type = ButtonType.FILLED,
+            hierarchy = ButtonHierarchy.SECONDARY,
+            onClick = onReWriteScriptClick,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 @Composable
