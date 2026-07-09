@@ -38,8 +38,6 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 
-private val DefaultVoiceChromeHeight = 160.dp
-
 @Composable
 internal fun VoiceRecordingScreen(
     uiState: AnalysisFlowUiState,
@@ -96,7 +94,6 @@ private fun VoiceRecordingScreen(
                 VoiceRecordingCompletedTopBar(onBack = onBack)
             } else {
                 VoiceRecordingChromeTopBar(
-                    recordingState = recordingState,
                     titleResId = voiceChromeUi?.titleResId ?: recordingState.titleResId,
                     status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
                     gradient = voiceChromeUi?.gradient ?: VoiceChromeGradient.MIN,
@@ -158,7 +155,6 @@ private fun VoiceRecordingCompletedTopBar(onBack: () -> Unit) {
 
 @Composable
 private fun ColumnScope.VoiceRecordingChromeTopBar(
-    recordingState: AudioSessionState,
     @StringRes titleResId: Int,
     status: VoiceChromeStatus,
     gradient: VoiceChromeGradient,
@@ -191,9 +187,7 @@ private fun ColumnScope.VoiceRecordingChromeTopBar(
                     .weight(1f)
                     .fillMaxWidth()
             } else {
-                Modifier
-                    .height(DefaultVoiceChromeHeight)
-                    .fillMaxWidth()
+                Modifier.fillMaxWidth()
             },
         )
     }
