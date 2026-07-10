@@ -196,6 +196,7 @@ private fun WordAnalysisStatus.chipTextColor(): Color =
     when (this) {
         WordAnalysisStatus.INSERTION,
         WordAnalysisStatus.MISPRONUNCIATION,
+        WordAnalysisStatus.STUTTER,
         -> PrezelTheme.colors.feedbackWarningRegular
 
         WordAnalysisStatus.OMISSION -> PrezelTheme.colors.textRegular
@@ -207,6 +208,7 @@ private fun WordAnalysisStatus.chipBackgroundColor(): Color =
     when (this) {
         WordAnalysisStatus.INSERTION,
         WordAnalysisStatus.MISPRONUNCIATION,
+        WordAnalysisStatus.STUTTER,
         -> PrezelTheme.colors.feedbackWarningSmall
 
         WordAnalysisStatus.OMISSION -> PrezelTheme.colors.bgLarge

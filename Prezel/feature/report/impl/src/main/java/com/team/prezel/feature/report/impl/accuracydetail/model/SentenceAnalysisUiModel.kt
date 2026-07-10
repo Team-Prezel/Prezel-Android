@@ -24,14 +24,11 @@ internal data class SentenceAnalysisUiModel(
     val isSpeechAccuracyIssue: Boolean
         get() = status.isSpeechAccuracyIssue || wordDetails.any { word -> word.status.isSpeechAccuracyIssue }
 
-    val hasSpeechAccuracyStatus: Boolean
-        get() = status.isSpeechAccuracyStatus || wordDetails.any { word -> word.status.isSpeechAccuracyStatus }
-
     val scriptMatchStatus: WordAnalysisStatus
         get() = wordDetails.firstOrNull { word -> word.status.isScriptMatchIssue }?.status ?: status
 
     val speechAccuracyStatus: WordAnalysisStatus
-        get() = wordDetails.firstOrNull { word -> word.status.isSpeechAccuracyStatus }?.status ?: status
+        get() = wordDetails.firstOrNull { word -> word.status.isSpeechAccuracyIssue }?.status ?: status
 }
 
 @Immutable
@@ -43,18 +40,13 @@ internal data class WordAnalysisUiModel(
     val endTimeMs: Long,
 )
 
-private val WordAnalysisStatus.isScriptMatchIssue: Boolean
-    get() = this == WordAnalysisStatus.INSERTION ||
-        this == WordAnalysisStatus.OMISSION
-
-private val WordAnalysisStatus.isSpeechAccuracyIssue: Boolean
-    get() = this == WordAnalysisStatus.STUTTER ||
+internal val WordAnalysisStatus.isScriptMatchIssue: Boolean
+    get() = this == WordAnalysisStatus.OMISSION ||
         this == WordAnalysisStatus.MISPRONUNCIATION
 
-private val WordAnalysisStatus.isSpeechAccuracyStatus: Boolean
-    get() = this == WordAnalysisStatus.EXCELLENT ||
-        this == WordAnalysisStatus.GOOD ||
-        this == WordAnalysisStatus.STUTTER
+internal val WordAnalysisStatus.isSpeechAccuracyIssue: Boolean
+    get() = this == WordAnalysisStatus.STUTTER ||
+        this == WordAnalysisStatus.INSERTION
 
 internal fun ImmutableList<SentenceAnalysisDetail>.toUiModels(): ImmutableList<SentenceAnalysisUiModel> =
     map { detail -> detail.toUiModel() }.toImmutableList()

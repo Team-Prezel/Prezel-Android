@@ -17,8 +17,11 @@ import com.team.prezel.core.model.presentation.WordAnalysisStatus
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailTab
 import com.team.prezel.feature.report.impl.accuracydetail.model.SentenceAnalysisUiModel
+import com.team.prezel.feature.report.impl.accuracydetail.model.isScriptMatchIssue
+import com.team.prezel.feature.report.impl.accuracydetail.model.isSpeechAccuracyIssue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun ScriptDetailList(
@@ -27,6 +30,9 @@ internal fun ScriptDetailList(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
 ) {
     val scrollState = rememberScrollState()
+    val visibleDetails = sentenceDetails
+        .filter { detail -> detail.isVisibleIn(selectedTab) }
+        .toImmutableList()
 
     LaunchedEffect(selectedTab) {
         scrollState.scrollTo(0)
@@ -39,10 +45,10 @@ internal fun ScriptDetailList(
             .padding(all = PrezelTheme.spacing.V20),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
     ) {
-        if (sentenceDetails.isNotEmpty()) {
-            sentenceDetails.forEach { detail ->
+        if (visibleDetails.isNotEmpty()) {
+            visibleDetails.forEach { detail ->
                 SentenceAnalysisCard(
-                    detail = detail,
+                    detail = detail.withVisibleWordDetails(selectedTab),
                     highlighted = detail == selectedSentence,
                     showStatusChip = detail.showsStatusChip(selectedTab),
                     highlightWordDetails = true,
@@ -55,6 +61,23 @@ internal fun ScriptDetailList(
     }
 }
 
+private fun SentenceAnalysisUiModel.isVisibleIn(selectedTab: AccuracyDetailTab): Boolean =
+    when (selectedTab) {
+        AccuracyDetailTab.SPEECH -> isSpeechAccuracyIssue
+        AccuracyDetailTab.SCRIPT_MATCH -> isScriptMatchIssue
+    }
+
+private fun SentenceAnalysisUiModel.withVisibleWordDetails(selectedTab: AccuracyDetailTab): SentenceAnalysisUiModel =
+    copy(
+        wordDetails = wordDetails
+            .filter { word ->
+                when (selectedTab) {
+                    AccuracyDetailTab.SPEECH -> word.status.isSpeechAccuracyIssue
+                    AccuracyDetailTab.SCRIPT_MATCH -> word.status.isScriptMatchIssue
+                }
+            }.toImmutableList(),
+    )
+
 private val AccuracyDetailTab.emptyDetailTextResId: Int
     get() = when (this) {
         AccuracyDetailTab.SPEECH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_speech
@@ -63,7 +86,7 @@ private val AccuracyDetailTab.emptyDetailTextResId: Int
 
 private fun SentenceAnalysisUiModel.showsStatusChip(selectedTab: AccuracyDetailTab): Boolean =
     when (selectedTab) {
-        AccuracyDetailTab.SPEECH -> hasSpeechAccuracyStatus
+        AccuracyDetailTab.SPEECH -> isSpeechAccuracyIssue
         AccuracyDetailTab.SCRIPT_MATCH -> isScriptMatchIssue
     }
 
