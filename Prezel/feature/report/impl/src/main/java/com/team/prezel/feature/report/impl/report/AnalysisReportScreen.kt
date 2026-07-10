@@ -199,6 +199,12 @@ private val AnalysisReportUiMessage.resId: Int
     @StringRes get() = when (this) {
         AnalysisReportUiMessage.FETCH_REPORT_FAILED -> R.string.feature_report_impl_fetch_report_failed
         AnalysisReportUiMessage.DELETE_REPORT_FAILED -> R.string.feature_report_impl_delete_report_failed
+        AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE -> {
+            R.string.feature_report_impl_script_match_analysis_unavailable
+        }
+        AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE -> {
+            R.string.feature_report_impl_speech_analysis_unavailable
+        }
     }
 
 @BasicPreview

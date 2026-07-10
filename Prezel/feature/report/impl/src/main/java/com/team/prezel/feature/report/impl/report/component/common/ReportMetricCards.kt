@@ -27,13 +27,11 @@ internal fun MetricResultCard(
     value: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = false,
 ) {
     PrezelTouchArea(
         modifier = modifier
             .clip(shape = PrezelTheme.shapes.V8)
             .background(color = PrezelTheme.colors.bgMedium),
-        enabled = enabled,
         shape = PrezelTheme.shapes.V8,
         onClick = onClick,
     ) {
@@ -66,8 +64,8 @@ internal fun MetricResultCard(
             size = ButtonSize.SMALL,
             hierarchy = ButtonHierarchy.SECONDARY,
             modifier = Modifier.align(Alignment.TopEnd),
-            enabled = enabled,
             isUseRipple = false,
+            enabled = false,
             onClick = onClick,
         )
     }
