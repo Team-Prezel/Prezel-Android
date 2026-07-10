@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.datasource
 
+import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
@@ -118,6 +119,9 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                 request = SelfFeedbackRequest(content = content),
             ).requireSuccess()
     }
+
+    override suspend fun getCuration(presentationId: Long): List<GetCurationResponse> =
+        presentationService.getCuration(presentationId = presentationId).requireData()
 }
 
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {

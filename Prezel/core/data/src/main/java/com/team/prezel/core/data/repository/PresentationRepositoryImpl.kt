@@ -5,6 +5,7 @@ import com.team.prezel.core.data.mapper.toDomain
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
@@ -14,6 +15,7 @@ import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
+import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import javax.inject.Inject
@@ -135,5 +137,12 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 presentationId = presentationId,
                 content = content,
             )
+        }.mapDomainFailure()
+
+    override suspend fun getCuration(presentationId: Long): Result<List<Curation>> =
+        runCatching {
+            presentationRemoteDataSource.getCuration(presentationId = presentationId)
+        }.mapCatching { response ->
+            response.map(GetCurationResponse::toDomain)
         }.mapDomainFailure()
 }

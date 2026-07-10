@@ -11,4 +11,5 @@ data class MainDataWithPracticeRecords(
     val dDay: String,
     val growthGraph: List<PresentationGrowthPoint>,
     val practiceRecords: PracticeRecords,
+    val curations: List<Curation>,
 )

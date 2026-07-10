@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -128,7 +129,11 @@ private fun PrezelAppContent(
         }
 
         EdgeToEdgeStatusBarBackground(style = statusBarStyle)
-        AppDimmerOverlay(isVisible = appDimmerState.isVisible, onDismiss = appDimmerState::dismiss)
+        AppDimmerOverlay(
+            isVisible = appDimmerState.isVisible,
+            foregroundContent = appDimmerState.foregroundContent,
+            onDismiss = appDimmerState::dismiss,
+        )
     }
 }
 
@@ -163,16 +168,23 @@ private fun AppNavigationContent(
 @Composable
 private fun AppDimmerOverlay(
     isVisible: Boolean,
+    foregroundContent: (@Composable BoxScope.() -> Unit)?,
     onDismiss: () -> Unit,
 ) {
     if (!isVisible) return
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PrezelTheme.colors.scrimContainer)
-            .noRippleClickable(onClick = onDismiss),
-    )
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(PrezelTheme.colors.scrimContainer)
+                .noRippleClickable(onClick = onDismiss),
+        )
+
+        foregroundContent?.invoke(this)
+    }
 }
 
 private fun defaultPrezelNavTransition(): ContentTransform =

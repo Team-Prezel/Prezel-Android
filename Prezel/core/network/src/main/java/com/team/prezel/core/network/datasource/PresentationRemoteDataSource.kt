@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.datasource
 
+import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
@@ -49,4 +50,6 @@ interface PresentationRemoteDataSource {
         presentationId: Long,
         content: String,
     )
+
+    suspend fun getCuration(presentationId: Long): List<GetCurationResponse>
 }
