@@ -16,6 +16,7 @@ import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.component.voice.VoiceChromeGradient
 import com.team.prezel.core.designsystem.component.voice.VoiceChromeStatus
+import com.team.prezel.core.ui.state.LocalSnackbarCoroutineScope
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.analysis.impl.audio.AudioUploadScreen
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
@@ -55,6 +56,7 @@ internal fun AnalysisScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
+    val scope = LocalSnackbarCoroutineScope.current
     var isScriptExpanded by rememberSaveable(uiState.step) { mutableStateOf(false) }
 
     BackHandler {
@@ -66,7 +68,15 @@ internal fun AnalysisScreen(
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
                 is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
-                is AnalysisFlowUiEffect.NavigateToReport -> navigateToReport(effect.presentationId)
+                is AnalysisFlowUiEffect.NavigateToReport -> {
+                    navigateToReport(effect.presentationId)
+                    scope.launch {
+                        snackbarHostState.showPrezelSnackbar(
+                            message = resources.getString(R.string.feature_analysis_impl_analyze_complete_message),
+                            useRaisedPosition = false,
+                        )
+                    }
+                }
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toStringRes()))
                 }
