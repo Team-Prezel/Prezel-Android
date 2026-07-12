@@ -31,8 +31,7 @@ internal fun SettingScreen(
     navigateBack: () -> Unit,
     navigateToDeleteAccount: () -> Unit,
     navigateToSplash: () -> Unit,
-    navigateToTermsOfService: () -> Unit,
-    navigateToPrivacyPolicy: () -> Unit,
+    navigateToTermsDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -52,6 +51,10 @@ internal fun SettingScreen(
                     snackbarHostState.showPrezelSnackbar(message = resource.getString(R.string.feature_setting_impl_logout_success))
                 }
 
+                is SettingUiEffect.NavigateToTermsDetail -> {
+                    navigateToTermsDetail(effect.title, effect.url)
+                }
+
                 is SettingUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(message = resource.getString(effect.message.toMessageRes()))
                 }
@@ -69,8 +72,8 @@ internal fun SettingScreen(
     SettingScreen(
         uiState = uiState,
         onClickBack = navigateBack,
-        onClickTermsOfService = navigateToTermsOfService,
-        onClickPrivacyPolicy = navigateToPrivacyPolicy,
+        onClickTermsOfService = { viewModel.onIntent(SettingUiIntent.ClickTermsOfService) },
+        onClickPrivacyPolicy = { viewModel.onIntent(SettingUiIntent.ClickPrivacyPolicy) },
         onClickLogout = { shouldShowLogoutDialog = true },
         onClickWithdraw = navigateToDeleteAccount,
         modifier = modifier,

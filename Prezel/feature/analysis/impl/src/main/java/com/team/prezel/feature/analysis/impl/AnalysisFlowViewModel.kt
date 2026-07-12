@@ -18,26 +18,32 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
-import javax.inject.Inject
 
-private const val ANALYSIS_TIMEOUT_MILLIS = 15_000L
 private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
 
-@HiltViewModel
-internal class AnalysisFlowViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AnalysisFlowViewModel.Factory::class)
+internal class AnalysisFlowViewModel @AssistedInject constructor(
+    @Assisted isFromReport: Boolean,
     private val analyzePresentationUseCase: AnalyzePresentationUseCase,
     private val reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
     private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
     private val fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
     private val analysisFileCache: AnalysisFileCache,
     private val audioController: RecordingAudioController,
-) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
+) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState(isFromReport = isFromReport)) {
+    @AssistedFactory
+    interface Factory {
+        fun create(isFromReport: Boolean): AnalysisFlowViewModel
+    }
+
     private var analyzeJob: Job? = null
 
     init {
@@ -403,9 +409,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
         }
 
         currentState.backClearedFormOrNull()?.let { clearedForm ->
-            updateState {
-                copy(form = clearedForm)
-            }
+            updateState { copy(form = clearedForm) }
         }
 
         viewModelScope.launch { sendEffect(AnalysisFlowUiEffect.NavigateBack) }
@@ -443,48 +447,39 @@ private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
         .map { it.originalScript }
 }
 
-private suspend fun <T> runAnalysisCatching(block: suspend () -> T): Result<T> =
-    try {
-        Result.success(withTimeout(ANALYSIS_TIMEOUT_MILLIS) { block() })
-    } catch (throwable: Throwable) {
-        Result.failure(throwable)
-    }
-
 private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
     analysisFileCache: AnalysisFileCache,
     analyzePresentationUseCase: AnalyzePresentationUseCase,
-): Result<Long> =
-    runAnalysisCatching {
-        val audioFilePath = resolveAudioFilePath(analysisFileCache)
-        val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-        analyzePresentationUseCase(
-            name = name,
-            date = date.toRequestDate(),
-            category = category,
-            purpose = purpose,
-            style = style,
-            audience = audience,
-            script = script,
-            scriptFilePath = scriptFilePath,
-            audioFilePath = audioFilePath,
-        ).getOrThrow()
-    }
+): Result<Long> {
+    val audioFilePath = resolveAudioFilePath(analysisFileCache)
+    val scriptFilePath = resolveScriptFilePath(analysisFileCache)
+    return analyzePresentationUseCase(
+        name = name,
+        date = date.toRequestDate(),
+        category = category,
+        purpose = purpose,
+        style = style,
+        audience = audience,
+        script = script,
+        scriptFilePath = scriptFilePath,
+        audioFilePath = audioFilePath,
+    )
+}
 
 private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(
     presentationId: Long,
     analysisFileCache: AnalysisFileCache,
     reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
-): Result<PresentationAnalysisSummary> =
-    runAnalysisCatching {
-        val audioFilePath = resolveAudioFilePath(analysisFileCache)
-        val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-        reAnalyzePresentationUseCase(
-            presentationId = presentationId,
-            script = script,
-            scriptFilePath = scriptFilePath,
-            audioFilePath = audioFilePath,
-        ).getOrThrow()
-    }
+): Result<PresentationAnalysisSummary> {
+    val audioFilePath = resolveAudioFilePath(analysisFileCache)
+    val scriptFilePath = resolveScriptFilePath(analysisFileCache)
+    return reAnalyzePresentationUseCase(
+        presentationId = presentationId,
+        script = script,
+        scriptFilePath = scriptFilePath,
+        audioFilePath = audioFilePath,
+    )
+}
 
 private fun PresentationAnalysisSubmission.resolveAudioFilePath(analysisFileCache: AnalysisFileCache): String =
     audioFileUri
@@ -509,8 +504,7 @@ private fun PresentationAnalysisSubmission.resolveScriptFilePath(analysisFileCac
 private fun String?.isSupportedAudioFileName(): Boolean {
     if (this == null) return true
 
-    val extension = substringAfterLast('.', missingDelimiterValue = "")
-        .lowercase()
+    val extension = substringAfterLast('.', missingDelimiterValue = "").lowercase()
 
     return extension in SUPPORTED_AUDIO_FILE_EXTENSIONS
 }

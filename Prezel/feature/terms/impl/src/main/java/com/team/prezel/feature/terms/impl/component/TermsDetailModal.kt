@@ -27,6 +27,7 @@ import com.team.prezel.feature.terms.impl.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TermsDetailModal(
+    title: String,
     url: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -40,6 +41,7 @@ internal fun TermsDetailModal(
             .fillMaxSize(),
     ) {
         PrezelTopAppBar(
+            title = { androidx.compose.material3.Text(text = title) },
             trailingIcons = {
                 IconButton(onClick = onDismiss) {
                     Icon(

@@ -17,6 +17,7 @@ import com.team.prezel.core.ui.component.graph.CardGraph
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -80,6 +81,7 @@ private fun PresentationContentPreview() {
                 startDate = LocalDate(2026, 9, 26),
                 endDate = LocalDate(2026, 10, 1),
             ),
+            curations = persistentListOf(),
         )
 
         Box(modifier = Modifier.padding(top = 16.dp)) {

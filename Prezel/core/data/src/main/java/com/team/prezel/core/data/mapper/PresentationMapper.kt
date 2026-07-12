@@ -3,6 +3,7 @@ package com.team.prezel.core.data.mapper
 import com.team.prezel.core.model.practice.RecordingSpeed
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.ExpectedQuestion
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
@@ -18,6 +19,7 @@ import com.team.prezel.core.model.presentation.SentenceAnalysisDetail
 import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.model.presentation.WordAnalysisDetail
 import com.team.prezel.core.model.presentation.WordAnalysisStatus
+import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
@@ -151,4 +153,14 @@ private fun GetMainDataResponse.GrowthGraph.toDomain(): PresentationGrowthPoint 
         attempt = attempt,
         accuracyScore = accuracyScore,
         scriptMatchRate = scriptMatchRate,
+    )
+
+internal fun GetCurationResponse.toDomain(): Curation =
+    Curation(
+        guideMessage = guideMessage,
+        materialType = materialType,
+        title = title,
+        sourceChannel = sourceChannel,
+        linkUrl = linkUrl,
+        imageUrl = imageUrl,
     )

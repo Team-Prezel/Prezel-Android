@@ -5,6 +5,7 @@ import com.team.prezel.core.domain.repository.badge.BadgeRepository
 import com.team.prezel.core.model.badge.Badge
 import com.team.prezel.core.model.badge.BadgeDetail
 import com.team.prezel.core.model.badge.BadgeEvent
+import com.team.prezel.core.model.badge.BadgeSortType
 import com.team.prezel.core.network.datasource.BadgeRemoteDataSource
 import com.team.prezel.core.network.model.badge.BadgeEventResponse
 import com.team.prezel.core.network.model.badge.GetBadgeDetailResponse
@@ -16,9 +17,9 @@ import javax.inject.Inject
 internal class BadgeRepositoryImpl @Inject constructor(
     private val badgeRemoteDataSource: BadgeRemoteDataSource,
 ) : BadgeRepository {
-    override suspend fun getBadges(): Result<List<Badge>> =
+    override suspend fun getBadges(sort: BadgeSortType): Result<List<Badge>> =
         runCatching {
-            badgeRemoteDataSource.getBadges()
+            badgeRemoteDataSource.getBadges(sort.value.lowercase())
         }.mapCatching { response ->
             response.map(GetBadgeResponse::toDomain)
         }.mapDomainFailure()

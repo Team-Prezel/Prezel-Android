@@ -2,10 +2,13 @@ package com.team.prezel.feature.home.impl.main.model
 
 import androidx.compose.runtime.Immutable
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainDataWithPracticeRecords
 import com.team.prezel.core.ui.component.PracticeCardItem
 import com.team.prezel.feature.home.impl.main.model.GrowthGraphData.Companion.toUiModel
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel.Companion.toUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 @Immutable
@@ -38,6 +41,7 @@ internal sealed interface PresentationUiModel {
         override val date: LocalDate,
         override val dDay: String,
         override val practiceRecords: PracticeRecordsUiModel,
+        val curations: ImmutableList<Curation>,
     ) : PresentationUiModel
 
     companion object {
@@ -60,6 +64,7 @@ internal sealed interface PresentationUiModel {
                     date = presentationDate,
                     dDay = dDay,
                     practiceRecords = practiceRecords.toUiModel(),
+                    curations = curations.toImmutableList(),
                 )
             }
     }

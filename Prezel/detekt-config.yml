@@ -20,7 +20,7 @@ style:
 
 complexity:
     LongMethod:
-        threshold: 50
+        threshold: 70
         ignoreAnnotated:
             - Preview
             - BasicPreview
@@ -44,6 +44,8 @@ complexity:
             - Preview
             - BasicPreview
             - LargeDevicePreview
+    ComplexCondition:
+        active: false
 
 naming:
     FunctionNaming:

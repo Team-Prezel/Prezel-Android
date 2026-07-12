@@ -39,7 +39,6 @@ internal fun AnalysisReportScreen(
     navigateToSpeechAccuracy: (analysisResultId: Long) -> Unit,
     navigateToScriptMatch: (analysisResultId: Long) -> Unit,
     modifier: Modifier = Modifier,
-    showBackButton: Boolean = false,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -55,8 +54,24 @@ internal fun AnalysisReportScreen(
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()
                 is AnalysisReportUiEffect.ShowMessage -> {
+                    val contentState = uiState as? AnalysisReportUiState.Content
+                    val shouldShowInputAction = when {
+                        contentState == null -> false
+                        contentState.isPast -> false
+                        contentState.isScriptWritten -> false
+                        else -> effect.message.requiresScriptInputAction
+                    }
+
                     snackbarHostState.showPrezelSnackbar(
                         message = resources.getString(effect.message.resId),
+                        actionLabel = resources
+                            .getString(R.string.feature_report_impl_snackbar_action_input)
+                            .takeIf { shouldShowInputAction },
+                        onAction = {
+                            if (shouldShowInputAction) {
+                                viewModel.onIntent(AnalysisReportUiIntent.ClickReWriteScript)
+                            }
+                        }.takeIf { shouldShowInputAction },
                         useRaisedPosition = false,
                     )
                 }
@@ -75,7 +90,6 @@ internal fun AnalysisReportScreen(
 
     AnalysisReportScreen(
         uiState = uiState,
-        showBackButton = showBackButton,
         onBackClick = onBack,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
@@ -106,13 +120,11 @@ internal fun AnalysisReportScreen(
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showBackButton: Boolean = false,
 ) {
     when (uiState) {
         is AnalysisReportUiState.Content -> {
             AnalysisReportScreenContent(
                 uiState = uiState,
-                showBackButton = showBackButton,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
@@ -135,7 +147,6 @@ internal fun AnalysisReportScreen(
 @Composable
 private fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState.Content,
-    showBackButton: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -159,18 +170,14 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
-        leadingIcon = if (showBackButton) {
-            {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.ArrowLeft),
-                        contentDescription = stringResource(R.string.feature_report_impl_back),
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
+        leadingIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    painter = painterResource(PrezelIcons.ArrowLeft),
+                    contentDescription = stringResource(R.string.feature_report_impl_back),
+                    tint = PrezelTheme.colors.iconRegular,
+                )
             }
-        } else {
-            {}
         },
         headerContent = { titleModifier ->
             ReportHeaderContent(
@@ -199,6 +206,22 @@ private val AnalysisReportUiMessage.resId: Int
     @StringRes get() = when (this) {
         AnalysisReportUiMessage.FETCH_REPORT_FAILED -> R.string.feature_report_impl_fetch_report_failed
         AnalysisReportUiMessage.DELETE_REPORT_FAILED -> R.string.feature_report_impl_delete_report_failed
+        AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE -> {
+            R.string.feature_report_impl_script_match_analysis_unavailable
+        }
+        AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE -> {
+            R.string.feature_report_impl_speech_analysis_unavailable
+        }
+    }
+
+private val AnalysisReportUiMessage.requiresScriptInputAction: Boolean
+    get() = when (this) {
+        AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE,
+        AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE,
+        -> true
+        AnalysisReportUiMessage.FETCH_REPORT_FAILED,
+        AnalysisReportUiMessage.DELETE_REPORT_FAILED,
+        -> false
     }
 
 @BasicPreview

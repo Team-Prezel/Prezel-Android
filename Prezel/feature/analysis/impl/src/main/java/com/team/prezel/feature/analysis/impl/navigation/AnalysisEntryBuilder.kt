@@ -52,7 +52,7 @@ private fun AnalysisNavKey.enterStep(step: AnalysisFlowStep): AnalysisFlowUiInte
 private inline fun <reified T : AnalysisNavKey> EntryProviderScope<NavKey>.analysisEntry(crossinline enterIntent: (T) -> AnalysisFlowUiIntent) {
     entry<T> { key ->
         AnalysisRoute(
-            flowId = key.flowId,
+            navKey = key,
             enterIntent = enterIntent(key),
             stepToNavKey = key::toNavKey,
         )
@@ -61,15 +61,16 @@ private inline fun <reified T : AnalysisNavKey> EntryProviderScope<NavKey>.analy
 
 @Composable
 private fun AnalysisRoute(
-    flowId: String,
+    navKey: AnalysisNavKey,
     enterIntent: AnalysisFlowUiIntent,
     stepToNavKey: (AnalysisFlowStep) -> AnalysisNavKey,
 ) {
     val navigator = LocalNavigator.current
     val viewModelStoreOwner = LocalContext.current.findViewModelStoreOwner()
-    val viewModel = hiltViewModel<AnalysisFlowViewModel>(
+    val viewModel = hiltViewModel<AnalysisFlowViewModel, AnalysisFlowViewModel.Factory>(
         viewModelStoreOwner = viewModelStoreOwner,
-        key = flowId,
+        key = navKey.flowId,
+        creationCallback = { factory -> factory.create(navKey is AnalysisNavKey.ReWritingScript) },
     )
 
     LaunchedEffect(enterIntent) {

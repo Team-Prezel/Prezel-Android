@@ -52,6 +52,7 @@ internal fun AnalysisStepLayout(
     subButtonText: String? = null,
     onSubButtonClick: (() -> Unit)? = null,
     contentScrollable: Boolean = true,
+    isHiddenOptions: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
@@ -67,6 +68,7 @@ internal fun AnalysisStepLayout(
         PrezelTopAppBar(
             title = { Text(text = title) },
             leadingIcon = {
+                if (isHiddenOptions) return@PrezelTopAppBar
                 IconButton(onClick = onBack) {
                     Icon(
                         painter = painterResource(PrezelIcons.ArrowLeft),
@@ -75,6 +77,15 @@ internal fun AnalysisStepLayout(
                 }
             },
             trailingIcons = {
+                if (isHiddenOptions) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            painter = painterResource(PrezelIcons.Cancel),
+                            contentDescription = null,
+                        )
+                    }
+                    return@PrezelTopAppBar
+                }
                 AnalysisStepTrailingText(
                     text = trailingText,
                     onClick = onTrailingTextClick,

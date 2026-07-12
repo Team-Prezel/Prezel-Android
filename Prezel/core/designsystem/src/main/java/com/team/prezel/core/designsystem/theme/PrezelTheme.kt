@@ -58,7 +58,7 @@ fun PrezelTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = if (isDarkTheme) PrezelColorScheme.Dark else PrezelColorScheme.Light
+    val colorScheme = if (isDarkTheme) PrezelColorScheme.Light else PrezelColorScheme.Light
     val typographyScheme = PrezelTypographyScheme.Default()
 
     CompositionLocalProvider(

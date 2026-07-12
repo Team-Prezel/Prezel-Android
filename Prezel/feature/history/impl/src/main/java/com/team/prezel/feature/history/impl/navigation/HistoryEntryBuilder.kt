@@ -23,7 +23,6 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
                     ReportNavKey(
                         presentationId = presentationId,
                         isPast = isPast,
-                        showBackButton = true,
                     ),
                 )
             },

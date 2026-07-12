@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil.kt.compose)
+    implementation(libs.coil.kt.svg)
     implementation(libs.kotlinx.datetime)
     implementation(libs.timber)
 

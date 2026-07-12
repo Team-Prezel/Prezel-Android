@@ -32,7 +32,7 @@ internal class UserRemoteDataSourceImpl @Inject constructor(
                             append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
                         },
                     )
-                }
+                } ?: append("\"deleteImage\"", true)
             },
         )
 

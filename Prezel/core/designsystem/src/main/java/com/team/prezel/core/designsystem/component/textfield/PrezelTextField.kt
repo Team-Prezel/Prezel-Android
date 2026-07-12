@@ -3,12 +3,13 @@ package com.team.prezel.core.designsystem.component.textfield
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
@@ -29,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -43,6 +44,7 @@ import com.team.prezel.core.designsystem.preview.PreviewColumn
 import com.team.prezel.core.designsystem.preview.PreviewSurface
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PrezelTextField(
     value: String,
@@ -57,11 +59,11 @@ fun PrezelTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
+    val focusManager = LocalFocusManager.current
+    val isImeVisible = WindowInsets.isImeVisible
     var focused by remember { mutableStateOf(false) }
+    var wasImeVisible by remember { mutableStateOf(isImeVisible) }
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length))) }
-    val density = LocalDensity.current
-    val imeVisible = WindowInsets.ime.getBottom(density) > 0
-    val typing = focused && imeVisible
 
     LaunchedEffect(value) {
         if (value != textFieldValue.text) {
@@ -69,10 +71,17 @@ fun PrezelTextField(
         }
     }
 
+    LaunchedEffect(isImeVisible, focused, enabled) {
+        if (enabled && focused && wasImeVisible && !isImeVisible) {
+            focusManager.clearFocus()
+        }
+        wasImeVisible = isImeVisible
+    }
+
     val state = rememberPrezelTextFieldState(
         value = textFieldValue.text,
         enabled = enabled,
-        focused = typing,
+        focused = focused,
     ).let { state -> PrezelTextFieldStyle(state = state, status = status) }
 
     PrezelTextField(
@@ -86,7 +95,7 @@ fun PrezelTextField(
         },
         placeholder = placeholder,
         style = state,
-        focused = typing,
+        focused = focused,
         onFocusChange = { isFocused -> focused = isFocused },
         modifier = modifier,
         label = label,

@@ -2,10 +2,14 @@ package com.team.prezel.feature.home.impl.main.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.onHeightChanged
 import com.team.prezel.feature.home.impl.main.component.body.EmptySheet
 import com.team.prezel.feature.home.impl.main.component.body.PresentationSheet
@@ -45,30 +50,43 @@ internal fun HomeScreenContent(
         val maxScreenHeight = maxHeight
         var headerHeight by remember { mutableStateOf(0.dp) }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            HomeContent(
-                uiState = uiState,
-                pagerState = pagerState,
-                maxHeight = maxScreenHeight,
-                headerHeight = headerHeight,
-                onClickAddPresentation = onClickAddPresentation,
-                onClickPracticeRecording = onClickPracticeRecording,
-                onClickAnalyzePresentation = onClickAnalyzePresentation,
-                onClickWriteFeedback = onClickWriteFeedback,
-                onClickCardGraphItemIndex = onClickCardGraphItemIndex,
-            )
-
-            HomeHeadSection(
-                uiState = uiState,
-                pagerState = pagerState,
-                onClickTab = { pageIndex -> scope.launch { pagerState.scrollToPage(pageIndex) } },
-                modifier = Modifier.onHeightChanged { newHeight -> headerHeight = newHeight },
-            )
-
-            HomeAnalysisFabOverlay(
-                onClickVoiceRecordingAnalysis = onClickVoiceRecordingAnalysis,
-                onClickFileUploadAnalysis = onClickFileUploadAnalysis,
-            )
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = PrezelTheme.colors.bgRegular,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            topBar = {
+                HomeHeadSection(
+                    uiState = uiState,
+                    pagerState = pagerState,
+                    onClickTab = { pageIndex -> scope.launch { pagerState.scrollToPage(pageIndex) } },
+                    modifier = Modifier.onHeightChanged { newHeight -> headerHeight = newHeight },
+                )
+            },
+            floatingActionButtonPosition = FabPosition.End,
+            floatingActionButton = {
+                HomeAnalysisFabOverlay(
+                    onClickVoiceRecordingAnalysis = onClickVoiceRecordingAnalysis,
+                    onClickFileUploadAnalysis = onClickFileUploadAnalysis,
+                )
+            },
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding),
+            ) {
+                HomeContent(
+                    uiState = uiState,
+                    pagerState = pagerState,
+                    maxHeight = maxScreenHeight,
+                    headerHeight = headerHeight,
+                    onClickAddPresentation = onClickAddPresentation,
+                    onClickPracticeRecording = onClickPracticeRecording,
+                    onClickAnalyzePresentation = onClickAnalyzePresentation,
+                    onClickWriteFeedback = onClickWriteFeedback,
+                    onClickCardGraphItemIndex = onClickCardGraphItemIndex,
+                )
+            }
         }
     }
 }

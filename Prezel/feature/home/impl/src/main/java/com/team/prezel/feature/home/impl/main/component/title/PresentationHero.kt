@@ -20,6 +20,7 @@ import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.main.model.GrowthGraphData
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 
@@ -151,6 +152,7 @@ private fun HomePresentationPagePreview() {
                     startDate = LocalDate(2026, 9, 26),
                     endDate = LocalDate(2026, 10, 1),
                 ),
+                curations = persistentListOf(),
             ),
             onClickAnalyzePresentation = {},
             onClickWriteFeedback = {},
