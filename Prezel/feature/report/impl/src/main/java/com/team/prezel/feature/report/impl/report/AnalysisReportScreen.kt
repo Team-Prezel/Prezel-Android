@@ -39,7 +39,6 @@ internal fun AnalysisReportScreen(
     navigateToSpeechAccuracy: (analysisResultId: Long) -> Unit,
     navigateToScriptMatch: (analysisResultId: Long) -> Unit,
     modifier: Modifier = Modifier,
-    showBackButton: Boolean = false,
     viewModel: AnalysisReportViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,7 +74,6 @@ internal fun AnalysisReportScreen(
 
     AnalysisReportScreen(
         uiState = uiState,
-        showBackButton = showBackButton,
         onBackClick = onBack,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
@@ -106,13 +104,11 @@ internal fun AnalysisReportScreen(
     onSpeechAccuracyClick: () -> Unit,
     onScriptMatchClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showBackButton: Boolean = false,
 ) {
     when (uiState) {
         is AnalysisReportUiState.Content -> {
             AnalysisReportScreenContent(
                 uiState = uiState,
-                showBackButton = showBackButton,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
@@ -135,7 +131,6 @@ internal fun AnalysisReportScreen(
 @Composable
 private fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState.Content,
-    showBackButton: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -159,18 +154,14 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
-        leadingIcon = if (showBackButton) {
-            {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.ArrowLeft),
-                        contentDescription = stringResource(R.string.feature_report_impl_back),
-                        tint = PrezelTheme.colors.iconRegular,
-                    )
-                }
+        leadingIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    painter = painterResource(PrezelIcons.ArrowLeft),
+                    contentDescription = stringResource(R.string.feature_report_impl_back),
+                    tint = PrezelTheme.colors.iconRegular,
+                )
             }
-        } else {
-            {}
         },
         headerContent = { titleModifier ->
             ReportHeaderContent(
