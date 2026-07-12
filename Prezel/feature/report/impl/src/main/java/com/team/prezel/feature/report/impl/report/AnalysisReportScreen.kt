@@ -54,8 +54,24 @@ internal fun AnalysisReportScreen(
             when (effect) {
                 AnalysisReportUiEffect.NavigateToBack -> onBack()
                 is AnalysisReportUiEffect.ShowMessage -> {
+                    val contentState = uiState as? AnalysisReportUiState.Content
+                    val shouldShowInputAction = when {
+                        contentState == null -> false
+                        contentState.isPast -> false
+                        contentState.isScriptWritten -> false
+                        else -> effect.message.requiresScriptInputAction
+                    }
+
                     snackbarHostState.showPrezelSnackbar(
                         message = resources.getString(effect.message.resId),
+                        actionLabel = resources
+                            .getString(R.string.feature_report_impl_snackbar_action_input)
+                            .takeIf { shouldShowInputAction },
+                        onAction = {
+                            if (shouldShowInputAction) {
+                                viewModel.onIntent(AnalysisReportUiIntent.ClickReWriteScript)
+                            }
+                        }.takeIf { shouldShowInputAction },
                         useRaisedPosition = false,
                     )
                 }
@@ -196,6 +212,16 @@ private val AnalysisReportUiMessage.resId: Int
         AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE -> {
             R.string.feature_report_impl_speech_analysis_unavailable
         }
+    }
+
+private val AnalysisReportUiMessage.requiresScriptInputAction: Boolean
+    get() = when (this) {
+        AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE,
+        AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE,
+        -> true
+        AnalysisReportUiMessage.FETCH_REPORT_FAILED,
+        AnalysisReportUiMessage.DELETE_REPORT_FAILED,
+        -> false
     }
 
 @BasicPreview
