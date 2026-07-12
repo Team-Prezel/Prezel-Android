@@ -2,6 +2,7 @@ package com.team.prezel.core.domain.repository.presentation
 
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
@@ -53,4 +54,6 @@ interface PresentationRepository {
         presentationId: Long,
         content: String,
     ): Result<Unit>
+
+    suspend fun getCuration(presentationId: Long): Result<List<Curation>>
 }

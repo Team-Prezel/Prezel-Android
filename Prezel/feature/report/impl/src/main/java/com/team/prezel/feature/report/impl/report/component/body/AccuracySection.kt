@@ -95,14 +95,12 @@ private fun AccuracyMetricCards(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_speech),
             value = accuracyScore.toPercentLabel(),
-            enabled = accuracyScore != null,
             onClick = onSpeechAccuracyClick,
         )
         MetricResultCard(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.feature_report_impl_label_script_match),
             value = scriptMatchRate.toPercentLabel(),
-            enabled = scriptMatchRate != null,
             onClick = onScriptMatchClick,
         )
     }

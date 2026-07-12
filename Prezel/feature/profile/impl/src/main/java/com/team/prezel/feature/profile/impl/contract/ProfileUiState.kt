@@ -28,6 +28,7 @@ internal sealed interface ProfileUiState : UiState {
 
     data class Content(
         val isRegistered: Boolean,
+        val isHydrated: Boolean = true,
         val original: OriginalProfile,
         val editing: EditingProfile,
     ) : ProfileUiState {
@@ -35,13 +36,37 @@ internal sealed interface ProfileUiState : UiState {
 
         val isProfileImageChanged: Boolean = editing.profileImageUrl != original.profileImageUrl
 
-        val submitButtonEnabled: Boolean =
-            isProfileImageChanged || (isNicknameChanged && editing.nicknameValidation == NicknameValidationState.Available)
+        val hasAnyChanges: Boolean = isProfileImageChanged || isNicknameChanged
+
+        val isNicknameSubmittable: Boolean =
+            !isNicknameChanged || editing.nicknameValidation == NicknameValidationState.Available
+
+        val submitButtonEnabled: Boolean = isHydrated && hasAnyChanges && isNicknameSubmittable
 
         companion object {
+            fun fromCachedNickname(
+                nickname: String,
+                isRegistered: Boolean = true,
+            ): ProfileUiState =
+                Content(
+                    isRegistered = isRegistered,
+                    isHydrated = false,
+                    original = OriginalProfile(
+                        nickname = nickname,
+                        profileImageUrl = null,
+                    ),
+                    editing = EditingProfile(
+                        nickname = nickname,
+                        nicknameValidation = NicknameValidationState.Unchecked,
+                        profileImageUrl = null,
+                        profileImageFile = null,
+                    ),
+                )
+
             fun User.toUiState(): ProfileUiState =
                 Content(
                     isRegistered = isRegistered,
+                    isHydrated = true,
                     original = OriginalProfile(
                         nickname = nickname,
                         profileImageUrl = profileImageUrl,

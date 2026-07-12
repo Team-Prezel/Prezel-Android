@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -53,6 +55,7 @@ import com.team.prezel.core.navigation.Navigator
 import com.team.prezel.core.navigation.ProvideSharedTransitionScope
 import com.team.prezel.core.navigation.toEntries
 import com.team.prezel.core.ui.state.LocalAppDimmerState
+import com.team.prezel.core.ui.state.LocalSnackbarCoroutineScope
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.state.rememberAppDimmerState
 import com.team.prezel.core.ui.util.noRippleClickable
@@ -70,11 +73,13 @@ fun PrezelApp(
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarCoroutineScope = rememberCoroutineScope()
     val appDimmerState = rememberAppDimmerState()
 
     CompositionLocalProvider(
         LocalNavigator provides navigator,
         LocalAppDimmerState provides appDimmerState,
+        LocalSnackbarCoroutineScope provides snackbarCoroutineScope,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
         DoubleBackToExitHandler(navigationState = appState.navigationState)
@@ -124,7 +129,11 @@ private fun PrezelAppContent(
         }
 
         EdgeToEdgeStatusBarBackground(style = statusBarStyle)
-        AppDimmerOverlay(isVisible = appDimmerState.isVisible, onDismiss = appDimmerState::dismiss)
+        AppDimmerOverlay(
+            isVisible = appDimmerState.isVisible,
+            foregroundContent = appDimmerState.foregroundContent,
+            onDismiss = appDimmerState::dismiss,
+        )
     }
 }
 
@@ -159,16 +168,23 @@ private fun AppNavigationContent(
 @Composable
 private fun AppDimmerOverlay(
     isVisible: Boolean,
+    foregroundContent: (@Composable BoxScope.() -> Unit)?,
     onDismiss: () -> Unit,
 ) {
     if (!isVisible) return
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PrezelTheme.colors.scrimContainer)
-            .noRippleClickable(onClick = onDismiss),
-    )
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(PrezelTheme.colors.scrimContainer)
+                .noRippleClickable(onClick = onDismiss),
+        )
+
+        foregroundContent?.invoke(this)
+    }
 }
 
 private fun defaultPrezelNavTransition(): ContentTransform =

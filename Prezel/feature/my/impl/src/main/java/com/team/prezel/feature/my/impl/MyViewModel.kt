@@ -3,6 +3,7 @@ package com.team.prezel.feature.my.impl
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.badge.FetchBadgesUseCase
 import com.team.prezel.core.domain.usecase.user.FetchUserInfoUseCase
+import com.team.prezel.core.model.badge.BadgeSortType
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.my.impl.contract.MyUiEffect
@@ -42,7 +43,7 @@ internal class MyViewModel @Inject constructor(
             updateState {
                 copy(
                     isLoading = false,
-                    profileImageUrl = user?.profileImageUrl ?: this.profileImageUrl,
+                    profileImageUrl = user?.profileImageUrl,
                     nickname = user?.nickname ?: this.nickname,
                     badges = badges ?: this.badges,
                 )
@@ -61,7 +62,7 @@ internal class MyViewModel @Inject constructor(
         )
 
     private suspend fun fetchMyBadges(): ImmutableList<BadgeUiModel>? =
-        fetchBadgesUseCase().fold(
+        fetchBadgesUseCase(sort = BadgeSortType.ACQUIRED).fold(
             onSuccess = { badges ->
                 badges
                     .map { badge ->

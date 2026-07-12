@@ -26,6 +26,7 @@ import com.team.prezel.feature.home.impl.main.model.GrowthGraphItemUiModel
 import com.team.prezel.feature.home.impl.main.model.HomeUiMessage
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDate
 
@@ -132,6 +133,7 @@ private fun HomeScreenMultiplePreview() {
                     startDate = LocalDate(2026, 4, 7 + index),
                     endDate = LocalDate(2026, 4, 10 + index),
                 ),
+                curations = persistentListOf(),
             )
         }.toPersistentList(),
     )

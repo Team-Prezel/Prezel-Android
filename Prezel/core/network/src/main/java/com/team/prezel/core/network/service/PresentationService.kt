@@ -1,6 +1,7 @@
 package com.team.prezel.core.network.service
 
 import com.team.prezel.core.network.model.BaseResponse
+import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
@@ -72,4 +73,9 @@ interface PresentationService {
         @Path("presentationId") presentationId: Long,
         @Body request: SelfFeedbackRequest,
     ): BaseResponse<Unit>
+
+    @GET("api/presentations/{presentationId}/curations")
+    suspend fun getCuration(
+        @Path("presentationId") presentationId: Long,
+    ): BaseResponse<List<GetCurationResponse>>
 }

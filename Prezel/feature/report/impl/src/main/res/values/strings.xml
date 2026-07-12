@@ -60,6 +60,9 @@
     <string name="feature_report_impl_fetch_report_failed">리포트를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_fetch_script_detail_failed">대본 분석 결과를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_delete_report_failed">리포트를 삭제하지 못했습니다.</string>
+    <string name="feature_report_impl_snackbar_action_input">입력하기</string>
+    <string name="feature_report_impl_script_match_analysis_unavailable">대본을 입력하지 않아 대본 일치율을 분석할 수 없어요.</string>
+    <string name="feature_report_impl_speech_analysis_unavailable">대본을 입력하지 않아 발화를 분석할 수 없어요.</string>
     <string name="feature_report_impl_close">닫기</string>
     <string name="feature_report_impl_script_detail_load_failed">정확도 상세를 불러오지 못했습니다.</string>
     <string name="feature_report_impl_script_detail_empty_speech">발화 분석 상세가 없어요.</string>

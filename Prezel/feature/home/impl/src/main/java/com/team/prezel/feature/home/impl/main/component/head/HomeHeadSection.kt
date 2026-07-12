@@ -21,6 +21,7 @@ import com.team.prezel.feature.home.impl.main.contract.HomeUiState
 import com.team.prezel.feature.home.impl.main.model.GrowthGraphData
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
@@ -67,6 +68,7 @@ private fun HomeHeadSectionSinglePreview() {
                 startDate = LocalDate(2023, 12, 28),
                 endDate = LocalDate(2024, 1, 1),
             ),
+            curations = persistentListOf(),
         ),
     )
     val pagerState = rememberPagerState(0) { uiState.presentationCount() }
@@ -96,6 +98,7 @@ private fun HomeHeadSectionMultiplePreview() {
                     startDate = LocalDate(2023, 12, 28),
                     endDate = LocalDate(2024, 1, 1),
                 ),
+                curations = persistentListOf(),
             ),
             PresentationUiModel.Past(
                 id = 2L,

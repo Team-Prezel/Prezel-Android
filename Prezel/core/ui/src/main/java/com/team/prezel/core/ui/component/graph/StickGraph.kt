@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ import kotlinx.collections.immutable.persistentMapOf
 
 private const val STICK_GRAPH_MAX_HEIGHT = 160
 private val STICK_GRAPH_ITEM_WIDTH = 52.dp
+private val STICK_GRAPH_TRACK_HEIGHT = STICK_GRAPH_MAX_HEIGHT.dp
 
 enum class StickGraphItemType {
     SPELLING,
@@ -76,13 +78,22 @@ private fun StickGraphItem(
         )
 
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .size(
                     width = STICK_GRAPH_ITEM_WIDTH,
-                    height = bar.height,
+                    height = STICK_GRAPH_TRACK_HEIGHT,
                 ).clip(PrezelTheme.shapes.V4)
-                .background(color = bar.color),
-        )
+                .background(color = PrezelTheme.colors.bgMedium),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(height = bar.height, width = STICK_GRAPH_ITEM_WIDTH)
+                    .clip(PrezelTheme.shapes.V4)
+                    .background(color = bar.color),
+            )
+        }
 
         Text(
             text = bar.label,
@@ -94,24 +105,24 @@ private fun StickGraphItem(
 
 @Composable
 private fun ImmutableMap<StickGraphItemType, Int>.toStickGraphBars(): List<StickGraphBar> {
-    val maxCount = values.maxOrNull() ?: 0
+    val totalCount = values.sum()
 
     return StickGraphItemType.entries.map { itemType ->
         val count = getValue(itemType)
 
         StickGraphBar(
             count = count,
-            height = count.toStickHeight(maxCount = maxCount),
+            height = count.toStickHeight(totalCount = totalCount),
             color = itemType.itemColor(),
             label = itemType.itemLabel(),
         )
     }
 }
 
-private fun Int.toStickHeight(maxCount: Int): Dp {
-    if (maxCount <= 0) return 0.dp
+private fun Int.toStickHeight(totalCount: Int): Dp {
+    if (totalCount <= 0) return 0.dp
 
-    val heightRatio = this.toFloat() / maxCount
+    val heightRatio = this.toFloat() / totalCount
     return (heightRatio * STICK_GRAPH_MAX_HEIGHT).dp
 }
 

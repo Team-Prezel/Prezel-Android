@@ -72,6 +72,7 @@ ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref =
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 orhanobut-logger = { group = "com.orhanobut", name = "logger", version.ref = "orhanobutLogger" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }

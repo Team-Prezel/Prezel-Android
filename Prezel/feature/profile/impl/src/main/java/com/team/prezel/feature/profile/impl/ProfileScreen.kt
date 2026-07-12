@@ -32,6 +32,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.state.LocalSnackbarCoroutineScope
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.profile.impl.component.NicknameTextField
@@ -42,6 +43,8 @@ import com.team.prezel.feature.profile.impl.contract.ProfileUiIntent
 import com.team.prezel.feature.profile.impl.contract.ProfileUiState
 import com.team.prezel.feature.profile.impl.model.NicknameValidationState
 import com.team.prezel.feature.profile.impl.model.ProfileUiMessage
+import com.team.prezel.feature.profile.impl.model.ProfileUpdateResult
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
@@ -54,6 +57,7 @@ internal fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarCoroutineScope = LocalSnackbarCoroutineScope.current
     val resources = LocalResources.current
     val photoPickerLauncher = rememberProfileImagePicker { profileUrl, profileImageFile ->
         viewModel.onIntent(
@@ -65,7 +69,19 @@ internal fun ProfileScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ProfileUiEffect.NavigateToHome -> navigateToHome()
-                ProfileUiEffect.NavigateToBack -> onBack()
+                is ProfileUiEffect.NavigateToBack -> {
+                    effect.result?.let { result ->
+                        snackbarCoroutineScope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            snackbarHostState.showPrezelSnackbar(
+                                message = resources.getString(result.messageResId),
+                                useRaisedPosition = false,
+                            )
+                        }
+                    }
+                    onBack()
+                }
+
                 is ProfileUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(
                         message = resources.getString(effect.message.resId),
@@ -226,6 +242,13 @@ private val ProfileUiMessage.resId: Int
         ProfileUiMessage.CHECK_NICKNAME_FAILED -> R.string.feature_profile_impl_check_nickname_failed_message
         ProfileUiMessage.FETCH_USER_INFO_FAILED -> R.string.feature_profile_impl_fetch_user_info_failed_message
         ProfileUiMessage.PATCH_USER_PROFILE_FAILED -> R.string.feature_profile_impl_patch_user_profile_failed_message
+    }
+
+private val ProfileUpdateResult.messageResId: Int
+    get() = when (this) {
+        ProfileUpdateResult.Image -> R.string.feature_profile_impl_patch_user_profile_image_success_message
+        ProfileUpdateResult.Nickname -> R.string.feature_profile_impl_patch_user_nickname_success_message
+        ProfileUpdateResult.Profile -> R.string.feature_profile_impl_patch_user_profile_success_message
     }
 
 @BasicPreview

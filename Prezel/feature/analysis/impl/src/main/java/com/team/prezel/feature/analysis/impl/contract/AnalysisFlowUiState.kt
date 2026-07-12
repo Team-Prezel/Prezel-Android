@@ -14,6 +14,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Immutable
 internal data class AnalysisFlowUiState(
     val step: AnalysisFlowStep = AnalysisFlowStep.PRESENTATION_SCHEDULE,
+    val isFromReport: Boolean = false,
     val form: AnalysisForm = AnalysisForm(),
     val recordingState: AudioSessionState = AudioSessionState.Idle,
     val recordingVolumes: ImmutableList<Float> = persistentListOf(),
@@ -59,6 +60,8 @@ internal data class AnalysisFlowUiState(
             AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED,
             -> false
         }
+
+    val isScriptInputOptionsHidden: Boolean = isFromReport && step == AnalysisFlowStep.SCRIPT_INPUT
 }
 
 @Immutable

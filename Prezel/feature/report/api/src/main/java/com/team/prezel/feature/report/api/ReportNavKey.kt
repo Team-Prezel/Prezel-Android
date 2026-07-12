@@ -7,5 +7,4 @@ import kotlinx.serialization.Serializable
 data class ReportNavKey(
     val presentationId: Long,
     val isPast: Boolean = false,
-    val showBackButton: Boolean = false,
 ) : NavKey

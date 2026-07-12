@@ -63,9 +63,7 @@ internal fun BadgeDetailModal(
         Spacer(modifier = Modifier.weight(72f))
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(376f),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BadgeHeader(
