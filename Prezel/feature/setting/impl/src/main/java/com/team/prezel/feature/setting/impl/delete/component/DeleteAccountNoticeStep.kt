@@ -37,11 +37,7 @@ private val supportedTags = listOf(
 )
 
 @Composable
-internal fun DeleteAccountNoticeStep(
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun DeleteAccountNoticeStep(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,8 +52,6 @@ internal fun DeleteAccountNoticeStep(
         DeleteAccountNoticeDetailBox()
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V36))
-
-//        DeletionAgreement(isChecked = isChecked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -288,9 +282,6 @@ private data class TagState(
 @Composable
 private fun DeleteAccountNoticeStepPreview() {
     PrezelTheme {
-        DeleteAccountNoticeStep(
-            isChecked = false,
-            onCheckedChange = {},
-        )
+        DeleteAccountNoticeStep()
     }
 }

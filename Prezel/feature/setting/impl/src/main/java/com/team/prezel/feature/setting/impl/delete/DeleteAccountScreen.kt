@@ -115,7 +115,6 @@ private fun DeleteAccountScreen(
 
         DeleteAccountContent(
             uiState = uiState,
-            onToggleNoticeChecked = onToggleNoticeChecked,
             onSelectReason = onSelectReason,
             onOtherReasonChanged = onOtherReasonChanged,
             modifier = Modifier
@@ -144,17 +143,13 @@ private fun DeleteAccountScreen(
 @Composable
 private fun DeleteAccountContent(
     uiState: DeleteAccountUiState,
-    onToggleNoticeChecked: (Boolean) -> Unit,
     onSelectReason: (DeleteAccountReasonOption) -> Unit,
     onOtherReasonChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
         when (uiState.step) {
-            DeleteAccountStep.NOTICE -> DeleteAccountNoticeStep(
-                isChecked = uiState.isNoticeChecked,
-                onCheckedChange = onToggleNoticeChecked,
-            )
+            DeleteAccountStep.NOTICE -> DeleteAccountNoticeStep()
 
             DeleteAccountStep.REASON -> DeleteAccountReasonStep(
                 selectedReason = uiState.selectedReason,
