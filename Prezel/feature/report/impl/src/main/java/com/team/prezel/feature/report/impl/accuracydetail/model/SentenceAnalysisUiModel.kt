@@ -13,6 +13,7 @@ internal data class SentenceAnalysisUiModel(
     val status: WordAnalysisStatus,
     val mainFeedback: String,
     val subFeedback: String,
+    val guideScript: String = "",
     val accuracy: Double,
     val startTimeMs: Long,
     val endTimeMs: Long,
@@ -45,7 +46,8 @@ internal val WordAnalysisStatus.isScriptMatchIssue: Boolean
         this == WordAnalysisStatus.MISPRONUNCIATION
 
 internal val WordAnalysisStatus.isSpeechAccuracyIssue: Boolean
-    get() = this == WordAnalysisStatus.STUTTER ||
+    get() = this == WordAnalysisStatus.EXCELLENT ||
+        this == WordAnalysisStatus.STUTTER ||
         this == WordAnalysisStatus.INSERTION
 
 internal fun ImmutableList<SentenceAnalysisDetail>.toUiModels(): ImmutableList<SentenceAnalysisUiModel> =
@@ -57,6 +59,7 @@ private fun SentenceAnalysisDetail.toUiModel(): SentenceAnalysisUiModel =
         status = status,
         mainFeedback = mainFeedback,
         subFeedback = subFeedback,
+        guideScript = guideScript,
         accuracy = accuracy,
         startTimeMs = startTimeMs,
         endTimeMs = endTimeMs,

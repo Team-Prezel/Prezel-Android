@@ -74,6 +74,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                     startType = intent.startType,
                 )
             }
+
             is AnalysisFlowUiIntent.StartReRecording -> startReRecording(
                 presentationId = intent.presentationId,
                 isPast = intent.isPast,
@@ -89,6 +90,7 @@ internal class AnalysisFlowViewModel @Inject constructor(
                 fileUri = intent.fileUri,
                 fileName = intent.fileName,
             )
+
             is AnalysisFlowUiIntent.RetryFileUpload -> retryFileUpload(intent.uploadType)
             AnalysisFlowUiIntent.Next -> moveNext()
             AnalysisFlowUiIntent.SkipScript -> skipScript()

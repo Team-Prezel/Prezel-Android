@@ -13,6 +13,7 @@ data class SentenceAnalysisDetail(
     val status: WordAnalysisStatus,
     val mainFeedback: String,
     val subFeedback: String,
+    val guideScript: String = "",
     val accuracy: Double,
     val startTimeMs: Long,
     val endTimeMs: Long,

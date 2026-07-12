@@ -23,6 +23,8 @@ data class PresentationSentenceAnalysisResponse(
     val mainFeedback: String,
     @SerialName("subFeedback")
     val subFeedback: String,
+    @SerialName("guideScript")
+    val guideScript: String = "",
     @SerialName("accuracy")
     val accuracy: Double,
     @SerialName("startTimeMs")

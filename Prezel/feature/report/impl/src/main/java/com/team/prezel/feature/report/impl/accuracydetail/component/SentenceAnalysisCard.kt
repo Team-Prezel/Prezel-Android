@@ -197,9 +197,9 @@ private fun WordAnalysisStatus.chipTextColor(): Color =
         WordAnalysisStatus.INSERTION,
         WordAnalysisStatus.MISPRONUNCIATION,
         WordAnalysisStatus.STUTTER,
+        WordAnalysisStatus.OMISSION,
         -> PrezelTheme.colors.feedbackWarningRegular
 
-        WordAnalysisStatus.OMISSION -> PrezelTheme.colors.textRegular
         else -> PrezelTheme.colors.interactiveRegular
     }
 
@@ -209,9 +209,9 @@ private fun WordAnalysisStatus.chipBackgroundColor(): Color =
         WordAnalysisStatus.INSERTION,
         WordAnalysisStatus.MISPRONUNCIATION,
         WordAnalysisStatus.STUTTER,
+        WordAnalysisStatus.OMISSION,
         -> PrezelTheme.colors.feedbackWarningSmall
 
-        WordAnalysisStatus.OMISSION -> PrezelTheme.colors.bgLarge
         else -> PrezelTheme.colors.interactiveXSmall
     }
 

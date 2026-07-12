@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.component.PrezelAccordion
 import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
 import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
 import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
@@ -66,6 +70,7 @@ internal fun AccuracyDetailPlayerSheet(
         PrezelPlayer(
             state = playerState,
             trackContentDescription = stringResource(R.string.feature_report_impl_script_detail_player_track_desc),
+            modifier = Modifier.navigationBarsPadding(),
         )
     }
 }
@@ -99,17 +104,7 @@ private fun SheetDetailContent(
         AccuracyDetailTab.SPEECH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_speech
         AccuracyDetailTab.SCRIPT_MATCH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_script
     }
-    val isEmptyDetail = when (selectedTab) {
-        AccuracyDetailTab.SPEECH -> sentenceDetails.visibleSpeechAccuracyDetails(
-            selectedSentence = selectedSentence,
-            expanded = expanded,
-        )
-
-        AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.visibleScriptMatchDetails(
-            selectedSentence = selectedSentence,
-            expanded = expanded,
-        )
-    }.isEmpty()
+    val isEmptyDetail = sentenceDetails.hasNoVisibleDetails(selectedTab, selectedSentence, expanded)
 
     if (expanded && isEmptyDetail) {
         Box(
@@ -151,6 +146,16 @@ private fun SheetDetailContent(
     }
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 }
+
+private fun ImmutableList<SentenceAnalysisUiModel>.hasNoVisibleDetails(
+    selectedTab: AccuracyDetailTab,
+    selectedSentence: SentenceAnalysisUiModel?,
+    expanded: Boolean,
+): Boolean =
+    when (selectedTab) {
+        AccuracyDetailTab.SPEECH -> visibleSpeechAccuracyDetails(selectedSentence, expanded)
+        AccuracyDetailTab.SCRIPT_MATCH -> visibleScriptMatchDetails(selectedSentence, expanded)
+    }.isEmpty()
 
 @Composable
 private fun CollapsedEmptyDetailCard(text: String) {
@@ -202,7 +207,6 @@ private fun SpeechDetailContent(
             SentenceAnalysisCard(
                 detail = detail,
                 highlighted = detail == selectedSentence,
-                text = detail.mainFeedback,
                 subText = detail.subFeedback.takeIf { expanded },
                 useStatusTextColor = false,
                 status = detail.speechAccuracyStatus,
@@ -239,14 +243,52 @@ private fun ScriptMatchDetailContent(
     }
 
     visibleMismatchDetails.forEach { detail ->
-        SentenceAnalysisCard(
+        ScriptMatchAnalysisAccordion(
             detail = detail,
             highlighted = detail == selectedSentence,
-            text = detail.mainFeedback,
-            subText = detail.subFeedback.takeIf { expanded },
-            useStatusTextColor = false,
-            status = detail.scriptMatchStatus,
         )
+    }
+}
+
+@Composable
+private fun ScriptMatchAnalysisAccordion(
+    detail: SentenceAnalysisUiModel,
+    highlighted: Boolean,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(PrezelTheme.shapes.V8)
+            .background(if (highlighted) PrezelTheme.colors.bgMedium else Color.Transparent),
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                start = PrezelTheme.spacing.V12,
+                top = PrezelTheme.spacing.V12,
+                end = PrezelTheme.spacing.V12,
+            ),
+            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = detail.startTimeMs.toPlayerTimeText(),
+                style = PrezelTheme.typography.caption1Regular,
+                color = PrezelTheme.colors.textRegular,
+            )
+            StatusChip(status = detail.scriptMatchStatus)
+        }
+
+        PrezelAccordion(
+            title = detail.mainFeedback,
+            initiallyExpanded = false,
+        ) {
+            Text(
+                text = detail.guideScript,
+                modifier = Modifier.padding(PrezelTheme.spacing.V12),
+                style = PrezelTheme.typography.body3Regular,
+                color = PrezelTheme.colors.textMedium,
+            )
+        }
     }
 }
 
@@ -394,7 +436,7 @@ private val PreviewSentenceDetails = persistentListOf(
     SentenceAnalysisUiModel(
         sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.OMISSION,
-        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        mainFeedback = "말하지 않고 넘어갔어요",
         subFeedback = "대본에 있으나 읽지 않은 구간이에요.",
         accuracy = 0.0,
         startTimeMs = 9_400L,
@@ -415,7 +457,7 @@ private val PreviewAllAccurateSentenceDetails = persistentListOf(
     SentenceAnalysisUiModel(
         sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.EXCELLENT,
-        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        mainFeedback = "말하지 않고 넘어갔어요",
         subFeedback = "모든 단어가 정확하게 발음되었어요.",
         accuracy = 98.0,
         startTimeMs = 0L,
@@ -433,7 +475,7 @@ private val PreviewAllAccurateSentenceDetails = persistentListOf(
     SentenceAnalysisUiModel(
         sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.GOOD,
-        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        mainFeedback = "말하지 않고 넘어갔어요",
         subFeedback = "모든 단어가 안정적으로 전달되었어요.",
         accuracy = 94.0,
         startTimeMs = 7_000L,
@@ -443,7 +485,7 @@ private val PreviewAllAccurateSentenceDetails = persistentListOf(
     SentenceAnalysisUiModel(
         sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.EXCELLENT,
-        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        mainFeedback = "말하지 않고 넘어갔어요",
         subFeedback = "또렷한 발음을 유지해주세요.",
         accuracy = 97.0,
         startTimeMs = 9_000L,
