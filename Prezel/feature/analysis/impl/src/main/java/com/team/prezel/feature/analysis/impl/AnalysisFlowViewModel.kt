@@ -18,24 +18,32 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
 
-@HiltViewModel
-internal class AnalysisFlowViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AnalysisFlowViewModel.Factory::class)
+internal class AnalysisFlowViewModel @AssistedInject constructor(
+    @Assisted isFromReport: Boolean,
     private val analyzePresentationUseCase: AnalyzePresentationUseCase,
     private val reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
     private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
     private val fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
     private val analysisFileCache: AnalysisFileCache,
     private val audioController: RecordingAudioController,
-) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState()) {
+) : BaseViewModel<AnalysisFlowUiState, AnalysisFlowUiIntent, AnalysisFlowUiEffect>(AnalysisFlowUiState(isFromReport = isFromReport)) {
+    @AssistedFactory
+    interface Factory {
+        fun create(isFromReport: Boolean): AnalysisFlowViewModel
+    }
+
     private var analyzeJob: Job? = null
 
     init {

@@ -1,10 +1,12 @@
 package com.team.prezel.feature.analysis.api
 
+import androidx.compose.runtime.Immutable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Serializable
+@Immutable
 sealed interface AnalysisNavKey : NavKey {
     val flowId: String
     val startType: AnalysisStartType
