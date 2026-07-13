@@ -4,20 +4,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.team.prezel.core.designsystem.component.PrezelAccordion
+import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
+import com.team.prezel.core.designsystem.component.chip.chip.ChipSize
+import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.component.player.PrezelPlayer
 import com.team.prezel.core.designsystem.component.player.PrezelPlayerItem
 import com.team.prezel.core.designsystem.component.player.PrezelPlayerState
@@ -40,11 +48,16 @@ internal fun AccuracyDetailPlayerSheet(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+        modifier = modifier.then(
+            if (expanded) {
+                Modifier.fillMaxSize()
+            } else {
+                Modifier.fillMaxWidth()
+            },
+        ),
     ) {
         SheetHandle()
         SheetDetailContent(
@@ -57,6 +70,7 @@ internal fun AccuracyDetailPlayerSheet(
         PrezelPlayer(
             state = playerState,
             trackContentDescription = stringResource(R.string.feature_report_impl_script_detail_player_track_desc),
+            modifier = Modifier.navigationBarsPadding(),
         )
     }
 }
@@ -86,6 +100,25 @@ private fun SheetDetailContent(
     expanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val emptyDetailTextResId = when (selectedTab) {
+        AccuracyDetailTab.SPEECH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_speech
+        AccuracyDetailTab.SCRIPT_MATCH -> R.string.feature_report_impl_accuracy_detail_sheet_empty_script
+    }
+    val isEmptyDetail = sentenceDetails.hasNoVisibleDetails(selectedTab, selectedSentence, expanded)
+
+    if (expanded && isEmptyDetail) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = PrezelTheme.spacing.V20),
+            contentAlignment = Alignment.Center,
+        ) {
+            ExpandedEmptyDetailText(text = stringResource(emptyDetailTextResId))
+        }
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+        return
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -93,21 +126,67 @@ private fun SheetDetailContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
     ) {
-        when (selectedTab) {
-            AccuracyDetailTab.SPEECH -> SpeechDetailContent(
-                selectedSentence = selectedSentence,
-                sentenceDetails = sentenceDetails,
-                expanded = expanded,
-            )
+        if (isEmptyDetail) {
+            CollapsedEmptyDetailCard(text = stringResource(emptyDetailTextResId))
+        } else {
+            when (selectedTab) {
+                AccuracyDetailTab.SPEECH -> SpeechDetailContent(
+                    selectedSentence = selectedSentence,
+                    sentenceDetails = sentenceDetails,
+                    expanded = expanded,
+                )
 
-            AccuracyDetailTab.SCRIPT_MATCH -> ScriptMatchDetailContent(
-                selectedSentence = selectedSentence,
-                sentenceDetails = sentenceDetails,
-                expanded = expanded,
-            )
+                AccuracyDetailTab.SCRIPT_MATCH -> ScriptMatchDetailContent(
+                    selectedSentence = selectedSentence,
+                    sentenceDetails = sentenceDetails,
+                    expanded = expanded,
+                )
+            }
         }
     }
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+}
+
+private fun ImmutableList<SentenceAnalysisUiModel>.hasNoVisibleDetails(
+    selectedTab: AccuracyDetailTab,
+    selectedSentence: SentenceAnalysisUiModel?,
+    expanded: Boolean,
+): Boolean =
+    when (selectedTab) {
+        AccuracyDetailTab.SPEECH -> visibleSpeechAccuracyDetails(selectedSentence, expanded)
+        AccuracyDetailTab.SCRIPT_MATCH -> visibleScriptMatchDetails(selectedSentence, expanded)
+    }.isEmpty()
+
+@Composable
+private fun CollapsedEmptyDetailCard(text: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(PrezelTheme.shapes.V8)
+            .background(PrezelTheme.colors.bgMedium)
+            .padding(PrezelTheme.spacing.V12),
+        verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+    ) {
+        PrezelChip(
+            text = stringResource(R.string.feature_report_impl_accuracy_detail_sheet_empty_card_label),
+            size = ChipSize.SMALL,
+            hierarchy = ChipHierarchy.SECONDARY,
+        )
+        Text(
+            text = text,
+            style = PrezelTheme.typography.body2Medium,
+            color = PrezelTheme.colors.textLarge,
+        )
+    }
+}
+
+@Composable
+private fun ExpandedEmptyDetailText(text: String) {
+    Text(
+        text = text,
+        style = PrezelTheme.typography.body3Medium,
+        color = PrezelTheme.colors.textMedium,
+    )
 }
 
 @Composable
@@ -116,12 +195,10 @@ private fun SpeechDetailContent(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     expanded: Boolean,
 ) {
-    val accuracyDetails = sentenceDetails.filter { it.isSpeechAccuracyIssue }.toImmutableList()
-    val visibleAccuracyDetails = if (expanded) {
-        accuracyDetails
-    } else {
-        listOfNotNull(selectedSentence?.takeIf { it.isSpeechAccuracyIssue } ?: accuracyDetails.firstOrNull())
-    }
+    val visibleAccuracyDetails = sentenceDetails.visibleSpeechAccuracyDetails(
+        selectedSentence = selectedSentence,
+        expanded = expanded,
+    )
 
     if (visibleAccuracyDetails.isEmpty()) {
         EmptyDetailText(text = stringResource(R.string.feature_report_impl_accuracy_detail_sheet_empty_speech))
@@ -130,12 +207,23 @@ private fun SpeechDetailContent(
             SentenceAnalysisCard(
                 detail = detail,
                 highlighted = detail == selectedSentence,
-                text = detail.mainFeedback,
-                subText = detail.subFeedback,
+                subText = detail.subFeedback.takeIf { expanded },
                 useStatusTextColor = false,
                 status = detail.speechAccuracyStatus,
             )
         }
+    }
+}
+
+private fun ImmutableList<SentenceAnalysisUiModel>.visibleSpeechAccuracyDetails(
+    selectedSentence: SentenceAnalysisUiModel?,
+    expanded: Boolean,
+): ImmutableList<SentenceAnalysisUiModel> {
+    val accuracyDetails = filter { it.isSpeechAccuracyIssue }.toImmutableList()
+    return if (expanded) {
+        accuracyDetails
+    } else {
+        listOfNotNull(selectedSentence?.takeIf { it.isSpeechAccuracyIssue } ?: accuracyDetails.firstOrNull()).toImmutableList()
     }
 }
 
@@ -155,14 +243,52 @@ private fun ScriptMatchDetailContent(
     }
 
     visibleMismatchDetails.forEach { detail ->
-        SentenceAnalysisCard(
+        ScriptMatchAnalysisAccordion(
             detail = detail,
             highlighted = detail == selectedSentence,
-            text = detail.mainFeedback,
-            subText = detail.subFeedback,
-            useStatusTextColor = false,
-            status = detail.scriptMatchStatus,
         )
+    }
+}
+
+@Composable
+private fun ScriptMatchAnalysisAccordion(
+    detail: SentenceAnalysisUiModel,
+    highlighted: Boolean,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(PrezelTheme.shapes.V8)
+            .background(if (highlighted) PrezelTheme.colors.bgMedium else Color.Transparent),
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                start = PrezelTheme.spacing.V12,
+                top = PrezelTheme.spacing.V12,
+                end = PrezelTheme.spacing.V12,
+            ),
+            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V8),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = detail.startTimeMs.toPlayerTimeText(),
+                style = PrezelTheme.typography.caption1Regular,
+                color = PrezelTheme.colors.textRegular,
+            )
+            StatusChip(status = detail.scriptMatchStatus)
+        }
+
+        PrezelAccordion(
+            title = detail.mainFeedback,
+            initiallyExpanded = false,
+        ) {
+            Text(
+                text = detail.guideScript,
+                modifier = Modifier.padding(PrezelTheme.spacing.V12),
+                style = PrezelTheme.typography.body3Regular,
+                color = PrezelTheme.colors.textMedium,
+            )
+        }
     }
 }
 
@@ -201,6 +327,42 @@ private fun AccuracyDetailPlayerSheetScriptMatchPreview() {
             selectedSentence = PreviewSentenceDetails[1],
             sentenceDetails = PreviewSentenceDetails,
             playerState = rememberPreviewPlayerState(),
+            expanded = false,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun AccuracyDetailPlayerSheetAllAccuratePreview() {
+    PrezelTheme {
+        AccuracyDetailPlayerSheet(
+            selectedTab = AccuracyDetailTab.SPEECH,
+            selectedSentence = PreviewAllAccurateSentenceDetails.first(),
+            sentenceDetails = PreviewAllAccurateSentenceDetails,
+            playerState = rememberPrezelPlayerState(
+                durationMillis = 11_300L,
+                currentMillis = 0L,
+                initialItems = persistentListOf(),
+            ),
+            expanded = false,
+        )
+    }
+}
+
+@BasicPreview
+@Composable
+private fun AccuracyDetailPlayerSheetAllScriptMatchedPreview() {
+    PrezelTheme {
+        AccuracyDetailPlayerSheet(
+            selectedTab = AccuracyDetailTab.SCRIPT_MATCH,
+            selectedSentence = PreviewAllAccurateSentenceDetails.first(),
+            sentenceDetails = PreviewAllAccurateSentenceDetails,
+            playerState = rememberPrezelPlayerState(
+                durationMillis = 11_300L,
+                currentMillis = 7_230L,
+                initialItems = persistentListOf(),
+            ),
             expanded = false,
         )
     }
@@ -274,7 +436,7 @@ private val PreviewSentenceDetails = persistentListOf(
     SentenceAnalysisUiModel(
         sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
         status = WordAnalysisStatus.OMISSION,
-        mainFeedback = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        mainFeedback = "말하지 않고 넘어갔어요",
         subFeedback = "대본에 있으나 읽지 않은 구간이에요.",
         accuracy = 0.0,
         startTimeMs = 9_400L,
@@ -288,5 +450,46 @@ private val PreviewSentenceDetails = persistentListOf(
                 endTimeMs = 10_100L,
             ),
         ),
+    ),
+)
+
+private val PreviewAllAccurateSentenceDetails = persistentListOf(
+    SentenceAnalysisUiModel(
+        sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        status = WordAnalysisStatus.EXCELLENT,
+        mainFeedback = "말하지 않고 넘어갔어요",
+        subFeedback = "모든 단어가 정확하게 발음되었어요.",
+        accuracy = 98.0,
+        startTimeMs = 0L,
+        endTimeMs = 6_800L,
+        wordDetails = persistentListOf(
+            WordAnalysisUiModel(
+                word = "발음",
+                status = WordAnalysisStatus.EXCELLENT,
+                accuracy = 99.0,
+                startTimeMs = 1_200L,
+                endTimeMs = 1_700L,
+            ),
+        ),
+    ),
+    SentenceAnalysisUiModel(
+        sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        status = WordAnalysisStatus.GOOD,
+        mainFeedback = "말하지 않고 넘어갔어요",
+        subFeedback = "모든 단어가 안정적으로 전달되었어요.",
+        accuracy = 94.0,
+        startTimeMs = 7_000L,
+        endTimeMs = 8_800L,
+        wordDetails = persistentListOf(),
+    ),
+    SentenceAnalysisUiModel(
+        sentence = "오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+        status = WordAnalysisStatus.EXCELLENT,
+        mainFeedback = "말하지 않고 넘어갔어요",
+        subFeedback = "또렷한 발음을 유지해주세요.",
+        accuracy = 97.0,
+        startTimeMs = 9_000L,
+        endTimeMs = 11_300L,
+        wordDetails = persistentListOf(),
     ),
 )

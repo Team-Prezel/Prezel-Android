@@ -1,8 +1,10 @@
 package com.team.prezel.feature.report.impl.accuracydetail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -20,13 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
-import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabs
 import com.team.prezel.core.designsystem.component.player.PrezelPlayerItem
 import com.team.prezel.core.designsystem.component.player.PrezelPlayerState
@@ -136,7 +138,7 @@ private fun AccuracyDetailScreenContent(
             AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.filter { detail -> detail.isScriptMatchIssue }
         }.toImmutableList()
     }
-    val sheetPeekHeight = rememberPlayerSheetPeekHeight(markerSentenceDetails = playerMarkerSentenceDetails)
+    val sheetPeekHeight = AccuracyDetailPlayerSheetPeekHeight
     val playerState = rememberDetailPlayerState(
         selectedTab = selectedTab,
         sentenceDetails = sentenceDetails,
@@ -178,16 +180,6 @@ private fun rememberAccuracyDetailTabs(): List<AccuracyDetailTab> =
             AccuracyDetailTab.SPEECH,
             AccuracyDetailTab.SCRIPT_MATCH,
         )
-    }
-
-@Composable
-private fun rememberPlayerSheetPeekHeight(markerSentenceDetails: ImmutableList<SentenceAnalysisUiModel>): Dp =
-    remember(markerSentenceDetails) {
-        if (markerSentenceDetails.isEmpty()) {
-            AccuracyDetailPlayerSheetDefaultPeekHeight
-        } else {
-            AccuracyDetailPlayerSheetLargePeekHeight
-        }
     }
 
 @Composable
@@ -267,6 +259,7 @@ private fun PlaybackEffect(
     }
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccuracyDetailScaffold(
@@ -282,6 +275,9 @@ private fun AccuracyDetailScaffold(
     onClickTab: (Int) -> Unit,
     pagerState: PagerState,
 ) {
+    val configuration = LocalConfiguration.current
+    val expandedSheetMaxHeight = configuration.screenHeightDp.dp - AccuracyDetailExpandedSheetTopGap
+
     BottomSheetScaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
@@ -296,6 +292,11 @@ private fun AccuracyDetailScaffold(
                 sentenceDetails = sentenceDetails,
                 playerState = playerState,
                 expanded = expanded,
+                modifier = if (expanded) {
+                    Modifier.heightIn(max = expandedSheetMaxHeight)
+                } else {
+                    Modifier
+                },
             )
         },
         sheetDragHandle = null,
@@ -306,11 +307,12 @@ private fun AccuracyDetailScaffold(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            AccuracyDetailTopAppBar(onClose = onClose)
+            if (!expanded) {
+                AccuracyDetailTopAppBar(onClose = onClose)
+            }
             PrezelTabs(
                 tabs = tabLabels,
                 pagerState = pagerState,
-                size = PrezelTabSize.SMALL,
                 onClickTab = onClickTab,
             )
             ScriptDetailList(
@@ -323,8 +325,8 @@ private fun AccuracyDetailScaffold(
 }
 
 private const val SEEK_SYNC_THRESHOLD_MILLIS = 750L
-private val AccuracyDetailPlayerSheetDefaultPeekHeight = 220.dp
-private val AccuracyDetailPlayerSheetLargePeekHeight = 336.dp
+private val AccuracyDetailPlayerSheetPeekHeight = 252.dp
+private val AccuracyDetailExpandedSheetTopGap = 56.dp
 
 @BasicPreview
 @Composable

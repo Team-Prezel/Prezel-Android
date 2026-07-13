@@ -13,6 +13,7 @@ data class SentenceAnalysisDetail(
     val status: WordAnalysisStatus,
     val mainFeedback: String,
     val subFeedback: String,
+    val guideScript: String = "",
     val accuracy: Double,
     val startTimeMs: Long,
     val endTimeMs: Long,
@@ -32,10 +33,10 @@ enum class WordAnalysisStatus(
 ) {
     EXCELLENT("Excellent"),
     GOOD("Good"),
-    STUTTER("Stutter"),
     INSERTION("Insertion"),
-    OMISSION("Omission"),
+    STUTTER("Stutter"),
     MISPRONUNCIATION("Mispronunciation"),
+    OMISSION("Omission"),
     UNKNOWN("Unknown"),
     ;
 

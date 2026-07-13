@@ -84,6 +84,7 @@ fun PrezelAccordion(
                     ),
                 size = if (nested) PrezelListSize.SMALL else PrezelListSize.REGULAR,
                 nested = nested,
+                titleTextColor = PrezelTheme.colors.textLarge,
                 leadingContent = leadingContent,
                 trailingContent = {
                     trailingContent?.invoke()
