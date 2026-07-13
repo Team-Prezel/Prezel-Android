@@ -1,6 +1,8 @@
 package com.team.prezel.feature.home.impl.main.component.body
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -15,6 +17,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.ui.component.PracticeCard
 import com.team.prezel.core.ui.component.graph.CardGraph
 import com.team.prezel.feature.home.impl.R
+import com.team.prezel.feature.home.impl.main.model.CurationUiModel
 import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.collections.immutable.persistentListOf
@@ -59,7 +62,14 @@ internal fun PresentationSheet(
             }
 
             is PresentationUiModel.Upcoming -> {
-                HomeBottomSheetTitle(title = stringResource(R.string.feature_home_impl_bottom_sheet_upcoming_keywords_title))
+                presentation.curations.firstOrNull()?.let { firstCuration ->
+                    HomeBottomSheetTitle(title = firstCuration.guideMessage)
+                    Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16)) {
+                        presentation.curations.forEach { curation ->
+                            CurationCard(curation = curation)
+                        }
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V36))
@@ -81,7 +91,32 @@ private fun PresentationContentPreview() {
                 startDate = LocalDate(2026, 9, 26),
                 endDate = LocalDate(2026, 10, 1),
             ),
-            curations = persistentListOf(),
+            curations = persistentListOf(
+                CurationUiModel(
+                    guideMessage = "발표 흐름을 키워드별로 정리해보세요",
+                    materialType = "아티클",
+                    title = "제목이 한 줄이라면 이래요",
+                    sourceChannel = "계정 이름",
+                    linkUrl = "https://example.com/article",
+                    imageUrl = "https://picsum.photos/280/160?random=1",
+                ),
+                CurationUiModel(
+                    guideMessage = "발표 흐름을 키워드별로 정리해보세요",
+                    materialType = "영상",
+                    title = "제목이 두 줄로 넘어가면 자연스럽게 말줄임표로 전환돼요",
+                    sourceChannel = "프레젠테이션 채널",
+                    linkUrl = "https://example.com/video",
+                    imageUrl = "https://picsum.photos/280/160?random=2",
+                ),
+                CurationUiModel(
+                    guideMessage = "발표 흐름을 키워드별로 정리해보세요",
+                    materialType = "아티클",
+                    title = "청중을 설득하는 발표 구성 방법",
+                    sourceChannel = "발표 연구소",
+                    linkUrl = "https://example.com/presentation",
+                    imageUrl = "https://picsum.photos/280/160?random=3",
+                ),
+            ),
         )
 
         Box(modifier = Modifier.padding(top = 16.dp)) {
