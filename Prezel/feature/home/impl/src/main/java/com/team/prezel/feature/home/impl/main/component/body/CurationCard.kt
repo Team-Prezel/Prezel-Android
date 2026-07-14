@@ -23,12 +23,18 @@ import com.team.prezel.core.designsystem.component.chip.chip.ChipType
 import com.team.prezel.core.designsystem.component.chip.chip.PrezelChip
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.model.presentation.Audience
+import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.Purpose
+import com.team.prezel.core.model.presentation.Style
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.home.impl.main.model.CurationUiModel
+import java.net.URI
 
 @Composable
 internal fun CurationCard(
     curation: CurationUiModel,
+    onLinkOpenFailed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -36,7 +42,17 @@ internal fun CurationCard(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = { uriHandler.openUri(curation.linkUrl) }),
+            .noRippleClickable {
+                if (curation.linkUrl.isSupportedWebUrl()) {
+                    try {
+                        uriHandler.openUri(curation.linkUrl)
+                    } catch (_: IllegalArgumentException) {
+                        onLinkOpenFailed()
+                    }
+                } else {
+                    onLinkOpenFailed()
+                }
+            },
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
     ) {
         Box(
@@ -46,7 +62,7 @@ internal fun CurationCard(
         ) {
             PrezelAsyncImage(
                 url = curation.imageUrl,
-                contentDescription = curation.title,
+                contentDescription = "",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
@@ -80,6 +96,14 @@ internal fun CurationCard(
     }
 }
 
+private fun String.isSupportedWebUrl(): Boolean =
+    runCatching { URI(this) }
+        .getOrNull()
+        ?.let { uri ->
+            !uri.host.isNullOrBlank() &&
+                (uri.scheme.equals("http", ignoreCase = true) || uri.scheme.equals("https", ignoreCase = true))
+        } == true
+
 @BasicPreview
 @Composable
 private fun CurationCardPreview() {
@@ -87,12 +111,17 @@ private fun CurationCardPreview() {
         CurationCard(
             curation = CurationUiModel(
                 guideMessage = "발표 흐름을 키워드별로 정리해보세요",
+                category = Category.EDUCATION,
+                purpose = Purpose.INFO,
+                style = Style.FORMAL,
+                audience = Audience.GENERAL,
                 materialType = "아티클",
                 title = "제목이 두 줄로 넘어가면 자연스럽게 말줄임표로 전환돼요",
                 sourceChannel = "계정 이름",
                 linkUrl = "https://example.com",
                 imageUrl = "",
             ),
+            onLinkOpenFailed = {},
         )
     }
 }

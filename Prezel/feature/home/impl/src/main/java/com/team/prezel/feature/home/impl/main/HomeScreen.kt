@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -28,6 +29,7 @@ import com.team.prezel.feature.home.impl.main.model.PracticeRecordsUiModel
 import com.team.prezel.feature.home.impl.main.model.PresentationUiModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -44,6 +46,7 @@ internal fun HomeScreen(
     val pagerState = rememberPagerState(0) { uiState.presentationCount() }
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)
@@ -79,6 +82,13 @@ internal fun HomeScreen(
         onClickFileUploadAnalysis = navigateToFileUploadAnalysis,
         onClickCardGraphItemIndex = { presentationId, index ->
             viewModel.onIntent(HomeUiIntent.ClickCardGraphItem(presentationId = presentationId, index = index))
+        },
+        onCurationLinkOpenFailed = {
+            scope.launch {
+                snackbarHostState.showPrezelSnackbar(
+                    message = resources.getString(R.string.feature_home_impl_open_curation_link_failed),
+                )
+            }
         },
         modifier = modifier,
     )
@@ -156,6 +166,7 @@ private fun HomeScreenPreview(uiState: HomeUiState) {
                 onClickVoiceRecordingAnalysis = {},
                 onClickFileUploadAnalysis = {},
                 onClickCardGraphItemIndex = { _, _ -> },
+                onCurationLinkOpenFailed = {},
             )
         }
     }

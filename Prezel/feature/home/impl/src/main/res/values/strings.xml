@@ -20,6 +20,16 @@
     <string name="feature_home_impl_category_event">행사·공개</string>
     <string name="feature_home_impl_category_education">학술·교육</string>
     <string name="feature_home_impl_category_report">업무·보고</string>
+    <string name="feature_home_impl_purpose_info">정보 전달</string>
+    <string name="feature_home_impl_purpose_understanding">이해도 향상</string>
+    <string name="feature_home_impl_purpose_empathy">공감대 형성</string>
+    <string name="feature_home_impl_style_formal">전문적인</string>
+    <string name="feature_home_impl_style_friendly">친근한</string>
+    <string name="feature_home_impl_style_calm">격식있는</string>
+    <string name="feature_home_impl_style_casual">일상적인</string>
+    <string name="feature_home_impl_audience_general">대중</string>
+    <string name="feature_home_impl_audience_professional">교수/교사/강사</string>
+    <string name="feature_home_impl_audience_teammate">팀/동료</string>
 
     <string name="feature_home_impl_practice_recording_action">연습하기</string>
 
@@ -29,4 +39,5 @@
 
     <!-- Message  -->
     <string name="feature_home_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>
+    <string name="feature_home_impl_open_curation_link_failed">링크를 열 수 없습니다.</string>
 </resources>

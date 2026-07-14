@@ -7,6 +7,14 @@ import kotlinx.serialization.Serializable
 data class GetCurationResponse(
     @SerialName("guideMessage")
     val guideMessage: String,
+    @SerialName("type")
+    val type: String,
+    @SerialName("purpose")
+    val purpose: String,
+    @SerialName("style")
+    val style: String,
+    @SerialName("audience")
+    val audience: String,
     @SerialName("materialType")
     val materialType: String,
     @SerialName("title")

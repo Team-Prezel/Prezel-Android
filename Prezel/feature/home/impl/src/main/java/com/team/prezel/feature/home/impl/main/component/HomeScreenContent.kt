@@ -42,6 +42,7 @@ internal fun HomeScreenContent(
     onClickVoiceRecordingAnalysis: () -> Unit,
     onClickFileUploadAnalysis: () -> Unit,
     onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
+    onCurationLinkOpenFailed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -85,6 +86,7 @@ internal fun HomeScreenContent(
                     onClickAnalyzePresentation = onClickAnalyzePresentation,
                     onClickWriteFeedback = onClickWriteFeedback,
                     onClickCardGraphItemIndex = onClickCardGraphItemIndex,
+                    onCurationLinkOpenFailed = onCurationLinkOpenFailed,
                 )
             }
         }
@@ -102,6 +104,7 @@ private fun HomeContent(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
+    onCurationLinkOpenFailed: () -> Unit,
 ) {
     when (uiState) {
         HomeUiState.Loading -> Unit
@@ -123,6 +126,7 @@ private fun HomeContent(
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
                 onClickCardGraphItemIndex = { index -> onClickCardGraphItemIndex(uiState.presentation.id, index) },
+                onCurationLinkOpenFailed = onCurationLinkOpenFailed,
             )
         }
 
@@ -136,6 +140,7 @@ private fun HomeContent(
                 onClickAnalyzePresentation = onClickAnalyzePresentation,
                 onClickWriteFeedback = onClickWriteFeedback,
                 onClickCardGraphItemIndex = onClickCardGraphItemIndex,
+                onCurationLinkOpenFailed = onCurationLinkOpenFailed,
             )
         }
     }
@@ -170,6 +175,7 @@ private fun HomePresentationContent(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     onClickCardGraphItemIndex: (index: Int) -> Unit,
+    onCurationLinkOpenFailed: () -> Unit,
 ) {
     HomePageLayout(
         maxHeight = maxHeight,
@@ -179,6 +185,7 @@ private fun HomePresentationContent(
                 presentation = presentation,
                 onClickPracticeRecording = onClickPracticeRecording,
                 onClickCardGraphItemIndex = onClickCardGraphItemIndex,
+                onCurationLinkOpenFailed = onCurationLinkOpenFailed,
             )
         },
         heroContent = {
@@ -201,6 +208,7 @@ private fun HomeMultipleContent(
     onClickAnalyzePresentation: (PresentationUiModel) -> Unit,
     onClickWriteFeedback: (PresentationUiModel) -> Unit,
     onClickCardGraphItemIndex: (presentationId: Long, index: Int) -> Unit,
+    onCurationLinkOpenFailed: () -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
@@ -219,6 +227,7 @@ private fun HomeMultipleContent(
             onClickAnalyzePresentation = onClickAnalyzePresentation,
             onClickWriteFeedback = onClickWriteFeedback,
             onClickCardGraphItemIndex = { index -> onClickCardGraphItemIndex(presentation.id, index) },
+            onCurationLinkOpenFailed = onCurationLinkOpenFailed,
         )
     }
 }

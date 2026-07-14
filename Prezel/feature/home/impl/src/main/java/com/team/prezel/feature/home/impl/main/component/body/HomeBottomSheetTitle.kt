@@ -2,9 +2,7 @@ package com.team.prezel.feature.home.impl.main.component.body
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ internal fun HomeBottomSheetTitle(
             color = PrezelTheme.colors.textLarge,
             style = PrezelTheme.typography.body2Bold,
         )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
     }
 }
 
