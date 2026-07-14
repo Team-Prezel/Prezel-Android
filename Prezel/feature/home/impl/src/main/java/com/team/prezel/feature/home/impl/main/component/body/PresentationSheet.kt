@@ -118,7 +118,6 @@ private fun UpcomingPresentationSection(
     val firstCuration = presentation.curations.firstOrNull() ?: return
 
     HomeBottomSheetTitle(title = firstCuration.guideMessage)
-    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
     CurationMetadataRow(
         presentationTitle = presentation.title,
         curation = firstCuration,
