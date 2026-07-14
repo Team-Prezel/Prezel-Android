@@ -158,6 +158,10 @@ private fun GetMainDataResponse.GrowthGraph.toDomain(): PresentationGrowthPoint 
 internal fun GetCurationResponse.toDomain(): Curation =
     Curation(
         guideMessage = guideMessage,
+        category = Category.from(value = type),
+        purpose = Purpose.from(value = purpose),
+        style = Style.from(value = style),
+        audience = Audience.from(value = audience),
         materialType = materialType,
         title = title,
         sourceChannel = sourceChannel,
