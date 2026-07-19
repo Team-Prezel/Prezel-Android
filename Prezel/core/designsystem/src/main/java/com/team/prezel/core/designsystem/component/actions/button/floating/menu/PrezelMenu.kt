@@ -2,7 +2,9 @@ package com.team.prezel.core.designsystem.component.actions.button.floating.menu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ fun PrezelMenu(
 
     Column(
         modifier = modifier
+            .width(IntrinsicSize.Max)
             .clip(shape = config.shape)
             .background(color = config.backgroundColor)
             .padding(config.contentPadding),

@@ -3,6 +3,8 @@ package com.team.prezel.core.designsystem.component.actions.button.floating.menu
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -16,7 +18,6 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewSection
 import com.team.prezel.core.designsystem.preview.PreviewValueRow
-import com.team.prezel.core.designsystem.util.drawDashBorder
 
 /**
  * 메뉴 scope가 실제로 그리는 클릭 가능한 단일 메뉴 아이템입니다.
@@ -31,7 +32,7 @@ internal fun PrezelMenuItem(
     onClick: () -> Unit,
 ) {
     PrezelTouchArea(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         onClick = onClick,
         shape = config.shape,
         extraTouchPadding = config.contentPadding,
@@ -52,7 +53,9 @@ private fun PrezelMenuItemLayout(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(config.height),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -81,14 +84,14 @@ private fun PrezelMenuMenuItemPreview() {
     ) {
         MenuSize.entries.forEach { size ->
             PreviewValueRow(name = size.name) {
-                PrezelMenu(
-                    size = size,
-                    modifier = Modifier.drawDashBorder(
-                        shape = PrezelMenuDefaults.getDefault(size = size).shape,
-                    ),
-                ) {
+                PrezelMenu(size = size) {
                     MenuItem(
-                        label = "Label",
+                        label = if (size == MenuSize.REGULAR) "Longer Label" else "Label",
+                        iconResId = PrezelIcons.Blank,
+                        onClick = {},
+                    )
+                    MenuItem(
+                        label = "Short",
                         iconResId = PrezelIcons.Blank,
                         onClick = {},
                     )

@@ -29,6 +29,7 @@ data class PrezelMenuItemDefault(
     val textStyle: TextStyle,
     val contentColor: Color,
     val shape: RoundedCornerShape,
+    val height: Dp,
 )
 
 /**
@@ -45,6 +46,7 @@ object PrezelMenuItemDefaults {
             textStyle = getTextStyle(size),
             contentColor = getContentColor(),
             shape = getShape(),
+            height = getHeight(size),
         )
 
     private fun getIconSize(size: MenuItemSize): Dp =
@@ -55,10 +57,11 @@ object PrezelMenuItemDefaults {
 
     @Composable
     private fun getContentPadding(size: MenuItemSize): PaddingValues {
-        val verticalPadding = when (size) {
-            MenuItemSize.SMALL -> PrezelTheme.spacing.V4
-            MenuItemSize.REGULAR -> PrezelTheme.spacing.V8
-        }
+        // 피그마 상으로 아이콘 사이즈를 고려하지 않은 패딩값이 존재하여 높이를 고정으로 하고 가운데 배치하도록 함
+//        val verticalPadding = when (size) {
+//            MenuItemSize.SMALL -> PrezelTheme.spacing.V4
+//            MenuItemSize.REGULAR -> PrezelTheme.spacing.V8
+//        }
 
         val startPadding = when (size) {
             MenuItemSize.SMALL -> PrezelTheme.spacing.V8
@@ -73,8 +76,8 @@ object PrezelMenuItemDefaults {
         return PaddingValues(
             start = startPadding,
             end = endPadding,
-            top = verticalPadding,
-            bottom = verticalPadding,
+//            top = verticalPadding,
+//            bottom = verticalPadding,
         )
     }
 
@@ -96,5 +99,12 @@ object PrezelMenuItemDefaults {
     private fun getContentColor(): Color = PrezelTheme.colors.textMedium
 
     @Composable
-    private fun getShape(): RoundedCornerShape = PrezelTheme.shapes.V8
+    private fun getShape(): RoundedCornerShape = PrezelTheme.shapes.V4
+
+    @Composable
+    private fun getHeight(size: MenuItemSize): Dp =
+        when (size) {
+            MenuItemSize.SMALL -> 28.dp
+            MenuItemSize.REGULAR -> 40.dp
+        }
 }
