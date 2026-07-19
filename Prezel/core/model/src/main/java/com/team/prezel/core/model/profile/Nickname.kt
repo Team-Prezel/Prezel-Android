@@ -29,6 +29,7 @@ value class Nickname private constructor(
         private const val LATIN_UPPERCASE_END = 'Z'.code
         private const val LATIN_LOWERCASE_START = 'a'.code
         private const val LATIN_LOWERCASE_END = 'z'.code
+        private val HANGUL_SYLLABLES_BLOCK = Character.UnicodeBlock.HANGUL_SYLLABLES
 
         fun create(value: String): CreationResult =
             when (val reason = invalidReasonOf(value)) {
@@ -51,6 +52,6 @@ value class Nickname private constructor(
             codePoint in DIGIT_START..DIGIT_END ||
                 codePoint in LATIN_UPPERCASE_START..LATIN_UPPERCASE_END ||
                 codePoint in LATIN_LOWERCASE_START..LATIN_LOWERCASE_END ||
-                Character.UnicodeScript.of(codePoint) == Character.UnicodeScript.HANGUL
+                Character.UnicodeBlock.of(codePoint) == HANGUL_SYLLABLES_BLOCK
     }
 }
