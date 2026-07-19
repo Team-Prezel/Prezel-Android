@@ -10,11 +10,11 @@ plugins {
 val androidVersionCodeProvider = providers
     .gradleProperty("ANDROID_VERSION_CODE")
     .orElse(providers.environmentVariable("ANDROID_VERSION_CODE"))
-    .orElse("1")
+    .orElse("2")
 val androidVersionNameProvider = providers
     .gradleProperty("ANDROID_VERSION_NAME")
     .orElse(providers.environmentVariable("ANDROID_VERSION_NAME"))
-    .orElse("0.1.0")
+    .orElse("1.0.0")
 val appApplicationIdProvider = providers
     .gradleProperty("APP_APPLICATION_ID")
     .orElse(providers.environmentVariable("APP_APPLICATION_ID"))
