@@ -1,14 +1,11 @@
 package com.team.prezel.feature.report.impl.report
 
 import androidx.annotation.StringRes
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -170,14 +167,12 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
-        leadingIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    painter = painterResource(PrezelIcons.ArrowLeft),
-                    contentDescription = stringResource(R.string.feature_report_impl_back),
-                    tint = PrezelTheme.colors.iconRegular,
-                )
-            }
+        topAppBarContent = {
+            LeadingIcon(
+                iconResId = PrezelIcons.ArrowLeft,
+                contentDescription = stringResource(R.string.feature_report_impl_back),
+                onClick = onBackClick,
+            )
         },
         headerContent = { titleModifier ->
             ReportHeaderContent(

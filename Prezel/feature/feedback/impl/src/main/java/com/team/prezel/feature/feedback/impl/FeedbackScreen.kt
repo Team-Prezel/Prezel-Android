@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -154,18 +151,15 @@ private fun FeedbackTopAppBar(
     modifier: Modifier = Modifier,
 ) {
     PrezelTopAppBar(
-        title = { Text(text = stringResource(R.string.feature_feedback_impl_top_app_bar_title)) },
-        trailingIcons = {
-            IconButton(onClick = onClickClose) {
-                Icon(
-                    painter = painterResource(PrezelIcons.Cancel),
-                    contentDescription = stringResource(R.string.feature_feedback_impl_close),
-                    tint = PrezelTheme.colors.iconRegular,
-                )
-            }
-        },
+        title = stringResource(R.string.feature_feedback_impl_top_app_bar_title),
         modifier = modifier,
-    )
+    ) {
+        TrailingIcon(
+            iconResId = PrezelIcons.Cancel,
+            contentDescription = stringResource(R.string.feature_feedback_impl_close),
+            onClick = onClickClose,
+        )
+    }
 }
 
 @Composable
