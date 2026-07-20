@@ -170,8 +170,8 @@ private fun PrezelDatePickerPreview() {
     ) {
         PrezelDatePicker(
             title = "발표 날짜",
-            today = LocalDate(year = 2026, month = 3, day = 16),
-            initialSelectedDate = LocalDate(year = 2026, month = 3, day = 25),
+            today = LocalDate(year = 2026, month = 8, day = 1),
+            initialSelectedDate = LocalDate(year = 2026, month = 8, day = 10),
             onClose = {},
             onConfirm = {},
         )
