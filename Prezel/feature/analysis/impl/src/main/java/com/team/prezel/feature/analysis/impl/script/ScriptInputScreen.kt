@@ -371,7 +371,7 @@ private fun EmptyScriptUploadContent(
                 text = stringResource(R.string.feature_analysis_impl_script_upload_button),
                 iconResId = PrezelIcons.Plus,
                 type = ButtonType.OUTLINED,
-                size = ButtonSize.REGULAR,
+                size = ButtonSize.SMALL,
                 isRounded = true,
                 onClick = onClick,
             )
