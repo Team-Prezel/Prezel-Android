@@ -8,14 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
@@ -41,16 +38,14 @@ internal fun TermsDetailModal(
             .fillMaxSize(),
     ) {
         PrezelTopAppBar(
-            title = { androidx.compose.material3.Text(text = title) },
-            trailingIcons = {
-                IconButton(onClick = onDismiss) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.Cancel),
-                        contentDescription = stringResource(R.string.feature_terms_impl_cancel_icon_description),
-                    )
-                }
-            },
-        )
+            title = title,
+        ) {
+            TrailingIcon(
+                iconResId = PrezelIcons.Cancel,
+                contentDescription = stringResource(R.string.feature_terms_impl_cancel_icon_description),
+                onClick = onDismiss,
+            )
+        }
         NotionWebView(url = url, modifier = Modifier.weight(1f))
     }
 }

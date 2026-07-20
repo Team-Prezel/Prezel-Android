@@ -5,18 +5,21 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -28,14 +31,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.feedback.snackbar.PrezelSnackbarHost
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.designsystem.util.NoRippleInteractionSource
 
 @Composable
 fun PrezelNavigationBar(
@@ -50,9 +51,12 @@ fun PrezelNavigationBar(
                 .background(PrezelTheme.colors.borderRegular),
         )
 
-        NavigationBar(
-            containerColor = PrezelTheme.colors.bgRegular,
-            tonalElevation = 0.dp,
+        Row(
+            modifier = Modifier
+                .background(PrezelTheme.colors.bgRegular)
+                .padding(horizontal = PrezelTheme.spacing.V20)
+                .navigationBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
     }
@@ -66,35 +70,33 @@ fun RowScope.PrezelNavigationBarItem(
     label: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    alwaysShowLabel: Boolean = true,
 ) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        icon = {
-            Icon(
-                painter = painterResource(id = iconResId),
-                contentDescription = null,
-            )
-        },
-        modifier = modifier,
-        enabled = enabled,
-        label = {
-            Text(
-                text = label,
-                style = PrezelTheme.typography.caption2Medium,
-            )
-        },
-        alwaysShowLabel = alwaysShowLabel,
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = PrezelTheme.colors.iconMedium,
-            unselectedIconColor = PrezelTheme.colors.iconDisabled,
-            selectedTextColor = PrezelTheme.colors.textLarge,
-            unselectedTextColor = PrezelTheme.colors.textDisabled,
-            indicatorColor = Color.Transparent,
-        ),
-        interactionSource = NoRippleInteractionSource,
-    )
+    Column(
+        modifier = modifier
+            .weight(1f)
+            .clickable(
+                enabled = enabled,
+                onClick = onClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+        Icon(
+            modifier = Modifier.size(28.dp),
+            painter = painterResource(id = iconResId),
+            tint = if (selected) PrezelTheme.colors.iconMedium else PrezelTheme.colors.iconDisabled,
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
+        Text(
+            text = label,
+            style = PrezelTheme.typography.caption2Medium,
+            color = if (selected) PrezelTheme.colors.textLarge else PrezelTheme.colors.textDisabled,
+        )
+        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
+    }
 }
 
 @Composable
@@ -141,7 +143,6 @@ class PrezelNavigationScope internal constructor(
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
-        alwaysShowLabel: Boolean = true,
     ) {
         rowScope.PrezelNavigationBarItem(
             selected = selected,
@@ -150,7 +151,6 @@ class PrezelNavigationScope internal constructor(
             label = label,
             modifier = modifier,
             enabled = enabled,
-            alwaysShowLabel = alwaysShowLabel,
         )
     }
 }

@@ -123,7 +123,7 @@ private fun UpcomingPresentationSection(
         curation = firstCuration,
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
-    Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16)) {
+    Column(verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12)) {
         presentation.curations.forEach { curation ->
             CurationCard(
                 curation = curation,

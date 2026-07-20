@@ -8,7 +8,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -107,7 +106,7 @@ internal fun HistoryScreen(
     ) {
         PrezelTopAppBar(
             modifier = Modifier.background(PrezelTheme.colors.bgRegular),
-            title = { Text(text = stringResource(R.string.feature_history_impl_title)) },
+            title = stringResource(R.string.feature_history_impl_title),
         )
 
         HistoryContent(

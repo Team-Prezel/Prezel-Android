@@ -10,13 +10,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.icon.PrezelIcons
@@ -37,16 +33,14 @@ internal fun BadgeListContent(
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         PrezelTopAppBar(
-            title = { Text(text = stringResource(R.string.feature_badge_impl_title)) },
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        painter = painterResource(PrezelIcons.ChevronLeft),
-                        contentDescription = stringResource(R.string.feature_badge_impl_back),
-                    )
-                }
-            },
-        )
+            title = stringResource(R.string.feature_badge_impl_title),
+        ) {
+            LeadingIcon(
+                iconResId = PrezelIcons.ChevronLeft,
+                contentDescription = stringResource(R.string.feature_badge_impl_back),
+                onClick = onBack,
+            )
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,7 +38,7 @@ internal fun HomeHeadSection(
             .background(PrezelTheme.colors.bgRegular),
     ) {
         PrezelTopAppBar(
-            title = { Text(text = stringResource(R.string.feature_home_impl_title)) },
+            title = stringResource(R.string.feature_home_impl_title),
         )
 
         if (uiState is HomeUiState.MultipleContent) {
