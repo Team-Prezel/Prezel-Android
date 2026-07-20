@@ -250,6 +250,7 @@ private fun AudienceSituationAccordion(
         onExpandedTypeChange = onExpandedTypeChange,
         title = stringResource(R.string.feature_analysis_impl_situation_scale_label),
         selectedText = audienceOptions.firstOrNull { it.value == form.audience }?.text,
+        showDivider = false,
     ) {
         ChipOptionsContent(
             options = audienceOptions.toChipContentOptions(form.audience),
@@ -270,6 +271,7 @@ private fun SituationAccordion(
     onExpandedTypeChange: (SituationAccordionType?) -> Unit,
     title: String,
     selectedText: String?,
+    showDivider: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
@@ -281,7 +283,7 @@ private fun SituationAccordion(
             onExpandedChange = { expanded ->
                 onExpandedTypeChange(if (expanded) type else null)
             },
-            showDivider = true,
+            showDivider = showDivider,
             trailingContent = selectedText?.let { text ->
                 {
                     Text(
