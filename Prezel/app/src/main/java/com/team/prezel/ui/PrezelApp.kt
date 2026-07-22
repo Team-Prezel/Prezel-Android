@@ -157,9 +157,9 @@ private fun AppNavigationContent(
             entries = appState.navigationState.toEntries(provider),
             onBack = navigator::goBack,
             modifier = Modifier.padding(padding),
-            transitionSpec = { defaultPrezelNavTransition() },
-            popTransitionSpec = { defaultPrezelNavTransition() },
-            predictivePopTransitionSpec = { _: Int -> defaultPrezelNavTransition() },
+            predictivePopTransitionSpec = {
+                ContentTransform(fadeIn(animationSpec = tween(700)), fadeOut(animationSpec = tween(700)))
+            },
         )
     }
 }
@@ -185,10 +185,6 @@ private fun AppDimmerOverlay(
         foregroundContent?.invoke(this)
     }
 }
-
-private fun defaultPrezelNavTransition(): ContentTransform =
-    fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-        fadeOut(animationSpec = tween(durationMillis = 100))
 
 @Composable
 private fun EdgeToEdgeStatusBarBackground(style: EdgeToEdgeStatusBarStyle) {
