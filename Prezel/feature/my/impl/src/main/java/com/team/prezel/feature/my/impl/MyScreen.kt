@@ -146,13 +146,6 @@ private fun BadgeListTitle(modifier: Modifier = Modifier) {
         size = PrezelListSize.REGULAR,
         nested = true,
         modifier = modifier.fillMaxWidth(),
-        trailingContent = {
-            Icon(
-                painter = painterResource(PrezelIcons.ChevronRight),
-                contentDescription = "뱃지",
-                tint = PrezelTheme.colors.iconRegular,
-            )
-        },
     )
 }
 
