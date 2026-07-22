@@ -35,7 +35,7 @@ internal fun SettingActionSection(
                 modifier = modifier,
                 text = stringResource(R.string.feature_setting_impl_logout),
                 type = ButtonType.FILLED,
-                size = ButtonSize.SMALL,
+                size = ButtonSize.REGULAR,
                 hierarchy = ButtonHierarchy.SECONDARY,
                 onClick = onClickLogout,
             )
