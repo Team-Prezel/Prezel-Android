@@ -8,7 +8,6 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -114,7 +113,7 @@ private fun PrezelAppContent(
         isAuthenticated = appState.isAuthenticated,
         connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
         shouldShowNavigationBar = appState.shouldShowNavigationBar,
-        navigateToBadge = { navigator.navigate(BadgeNavKey) },
+        navigateToBadge = { badgeCode -> navigator.navigate(BadgeNavKey(badgeCode = badgeCode)) },
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -279,7 +278,7 @@ private fun ObserveBadgeEvents(
     isAuthenticated: Boolean,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     shouldShowNavigationBar: Boolean,
-    navigateToBadge: () -> Unit,
+    navigateToBadge: (String) -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
@@ -290,6 +289,7 @@ private fun ObserveBadgeEvents(
 
         connectBadgeEventStreamUseCase()
             .collect { event ->
+                val badgeCode = event.badgeCode?.takeIf(String::isNotBlank)
                 val message =
                     event.message
                         ?.takeIf(String::isNotBlank)
@@ -303,8 +303,8 @@ private fun ObserveBadgeEvents(
                 snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showPrezelSnackbar(
                     message = message,
-                    actionLabel = resources.getString(R.string.app_badge_event_action),
-                    onAction = navigateToBadge,
+                    actionLabel = badgeCode?.let { resources.getString(R.string.app_badge_event_action) },
+                    onAction = badgeCode?.let { code -> { navigateToBadge(code) } },
                     useRaisedPosition = currentShouldShowNavigationBar,
                 )
             }

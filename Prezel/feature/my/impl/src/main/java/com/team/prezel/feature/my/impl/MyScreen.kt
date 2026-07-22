@@ -40,7 +40,7 @@ import kotlinx.collections.immutable.toImmutableList
 internal fun MyScreen(
     navigateToEditProfile: () -> Unit,
     navigateToSetting: () -> Unit,
-    navigateToBadge: () -> Unit,
+    navigateToBadge: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
@@ -79,7 +79,7 @@ private fun MyScreen(
     uiState: MyUiState,
     onClickEditProfile: () -> Unit,
     onClickSetting: () -> Unit,
-    navigateToBadge: () -> Unit,
+    navigateToBadge: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -113,8 +113,7 @@ private fun MyScreen(
                 BadgeListTitle(
                     modifier = Modifier
                         .padding(top = PrezelTheme.spacing.V16)
-                        .fillMaxWidth()
-                        .noRippleClickable(onClick = navigateToBadge),
+                        .fillMaxWidth(),
                 )
             }
 
@@ -124,7 +123,7 @@ private fun MyScreen(
             ) { badge ->
                 BadgeGridItem(
                     badge = badge,
-                    modifier = modifier.noRippleClickable(onClick = navigateToBadge),
+                    modifier = Modifier.noRippleClickable(onClick = { navigateToBadge(badge.code) }),
                 )
             }
         }

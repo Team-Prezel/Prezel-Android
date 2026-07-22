@@ -12,10 +12,11 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal fun EntryProviderScope<NavKey>.featureBadgeEntryBuilder() {
-    entry<BadgeNavKey> {
+    entry<BadgeNavKey> { key ->
         val navigator = LocalNavigator.current
 
         BadgeScreen(
+            badgeNavKey = key,
             onBack = { navigator.goBack() },
         )
     }

@@ -2,24 +2,6 @@ package com.team.prezel.feature.badge.impl.component
 
 import com.team.prezel.feature.badge.impl.contract.BadgeUiState
 import com.team.prezel.feature.badge.impl.model.BadgeDetailUiModel
-import com.team.prezel.feature.badge.impl.model.BadgeUiModel
-import kotlinx.collections.immutable.persistentListOf
-
-internal fun badgePreviewBadges() =
-    persistentListOf(
-        BadgeUiModel(
-            badgeCode = "1",
-            badgeName = "첫 발표",
-            imageUrl = "",
-            isUnlocked = true,
-        ),
-        BadgeUiModel(
-            badgeCode = "2",
-            badgeName = "분석 왕",
-            imageUrl = "",
-            isUnlocked = false,
-        ),
-    )
 
 internal fun badgePreviewDetail() =
     BadgeDetailUiModel(
@@ -33,7 +15,5 @@ internal fun badgePreviewDetail() =
 
 internal fun badgeScreenPreviewState() =
     BadgeUiState(
-        badges = badgePreviewBadges(),
-        selectedBadgeCode = "1",
-        selectedBadgeDetail = badgePreviewDetail(),
+        badgeDetail = badgePreviewDetail(),
     )
