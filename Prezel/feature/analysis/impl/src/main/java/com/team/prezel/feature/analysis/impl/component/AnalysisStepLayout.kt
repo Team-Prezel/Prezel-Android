@@ -43,11 +43,13 @@ internal fun AnalysisStepLayout(
     subButtonText: String? = null,
     onSubButtonClick: (() -> Unit)? = null,
     contentScrollable: Boolean = true,
+    alwaysShowButtonAreaDivider: Boolean = false,
     isHiddenOptions: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
-    val showButtonAreaDivider = contentScrollable && contentScrollState.maxValue > 0
+    val showButtonAreaDivider =
+        alwaysShowButtonAreaDivider || (contentScrollable && contentScrollState.maxValue > 0)
 
     Column(
         modifier = modifier

@@ -81,7 +81,6 @@ private fun VoiceRecordingScreen(
     onScriptExpandedChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
-    var showButtonAreaDivider by remember { mutableStateOf(false) }
     val useEmptyScriptLayout = script.isBlank() && !isScriptExpanded && !recordingState.isCompleted
 
     Column(
@@ -114,16 +113,19 @@ private fun VoiceRecordingScreen(
             },
             onClickRecordingControl = onClickRecordingControl,
             useMinimumScriptHeight = useEmptyScriptLayout,
-            onScriptScrollableChange = { scrollable ->
-                showButtonAreaDivider = scrollable
-            },
             modifier = contentModifier,
         )
 
         VoiceRecordingButtonArea(
             recordingState = recordingState,
             analyzeEnabled = analyzeEnabled,
-            showDivider = showButtonAreaDivider,
+            modifier = Modifier.background(
+                if (isScriptExpanded || recordingState.isCompleted) {
+                    PrezelTheme.colors.bgRegular
+                } else {
+                    PrezelTheme.colors.bgMedium
+                },
+            ),
             onClickRecordingControl = onClickRecordingControl,
             onStopRecording = onStopRecording,
             onResetRecording = onResetRecording,

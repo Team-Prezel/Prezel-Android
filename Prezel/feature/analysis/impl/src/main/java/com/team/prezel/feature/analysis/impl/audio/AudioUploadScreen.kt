@@ -8,6 +8,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -135,6 +136,8 @@ private fun AudioUploadScreen(
         buttonEnabled = buttonEnabled,
         onButtonClick = onAnalyze,
         onBack = onBack,
+        contentScrollable = false,
+        alwaysShowButtonAreaDivider = true,
     ) {
         AnalysisStepTitle(
             title = stringResource(R.string.feature_analysis_impl_audio_headline),
@@ -160,14 +163,17 @@ private fun AudioUploadScreen(
 }
 
 @Composable
-private fun AudioUploadContent(
+private fun ColumnScope.AudioUploadContent(
     fileUri: String?,
     uploadProgress: Float?,
     onUploadClick: () -> Unit,
     onClear: () -> Unit,
 ) {
     if (fileUri == null) {
-        AudioUploadEmptyContent(onUploadClick = onUploadClick)
+        AudioUploadEmptyContent(
+            onUploadClick = onUploadClick,
+            modifier = Modifier.weight(1f),
+        )
     } else {
         val context = LocalContext.current
         val playbackState = rememberAudioUploadPlaybackState(
@@ -320,13 +326,14 @@ internal fun audioPlaybackProgress(
 }
 
 @Composable
-private fun AudioUploadEmptyContent(onUploadClick: () -> Unit) {
+private fun AudioUploadEmptyContent(
+    onUploadClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     StatusView(
         title = stringResource(R.string.feature_analysis_impl_audio_file_placeholder),
         description = stringResource(R.string.feature_analysis_impl_audio_file_format),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(320.dp),
+        modifier = modifier.fillMaxWidth(),
         visual = {
             Image(
                 painter = painterResource(R.drawable.feature_analysis_impl_no_voice),
@@ -339,7 +346,7 @@ private fun AudioUploadEmptyContent(onUploadClick: () -> Unit) {
                 text = stringResource(R.string.feature_analysis_impl_audio_upload_button),
                 iconResId = PrezelIcons.Plus,
                 type = ButtonType.OUTLINED,
-                size = ButtonSize.REGULAR,
+                size = ButtonSize.SMALL,
                 isRounded = true,
                 onClick = onUploadClick,
             )

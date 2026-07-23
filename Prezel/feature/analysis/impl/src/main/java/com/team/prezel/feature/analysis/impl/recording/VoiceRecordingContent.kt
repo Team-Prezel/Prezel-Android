@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -61,7 +60,6 @@ internal fun VoiceRecordingContent(
     modifier: Modifier = Modifier,
     voiceChromeUi: VoiceRecordingChromeUi? = null,
     useMinimumScriptHeight: Boolean = false,
-    onScriptScrollableChange: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -81,11 +79,10 @@ internal fun VoiceRecordingContent(
         VoiceRecordingScriptBody(
             script = script,
             modifier = if (useMinimumScriptHeight) {
-                Modifier.heightIn(min = 84.dp)
+                Modifier.heightIn(min = 94.dp)
             } else {
                 Modifier.weight(1f)
             },
-            onScrollableChange = onScriptScrollableChange,
         )
 
         if (recordingState !is AudioSessionState.Idle) {
@@ -132,21 +129,13 @@ private fun VoiceRecordingScriptHeader(
 private fun VoiceRecordingScriptBody(
     script: String,
     modifier: Modifier = Modifier,
-    onScrollableChange: (Boolean) -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
-    val scrollable by remember {
-        derivedStateOf { scrollState.maxValue > 0 }
-    }
     val showTopGradient by remember {
         derivedStateOf { scrollState.value > 0 }
     }
     val showBottomGradient by remember {
         derivedStateOf { scrollState.value < scrollState.maxValue }
-    }
-
-    LaunchedEffect(scrollable) {
-        onScrollableChange(scrollable)
     }
 
     Box(
@@ -445,7 +434,6 @@ private fun RecordingRoundIconButton(
 ) {
     PrezelIconButton(
         iconResId = iconResId,
-        modifier = Modifier.size(48.dp),
         buttonDefault = PrezelButtonDefaults.getDefault(
             isIconOnly = true,
             isRounded = true,
@@ -454,7 +442,7 @@ private fun RecordingRoundIconButton(
             hierarchy = ButtonHierarchy.SECONDARY,
             contentColor = iconColor,
             backgroundColor = PrezelTheme.colors.bgLarge,
-            iconSize = 20.dp,
+            iconSize = 24.dp,
         ),
         onClick = onClick,
     )
