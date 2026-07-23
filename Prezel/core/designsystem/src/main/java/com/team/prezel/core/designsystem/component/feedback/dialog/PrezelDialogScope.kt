@@ -2,7 +2,6 @@ package com.team.prezel.core.designsystem.component.feedback.dialog
 
 import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -34,17 +33,16 @@ class PrezelDialogScope {
         PrezelTouchArea(
             onClick = onClick,
             shape = PrezelTheme.shapes.V4,
-            modifier = Modifier
-                .sizeIn(
-                    minWidth = PrezelTheme.spacing.V48,
-                    minHeight = PrezelTheme.spacing.V40,
-                ).semantics { role = Role.Button },
+            modifier = Modifier.semantics { role = Role.Button },
         ) {
             Text(
                 text = label,
                 style = PrezelTheme.typography.body2Medium,
                 color = labelColor,
-                modifier = Modifier.padding(vertical = PrezelTheme.spacing.V8),
+                modifier = Modifier.padding(
+                    vertical = PrezelTheme.spacing.V8,
+                    horizontal = PrezelTheme.spacing.V8,
+                ),
             )
         }
     }

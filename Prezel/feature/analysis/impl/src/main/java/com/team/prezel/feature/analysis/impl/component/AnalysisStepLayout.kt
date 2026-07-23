@@ -16,9 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,9 +47,7 @@ internal fun AnalysisStepLayout(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
-    val showButtonAreaDivider by remember {
-        derivedStateOf { contentScrollable && contentScrollState.maxValue > 0 }
-    }
+    val showButtonAreaDivider = contentScrollable && contentScrollState.maxValue > 0
 
     Column(
         modifier = modifier

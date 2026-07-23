@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -158,7 +157,7 @@ private fun ScriptInputScreen(
         isHiddenOptions = isHiddenOptions,
         trailingText = stringResource(R.string.feature_analysis_impl_skip),
         onTrailingTextClick = onSkip,
-        contentScrollable = false,
+        contentScrollable = form.scriptInputType == ScriptInputType.DIRECT_INPUT,
     ) {
         AnalysisStepTitle(
             title = stringResource(R.string.feature_analysis_impl_script_headline),
@@ -227,7 +226,7 @@ private fun ColumnScope.ScriptInputContent(
 }
 
 @Composable
-private fun ColumnScope.DirectScriptInput(
+private fun DirectScriptInput(
     script: String,
     onScriptChange: (String) -> Unit,
 ) {
@@ -236,11 +235,8 @@ private fun ColumnScope.DirectScriptInput(
         onValueChange = onScriptChange,
         placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
         maxLength = SCRIPT_MAX_LENGTH,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f, fill = false)
-            .heightIn(min = 122.dp),
-        fillContainerHeight = true,
+        minHeight = 122.dp,
+        modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 }

@@ -28,7 +28,7 @@ internal fun DayCell(
         enabled = dayCell != null && dayCell !is DayCellType.Past,
         modifier = modifier
             .aspectRatio(1f)
-            .padding(PrezelTheme.spacing.V4)
+            .padding(PrezelTheme.spacing.V8)
             .clip(PrezelTheme.shapes.V1000)
             .background(color = config.dayContainerColor(dayCell = dayCell)),
         isUseRipple = false,
