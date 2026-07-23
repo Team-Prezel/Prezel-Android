@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -237,7 +238,8 @@ private fun ColumnScope.DirectScriptInput(
         maxLength = SCRIPT_MAX_LENGTH,
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),
+            .weight(1f, fill = false)
+            .heightIn(min = 122.dp),
         fillContainerHeight = true,
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))

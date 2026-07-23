@@ -85,7 +85,7 @@ private fun ActionSection(
     ) {
         Row(
             modifier = Modifier.align(Alignment.CenterEnd),
-            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V32),
+            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V20),
         ) {
             content()
         }
