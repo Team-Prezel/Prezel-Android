@@ -29,7 +29,8 @@
     <string name="feature_report_impl_label_speed">속도</string>
     <string name="feature_report_impl_label_speech">발화</string>
     <string name="feature_report_impl_label_script_match">대본 일치율</string>
-    <string name="feature_report_impl_label_total_errors">총 오류 수</string>
+    <string name="feature_report_impl_label_total_errors">오류</string>
+    <string name="feature_report_impl_total_error_count">%1$d개</string>
     <string name="feature_report_impl_speed_tooltip">SPM은 1분당 말하는 음절의 수에요.</string>
     <string name="feature_report_impl_speed_label_slow">느려요</string>
     <string name="feature_report_impl_speed_label_adequate">적당해요</string>

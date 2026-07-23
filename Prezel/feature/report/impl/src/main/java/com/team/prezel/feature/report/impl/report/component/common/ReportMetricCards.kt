@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -30,6 +31,7 @@ internal fun MetricResultCard(
 ) {
     PrezelTouchArea(
         modifier = modifier
+            .height(80.dp)
             .clip(shape = PrezelTheme.shapes.V8)
             .background(color = PrezelTheme.colors.bgMedium),
         shape = PrezelTheme.shapes.V8,
