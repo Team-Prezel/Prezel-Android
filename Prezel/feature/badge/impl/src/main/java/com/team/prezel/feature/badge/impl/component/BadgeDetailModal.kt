@@ -1,6 +1,5 @@
 package com.team.prezel.feature.badge.impl.component
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,48 +26,41 @@ import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.badge.impl.R
 import com.team.prezel.feature.badge.impl.model.BadgeDetailUiModel
-import com.team.prezel.feature.badge.impl.model.BadgeUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BadgeDetailModal(
-    badge: BadgeUiModel,
+internal fun BadgeDetailScreenContent(
     badgeDetail: BadgeDetailUiModel?,
-    onDismiss: () -> Unit,
+    onBack: () -> Unit,
     onImageLoadFailure: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onDismiss)
-
     Column(
         modifier = modifier
             .background(PrezelTheme.colors.bgRegular)
             .noRippleClickable { /* 클릭 이벤트 소비를 위함 */ },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PrezelTopAppBar(
-            title = "",
-        ) {
+        PrezelTopAppBar(title = null) {
             TrailingIcon(
                 iconResId = PrezelIcons.Cancel,
-                contentDescription = stringResource(R.string.feature_badge_impl_close),
-                onClick = onDismiss,
+                contentDescription = stringResource(R.string.feature_badge_impl_back),
+                onClick = onBack,
             )
         }
 
         Spacer(modifier = Modifier.weight(72f))
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            BadgeHeader(
-                badge = badge,
-                badgeDetail = badgeDetail,
-                onImageLoadFailure = onImageLoadFailure,
-            )
+        badgeDetail?.let { detail ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                BadgeHeader(
+                    badgeDetail = detail,
+                    onImageLoadFailure = onImageLoadFailure,
+                )
 
-            badgeDetail?.let { detail ->
                 Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
                 BadgeDetailDescription(
                     detail = detail,
@@ -83,8 +75,7 @@ internal fun BadgeDetailModal(
 
 @Composable
 private fun BadgeHeader(
-    badge: BadgeUiModel,
-    badgeDetail: BadgeDetailUiModel?,
+    badgeDetail: BadgeDetailUiModel,
     onImageLoadFailure: () -> Unit,
 ) {
     Column(
@@ -93,8 +84,8 @@ private fun BadgeHeader(
         verticalArrangement = Arrangement.Center,
     ) {
         BadgeDetailImage(
-            imageUrl = badge.imageUrl,
-            isUnlocked = badge.isUnlocked,
+            imageUrl = badgeDetail.imageUrl,
+            isUnlocked = badgeDetail.isUnlocked,
             onError = onImageLoadFailure,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -102,7 +93,7 @@ private fun BadgeHeader(
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 
         Text(
-            text = badge.badgeName,
+            text = badgeDetail.badgeName,
             style = PrezelTheme.typography.title1Bold,
             color = PrezelTheme.colors.textLarge,
             textAlign = TextAlign.Center,
@@ -110,9 +101,7 @@ private fun BadgeHeader(
 
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 
-        badgeDetail?.let { detail ->
-            BadgeDetailChip(badgeCondition = detail.conditionText)
-        }
+        BadgeDetailChip(badgeCondition = badgeDetail.conditionText)
     }
 }
 
@@ -146,12 +135,11 @@ private fun BadgeDetailDescription(
 
 @BasicPreview
 @Composable
-private fun BadgeDetailModalPreview() {
+private fun BadgeDetailScreenContentPreview() {
     PrezelTheme {
-        BadgeDetailModal(
-            badge = badgePreviewBadges().first(),
+        BadgeDetailScreenContent(
             badgeDetail = badgePreviewDetail(),
-            onDismiss = {},
+            onBack = {},
             onImageLoadFailure = {},
             modifier = Modifier.fillMaxSize(),
         )
