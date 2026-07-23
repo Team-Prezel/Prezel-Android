@@ -85,7 +85,7 @@ private fun ActionSection(
     ) {
         Row(
             modifier = Modifier.align(Alignment.CenterEnd),
-            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V32),
+            horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V24),
         ) {
             content()
         }
@@ -102,8 +102,8 @@ private fun PrezelDialogPreview() {
                 description = "Description",
                 onDismiss = {},
             ) {
-                Action(label = "Action2") {}
-                Action(label = "Action1", type = PrezelDialogScope.ActionType.GOOD) {}
+                Action(label = "취소") {}
+                Action(label = "탈퇴", type = PrezelDialogScope.ActionType.BAD) {}
             }
         }
     }

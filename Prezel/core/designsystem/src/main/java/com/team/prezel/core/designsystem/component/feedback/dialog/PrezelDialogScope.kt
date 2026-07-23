@@ -39,7 +39,10 @@ class PrezelDialogScope {
                 text = label,
                 style = PrezelTheme.typography.body2Medium,
                 color = labelColor,
-                modifier = Modifier.padding(vertical = PrezelTheme.spacing.V8),
+                modifier = Modifier.padding(
+                    vertical = PrezelTheme.spacing.V8,
+                    horizontal = PrezelTheme.spacing.V8,
+                ),
             )
         }
     }

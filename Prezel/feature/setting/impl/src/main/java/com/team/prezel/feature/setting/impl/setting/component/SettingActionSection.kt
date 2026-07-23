@@ -25,7 +25,7 @@ internal fun SettingActionSection(
                 modifier = modifier,
                 text = stringResource(R.string.feature_setting_impl_withdraw),
                 type = ButtonType.GHOST,
-                size = ButtonSize.XSMALL,
+                size = ButtonSize.SMALL,
                 hierarchy = ButtonHierarchy.SECONDARY,
                 onClick = onClickWithdraw,
             )
@@ -35,7 +35,7 @@ internal fun SettingActionSection(
                 modifier = modifier,
                 text = stringResource(R.string.feature_setting_impl_logout),
                 type = ButtonType.FILLED,
-                size = ButtonSize.SMALL,
+                size = ButtonSize.REGULAR,
                 hierarchy = ButtonHierarchy.SECONDARY,
                 onClick = onClickLogout,
             )

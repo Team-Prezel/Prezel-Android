@@ -67,7 +67,7 @@ private fun DeleteAccountReasonHeader(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
         Text(
             text = stringResource(R.string.feature_setting_impl_delete_account_reason_description),
-            style = PrezelTheme.typography.body3Regular,
+            style = PrezelTheme.typography.body2Regular,
             color = PrezelTheme.colors.textRegular,
         )
     }

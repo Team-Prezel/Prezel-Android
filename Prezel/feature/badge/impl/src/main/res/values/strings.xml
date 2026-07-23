@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_badge_impl_title">나의 뱃지</string>
     <string name="feature_badge_impl_back">뒤로가기</string>
     <string name="feature_badge_impl_close">닫기</string>
 

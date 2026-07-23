@@ -21,7 +21,7 @@ internal fun EntryProviderScope<NavKey>.featureMyEntryBuilder() {
         MyScreen(
             navigateToEditProfile = { navigator.navigate(ProfileNavKey.Edit) },
             navigateToSetting = { navigator.navigate(SettingNavKey) },
-            navigateToBadge = { navigator.navigate(BadgeNavKey) },
+            navigateToBadge = { badgeCode -> navigator.navigate(BadgeNavKey(badgeCode = badgeCode)) },
         )
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -114,7 +113,7 @@ private fun PrezelAppContent(
         isAuthenticated = appState.isAuthenticated,
         connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
         shouldShowNavigationBar = appState.shouldShowNavigationBar,
-        navigateToBadge = { navigator.navigate(BadgeNavKey) },
+        navigateToBadge = { badgeCode -> navigator.navigate(BadgeNavKey(badgeCode = badgeCode)) },
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -158,9 +157,9 @@ private fun AppNavigationContent(
             entries = appState.navigationState.toEntries(provider),
             onBack = navigator::goBack,
             modifier = Modifier.padding(padding),
-            transitionSpec = { defaultPrezelNavTransition() },
-            popTransitionSpec = { defaultPrezelNavTransition() },
-            predictivePopTransitionSpec = { _: Int -> defaultPrezelNavTransition() },
+            predictivePopTransitionSpec = {
+                ContentTransform(fadeIn(animationSpec = tween(700)), fadeOut(animationSpec = tween(700)))
+            },
         )
     }
 }
@@ -186,10 +185,6 @@ private fun AppDimmerOverlay(
         foregroundContent?.invoke(this)
     }
 }
-
-private fun defaultPrezelNavTransition(): ContentTransform =
-    fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-        fadeOut(animationSpec = tween(durationMillis = 100))
 
 @Composable
 private fun EdgeToEdgeStatusBarBackground(style: EdgeToEdgeStatusBarStyle) {
@@ -279,7 +274,7 @@ private fun ObserveBadgeEvents(
     isAuthenticated: Boolean,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     shouldShowNavigationBar: Boolean,
-    navigateToBadge: () -> Unit,
+    navigateToBadge: (String) -> Unit,
 ) {
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
@@ -290,6 +285,7 @@ private fun ObserveBadgeEvents(
 
         connectBadgeEventStreamUseCase()
             .collect { event ->
+                val badgeCode = event.badgeCode?.takeIf(String::isNotBlank)
                 val message =
                     event.message
                         ?.takeIf(String::isNotBlank)
@@ -303,8 +299,8 @@ private fun ObserveBadgeEvents(
                 snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showPrezelSnackbar(
                     message = message,
-                    actionLabel = resources.getString(R.string.app_badge_event_action),
-                    onAction = navigateToBadge,
+                    actionLabel = badgeCode?.let { resources.getString(R.string.app_badge_event_action) },
+                    onAction = badgeCode?.let { code -> { navigateToBadge(code) } },
                     useRaisedPosition = currentShouldShowNavigationBar,
                 )
             }

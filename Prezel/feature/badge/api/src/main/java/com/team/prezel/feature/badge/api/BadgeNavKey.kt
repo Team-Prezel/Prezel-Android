@@ -4,4 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object BadgeNavKey : NavKey
+data class BadgeNavKey(
+    val badgeCode: String,
+) : NavKey
