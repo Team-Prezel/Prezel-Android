@@ -43,9 +43,9 @@ internal fun ScriptCorrectionPopup(
                     backgroundColor = PrezelTheme.colors.bgRegular,
                     token = PrezelDropShadowDefaults.PrezelShadowToken(
                         offsetX = 0.dp,
-                        offsetY = 8.dp,
+                        offsetY = 0.dp,
                         blurRadius = popupRadius,
-                        spreadRadius = 0.dp,
+                        spreadRadius = 8.dp,
                         color = PrezelTheme.colors.solidBlack.copy(alpha = 0.12f),
                     ),
                 ),
