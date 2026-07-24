@@ -1,8 +1,9 @@
 package com.team.prezel.feature.report.impl.report.component.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,20 +40,20 @@ internal fun MetricResultCard(
     ) {
         Column(
             modifier = Modifier
-                .align(Alignment.TopStart)
+                .fillMaxHeight()
+                .align(Alignment.CenterStart)
                 .padding(
                     start = PrezelTheme.spacing.V12,
                     bottom = PrezelTheme.spacing.V12,
                     top = PrezelTheme.spacing.V14,
                 ),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = title,
                 style = PrezelTheme.typography.body3Regular,
                 color = PrezelTheme.colors.textRegular,
             )
-
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V2))
 
             Text(
                 text = value,
