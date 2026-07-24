@@ -29,6 +29,7 @@ import com.team.prezel.feature.report.impl.report.preview.ReportPreviewUpcomingU
 @Composable
 internal fun AnalysisReportScreen(
     onBack: () -> Unit,
+    showTopAppBar: Boolean,
     navigateToAnalysisScript: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToScriptAnalysis: (analysisResultId: Long) -> Unit,
@@ -88,6 +89,7 @@ internal fun AnalysisReportScreen(
     AnalysisReportScreen(
         uiState = uiState,
         onBackClick = onBack,
+        showTopAppBar = showTopAppBar,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
         onDialogDismiss = { viewModel.onIntent(AnalysisReportUiIntent.DismissDialog) },
@@ -106,6 +108,7 @@ internal fun AnalysisReportScreen(
 internal fun AnalysisReportScreen(
     uiState: AnalysisReportUiState,
     onBackClick: () -> Unit,
+    showTopAppBar: Boolean,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
     onDialogDismiss: () -> Unit,
@@ -123,6 +126,7 @@ internal fun AnalysisReportScreen(
             AnalysisReportScreenContent(
                 uiState = uiState,
                 onBackClick = onBackClick,
+                showTopAppBar = showTopAppBar,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
                 onImprovementCardIndexChange = onImprovementCardIndexChange,
@@ -145,6 +149,7 @@ internal fun AnalysisReportScreen(
 private fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState.Content,
     onBackClick: () -> Unit,
+    showTopAppBar: Boolean,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
     onDialogDismiss: () -> Unit,
@@ -167,6 +172,7 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
+        showTopAppBar = showTopAppBar,
         topAppBarContent = {
             LeadingIcon(
                 iconResId = PrezelIcons.ArrowLeft,
@@ -226,6 +232,7 @@ private fun UpcomingAnalysisReportScreenPreview() {
         AnalysisReportScreen(
             uiState = ReportPreviewUpcomingUiState,
             onBackClick = { },
+            showTopAppBar = false,
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
@@ -247,6 +254,7 @@ private fun PastAnalysisReportScreenPreview() {
         AnalysisReportScreen(
             uiState = ReportPreviewPastUiState,
             onBackClick = { },
+            showTopAppBar = true,
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
@@ -268,6 +276,7 @@ private fun AnalysisReportScreenLoadingPreview() {
         AnalysisReportScreen(
             uiState = AnalysisReportUiState.Loading,
             onBackClick = { },
+            showTopAppBar = false,
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
             onDialogDismiss = {},
