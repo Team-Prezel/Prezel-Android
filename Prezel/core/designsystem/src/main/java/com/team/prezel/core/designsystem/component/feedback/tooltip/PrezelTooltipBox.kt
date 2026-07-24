@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.preview.PreviewScaffold
 import com.team.prezel.core.designsystem.theme.PrezelColorScheme
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import kotlin.math.roundToInt
 
 @Composable
 fun PrezelTooltipBox(
@@ -87,8 +89,18 @@ fun PrezelTooltipBox(
 }
 
 @Composable
-private fun rememberBalloonBuilder(showArrow: Boolean): Balloon.Builder =
-    rememberBalloonBuilder {
+private fun rememberBalloonBuilder(showArrow: Boolean): Balloon.Builder {
+    val horizontalMarginDp = PrezelTheme.spacing.V20.value
+        .roundToInt()
+    val maxWidthDp = (LocalWindowInfo.current.containerSize.width - (horizontalMarginDp * 2)).coerceAtLeast(0)
+
+    return rememberBalloonBuilder(
+        key = Triple(
+            showArrow,
+            horizontalMarginDp,
+            maxWidthDp,
+        ),
+    ) {
         setIsVisibleArrow(showArrow)
         setArrowWidth(12)
         setArrowHeight(6)
@@ -101,7 +113,10 @@ private fun rememberBalloonBuilder(showArrow: Boolean): Balloon.Builder =
         setDismissWhenTouchOutside(false)
         setBalloonAnimation(BalloonAnimation.NONE)
         setBackgroundColor(PrezelColorScheme.Dark.bgMedium)
+        setMarginHorizontal(horizontalMarginDp)
+        if (maxWidthDp > 0) setMaxWidth(maxWidthDp)
     }
+}
 
 private fun Rect.intersects(other: Rect): Boolean = left < other.right && right > other.left && top < other.bottom && bottom > other.top
 
