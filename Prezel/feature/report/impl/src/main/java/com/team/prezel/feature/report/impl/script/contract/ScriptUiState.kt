@@ -10,6 +10,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Immutable
 internal data class ScriptUiState(
     val isLoading: Boolean = false,
+    val isSubmittingCorrection: Boolean = false,
     val originalScript: String = "",
     val currentScript: String = "",
     val selectedCorrectionId: Long? = null,
@@ -18,12 +19,12 @@ internal data class ScriptUiState(
 ) : UiState {
     val unappliedSpellingErrors: Int =
         scriptDetails.count { detail ->
-            detail.errorType == ScriptErrorType.SPELLING && !detail.isApplied
+            detail.errorType == ScriptErrorType.SPELLING
         }
 
     val unappliedGrammarErrors: Int =
         scriptDetails.count { detail ->
-            detail.errorType == ScriptErrorType.GRAMMAR && !detail.isApplied
+            detail.errorType == ScriptErrorType.GRAMMAR
         }
 
     val selectedCorrection: ScriptCorrectionUiModel? =
@@ -32,5 +33,5 @@ internal data class ScriptUiState(
         }
 
     val enabledAllCorrectionButton: Boolean =
-        unappliedGrammarErrors + unappliedSpellingErrors > 0
+        !isSubmittingCorrection && unappliedGrammarErrors + unappliedSpellingErrors > 0
 }

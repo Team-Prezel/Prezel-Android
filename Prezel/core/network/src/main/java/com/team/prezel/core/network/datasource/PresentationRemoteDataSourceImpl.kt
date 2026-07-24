@@ -93,13 +93,14 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         finalScript: String,
         correctedIndices: List<Int>,
     ): PresentationScriptDetailResponse =
-        presentationService.correctScript(
-            analysisResultId = analysisResultId,
-            request = ScriptCorrectionRequest(
-                finalScript = finalScript,
-                correctedIndices = correctedIndices,
-            ),
-        ).requireData()
+        presentationService
+            .correctScript(
+                analysisResultId = analysisResultId,
+                request = ScriptCorrectionRequest(
+                    finalScript = finalScript,
+                    correctedIndices = correctedIndices,
+                ),
+            ).requireData()
 
     override suspend fun getWordDetail(analysisResultId: Long): PresentationWordDetailResponse =
         presentationService.getWordDetail(analysisResultId = analysisResultId).requireData()

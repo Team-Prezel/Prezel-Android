@@ -5,6 +5,7 @@ import com.team.prezel.core.domain.usecase.presentation.DeletePresentationAnalys
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.report.api.ReportNavKey
+import com.team.prezel.feature.report.impl.refresh.ReportRefreshNotifier
 import com.team.prezel.feature.report.impl.report.contract.AnalysisReportUiEffect
 import com.team.prezel.feature.report.impl.report.contract.AnalysisReportUiIntent
 import com.team.prezel.feature.report.impl.report.contract.AnalysisReportUiState
@@ -22,6 +23,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     @Assisted navKey: ReportNavKey,
     private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
     private val deletePresentationAnalysisUseCase: DeletePresentationAnalysisUseCase,
+    private val reportRefreshNotifier: ReportRefreshNotifier,
 ) : BaseViewModel<AnalysisReportUiState, AnalysisReportUiIntent, AnalysisReportUiEffect>(AnalysisReportUiState.Loading) {
     @AssistedFactory
     interface Factory {
@@ -32,6 +34,16 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     private var presentationId: Long? = null
     private var analysisResultId: Long? = null
     private val isPast: Boolean = navKey.isPast
+
+    init {
+        viewModelScope.launch {
+            reportRefreshNotifier.events.collect { refreshedPresentationId ->
+                if (refreshedPresentationId == requestedPresentationId) {
+                    fetchData()
+                }
+            }
+        }
+    }
 
     override fun onIntent(intent: AnalysisReportUiIntent) {
         when (intent) {

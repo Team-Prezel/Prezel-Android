@@ -1,10 +1,12 @@
 package com.team.prezel.feature.report.impl.script
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.domain.usecase.presentation.CorrectPresentationScriptUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationScriptDetailUseCase
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
 import com.team.prezel.core.model.presentation.ScriptCorrection
 import com.team.prezel.core.ui.base.BaseViewModel
+import com.team.prezel.feature.report.impl.refresh.ReportRefreshNotifier
 import com.team.prezel.feature.report.impl.script.contract.ScriptUiEffect
 import com.team.prezel.feature.report.impl.script.contract.ScriptUiIntent
 import com.team.prezel.feature.report.impl.script.contract.ScriptUiState
@@ -22,6 +24,8 @@ import kotlinx.coroutines.launch
 internal class ScriptViewModel @AssistedInject constructor(
     @Assisted private val analysisResultId: Long,
     private val fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
+    private val correctPresentationScriptUseCase: CorrectPresentationScriptUseCase,
+    private val reportRefreshNotifier: ReportRefreshNotifier,
 ) : BaseViewModel<ScriptUiState, ScriptUiIntent, ScriptUiEffect>(ScriptUiState()) {
     @AssistedFactory
     interface Factory {
@@ -30,6 +34,9 @@ internal class ScriptViewModel @AssistedInject constructor(
         ): ScriptViewModel
     }
 
+    private var presentationId: Long? = null
+    private var hasScriptChanged: Boolean = false
+
     init {
         fetchData(analysisResultId = analysisResultId)
     }
@@ -37,6 +44,7 @@ internal class ScriptViewModel @AssistedInject constructor(
     override fun onIntent(intent: ScriptUiIntent) {
         when (intent) {
             ScriptUiIntent.ApplyAllCorrections -> applyAllCorrections()
+            ScriptUiIntent.ClickClose -> handleCloseClick()
             ScriptUiIntent.ClickCopy -> copyCurrentScriptToClipboard()
             ScriptUiIntent.DismissCorrectionPopup -> dismissCorrectionPopup()
 
@@ -55,6 +63,8 @@ internal class ScriptViewModel @AssistedInject constructor(
         correctionId: Long,
         popupY: Int,
     ) {
+        if (currentState.isSubmittingCorrection) return
+
         updateState {
             copy(
                 selectedCorrectionId = correctionId,
@@ -74,14 +84,8 @@ internal class ScriptViewModel @AssistedInject constructor(
             updateState { copy(isLoading = true) }
             fetchPresentationScriptDetailUseCase(analysisResultId = analysisResultId)
                 .onSuccess { detail ->
-                    updateState {
-                        copy(
-                            isLoading = false,
-                            originalScript = detail.originalScript,
-                            currentScript = detail.originalScript,
-                            scriptDetails = detail.toCorrectionUiModels(),
-                        )
-                    }
+                    updateDetail(detail = detail)
+                    updateState { copy(isLoading = false) }
                 }.onFailure {
                     updateState { copy(isLoading = false) }
                     sendEffect(ScriptUiEffect.ShowMessage(ScriptUiMessage.FETCH_SCRIPT_DETAIL_FAILED))
@@ -91,45 +95,32 @@ internal class ScriptViewModel @AssistedInject constructor(
     }
 
     private fun applyCorrection(correctionId: Long) {
-        val updatedCorrections = currentState.scriptDetails
-            .map { correction ->
-                if (correction.id != correctionId) return@map correction
-                if (correction.isApplied) return@map correction
+        if (currentState.isSubmittingCorrection) return
 
-                correction.copy(isApplied = true)
-            }.toImmutableList()
+        val targetCorrection = currentState.scriptDetails.firstOrNull { correction ->
+            correction.id == correctionId
+        } ?: return
 
-        val updatedScript = rebuildScript(
-            originalScript = currentState.originalScript,
-            corrections = updatedCorrections,
+        submitCorrection(
+            correctedIndices = listOf(targetCorrection.id.toInt()),
+            finalScript = rebuildScript(
+                originalScript = currentState.originalScript,
+                corrections = listOf(targetCorrection),
+            ),
         )
-
-        updateState {
-            copy(
-                currentScript = updatedScript,
-                scriptDetails = updatedCorrections,
-                selectedCorrectionId = null,
-            )
-        }
     }
 
     private fun applyAllCorrections() {
-        val updatedCorrections = currentState.scriptDetails
-            .map { correction ->
-                correction.copy(isApplied = true)
-            }.toImmutableList()
+        if (currentState.isSubmittingCorrection) return
+        if (currentState.scriptDetails.isEmpty()) return
 
-        val updatedScript = rebuildScript(
-            originalScript = currentState.originalScript,
-            corrections = updatedCorrections,
+        submitCorrection(
+            correctedIndices = currentState.scriptDetails.map { correction -> correction.id.toInt() },
+            finalScript = rebuildScript(
+                originalScript = currentState.originalScript,
+                corrections = currentState.scriptDetails,
+            ),
         )
-
-        updateState {
-            copy(
-                currentScript = updatedScript,
-                scriptDetails = updatedCorrections,
-            )
-        }
     }
 
     private fun copyCurrentScriptToClipboard() {
@@ -142,18 +133,56 @@ internal class ScriptViewModel @AssistedInject constructor(
         }
     }
 
+    private fun handleCloseClick() {
+        if (currentState.isSubmittingCorrection) return
+
+        if (hasScriptChanged) {
+            presentationId?.let(reportRefreshNotifier::requestRefresh)
+        }
+
+        viewModelScope.launch {
+            sendEffect(ScriptUiEffect.NavigateToBack)
+        }
+    }
+
+    private fun submitCorrection(
+        correctedIndices: List<Int>,
+        finalScript: String,
+    ) {
+        viewModelScope.launch {
+            updateState {
+                copy(
+                    isSubmittingCorrection = true,
+                    selectedCorrectionId = null,
+                    currentScript = finalScript,
+                )
+            }
+
+            correctPresentationScriptUseCase(
+                analysisResultId = analysisResultId,
+                finalScript = finalScript,
+                correctedIndices = correctedIndices,
+            ).onSuccess { detail ->
+                hasScriptChanged = true
+                updateDetail(detail = detail)
+                updateState { copy(isSubmittingCorrection = false) }
+            }.onFailure {
+                updateState { copy(isSubmittingCorrection = false, currentScript = originalScript) }
+                sendEffect(ScriptUiEffect.ShowMessage(ScriptUiMessage.CORRECT_SCRIPT_FAILED))
+            }
+        }
+    }
+
     private fun rebuildScript(
         originalScript: String,
         corrections: List<ScriptCorrectionUiModel>,
     ): String {
-        val appliedCorrections = corrections
-            .filter { correction -> correction.isApplied }
-            .sortedBy { correction -> correction.originalRange.first }
+        val sortedCorrections = corrections.sortedBy { correction -> correction.originalRange.first }
 
         val builder = StringBuilder(originalScript)
         var offset = 0
 
-        appliedCorrections.forEach { correction ->
+        sortedCorrections.forEach { correction ->
             val startIndex = correction.originalRange.first + offset
             val endIndex = correction.originalRange.last + 1 + offset
 
@@ -167,6 +196,18 @@ internal class ScriptViewModel @AssistedInject constructor(
         }
 
         return builder.toString()
+    }
+
+    private fun updateDetail(detail: PresentationScriptDetail) {
+        presentationId = detail.presentationId
+        updateState {
+            copy(
+                originalScript = detail.originalScript,
+                currentScript = detail.originalScript,
+                scriptDetails = detail.toCorrectionUiModels(),
+                selectedCorrectionId = null,
+            )
+        }
     }
 }
 

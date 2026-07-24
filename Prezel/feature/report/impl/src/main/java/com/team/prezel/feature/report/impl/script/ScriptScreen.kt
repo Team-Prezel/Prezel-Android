@@ -67,7 +67,7 @@ internal fun ScriptScreen(
 
     ScriptScreen(
         uiState = uiState,
-        onClose = onClose,
+        onClose = { viewModel.onIntent(ScriptUiIntent.ClickClose) },
         onClickCopy = { viewModel.onIntent(ScriptUiIntent.ClickCopy) },
         onClickCorrection = { correctionId, popupY ->
             viewModel.onIntent(ScriptUiIntent.ClickCorrection(correctionId = correctionId, popupY = popupY))
@@ -114,6 +114,7 @@ internal fun ScriptScreen(
 private val ScriptUiMessage.resId: Int
     get() = when (this) {
         ScriptUiMessage.FETCH_SCRIPT_DETAIL_FAILED -> R.string.feature_report_impl_fetch_script_detail_failed
+        ScriptUiMessage.CORRECT_SCRIPT_FAILED -> R.string.feature_report_impl_correct_script_failed
     }
 
 @Composable
@@ -138,6 +139,7 @@ private fun ScriptScreenContent(
             ScriptTextContent(
                 script = uiState.currentScript,
                 corrections = uiState.scriptDetails,
+                isCorrectionClickable = !uiState.isSubmittingCorrection,
                 onClickCorrection = onClickCorrection,
                 modifier = Modifier
                     .padding(horizontal = PrezelTheme.spacing.V20)
@@ -151,6 +153,7 @@ private fun ScriptScreenContent(
             )
             ScriptActionBar(
                 isApplyAllEnabled = uiState.enabledAllCorrectionButton,
+                isCopyEnabled = !uiState.isSubmittingCorrection,
                 onCopyClick = onClickCopy,
                 onApplyAllClick = onApplyAllCorrections,
             )
@@ -176,6 +179,7 @@ private fun ScriptCorrectionPopup(
         ) {
             ScriptCorrectionPopup(
                 correction = correction,
+                isApplyEnabled = !uiState.isSubmittingCorrection,
                 onDismiss = onDismissCorrectionPopup,
                 onApplyCorrection = { onApplyCorrection(correction.id) },
             )

@@ -10,5 +10,4 @@ data class ScriptCorrectionUiModel(
     val correctedText: String,
     val reason: String,
     val originalRange: IntRange,
-    val isApplied: Boolean = false,
 )
