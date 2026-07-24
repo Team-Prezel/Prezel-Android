@@ -1,5 +1,6 @@
 package com.team.prezel.feature.login.impl
 
+import android.os.SystemClock
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExitTransition
@@ -41,6 +42,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.login.api.AUTH_LOGO_SHARED_ELEMENT_KEY
 import com.team.prezel.feature.login.impl.contract.LoginUiEffect
 import com.team.prezel.feature.login.impl.contract.LoginUiIntent
@@ -50,6 +52,7 @@ import com.team.prezel.core.designsystem.R as DSR
 
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DURATION = 300
 private const val AUTH_SHARED_ELEMENT_TRANSITION_DELAY = 400
+private const val AUTH_ADMIN_DOUBLE_TAP_TIMEOUT_MILLIS = 500L
 
 @Composable
 internal fun SharedTransitionScope.LoginScreen(
@@ -93,7 +96,9 @@ internal fun SharedTransitionScope.LoginScreen(
     LoginScreen(
         uiState = uiState,
         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-        onLogin = { viewModel.onIntent(LoginUiIntent.OnClickLogin) },
+        onLogin = {
+            viewModel.onIntent(if (it) LoginUiIntent.OnClickLoginAdmin else LoginUiIntent.OnClickLogin)
+        },
         modifier = modifier,
     )
 }
@@ -102,9 +107,11 @@ internal fun SharedTransitionScope.LoginScreen(
 private fun SharedTransitionScope.LoginScreen(
     uiState: LoginUiState,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    onLogin: () -> Unit,
+    onLogin: (isAdmin: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var lastLogoTapAtMillis by remember { mutableStateOf(0L) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -113,12 +120,24 @@ private fun SharedTransitionScope.LoginScreen(
     ) {
         LogoImage(
             animatedVisibilityScope = animatedVisibilityScope,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .noRippleClickable {
+                    if (uiState.isLoading) return@noRippleClickable
+
+                    val tapMillis = SystemClock.elapsedRealtime()
+                    if (tapMillis - lastLogoTapAtMillis <= AUTH_ADMIN_DOUBLE_TAP_TIMEOUT_MILLIS) {
+                        onLogin(true)
+                        lastLogoTapAtMillis = 0L
+                    } else {
+                        lastLogoTapAtMillis = tapMillis
+                    }
+                },
         )
 
         LoginFooter(
             enabled = !uiState.isLoading,
-            onLogin = onLogin,
+            onLogin = { onLogin(false) },
         )
     }
 }

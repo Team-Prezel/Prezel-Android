@@ -9,6 +9,8 @@ interface AuthRepository {
 
     suspend fun login(idToken: String): Result<Unit>
 
+    suspend fun loginAdmin(): Result<Unit>
+
     suspend fun clearSession(): Result<Unit>
 
     suspend fun withdraw(reason: WithdrawReason): Result<Unit>

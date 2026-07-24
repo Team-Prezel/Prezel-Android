@@ -9,4 +9,6 @@ internal sealed interface LoginUiIntent : UiIntent {
     data class OnLoginResult(
         val result: AuthResult,
     ) : LoginUiIntent
+
+    data object OnClickLoginAdmin : LoginUiIntent // 임시 로직임
 }

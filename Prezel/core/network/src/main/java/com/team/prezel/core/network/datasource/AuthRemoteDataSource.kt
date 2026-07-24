@@ -8,6 +8,8 @@ interface AuthRemoteDataSource {
 
     suspend fun login(idToken: String): LoginResponse
 
+    suspend fun loginAdmin(): LoginResponse
+
     suspend fun reissue(refreshToken: String): ReissueResponse
 
     suspend fun withdraw(

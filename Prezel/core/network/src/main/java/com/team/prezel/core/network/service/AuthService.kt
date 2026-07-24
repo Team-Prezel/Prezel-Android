@@ -9,6 +9,7 @@ import com.team.prezel.core.network.model.auth.reissue.ReissueRequest
 import com.team.prezel.core.network.model.auth.reissue.ReissueResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
+import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Tag
 
@@ -19,6 +20,11 @@ internal interface AuthService {
     @POST("auth/login")
     suspend fun login(
         @Body request: LoginRequest,
+        @Tag(AuthRequestAttributes.SKIP_AUTH) skipAuth: Boolean = true,
+    ): BaseResponse<LoginResponse>
+
+    @GET("admin/login")
+    suspend fun loginAdmin(
         @Tag(AuthRequestAttributes.SKIP_AUTH) skipAuth: Boolean = true,
     ): BaseResponse<LoginResponse>
 
