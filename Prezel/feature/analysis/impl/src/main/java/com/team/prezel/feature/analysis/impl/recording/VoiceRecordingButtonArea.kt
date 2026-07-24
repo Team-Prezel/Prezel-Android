@@ -67,6 +67,8 @@ private fun IdleRecordingButtonArea(
 ) {
     PrezelButtonArea(
         modifier = modifier,
+        showBackground = true,
+        showDivider = false,
         mainButton = { buttonModifier ->
             RecordingIconButton(
                 iconResId = recordingState.actionIconResId,
