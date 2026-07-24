@@ -15,7 +15,6 @@ internal data class VoiceRecordingChromeUi(
     @param:StringRes val titleResId: Int? = null,
     val status: VoiceChromeStatus? = null,
     val gradient: VoiceChromeGradient? = null,
-    val hideWaveform: Boolean = false,
 )
 
 internal val AudioSessionState.currentSeconds: Int

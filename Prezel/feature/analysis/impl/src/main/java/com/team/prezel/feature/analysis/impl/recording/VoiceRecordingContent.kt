@@ -279,14 +279,10 @@ private fun RecordingWaveform(
     modifier: Modifier = Modifier,
 ) {
     val playbackProgress = recordingState.playbackProgress()
-    val visibleVolumes = if (voiceChromeUi?.hideWaveform == true) {
-        persistentListOf()
-    } else {
-        recordingState.visibleRecordingVolumes(
-            recordingVolumes = recordingVolumes,
-            playbackProgress = playbackProgress,
-        )
-    }
+    val visibleVolumes = recordingState.visibleRecordingVolumes(
+        recordingVolumes = recordingVolumes,
+        playbackProgress = playbackProgress,
+    )
 
     PrezelVoiceChromeWave(
         status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
