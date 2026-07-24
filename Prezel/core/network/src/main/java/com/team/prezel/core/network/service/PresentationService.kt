@@ -9,10 +9,12 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.ScriptCorrectionRequest
 import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -32,6 +34,12 @@ interface PresentationService {
     @GET("recording/analyze/{analysisResultId}/scripts")
     suspend fun getScriptDetail(
         @Path("analysisResultId") analysisResultId: Long,
+    ): BaseResponse<PresentationScriptDetailResponse>
+
+    @PATCH("recording/analyze/{analysisResultId}/scripts/correct")
+    suspend fun correctScript(
+        @Path("analysisResultId") analysisResultId: Long,
+        @Body request: ScriptCorrectionRequest,
     ): BaseResponse<PresentationScriptDetailResponse>
 
     @GET("recording/analyze/{analysisResultId}/words")

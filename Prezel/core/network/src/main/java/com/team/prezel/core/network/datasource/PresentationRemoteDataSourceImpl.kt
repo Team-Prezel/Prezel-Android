@@ -8,6 +8,7 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.ScriptCorrectionRequest
 import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.model.requireSuccess
@@ -86,6 +87,19 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse =
         presentationService.getScriptDetail(analysisResultId = analysisResultId).requireData()
+
+    override suspend fun correctScript(
+        analysisResultId: Long,
+        finalScript: String,
+        correctedIndices: List<Int>,
+    ): PresentationScriptDetailResponse =
+        presentationService.correctScript(
+            analysisResultId = analysisResultId,
+            request = ScriptCorrectionRequest(
+                finalScript = finalScript,
+                correctedIndices = correctedIndices,
+            ),
+        ).requireData()
 
     override suspend fun getWordDetail(analysisResultId: Long): PresentationWordDetailResponse =
         presentationService.getWordDetail(analysisResultId = analysisResultId).requireData()

@@ -34,6 +34,12 @@ interface PresentationRepository {
 
     suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail>
 
+    suspend fun correctScript(
+        analysisResultId: Long,
+        finalScript: String,
+        correctedIndices: List<Int>,
+    ): Result<PresentationScriptDetail>
+
     suspend fun fetchWordDetail(analysisResultId: Long): Result<PresentationWordDetail>
 
     suspend fun deleteAnalysis(analysisResultId: Long): Result<Unit>
