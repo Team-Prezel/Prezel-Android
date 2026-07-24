@@ -133,7 +133,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     private fun navigateToSpeechAccuracy() {
         if (contentState?.accuracyScore == null) {
             viewModelScope.launch {
-                sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE))
+                sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE))
             }
             return
         }
@@ -144,7 +144,7 @@ internal class AnalysisReportViewModel @AssistedInject constructor(
     private fun navigateToScriptMatch() {
         if (contentState?.scriptMatchRate == null) {
             viewModelScope.launch {
-                sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.SPEECH_ANALYSIS_UNAVAILABLE))
+                sendEffect(AnalysisReportUiEffect.ShowMessage(AnalysisReportUiMessage.SCRIPT_MATCH_ANALYSIS_UNAVAILABLE))
             }
             return
         }
