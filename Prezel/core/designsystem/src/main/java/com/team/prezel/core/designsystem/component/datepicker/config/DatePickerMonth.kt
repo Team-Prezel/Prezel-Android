@@ -122,9 +122,9 @@ private fun DatePickerMonthPreview() {
         description = "DatePicker에 사용되는 리소스입니다.",
     ) {
         DatePickerMonth(
-            yearMonth = YearMonth(year = 2026, month = 2),
-            selectedDate = LocalDate(year = 2026, month = 2, day = 28),
-            today = LocalDate(year = 2026, month = 2, day = 18),
+            yearMonth = YearMonth(year = 2026, month = 8),
+            selectedDate = LocalDate(year = 2026, month = 8, day = 7),
+            today = LocalDate(year = 2026, month = 8, day = 1),
             onSelect = {},
             config = DatePickerDefaults.default(),
         )

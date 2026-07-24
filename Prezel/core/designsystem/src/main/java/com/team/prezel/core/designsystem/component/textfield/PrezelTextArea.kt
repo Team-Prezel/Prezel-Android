@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldLabel
 import com.team.prezel.core.designsystem.component.textfield.component.PrezelTextFieldPlaceholder
@@ -48,6 +49,7 @@ fun PrezelTextArea(
     status: PrezelTextFieldStatus = PrezelTextFieldStatus.DEFAULT,
     enabled: Boolean = true,
     showCount: Boolean = false,
+    minHeight: Dp = 72.dp,
     fillContainerHeight: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -85,6 +87,7 @@ fun PrezelTextArea(
         label = label,
         enabled = enabled,
         showCount = showCount,
+        minHeight = minHeight,
         fillContainerHeight = fillContainerHeight,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -103,6 +106,7 @@ private fun PrezelTextArea(
     label: String?,
     enabled: Boolean,
     showCount: Boolean,
+    minHeight: Dp = 72.dp,
     fillContainerHeight: Boolean,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
@@ -124,7 +128,7 @@ private fun PrezelTextArea(
                     if (fillContainerHeight) {
                         Modifier.weight(1f)
                     } else {
-                        Modifier.heightIn(min = 72.dp)
+                        Modifier.heightIn(min = minHeight)
                     },
                 ).onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
             textStyle = PrezelTheme.typography.body2Regular.copy(color = style.textColor()),
@@ -143,7 +147,7 @@ private fun PrezelTextArea(
                             Counter(currentLength = value.text.length, maxLength = maxLength, state = style)
                         }
                     },
-                    modifier = if (fillContainerHeight) Modifier.fillMaxHeight() else Modifier.heightIn(min = 72.dp),
+                    modifier = if (fillContainerHeight) Modifier.fillMaxHeight() else Modifier.heightIn(min = minHeight),
                     fillContainerHeight = fillContainerHeight,
                 )
             },

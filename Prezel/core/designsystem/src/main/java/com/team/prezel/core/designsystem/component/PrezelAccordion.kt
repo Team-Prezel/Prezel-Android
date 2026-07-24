@@ -2,7 +2,6 @@ package com.team.prezel.core.designsystem.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -108,17 +107,12 @@ fun PrezelAccordion(
 
 @Composable
 private fun PrezelAccordionChevron(expanded: Boolean) {
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-        label = "accordionChevronRotation",
-    )
-
     Icon(
         painter = painterResource(PrezelIcons.ChevronDown),
         contentDescription = stringResource(R.string.core_designsystem_accordion_desc),
         modifier = Modifier
             .size(24.dp)
-            .rotate(rotation),
+            .rotate(if (expanded) 180f else 0f),
         tint = PrezelTheme.colors.iconRegular,
     )
 }

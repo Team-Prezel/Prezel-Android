@@ -19,7 +19,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
-import com.team.prezel.core.designsystem.component.navigations.PrezelTabSize
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -133,7 +132,6 @@ private fun HistoryContent(
     PrezelTabsPager(
         tabs = tabs,
         pagerState = pagerState,
-        size = PrezelTabSize.SMALL,
         modifier = Modifier
             .fillMaxSize()
             .background(PrezelTheme.colors.bgRegular),

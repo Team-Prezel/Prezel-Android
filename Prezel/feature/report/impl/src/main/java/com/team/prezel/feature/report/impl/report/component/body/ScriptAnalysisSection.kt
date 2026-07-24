@@ -150,7 +150,7 @@ private fun RowScope.TotalErrorCard(
     Box(modifier = modifier.weight(1f)) {
         MetricResultCard(
             title = stringResource(R.string.feature_report_impl_label_total_errors),
-            value = totalErrorCount.toString(),
+            value = stringResource(R.string.feature_report_impl_total_error_count, totalErrorCount),
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
         )

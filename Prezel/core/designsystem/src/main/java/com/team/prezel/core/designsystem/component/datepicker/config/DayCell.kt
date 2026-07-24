@@ -28,7 +28,7 @@ internal fun DayCell(
         enabled = dayCell != null && dayCell !is DayCellType.Past,
         modifier = modifier
             .aspectRatio(1f)
-            .padding(PrezelTheme.spacing.V4)
+            .padding(PrezelTheme.spacing.V8)
             .clip(PrezelTheme.shapes.V1000)
             .background(color = config.dayContainerColor(dayCell = dayCell)),
         isUseRipple = false,
@@ -52,7 +52,7 @@ private fun DayCellPreview() {
         description = "DatePicker에 사용되는 리소스입니다.",
     ) {
         PreviewValueRow(name = "Default") {
-            Box(modifier = Modifier.size(50.dp)) {
+            Box(modifier = Modifier.size(44.dp)) {
                 DayCell(
                     dayCell = DayCellType.Default(LocalDate(year = 2026, month = 2, day = 26), isSelected = false),
                     config = DatePickerDefaults.default(),
@@ -62,7 +62,7 @@ private fun DayCellPreview() {
         }
 
         PreviewValueRow(name = "Past") {
-            Box(modifier = Modifier.size(50.dp)) {
+            Box(modifier = Modifier.size(44.dp)) {
                 DayCell(
                     dayCell = DayCellType.Past(LocalDate(year = 2026, month = 2, day = 26), isSelected = false),
                     config = DatePickerDefaults.default(),
@@ -72,7 +72,7 @@ private fun DayCellPreview() {
         }
 
         PreviewValueRow(name = "Today") {
-            Box(modifier = Modifier.size(50.dp)) {
+            Box(modifier = Modifier.size(44.dp)) {
                 DayCell(
                     dayCell = DayCellType.Today(LocalDate(year = 2026, month = 2, day = 26), isSelected = false),
                     config = DatePickerDefaults.default(),
@@ -82,7 +82,7 @@ private fun DayCellPreview() {
         }
 
         PreviewValueRow(name = "Holiday") {
-            Box(modifier = Modifier.size(50.dp)) {
+            Box(modifier = Modifier.size(44.dp)) {
                 DayCell(
                     dayCell = DayCellType.Holiday(LocalDate(year = 2026, month = 2, day = 26), isSelected = false),
                     config = DatePickerDefaults.default(),
@@ -92,7 +92,7 @@ private fun DayCellPreview() {
         }
 
         PreviewValueRow(name = "Selected") {
-            Box(modifier = Modifier.size(50.dp)) {
+            Box(modifier = Modifier.size(44.dp)) {
                 DayCell(
                     dayCell = DayCellType.Default(LocalDate(year = 2026, month = 2, day = 26), isSelected = true),
                     config = DatePickerDefaults.default(),

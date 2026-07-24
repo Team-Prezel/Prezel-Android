@@ -29,7 +29,20 @@ internal sealed interface DayCellType {
         override val isSelected: Boolean,
     ) : DayCellType {
         companion object {
-            fun isHoliday(date: LocalDate): Boolean = date.dayOfWeek == DayOfWeek.SUNDAY
+            private val holidays =
+                setOf(
+                    LocalDate(year = 2026, month = 8, day = 15),
+                    LocalDate(year = 2026, month = 8, day = 17),
+                    LocalDate(year = 2026, month = 9, day = 24),
+                    LocalDate(year = 2026, month = 9, day = 25),
+                    LocalDate(year = 2026, month = 9, day = 26),
+                    LocalDate(year = 2026, month = 10, day = 3),
+                    LocalDate(year = 2026, month = 10, day = 5),
+                    LocalDate(year = 2026, month = 10, day = 9),
+                    LocalDate(year = 2026, month = 12, day = 25),
+                )
+
+            fun isHoliday(date: LocalDate): Boolean = date.dayOfWeek == DayOfWeek.SUNDAY || date in holidays
         }
     }
 

@@ -157,7 +157,7 @@ private fun ScriptInputScreen(
         isHiddenOptions = isHiddenOptions,
         trailingText = stringResource(R.string.feature_analysis_impl_skip),
         onTrailingTextClick = onSkip,
-        contentScrollable = false,
+        contentScrollable = form.scriptInputType == ScriptInputType.DIRECT_INPUT,
     ) {
         AnalysisStepTitle(
             title = stringResource(R.string.feature_analysis_impl_script_headline),
@@ -226,7 +226,7 @@ private fun ColumnScope.ScriptInputContent(
 }
 
 @Composable
-private fun ColumnScope.DirectScriptInput(
+private fun DirectScriptInput(
     script: String,
     onScriptChange: (String) -> Unit,
 ) {
@@ -235,10 +235,8 @@ private fun ColumnScope.DirectScriptInput(
         onValueChange = onScriptChange,
         placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
         maxLength = SCRIPT_MAX_LENGTH,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
-        fillContainerHeight = true,
+        minHeight = 122.dp,
+        modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 }
@@ -371,7 +369,7 @@ private fun EmptyScriptUploadContent(
                 text = stringResource(R.string.feature_analysis_impl_script_upload_button),
                 iconResId = PrezelIcons.Plus,
                 type = ButtonType.OUTLINED,
-                size = ButtonSize.REGULAR,
+                size = ButtonSize.SMALL,
                 isRounded = true,
                 onClick = onClick,
             )

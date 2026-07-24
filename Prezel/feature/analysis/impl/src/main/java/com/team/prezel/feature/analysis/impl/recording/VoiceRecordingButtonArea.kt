@@ -26,7 +26,7 @@ import com.team.prezel.feature.analysis.impl.R
 internal fun VoiceRecordingButtonArea(
     recordingState: AudioSessionState,
     analyzeEnabled: Boolean,
-    showDivider: Boolean,
+    modifier: Modifier = Modifier,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
     onResetRecording: () -> Unit,
@@ -35,7 +35,7 @@ internal fun VoiceRecordingButtonArea(
     when (recordingState) {
         AudioSessionState.Idle -> IdleRecordingButtonArea(
             recordingState = recordingState,
-            showDivider = showDivider,
+            modifier = modifier,
             onClickRecordingControl = onClickRecordingControl,
         )
 
@@ -43,7 +43,7 @@ internal fun VoiceRecordingButtonArea(
         is AudioSessionState.PausedRecording,
         -> ActiveRecordingButtonArea(
             recordingState = recordingState,
-            showDivider = showDivider,
+            modifier = modifier,
             onClickRecordingControl = onClickRecordingControl,
             onStopRecording = onStopRecording,
         )
@@ -52,7 +52,7 @@ internal fun VoiceRecordingButtonArea(
         is AudioSessionState.Playing,
         -> CompletedRecordingButtonArea(
             analyzeEnabled = analyzeEnabled,
-            showDivider = showDivider,
+            modifier = modifier,
             onResetRecording = onResetRecording,
             onAnalyze = onAnalyze,
         )
@@ -62,11 +62,11 @@ internal fun VoiceRecordingButtonArea(
 @Composable
 private fun IdleRecordingButtonArea(
     recordingState: AudioSessionState,
-    showDivider: Boolean,
+    modifier: Modifier,
     onClickRecordingControl: () -> Unit,
 ) {
     PrezelButtonArea(
-        showBackground = showDivider,
+        modifier = modifier,
         mainButton = { buttonModifier ->
             RecordingIconButton(
                 iconResId = recordingState.actionIconResId,
@@ -81,12 +81,12 @@ private fun IdleRecordingButtonArea(
 @Composable
 private fun ActiveRecordingButtonArea(
     recordingState: AudioSessionState,
-    showDivider: Boolean,
+    modifier: Modifier,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
 ) {
     PrezelButtonArea(
-        showBackground = showDivider,
+        modifier = modifier,
         isVertical = false,
         isStrongStrength = false,
         mainButton = { buttonModifier ->
@@ -111,12 +111,12 @@ private fun ActiveRecordingButtonArea(
 @Composable
 private fun CompletedRecordingButtonArea(
     analyzeEnabled: Boolean,
-    showDivider: Boolean,
+    modifier: Modifier,
     onResetRecording: () -> Unit,
     onAnalyze: () -> Unit,
 ) {
     PrezelButtonArea(
-        showBackground = showDivider,
+        modifier = modifier,
         isVertical = false,
         mainButton = { buttonModifier ->
             PrezelButton(
@@ -132,7 +132,7 @@ private fun CompletedRecordingButtonArea(
             RecordingResetButton(
                 iconResId = PrezelIcons.Reset,
                 iconColor = PrezelTheme.colors.iconRegular,
-                modifier = buttonModifier.width(52.dp),
+                modifier = buttonModifier.width(80.dp),
                 onClick = onResetRecording,
             )
         },
@@ -183,7 +183,7 @@ private fun RecordingIconButton(
             isRounded = false,
             contentColor = iconColor,
             backgroundColor = PrezelTheme.colors.bgLarge,
-            iconSize = 20.dp,
+            iconSize = 24.dp,
         ),
         onClick = onClick,
     )

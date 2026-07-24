@@ -117,8 +117,10 @@ fun FileUploader(
                 color = PrezelTheme.colors.borderRegular,
                 shape = PrezelTheme.shapes.V8,
             ).padding(
-                horizontal = PrezelTheme.spacing.V16,
-                vertical = PrezelTheme.spacing.V12,
+                start = PrezelTheme.spacing.V16,
+                end = PrezelTheme.spacing.V16,
+                top = PrezelTheme.spacing.V12,
+                bottom = PrezelTheme.spacing.V12,
             ),
         horizontalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V12),
         verticalAlignment = Alignment.CenterVertically,
