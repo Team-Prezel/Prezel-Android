@@ -5,6 +5,7 @@
     <string name="feature_analysis_impl_schedule_description">발표 이름과 날짜를 입력해주세요.</string>
     <string name="feature_analysis_impl_presentation_name_label">발표 이름</string>
     <string name="feature_analysis_impl_presentation_name_placeholder">발표의 이름을 설정해주세요</string>
+    <string name="feature_analysis_impl_presentation_name_helper">2자부터 10자 이내로 입력해주세요</string>
     <string name="feature_analysis_impl_presentation_date_label">발표 날짜</string>
     <string name="feature_analysis_impl_presentation_date_placeholder">발표하는 날짜를 알려주세요</string>
 
