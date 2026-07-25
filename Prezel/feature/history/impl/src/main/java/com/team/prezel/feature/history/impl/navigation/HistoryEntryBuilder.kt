@@ -6,6 +6,7 @@ import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
 import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.history.impl.HistoryScreen
+import com.team.prezel.feature.report.api.ReportEntrySource
 import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,7 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
                     ReportNavKey(
                         presentationId = presentationId,
                         isPast = isPast,
+                        entrySource = ReportEntrySource.HISTORY,
                     ),
                 )
             },
