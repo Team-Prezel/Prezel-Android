@@ -1,8 +1,14 @@
 package com.team.prezel.feature.report.impl.report.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,15 +18,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.team.prezel.core.designsystem.component.PrezelTopAppBar
 import com.team.prezel.core.designsystem.component.PrezelTopAppBarScope
 import com.team.prezel.core.designsystem.preview.BasicPreview
@@ -35,6 +47,9 @@ private data class ReportTopBarState(
         get() = headerTitleBottom <= appBarHeight
 }
 
+private const val TOP_APPBAR_VISIBILITY_SCROLL_THRESHOLD = 48
+private val DefaultTopAppBarHeight = 56.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ReportScreenLayout(
@@ -46,21 +61,36 @@ internal fun ReportScreenLayout(
 ) {
     val scrollState = rememberScrollState()
     val (topBarState, updateAppBarHeight, updateHeaderTitleBottom) = rememberReportTopBarState()
+    val isTopAppBarVisible = rememberTopAppBarVisibility(scrollState)
+    val density = LocalDensity.current
+    val contentTopPadding = with(density) {
+        topBarState.appBarHeight.takeIf { it > 0f }?.toDp() ?: DefaultTopAppBarHeight
+    }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        ReportDetailTopAppBar(
-            appBarTitle = appBarTitle,
-            topBarState = topBarState,
-            onAppBarMeasured = updateAppBarHeight,
-            content = topAppBarContent,
-        )
-
+    Box(modifier = modifier.fillMaxSize()) {
         ReportDetailScrollContent(
             scrollState = scrollState,
+            topPadding = contentTopPadding,
             onHeaderMeasured = updateHeaderTitleBottom,
             headerContent = headerContent,
             bodyContent = bodyContent,
         )
+
+        AnimatedVisibility(
+            visible = isTopAppBarVisible,
+            enter = slideInVertically(initialOffsetY = { -it / 2 }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it / 2 }) + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .zIndex(1f),
+        ) {
+            ReportDetailTopAppBar(
+                appBarTitle = appBarTitle,
+                topBarState = topBarState,
+                onAppBarMeasured = updateAppBarHeight,
+                content = topAppBarContent,
+            )
+        }
     }
 }
 
@@ -82,6 +112,47 @@ private fun rememberReportTopBarState(): Triple<ReportTopBarState, (Float) -> Un
         { measuredHeight -> appBarHeight = measuredHeight },
         { measuredBottom -> headerTitleBottom = measuredBottom },
     )
+}
+
+@Composable
+private fun rememberTopAppBarVisibility(scrollState: ScrollState): Boolean {
+    var isVisible by remember { mutableStateOf(true) }
+    var previousScrollOffset by remember { mutableIntStateOf(0) }
+    var accumulatedScrollDelta by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(scrollState.value) {
+        val currentScrollOffset = scrollState.value
+        val delta = currentScrollOffset - previousScrollOffset
+
+        when {
+            currentScrollOffset <= 0 -> {
+                isVisible = true
+                accumulatedScrollDelta = 0
+            }
+            delta == 0 -> Unit
+            accumulatedScrollDelta == 0 || (accumulatedScrollDelta > 0) == (delta > 0) -> {
+                accumulatedScrollDelta += delta
+            }
+            else -> {
+                accumulatedScrollDelta = delta
+            }
+        }
+
+        when {
+            accumulatedScrollDelta >= TOP_APPBAR_VISIBILITY_SCROLL_THRESHOLD -> {
+                isVisible = false
+                accumulatedScrollDelta = 0
+            }
+            accumulatedScrollDelta <= -TOP_APPBAR_VISIBILITY_SCROLL_THRESHOLD -> {
+                isVisible = true
+                accumulatedScrollDelta = 0
+            }
+        }
+
+        previousScrollOffset = currentScrollOffset
+    }
+
+    return isVisible
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,12 +177,18 @@ private fun ReportDetailTopAppBar(
 @Composable
 private fun ReportDetailScrollContent(
     scrollState: ScrollState,
+    topPadding: androidx.compose.ui.unit.Dp,
     onHeaderMeasured: (Float) -> Unit,
     headerContent: @Composable ColumnScope.(Modifier) -> Unit,
     bodyContent: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+    ) {
         HeaderContentContainer(
+            topPadding = topPadding,
             onHeaderMeasured = onHeaderMeasured,
             headerContent = headerContent,
         )
@@ -121,13 +198,19 @@ private fun ReportDetailScrollContent(
 
 @Composable
 private fun HeaderContentContainer(
+    topPadding: androidx.compose.ui.unit.Dp,
     onHeaderMeasured: (Float) -> Unit,
     headerContent: @Composable ColumnScope.(Modifier) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(PrezelTheme.spacing.V20),
+            .padding(
+                start = PrezelTheme.spacing.V20,
+                end = PrezelTheme.spacing.V20,
+                top = topPadding + PrezelTheme.spacing.V20,
+                bottom = PrezelTheme.spacing.V20,
+            ),
         verticalArrangement = Arrangement.spacedBy(PrezelTheme.spacing.V16),
     ) {
         headerContent(
