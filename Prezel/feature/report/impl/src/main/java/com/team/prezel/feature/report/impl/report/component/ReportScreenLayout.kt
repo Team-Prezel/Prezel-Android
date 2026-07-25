@@ -55,16 +55,26 @@ private val DefaultTopAppBarHeight = 56.dp
 internal fun ReportScreenLayout(
     appBarTitle: String,
     modifier: Modifier = Modifier,
+    initiallyVisibleTopAppBar: Boolean = true,
+    topAppBarVisibleAtTop: Boolean = true,
+    reserveTopAppBarSpace: Boolean = true,
     topAppBarContent: @Composable PrezelTopAppBarScope.() -> Unit = {},
     headerContent: @Composable ColumnScope.(Modifier) -> Unit,
     bodyContent: @Composable ColumnScope.() -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val (topBarState, updateAppBarHeight, updateHeaderTitleBottom) = rememberReportTopBarState()
-    val isTopAppBarVisible = rememberTopAppBarVisibility(scrollState)
+    val isTopAppBarVisible = rememberTopAppBarVisibility(
+        scrollState = scrollState,
+        initiallyVisible = initiallyVisibleTopAppBar,
+        visibleAtTop = topAppBarVisibleAtTop,
+    )
     val density = LocalDensity.current
     val contentTopPadding = with(density) {
-        topBarState.appBarHeight.takeIf { it > 0f }?.toDp() ?: DefaultTopAppBarHeight
+        when {
+            !reserveTopAppBarSpace -> 0.dp
+            else -> topBarState.appBarHeight.takeIf { it > 0f }?.toDp() ?: DefaultTopAppBarHeight
+        }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -115,8 +125,12 @@ private fun rememberReportTopBarState(): Triple<ReportTopBarState, (Float) -> Un
 }
 
 @Composable
-private fun rememberTopAppBarVisibility(scrollState: ScrollState): Boolean {
-    var isVisible by remember { mutableStateOf(true) }
+private fun rememberTopAppBarVisibility(
+    scrollState: ScrollState,
+    initiallyVisible: Boolean,
+    visibleAtTop: Boolean,
+): Boolean {
+    var isVisible by remember(initiallyVisible) { mutableStateOf(initiallyVisible) }
     var previousScrollOffset by remember { mutableIntStateOf(0) }
     var accumulatedScrollDelta by remember { mutableIntStateOf(0) }
 
@@ -126,7 +140,7 @@ private fun rememberTopAppBarVisibility(scrollState: ScrollState): Boolean {
 
         when {
             currentScrollOffset <= 0 -> {
-                isVisible = true
+                isVisible = visibleAtTop
                 accumulatedScrollDelta = 0
             }
             delta == 0 -> Unit

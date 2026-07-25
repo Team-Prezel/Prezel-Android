@@ -173,6 +173,9 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
+        initiallyVisibleTopAppBar = entrySource != ReportEntrySource.ANALYSIS,
+        topAppBarVisibleAtTop = entrySource != ReportEntrySource.ANALYSIS,
+        reserveTopAppBarSpace = entrySource != ReportEntrySource.ANALYSIS,
         topAppBarContent = {
             if (entrySource == ReportEntrySource.HISTORY) {
                 LeadingIcon(
