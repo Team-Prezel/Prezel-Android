@@ -39,7 +39,6 @@ private data class ReportTopBarState(
 @Composable
 internal fun ReportScreenLayout(
     appBarTitle: String,
-    showTopAppBar: Boolean = true,
     modifier: Modifier = Modifier,
     topAppBarContent: @Composable PrezelTopAppBarScope.() -> Unit = {},
     headerContent: @Composable ColumnScope.(Modifier) -> Unit,
@@ -49,14 +48,12 @@ internal fun ReportScreenLayout(
     val (topBarState, updateAppBarHeight, updateHeaderTitleBottom) = rememberReportTopBarState()
 
     Column(modifier = modifier.fillMaxSize()) {
-        if (showTopAppBar) {
-            ReportDetailTopAppBar(
-                appBarTitle = appBarTitle,
-                topBarState = topBarState,
-                onAppBarMeasured = updateAppBarHeight,
-                content = topAppBarContent,
-            )
-        }
+        ReportDetailTopAppBar(
+            appBarTitle = appBarTitle,
+            topBarState = topBarState,
+            onAppBarMeasured = updateAppBarHeight,
+            content = topAppBarContent,
+        )
 
         ReportDetailScrollContent(
             scrollState = scrollState,

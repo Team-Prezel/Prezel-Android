@@ -33,7 +33,6 @@ private fun EntryProviderScope<NavKey>.reportEntry() {
 
         AnalysisReportScreen(
             onBack = { navigator.goBack() },
-            showTopAppBar = key.showTopAppBar,
             navigateToAnalysisScript = { presentationId, isPast ->
                 navigator.navigateToAnalysisScript(
                     presentationId = presentationId,

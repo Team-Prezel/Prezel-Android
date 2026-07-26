@@ -89,7 +89,6 @@ private fun AnalysisRoute(
             navigator.navigate(
                 key = ReportNavKey(
                     presentationId = presentationId,
-                    showTopAppBar = false,
                 ),
                 clearStack = true,
             )
