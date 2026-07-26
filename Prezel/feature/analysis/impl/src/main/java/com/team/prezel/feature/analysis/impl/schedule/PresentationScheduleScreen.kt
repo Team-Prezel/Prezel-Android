@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.team.prezel.core.designsystem.component.datepicker.PrezelDatePicker
 import com.team.prezel.core.designsystem.component.textfield.PrezelTextField
+import com.team.prezel.core.designsystem.component.textfield.PrezelTextFieldStatus
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
@@ -93,6 +94,9 @@ private fun PresentationScheduleScreen(
             onValueChange = onTitleChange,
             placeholder = stringResource(R.string.feature_analysis_impl_presentation_name_placeholder),
             label = stringResource(R.string.feature_analysis_impl_presentation_name_label),
+            status = PrezelTextFieldStatus.Default(
+                message = stringResource(R.string.feature_analysis_impl_presentation_name_helper),
+            ),
             maxLength = 10,
         )
 

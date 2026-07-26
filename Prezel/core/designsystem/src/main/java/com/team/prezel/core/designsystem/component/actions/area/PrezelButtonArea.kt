@@ -41,6 +41,7 @@ fun PrezelButtonArea(
     isVertical: Boolean = true,
     isStrongStrength: Boolean = true,
     showBackground: Boolean = false,
+    showDivider: Boolean = showBackground,
     isNested: Boolean = false,
     config: PrezelButtonAreaDefault = PrezelButtonAreaDefaults.getDefault(),
     mainButton: @Composable (Modifier) -> Unit,
@@ -53,7 +54,7 @@ fun PrezelButtonArea(
             .fillMaxWidth()
             .then(if (showBackground) Modifier.background(config.backgroundColor) else Modifier),
     ) {
-        if (showBackground) {
+        if (showDivider) {
             PrezelHorizontalDivider(type = PrezelDividerType.THICK, color = config.borderColor)
         }
 

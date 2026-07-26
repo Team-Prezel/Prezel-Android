@@ -1,8 +1,6 @@
 package com.team.prezel.core.designsystem.component.voice
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +33,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
+private const val MIN_REACTIVE_VOLUME = 0.12f
+private const val MIN_WAVE_VOLUME = 0.1f
+
 @Composable
 fun PrezelVoiceChromeWave(
     modifier: Modifier = Modifier,
@@ -48,33 +49,23 @@ fun PrezelVoiceChromeWave(
         VoiceChromeStatus.LISTENING,
         VoiceChromeStatus.WAITING,
         -> {
-            val clippedVolumes = volumes.map { volume ->
-                volume.coerceIn(
-                    minimumValue = 0.1f,
-                    maximumValue = 1f,
-                )
-            }
+            val clippedVolumes = volumes
+                .filter { volume -> volume > MIN_REACTIVE_VOLUME }
+                .map { volume ->
+                    volume.coerceIn(
+                        minimumValue = MIN_WAVE_VOLUME,
+                        maximumValue = 1f,
+                    )
+                }
 
             clippedVolumes.toImmutableList()
         }
     }
-    val activationProgress by animateFloatAsState(
-        targetValue = if (status == VoiceChromeStatus.IDLE) 0f else 1f,
-        animationSpec = tween(durationMillis = 6400),
-        label = "VoiceChromeWaveActivationProgress",
-    )
-    val volumeProgress by animateFloatAsState(
-        targetValue = if (status == VoiceChromeStatus.IDLE) 0f else 1f,
-        animationSpec = tween(durationMillis = 440),
-        label = "VoiceChromeWaveVolumeProgress",
-    )
 
     Spacer(
         modifier = modifier.drawVoiceChromeWave(
             status = status,
             volumes = adjustedVolumes,
-            activationProgress = activationProgress,
-            volumeProgress = volumeProgress,
             showBaseline = showBaseline,
         ),
     )
@@ -84,8 +75,6 @@ fun PrezelVoiceChromeWave(
 private fun Modifier.drawVoiceChromeWave(
     status: VoiceChromeStatus,
     volumes: ImmutableList<Float>,
-    activationProgress: Float,
-    volumeProgress: Float,
     showBaseline: Boolean,
 ): Modifier {
     val colors = PrezelTheme.colors
@@ -122,8 +111,6 @@ private fun Modifier.drawVoiceChromeWave(
                 status = status,
                 volumes = volumes,
                 config = drawConfig,
-                activationProgress = activationProgress,
-                volumeProgress = volumeProgress,
                 showBaseline = showBaseline,
                 baselineColor = colors.borderRegular,
             )
@@ -147,35 +134,14 @@ private fun DrawScope.drawVoiceChromeWaveContent(
     status: VoiceChromeStatus,
     volumes: ImmutableList<Float>,
     config: VoiceChromeWaveDrawConfig,
-    activationProgress: Float,
-    volumeProgress: Float,
     showBaseline: Boolean,
     baselineColor: Color,
 ) {
-    if (status == VoiceChromeStatus.LISTENING && activationProgress < 1f) {
-        drawVoiceChromeWaveBars(
-            status = VoiceChromeStatus.IDLE,
-            volumes = persistentListOf(),
-            config = config,
-            xOffset = -size.width * activationProgress,
-            volumeProgress = 0f,
-        )
-        drawVoiceChromeWaveBars(
-            status = VoiceChromeStatus.LISTENING,
-            volumes = volumes,
-            config = config,
-            xOffset = size.width * (1f - activationProgress),
-            volumeProgress = volumeProgress,
-        )
-    } else {
-        drawVoiceChromeWaveBars(
-            status = status,
-            volumes = volumes,
-            config = config,
-            xOffset = 0f,
-            volumeProgress = volumeProgress,
-        )
-    }
+    drawVoiceChromeWaveBars(
+        status = status,
+        volumes = volumes,
+        config = config,
+    )
 
     drawVoiceChromeWaveBaseline(
         visible = showBaseline,
@@ -188,10 +154,8 @@ private fun DrawScope.drawVoiceChromeWaveBars(
     status: VoiceChromeStatus,
     volumes: ImmutableList<Float>,
     config: VoiceChromeWaveDrawConfig,
-    xOffset: Float,
-    volumeProgress: Float,
 ) {
-    var barX = -config.barWidth + xOffset
+    var barX = -config.barWidth
     var barIndex = 0
     val barCount = (size.width / config.barSpacing).roundToInt() + 1
 
@@ -200,10 +164,7 @@ private fun DrawScope.drawVoiceChromeWaveBars(
             index = barIndex,
             sampleCount = barCount,
         )
-        val barHeight = config.volumeToBarHeight(
-            volume = volume,
-            progress = volumeProgress,
-        )
+        val barHeight = config.volumeToBarHeight(volume)
         val barTop = (size.height - barHeight) / 2f
         val topLeft = Offset(x = barX, y = barTop)
         val barSize = Size(width = config.barWidth, height = barHeight)
@@ -251,25 +212,22 @@ private fun DrawScope.drawVoiceChromeWaveBaseline(
     )
 }
 
-private fun VoiceChromeWaveDrawConfig.volumeToBarHeight(
-    volume: Float,
-    progress: Float,
-): Float {
-    val volumeProgress = (volume - 0.1f) / (1f - 0.1f)
-    val targetHeight = minBarHeight + volumeProgress * (maxBarHeight - minBarHeight)
+private fun VoiceChromeWaveDrawConfig.volumeToBarHeight(volume: Float): Float {
+    val volumeProgress = (volume - MIN_WAVE_VOLUME) / (1f - MIN_WAVE_VOLUME)
 
-    return minBarHeight + (targetHeight - minBarHeight) * progress
+    return minBarHeight + volumeProgress * (maxBarHeight - minBarHeight)
 }
 
 private fun ImmutableList<Float>.sampleVolume(
     index: Int,
     sampleCount: Int,
 ): Float {
-    if (isEmpty()) return 0.1f
-    if (size == 1 || sampleCount <= 1) return first()
+    if (isEmpty() || sampleCount <= 0) return MIN_WAVE_VOLUME
 
-    val sampleIndex = (index * (lastIndex.toFloat() / (sampleCount - 1))).roundToInt()
-    return get(sampleIndex.coerceIn(indices))
+    val firstVisibleIndex = (size - sampleCount).coerceAtLeast(0)
+    val sampleIndex = firstVisibleIndex + index
+
+    return getOrElse(sampleIndex) { MIN_WAVE_VOLUME }
 }
 
 @LargeDevicePreview

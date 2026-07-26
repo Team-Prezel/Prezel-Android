@@ -170,7 +170,6 @@ private fun VoiceRecordingFeedback.toChromeUi(): VoiceRecordingChromeUi =
             titleResId = R.string.feature_analysis_impl_voice_recording_ready_to_continue_feedback,
             status = VoiceChromeStatus.LISTENING,
             gradient = VoiceChromeGradient.NONE,
-            hideWaveform = true,
         )
 
         VoiceRecordingFeedback.SPEAK_LOUDER -> VoiceRecordingChromeUi(
