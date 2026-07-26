@@ -103,7 +103,7 @@ internal fun PresentationSentenceAnalysisResponse.toDomain(): SentenceAnalysisDe
         status = WordAnalysisStatus.from(value = status),
         mainFeedback = mainFeedback,
         subFeedback = subFeedback,
-        guideScript = guideScript,
+        guideScript = guideScript.orEmpty(),
         accuracy = accuracy,
         startTimeMs = startTimeMs,
         endTimeMs = endTimeMs,

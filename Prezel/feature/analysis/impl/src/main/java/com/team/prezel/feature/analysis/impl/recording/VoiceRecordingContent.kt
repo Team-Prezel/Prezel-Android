@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.audio.AudioSessionState
+import com.team.prezel.core.audio.AudioSource
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -42,6 +44,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.component.voice.PrezelVoiceChromeWave
 import com.team.prezel.core.designsystem.icon.PrezelIcons
+import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.analysis.impl.R
@@ -65,7 +68,7 @@ internal fun VoiceRecordingContent(
         modifier = modifier
             .fillMaxWidth()
             .background(PrezelTheme.colors.bgRegular)
-            .padding(vertical = PrezelTheme.spacing.V16),
+            .padding(vertical = PrezelTheme.spacing.V4),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (!recordingState.isCompleted || isScriptExpanded) {
@@ -73,7 +76,7 @@ internal fun VoiceRecordingContent(
                 isScriptExpanded = isScriptExpanded,
                 onToggleScriptExpanded = onToggleScriptExpanded,
             )
-            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
+            Spacer(modifier = Modifier.height(PrezelTheme.spacing.V4))
         }
 
         VoiceRecordingScriptBody(
@@ -104,7 +107,7 @@ private fun VoiceRecordingScriptHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(20.dp)
+            .height(48.dp)
             .padding(horizontal = PrezelTheme.spacing.V20),
     ) {
         Text(
@@ -240,6 +243,7 @@ private fun VoiceRecordingStatusArea(
             modifier = Modifier.fillMaxWidth(),
         )
     }
+    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 }
 
 @Composable
@@ -262,7 +266,7 @@ private fun ScriptZoomButton(
             ),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = PrezelTheme.colors.iconRegular,
+            tint = PrezelTheme.colors.iconDisabled,
         )
     }
 }
@@ -275,14 +279,10 @@ private fun RecordingWaveform(
     modifier: Modifier = Modifier,
 ) {
     val playbackProgress = recordingState.playbackProgress()
-    val visibleVolumes = if (voiceChromeUi?.hideWaveform == true) {
-        persistentListOf()
-    } else {
-        recordingState.visibleRecordingVolumes(
-            recordingVolumes = recordingVolumes,
-            playbackProgress = playbackProgress,
-        )
-    }
+    val visibleVolumes = recordingState.visibleRecordingVolumes(
+        recordingVolumes = recordingVolumes,
+        playbackProgress = playbackProgress,
+    )
 
     PrezelVoiceChromeWave(
         status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
@@ -446,4 +446,59 @@ private fun RecordingRoundIconButton(
         ),
         onClick = onClick,
     )
+}
+
+@BasicPreview
+@Composable
+private fun VoiceRecordingContentIdlePreview() {
+    VoiceRecordingContentPreview(recordingState = AudioSessionState.Idle)
+}
+
+@BasicPreview
+@Composable
+private fun VoiceRecordingContentEmptyScriptPreview() {
+    VoiceRecordingContentPreview(
+        recordingState = AudioSessionState.Idle,
+        script = "",
+        useMinimumScriptHeight = true,
+    )
+}
+
+@BasicPreview
+@Composable
+private fun VoiceRecordingContentRecordingPreview() {
+    VoiceRecordingContentPreview(
+        recordingState = AudioSessionState.Recording(elapsedSeconds = 12),
+    )
+}
+
+@BasicPreview
+@Composable
+private fun VoiceRecordingContentCompletedPreview() {
+    VoiceRecordingContentPreview(
+        recordingState = AudioSessionState.ReadyToPlay(
+            source = AudioSource.RecordedFile(filePath = "preview.m4a"),
+            durationSeconds = 75,
+        ),
+    )
+}
+
+@Composable
+private fun VoiceRecordingContentPreview(
+    recordingState: AudioSessionState,
+    script: String = "한 번쯤 발표하면서 긴장하신 경험 있으시죠. 오늘도 다들 긴장되는 마음으로 오셨을 것 같습니다.",
+    useMinimumScriptHeight: Boolean = false,
+) {
+    PrezelTheme {
+        VoiceRecordingContent(
+            script = script,
+            recordingState = recordingState,
+            recordingVolumes = persistentListOf(0.2f, 0.45f, 0.7f, 0.35f, 0.8f, 0.55f),
+            isScriptExpanded = false,
+            onToggleScriptExpanded = {},
+            onClickRecordingControl = {},
+            modifier = if (useMinimumScriptHeight) Modifier.fillMaxWidth() else Modifier.fillMaxSize(),
+            useMinimumScriptHeight = useMinimumScriptHeight,
+        )
+    }
 }

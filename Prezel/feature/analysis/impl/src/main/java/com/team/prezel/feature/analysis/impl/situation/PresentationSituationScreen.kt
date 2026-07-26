@@ -174,10 +174,7 @@ private fun CategorySituationAccordion(
         CategoryOptionGrid(
             selectedValue = form.category,
             options = categoryOptions,
-            onSelect = { selectedCategory ->
-                onSelectCategory(selectedCategory)
-                onExpandedTypeChange(selectedCategory.nextExpandedType(SituationAccordionType.CATEGORY))
-            },
+            onSelect = onSelectCategory,
         )
     }
 }
@@ -201,9 +198,7 @@ private fun PurposeSituationAccordion(
             options = purposeOptions.toChipContentOptions(form.purpose),
             onSelect = { index ->
                 val selectedPurpose = purposeOptions[index].value
-                val nextPurpose = selectedPurpose.toggleIfSelected(form.purpose)
-                onSelectPurpose(nextPurpose)
-                onExpandedTypeChange(nextPurpose.nextExpandedType(SituationAccordionType.PURPOSE))
+                onSelectPurpose(selectedPurpose.toggleIfSelected(form.purpose))
             },
         )
     }
@@ -228,9 +223,7 @@ private fun StyleSituationAccordion(
             options = styleOptions.toChipContentOptions(form.style),
             onSelect = { index ->
                 val selectedStyle = styleOptions[index].value
-                val nextStyle = selectedStyle.toggleIfSelected(form.style)
-                onSelectStyle(nextStyle)
-                onExpandedTypeChange(nextStyle.nextExpandedType(SituationAccordionType.STYLE))
+                onSelectStyle(selectedStyle.toggleIfSelected(form.style))
             },
         )
     }
@@ -256,9 +249,7 @@ private fun AudienceSituationAccordion(
             options = audienceOptions.toChipContentOptions(form.audience),
             onSelect = { index ->
                 val selectedAudience = audienceOptions[index].value
-                val nextAudience = selectedAudience.toggleIfSelected(form.audience)
-                onSelectAudience(nextAudience)
-                onExpandedTypeChange(nextAudience.nextExpandedType(SituationAccordionType.AUDIENCE))
+                onSelectAudience(selectedAudience.toggleIfSelected(form.audience))
             },
         )
     }
@@ -333,20 +324,9 @@ private enum class SituationAccordionType {
     PURPOSE,
     STYLE,
     AUDIENCE,
-    ;
-
-    val next: SituationAccordionType?
-        get() = when (this) {
-            CATEGORY -> PURPOSE
-            PURPOSE -> STYLE
-            STYLE -> AUDIENCE
-            AUDIENCE -> null
-        }
 }
 
 private fun <T> T.toggleIfSelected(selectedValue: T?): T? = if (this == selectedValue) null else this
-
-private fun Any?.nextExpandedType(currentType: SituationAccordionType): SituationAccordionType? = if (this == null) currentType else currentType.next
 
 @Composable
 private fun CategoryOptionCard(
