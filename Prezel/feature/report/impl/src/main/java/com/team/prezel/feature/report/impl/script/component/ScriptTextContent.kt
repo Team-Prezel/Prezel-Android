@@ -36,6 +36,7 @@ private val POPUP_Y_OFFSET = 42.dp
 internal fun ScriptTextContent(
     script: String,
     corrections: ImmutableList<ScriptCorrectionUiModel>,
+    isCorrectionClickable: Boolean,
     onClickCorrection: (correctionId: Long, popupY: Int) -> Unit,
     modifier: Modifier = Modifier,
     spellHighlightStyle: SpanStyle = SpanStyle(
@@ -71,13 +72,19 @@ internal fun ScriptTextContent(
             .fillMaxWidth()
             .onGloballyPositioned { coordinates ->
                 textPositionInWindow = coordinates.positionInWindow()
-            }.correctionTapGesture(
-                annotatedText = annotatedText,
-                textLayoutResult = textLayoutResult,
-                textPositionInWindow = textPositionInWindow,
-                popupYOffset = popupYOffset,
-                onClickCorrection = onClickCorrection,
-            ),
+            }.run {
+                if (isCorrectionClickable) {
+                    correctionTapGesture(
+                        annotatedText = annotatedText,
+                        textLayoutResult = textLayoutResult,
+                        textPositionInWindow = textPositionInWindow,
+                        popupYOffset = popupYOffset,
+                        onClickCorrection = onClickCorrection,
+                    )
+                } else {
+                    this
+                }
+            },
         onTextLayout = { result -> textLayoutResult = result },
     )
 }
@@ -178,32 +185,15 @@ private fun findClickedCorrectionId(
         ?.toLongOrNull()
 }
 
-private fun calculateHighlightCorrections(corrections: List<ScriptCorrectionUiModel>): List<HighlightCorrectionUiModel> {
-    val sortedCorrections = corrections.sortedBy { correction ->
-        correction.originalRange.first
-    }
-
-    var offset = 0
-    val highlightCorrections = mutableListOf<HighlightCorrectionUiModel>()
-
-    sortedCorrections.forEach { correction ->
-        val currentStartIndex = correction.originalRange.first + offset
-        val currentEndIndex = correction.originalRange.last + offset
-
-        if (!correction.isApplied) {
-            highlightCorrections += HighlightCorrectionUiModel(
+private fun calculateHighlightCorrections(corrections: List<ScriptCorrectionUiModel>): List<HighlightCorrectionUiModel> =
+    corrections
+        .sortedBy { correction -> correction.originalRange.first }
+        .map { correction ->
+            HighlightCorrectionUiModel(
                 correctionId = correction.id,
-                range = currentStartIndex..currentEndIndex,
+                range = correction.originalRange,
             )
         }
-
-        if (correction.isApplied) {
-            offset += correction.correctedText.length - correction.originalText.length
-        }
-    }
-
-    return highlightCorrections
-}
 
 @BasicPreview
 @Composable
@@ -236,6 +226,7 @@ private fun ScriptTextContentPreview() {
                     originalRange = 56 until 60,
                 ),
             ).toPersistentList(),
+            isCorrectionClickable = true,
             onClickCorrection = { _, _ -> },
         )
     }

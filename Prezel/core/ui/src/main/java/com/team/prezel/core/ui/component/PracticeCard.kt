@@ -175,7 +175,10 @@ private fun PaginationRow(
                 painter = painterResource(PrezelIcons.ChevronLeft),
                 contentDescription = stringResource(R.string.core_ui_impl_practice_card_prev_page),
                 tint = chevronIconTintColor(enabled = hasPreviousPage),
-                modifier = Modifier.noRippleClickable(onClickLeft),
+                modifier = Modifier.noRippleClickable(
+                    enabled = hasPreviousPage,
+                    onClick = onClickLeft,
+                ),
             )
         }
 
@@ -190,7 +193,10 @@ private fun PaginationRow(
                 painter = painterResource(PrezelIcons.ChevronRight),
                 contentDescription = stringResource(R.string.core_ui_impl_practice_card_next_page),
                 tint = chevronIconTintColor(enabled = hasNextPage),
-                modifier = Modifier.noRippleClickable(onClickRight),
+                modifier = Modifier.noRippleClickable(
+                    enabled = hasNextPage,
+                    onClick = onClickRight,
+                ),
             )
         }
     }

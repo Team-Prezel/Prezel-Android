@@ -74,6 +74,21 @@ internal class PresentationRepositoryImpl @Inject constructor(
             response.toDomain()
         }.mapDomainFailure()
 
+    override suspend fun correctScript(
+        analysisResultId: Long,
+        finalScript: String,
+        correctedIndices: List<Int>,
+    ): Result<PresentationScriptDetail> =
+        runCatching {
+            presentationRemoteDataSource.correctScript(
+                analysisResultId = analysisResultId,
+                finalScript = finalScript,
+                correctedIndices = correctedIndices,
+            )
+        }.mapCatching { response ->
+            response.toDomain()
+        }.mapDomainFailure()
+
     override suspend fun fetchWordDetail(analysisResultId: Long): Result<PresentationWordDetail> =
         runCatching {
             presentationRemoteDataSource.getWordDetail(analysisResultId = analysisResultId)

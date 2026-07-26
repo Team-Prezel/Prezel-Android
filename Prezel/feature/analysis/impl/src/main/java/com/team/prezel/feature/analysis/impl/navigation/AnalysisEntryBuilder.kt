@@ -15,6 +15,8 @@ import com.team.prezel.feature.analysis.impl.AnalysisFlowViewModel
 import com.team.prezel.feature.analysis.impl.AnalysisScreen
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
+import com.team.prezel.feature.home.api.HomeNavKey
+import com.team.prezel.feature.report.api.ReportEntrySource
 import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
@@ -89,9 +91,13 @@ private fun AnalysisRoute(
             navigator.navigate(
                 key = ReportNavKey(
                     presentationId = presentationId,
+                    entrySource = ReportEntrySource.ANALYSIS,
                 ),
                 clearStack = true,
             )
+        },
+        navigateToHome = {
+            navigator.replaceRoot(HomeNavKey)
         },
         viewModel = viewModel,
     )

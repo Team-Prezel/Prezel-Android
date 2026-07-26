@@ -6,9 +6,12 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
+import java.net.SocketTimeoutException
 
 internal sealed interface AnalysisFailureAction {
     data object RetryAnalysis : AnalysisFailureAction
+
+    data object NavigateHome : AnalysisFailureAction
 
     data class RetryFileUpload(
         val uploadType: AnalysisUploadType,
@@ -20,8 +23,8 @@ internal sealed interface AnalysisFailureAction {
 }
 
 internal fun Throwable.toAnalysisFailureAction(): AnalysisFailureAction {
-    if (this is TimeoutCancellationException) {
-        return AnalysisFailureAction.RetryAnalysis
+    if (isTimeoutException()) {
+        return AnalysisFailureAction.NavigateHome
     }
 
     if (this is CancellationException) {
@@ -51,3 +54,9 @@ internal fun Throwable.toAnalysisFailureAction(): AnalysisFailureAction {
         -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.UNKNOWN_FAILED)
     }
 }
+
+private fun Throwable.isTimeoutException(): Boolean =
+    this is TimeoutCancellationException ||
+        this is SocketTimeoutException ||
+        generateSequence(this) { throwable -> throwable.cause }
+            .any { throwable -> throwable::class.java.simpleName == "HttpRequestTimeoutException" }

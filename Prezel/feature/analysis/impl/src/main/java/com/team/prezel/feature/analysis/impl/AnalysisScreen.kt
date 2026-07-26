@@ -49,6 +49,7 @@ private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
 @Composable
 internal fun AnalysisScreen(
     onBack: () -> Unit,
+    navigateToHome: () -> Unit,
     navigateToStep: (step: AnalysisFlowStep, clearStack: Boolean) -> Unit,
     navigateToReport: (presentationId: Long) -> Unit,
     viewModel: AnalysisFlowViewModel,
@@ -67,6 +68,7 @@ internal fun AnalysisScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
+                AnalysisFlowUiEffect.NavigateHome -> navigateToHome()
                 is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
                 is AnalysisFlowUiEffect.NavigateToReport -> {
                     navigateToReport(effect.presentationId)

@@ -32,6 +32,7 @@ private fun EntryProviderScope<NavKey>.reportEntry() {
         val navigator = LocalNavigator.current
 
         AnalysisReportScreen(
+            entrySource = key.entrySource,
             onBack = { navigator.goBack() },
             navigateToAnalysisScript = { presentationId, isPast ->
                 navigator.navigateToAnalysisScript(

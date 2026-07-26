@@ -32,6 +32,16 @@ internal class AuthRepositoryImpl @Inject constructor(
             authSessionCache.clear()
         }.mapDomainFailure()
 
+    override suspend fun loginAdmin(): Result<Unit> =
+        runCatching {
+            val response = authRemoteDataSource.loginAdmin()
+            authLocalDataSource.saveTokens(
+                accessToken = response.accessToken,
+                refreshToken = response.refreshToken,
+            )
+            authSessionCache.clear()
+        }.mapDomainFailure()
+
     override suspend fun clearSession(): Result<Unit> = runCatching { clearLocalSession() }.mapDomainFailure()
 
     override suspend fun withdraw(reason: WithdrawReason): Result<Unit> =

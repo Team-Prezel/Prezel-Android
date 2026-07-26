@@ -26,6 +26,7 @@ import com.team.prezel.feature.report.impl.script.model.ScriptCorrectionUiModel
 @Composable
 internal fun ScriptCorrectionPopup(
     correction: ScriptCorrectionUiModel,
+    isApplyEnabled: Boolean,
     onDismiss: () -> Unit,
     onApplyCorrection: () -> Unit,
     modifier: Modifier = Modifier,
@@ -42,9 +43,9 @@ internal fun ScriptCorrectionPopup(
                     backgroundColor = PrezelTheme.colors.bgRegular,
                     token = PrezelDropShadowDefaults.PrezelShadowToken(
                         offsetX = 0.dp,
-                        offsetY = 8.dp,
+                        offsetY = 0.dp,
                         blurRadius = popupRadius,
-                        spreadRadius = 0.dp,
+                        spreadRadius = 8.dp,
                         color = PrezelTheme.colors.solidBlack.copy(alpha = 0.12f),
                     ),
                 ),
@@ -55,7 +56,11 @@ internal fun ScriptCorrectionPopup(
     ) {
         PopupContent(correction = correction)
 
-        PopupActions(onDismiss = onDismiss, onApplyCorrection = onApplyCorrection)
+        PopupActions(
+            isApplyEnabled = isApplyEnabled,
+            onDismiss = onDismiss,
+            onApplyCorrection = onApplyCorrection,
+        )
     }
 }
 
@@ -85,6 +90,7 @@ private fun PopupContent(
 
 @Composable
 private fun PopupActions(
+    isApplyEnabled: Boolean,
     onDismiss: () -> Unit,
     onApplyCorrection: () -> Unit,
     modifier: Modifier = Modifier,
@@ -104,8 +110,9 @@ private fun PopupActions(
 
         PopupActionButton(
             text = stringResource(R.string.feature_report_impl_script_apply),
-            textColor = PrezelTheme.colors.textMedium,
+            textColor = if (isApplyEnabled) PrezelTheme.colors.textMedium else PrezelTheme.colors.textDisabled,
             onClick = onApplyCorrection,
+            enabled = isApplyEnabled,
         )
     }
 }
@@ -115,6 +122,7 @@ private fun PopupActionButton(
     text: String,
     textColor: Color,
     onClick: () -> Unit,
+    enabled: Boolean = true,
 ) {
     Text(
         text = text,
@@ -122,7 +130,10 @@ private fun PopupActionButton(
         color = textColor,
         modifier = Modifier
             .padding(vertical = PrezelTheme.spacing.V8, horizontal = PrezelTheme.spacing.V12)
-            .noRippleClickable(onClick = onClick),
+            .noRippleClickable(
+                enabled = enabled,
+                onClick = onClick,
+            ),
     )
 }
 
@@ -140,6 +151,7 @@ private fun ScriptCorrectionPopupPreview() {
                 reason = "표준어는 '기다리다'를 활용한 표현이에요.",
                 originalRange = 30 until 34,
             ),
+            isApplyEnabled = true,
             onDismiss = {},
             onApplyCorrection = {},
         )

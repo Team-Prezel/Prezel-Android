@@ -1,5 +1,6 @@
 package com.team.prezel.core.network.datasource
 
+import com.team.prezel.core.network.model.BaseResponse
 import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
@@ -8,14 +9,20 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
+import com.team.prezel.core.network.model.presentation.ScriptCorrectionRequest
 import com.team.prezel.core.network.model.presentation.review.SelfFeedbackRequest
 import com.team.prezel.core.network.model.requireData
 import com.team.prezel.core.network.model.requireSuccess
 import com.team.prezel.core.network.service.PresentationService
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.FormBuilder
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
@@ -24,6 +31,7 @@ import javax.inject.Inject
 
 internal class PresentationRemoteDataSourceImpl @Inject constructor(
     private val presentationService: PresentationService,
+    private val httpClient: HttpClient,
 ) : PresentationRemoteDataSource {
     override suspend fun analyzePresentation(
         name: String,
@@ -54,8 +62,14 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             },
         )
 
-        return presentationService
-            .analyzePresentation(multipart = multipart)
+        return httpClient
+            .post("recording/analyze") {
+                timeout {
+                    requestTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                    socketTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                }
+                setBody(multipart)
+            }.body<BaseResponse<PresentationSummaryResponse>>()
             .requireData()
     }
 
@@ -77,15 +91,33 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             },
         )
 
-        return presentationService
-            .reAnalyzePresentation(
-                presentationId = presentationId,
-                multipart = multipart,
-            ).requireData()
+        return httpClient
+            .post("recording/$presentationId/re-analyze") {
+                timeout {
+                    requestTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                    socketTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                }
+                setBody(multipart)
+            }.body<BaseResponse<PresentationSummaryResponse>>()
+            .requireData()
     }
 
     override suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse =
         presentationService.getScriptDetail(analysisResultId = analysisResultId).requireData()
+
+    override suspend fun correctScript(
+        analysisResultId: Long,
+        finalScript: String,
+        correctedIndices: List<Int>,
+    ): PresentationScriptDetailResponse =
+        presentationService
+            .correctScript(
+                analysisResultId = analysisResultId,
+                request = ScriptCorrectionRequest(
+                    finalScript = finalScript,
+                    correctedIndices = correctedIndices,
+                ),
+            ).requireData()
 
     override suspend fun getWordDetail(analysisResultId: Long): PresentationWordDetailResponse =
         presentationService.getWordDetail(analysisResultId = analysisResultId).requireData()
@@ -160,3 +192,5 @@ private fun File.toChannelProvider(): ChannelProvider =
         require(canRead()) { "파일을 읽을 수 없습니다: $path" }
         inputStream().toByteReadChannel()
     }
+
+private const val ANALYSIS_TIMEOUT_MILLIS = 600_000L

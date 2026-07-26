@@ -14,4 +14,10 @@ class LoginUseCase @Inject constructor(
             onSuccess = { userRepository.fetchUserInfo() },
             onFailure = { exception -> Result.failure(exception) },
         )
+
+    suspend fun loginAdmin(): Result<User> =
+        authRepository.loginAdmin().fold(
+            onSuccess = { userRepository.fetchUserInfo() },
+            onFailure = { exception -> Result.failure(exception) },
+        )
 }

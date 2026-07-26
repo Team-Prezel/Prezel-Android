@@ -14,6 +14,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
+import com.team.prezel.feature.report.api.ReportEntrySource
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.report.component.ReportBodyContent
 import com.team.prezel.feature.report.impl.report.component.ReportHeaderContent
@@ -28,6 +29,7 @@ import com.team.prezel.feature.report.impl.report.preview.ReportPreviewUpcomingU
 
 @Composable
 internal fun AnalysisReportScreen(
+    entrySource: ReportEntrySource,
     onBack: () -> Unit,
     navigateToAnalysisScript: (presentationId: Long, isPast: Boolean) -> Unit,
     navigateToAnalysisRecording: (presentationId: Long, isPast: Boolean) -> Unit,
@@ -87,6 +89,7 @@ internal fun AnalysisReportScreen(
 
     AnalysisReportScreen(
         uiState = uiState,
+        entrySource = entrySource,
         onBackClick = onBack,
         onDeleteClick = { viewModel.onIntent(AnalysisReportUiIntent.ClickDelete) },
         onImprovementCardIndexChange = { index -> viewModel.onIntent(AnalysisReportUiIntent.ClickGrowthGraphItem(index)) },
@@ -105,6 +108,7 @@ internal fun AnalysisReportScreen(
 @Composable
 internal fun AnalysisReportScreen(
     uiState: AnalysisReportUiState,
+    entrySource: ReportEntrySource,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -122,6 +126,7 @@ internal fun AnalysisReportScreen(
         is AnalysisReportUiState.Content -> {
             AnalysisReportScreenContent(
                 uiState = uiState,
+                entrySource = entrySource,
                 onBackClick = onBackClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier,
@@ -144,6 +149,7 @@ internal fun AnalysisReportScreen(
 @Composable
 private fun AnalysisReportScreenContent(
     uiState: AnalysisReportUiState.Content,
+    entrySource: ReportEntrySource,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onImprovementCardIndexChange: (index: Int) -> Unit,
@@ -167,12 +173,17 @@ private fun AnalysisReportScreenContent(
 
     ReportScreenLayout(
         appBarTitle = uiState.presentationInfo.title,
+        initiallyVisibleTopAppBar = entrySource != ReportEntrySource.ANALYSIS,
+        topAppBarVisibleAtTop = entrySource != ReportEntrySource.ANALYSIS,
+        reserveTopAppBarSpace = entrySource != ReportEntrySource.ANALYSIS,
         topAppBarContent = {
-            LeadingIcon(
-                iconResId = PrezelIcons.ArrowLeft,
-                contentDescription = stringResource(R.string.feature_report_impl_back),
-                onClick = onBackClick,
-            )
+            if (entrySource == ReportEntrySource.HISTORY) {
+                LeadingIcon(
+                    iconResId = PrezelIcons.ArrowLeft,
+                    contentDescription = stringResource(R.string.feature_report_impl_back),
+                    onClick = onBackClick,
+                )
+            }
         },
         headerContent = { titleModifier ->
             ReportHeaderContent(
@@ -225,6 +236,7 @@ private fun UpcomingAnalysisReportScreenPreview() {
     PrezelTheme {
         AnalysisReportScreen(
             uiState = ReportPreviewUpcomingUiState,
+            entrySource = ReportEntrySource.HISTORY,
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
@@ -246,6 +258,7 @@ private fun PastAnalysisReportScreenPreview() {
     PrezelTheme {
         AnalysisReportScreen(
             uiState = ReportPreviewPastUiState,
+            entrySource = ReportEntrySource.HISTORY,
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},
@@ -267,6 +280,7 @@ private fun AnalysisReportScreenLoadingPreview() {
     PrezelTheme {
         AnalysisReportScreen(
             uiState = AnalysisReportUiState.Loading,
+            entrySource = ReportEntrySource.HISTORY,
             onBackClick = { },
             onDeleteClick = { },
             onImprovementCardIndexChange = {},

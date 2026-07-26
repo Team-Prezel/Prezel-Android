@@ -12,7 +12,7 @@ data class PresentationScriptDetailResponse(
     @SerialName("originalScript")
     val originalScript: String,
     @SerialName("scriptDetails")
-    val scriptDetails: List<PresentationScriptAnalysisResponse>,
+    val scriptDetails: List<PresentationScriptAnalysisResponse>?,
 )
 
 @Serializable

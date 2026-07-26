@@ -7,4 +7,11 @@ import kotlinx.serialization.Serializable
 data class ReportNavKey(
     val presentationId: Long,
     val isPast: Boolean = false,
+    val entrySource: ReportEntrySource,
 ) : NavKey
+
+@Serializable
+enum class ReportEntrySource {
+    ANALYSIS,
+    HISTORY,
+}

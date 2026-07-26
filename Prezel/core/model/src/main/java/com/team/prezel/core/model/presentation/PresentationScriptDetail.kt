@@ -1,6 +1,7 @@
 package com.team.prezel.core.model.presentation
 
 data class PresentationScriptDetail(
+    val presentationId: Long,
     val originalScript: String,
     val scriptCorrections: List<ScriptCorrection>,
 )

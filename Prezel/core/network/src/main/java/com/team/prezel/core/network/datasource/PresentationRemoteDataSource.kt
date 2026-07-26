@@ -30,6 +30,12 @@ interface PresentationRemoteDataSource {
 
     suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse
 
+    suspend fun correctScript(
+        analysisResultId: Long,
+        finalScript: String,
+        correctedIndices: List<Int>,
+    ): PresentationScriptDetailResponse
+
     suspend fun getWordDetail(analysisResultId: Long): PresentationWordDetailResponse
 
     suspend fun deleteAnalysis(analysisResultId: Long)

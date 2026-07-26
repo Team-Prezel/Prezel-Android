@@ -21,6 +21,7 @@ internal class LoginViewModel @Inject constructor(
     override fun onIntent(intent: LoginUiIntent) {
         when (intent) {
             LoginUiIntent.OnClickLogin -> handleClickLogin()
+            LoginUiIntent.OnClickLoginAdmin -> handleClickLoginAdmin()
             is LoginUiIntent.OnLoginResult -> handleLoginResult(result = intent.result)
         }
     }
@@ -31,6 +32,19 @@ internal class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             updateState { copy(isLoading = true) }
             sendEffect(LoginUiEffect.LaunchLogin)
+        }
+    }
+
+    private fun handleClickLoginAdmin() {
+        if (currentState.isLoading) return
+
+        viewModelScope.launch {
+            updateState { copy(isLoading = true) }
+            loginUseCase
+                .loginAdmin()
+                .onSuccess { user -> routeUser(user) }
+                .onFailure { exception -> Timber.e(exception) }
+            updateState { copy(isLoading = false) }
         }
     }
 

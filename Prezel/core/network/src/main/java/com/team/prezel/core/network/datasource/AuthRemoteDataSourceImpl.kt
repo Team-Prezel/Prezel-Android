@@ -19,6 +19,8 @@ internal class AuthRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun login(idToken: String): LoginResponse = authService.login(request = LoginRequest(idToken = idToken)).requireData()
 
+    override suspend fun loginAdmin(): LoginResponse = authService.loginAdmin().requireData()
+
     override suspend fun reissue(refreshToken: String): ReissueResponse =
         authService.reissue(request = ReissueRequest(refreshToken = refreshToken)).requireData()
 

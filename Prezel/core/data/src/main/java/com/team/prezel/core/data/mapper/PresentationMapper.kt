@@ -74,8 +74,9 @@ private fun PresentationExpectedQuestionResponse.toDomain(): ExpectedQuestion =
 
 internal fun PresentationScriptDetailResponse.toDomain(): PresentationScriptDetail =
     PresentationScriptDetail(
+        presentationId = presentationId,
         originalScript = originalScript,
-        scriptCorrections = scriptDetails.map { item -> item.toDomain() },
+        scriptCorrections = scriptDetails?.map { item -> item.toDomain() }.orEmpty(),
     )
 
 internal fun PresentationScriptAnalysisResponse.toDomain(): ScriptCorrection =

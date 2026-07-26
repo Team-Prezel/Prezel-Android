@@ -15,6 +15,7 @@ import com.team.prezel.feature.report.impl.R
 @Composable
 internal fun ScriptActionBar(
     isApplyAllEnabled: Boolean,
+    isCopyEnabled: Boolean,
     onCopyClick: () -> Unit,
     onApplyAllClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -35,6 +36,7 @@ internal fun ScriptActionBar(
             PrezelButton(
                 text = stringResource(R.string.feature_report_impl_script_copy_all),
                 modifier = modifier,
+                enabled = isCopyEnabled,
                 type = ButtonType.GHOST,
                 hierarchy = ButtonHierarchy.SECONDARY,
                 onClick = onCopyClick,
@@ -49,6 +51,7 @@ private fun ScriptActionBarPreview() {
     PrezelTheme {
         ScriptActionBar(
             isApplyAllEnabled = true,
+            isCopyEnabled = true,
             onCopyClick = {},
             onApplyAllClick = {},
         )

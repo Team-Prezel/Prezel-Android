@@ -319,6 +319,13 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
         when (action) {
+            AnalysisFailureAction.NavigateHome -> {
+                audioController.reset()
+                viewModelScope.launch {
+                    sendEffect(AnalysisFlowUiEffect.NavigateHome)
+                }
+            }
+
             AnalysisFailureAction.RetryAnalysis -> {
                 updateState { copy(step = AnalysisFlowStep.ANALYSIS_FAILED) }
             }

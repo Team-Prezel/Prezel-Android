@@ -44,11 +44,12 @@ fun PrezelDialog(
                 .padding(horizontal = PrezelTheme.spacing.V20)
                 .clip(shape = PrezelTheme.shapes.V12)
                 .background(color = PrezelTheme.colors.bgRegular)
-                .padding(horizontal = PrezelTheme.spacing.V24),
+                .padding(horizontal = PrezelTheme.spacing.V16),
         ) {
             DialogContent(
                 title = title,
                 description = description,
+                modifier = Modifier.padding(horizontal = PrezelTheme.spacing.V8),
             )
 
             ActionSection { scope.content() }
