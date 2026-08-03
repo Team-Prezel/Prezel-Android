@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.designsystem.component.PrezelAccordion
 import com.team.prezel.core.designsystem.component.chip.chip.ChipHierarchy
@@ -37,6 +40,7 @@ import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.AccuracyDetailTab
 import com.team.prezel.feature.report.impl.accuracydetail.model.SentenceAnalysisUiModel
 import com.team.prezel.feature.report.impl.accuracydetail.model.WordAnalysisUiModel
+import com.team.prezel.feature.report.impl.accuracydetail.model.isScriptMatchIssue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -144,7 +148,6 @@ private fun SheetDetailContent(
             }
         }
     }
-    Spacer(modifier = Modifier.height(PrezelTheme.spacing.V12))
 }
 
 private fun ImmutableList<SentenceAnalysisUiModel>.hasNoVisibleDetails(
@@ -199,6 +202,9 @@ private fun SpeechDetailContent(
         selectedSentence = selectedSentence,
         expanded = expanded,
     )
+    val highlightedDetail = selectedSentence
+        ?.takeIf { detail -> detail.isSpeechAccuracyIssue }
+        ?: visibleAccuracyDetails.firstOrNull()
 
     if (visibleAccuracyDetails.isEmpty()) {
         EmptyDetailText(text = stringResource(R.string.feature_report_impl_accuracy_detail_sheet_empty_speech))
@@ -206,7 +212,7 @@ private fun SpeechDetailContent(
         visibleAccuracyDetails.forEach { detail ->
             SentenceAnalysisCard(
                 detail = detail,
-                highlighted = detail == selectedSentence,
+                highlighted = detail == highlightedDetail,
                 subText = detail.subFeedback.takeIf { expanded },
                 useStatusTextColor = false,
                 status = detail.speechAccuracyStatus,
@@ -237,16 +243,30 @@ private fun ScriptMatchDetailContent(
         selectedSentence = selectedSentence,
         expanded = expanded,
     )
+    val highlightedDetail = selectedSentence
+        ?.takeIf { detail -> detail.isScriptMatchIssue }
+        ?: visibleMismatchDetails.firstOrNull()
 
     if (visibleMismatchDetails.isEmpty()) {
         EmptyDetailText(text = stringResource(R.string.feature_report_impl_accuracy_detail_sheet_empty_script))
     }
 
     visibleMismatchDetails.forEach { detail ->
-        ScriptMatchAnalysisAccordion(
-            detail = detail,
-            highlighted = detail == selectedSentence,
-        )
+        if (expanded) {
+            ScriptMatchAnalysisAccordion(
+                detail = detail,
+                highlighted = detail == highlightedDetail,
+            )
+        } else {
+            SentenceAnalysisCard(
+                detail = detail,
+                highlighted = detail == highlightedDetail,
+                modifier = Modifier.heightIn(min = 104.dp),
+                text = detail.mainFeedback,
+                useStatusTextColor = false,
+                status = detail.scriptMatchStatus,
+            )
+        }
     }
 }
 
@@ -282,14 +302,40 @@ private fun ScriptMatchAnalysisAccordion(
             title = detail.mainFeedback,
             initiallyExpanded = false,
         ) {
-            Text(
-                text = detail.guideScript,
-                modifier = Modifier.padding(PrezelTheme.spacing.V12),
-                style = PrezelTheme.typography.body3Regular,
-                color = PrezelTheme.colors.textMedium,
-            )
+            GuideScriptText(detail = detail)
         }
     }
+}
+
+@Composable
+private fun GuideScriptText(detail: SentenceAnalysisUiModel) {
+    val feedbackGoodColor = PrezelTheme.colors.feedbackGoodRegular
+    val guideScript = buildAnnotatedString {
+        append(detail.guideScript)
+
+        var searchFrom = 0
+        detail.wordDetails.forEach { wordDetail ->
+            val start = detail.guideScript.indexOf(wordDetail.word, startIndex = searchFrom)
+            if (start < 0) return@forEach
+
+            val end = start + wordDetail.word.length
+            searchFrom = end
+            if (wordDetail.status.isScriptMatchIssue) {
+                addStyle(
+                    style = SpanStyle(color = feedbackGoodColor),
+                    start = start,
+                    end = end,
+                )
+            }
+        }
+    }
+
+    Text(
+        text = guideScript,
+        modifier = Modifier.padding(PrezelTheme.spacing.V12),
+        style = PrezelTheme.typography.body3Regular,
+        color = PrezelTheme.colors.textMedium,
+    )
 }
 
 private fun ImmutableList<SentenceAnalysisUiModel>.visibleScriptMatchDetails(

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -134,6 +136,7 @@ private fun ScriptInputScreen(
     onBack: () -> Unit,
 ) {
     var pendingInputTypeChange by remember { mutableStateOf<ScriptInputType?>(null) }
+    val textAreaScrollState = rememberScrollState()
 
     pendingInputTypeChange?.let { inputType ->
         ScriptInputTypeChangeDialog(
@@ -157,7 +160,9 @@ private fun ScriptInputScreen(
         isHiddenOptions = isHiddenOptions,
         trailingText = stringResource(R.string.feature_analysis_impl_skip),
         onTrailingTextClick = onSkip,
-        contentScrollable = form.scriptInputType == ScriptInputType.DIRECT_INPUT,
+        contentScrollable = false,
+        alwaysShowButtonAreaDivider =
+            form.scriptInputType == ScriptInputType.DIRECT_INPUT && textAreaScrollState.maxValue > 0,
     ) {
         AnalysisStepTitle(
             title = stringResource(R.string.feature_analysis_impl_script_headline),
@@ -175,6 +180,7 @@ private fun ScriptInputScreen(
                 pendingInputTypeChange = inputType
             },
             onScriptChange = onScriptChange,
+            textAreaScrollState = textAreaScrollState,
             onScriptFileUploadClick = onScriptFileUploadClick,
             onScriptFileClear = onScriptFileClear,
         )
@@ -189,6 +195,7 @@ private fun ColumnScope.ScriptInputContent(
     onSelectInputType: (ScriptInputType) -> Unit,
     onRequestInputTypeChange: (ScriptInputType) -> Unit,
     onScriptChange: (String) -> Unit,
+    textAreaScrollState: ScrollState,
     onScriptFileUploadClick: () -> Unit,
     onScriptFileClear: () -> Unit,
 ) {
@@ -221,6 +228,8 @@ private fun ColumnScope.ScriptInputContent(
         ScriptInputType.DIRECT_INPUT -> DirectScriptInput(
             script = form.script,
             onScriptChange = onScriptChange,
+            scrollState = textAreaScrollState,
+            modifier = Modifier.weight(weight = 1f, fill = false),
         )
     }
 }
@@ -229,14 +238,17 @@ private fun ColumnScope.ScriptInputContent(
 private fun DirectScriptInput(
     script: String,
     onScriptChange: (String) -> Unit,
+    scrollState: ScrollState,
+    modifier: Modifier = Modifier,
 ) {
     PrezelTextArea(
         value = script,
         onValueChange = onScriptChange,
         placeholder = stringResource(R.string.feature_analysis_impl_script_placeholder),
         maxLength = SCRIPT_MAX_LENGTH,
-        minHeight = 122.dp,
-        modifier = Modifier.fillMaxWidth(),
+        minHeight = 82.dp,
+        scrollState = scrollState,
+        modifier = modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(PrezelTheme.spacing.V16))
 }

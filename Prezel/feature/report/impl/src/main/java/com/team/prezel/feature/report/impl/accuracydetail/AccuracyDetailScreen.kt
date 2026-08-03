@@ -1,7 +1,7 @@
 package com.team.prezel.feature.report.impl.accuracydetail
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
@@ -22,10 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
@@ -138,7 +136,6 @@ private fun AccuracyDetailScreenContent(
             AccuracyDetailTab.SCRIPT_MATCH -> sentenceDetails.filter { detail -> detail.isScriptMatchIssue }
         }.toImmutableList()
     }
-    val sheetPeekHeight = AccuracyDetailPlayerSheetPeekHeight
     val playerState = rememberDetailPlayerState(
         selectedTab = selectedTab,
         sentenceDetails = sentenceDetails,
@@ -165,7 +162,6 @@ private fun AccuracyDetailScreenContent(
         sentenceDetails = sentenceDetails,
         playerState = playerState,
         expanded = isSheetExpanded,
-        sheetPeekHeight = sheetPeekHeight,
         onClose = onClose,
         tabLabels = tabLabels,
         onClickTab = { index -> pagerState.requestScrollToPage(index) },
@@ -259,7 +255,6 @@ private fun PlaybackEffect(
     }
 }
 
-@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccuracyDetailScaffold(
@@ -269,64 +264,65 @@ private fun AccuracyDetailScaffold(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
-    sheetPeekHeight: Dp,
     onClose: () -> Unit,
     tabLabels: ImmutableList<String>,
     onClickTab: (Int) -> Unit,
     pagerState: PagerState,
 ) {
-    val configuration = LocalConfiguration.current
-    val expandedSheetMaxHeight = configuration.screenHeightDp.dp - AccuracyDetailExpandedSheetTopGap
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val expandedSheetMaxHeight = (maxHeight - 48.dp).coerceAtLeast(0.dp)
 
-    BottomSheetScaffold(
-        modifier = Modifier.fillMaxSize(),
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = sheetPeekHeight,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetContainerColor = PrezelTheme.colors.solidWhite,
-        sheetShadowElevation = 12.dp,
-        sheetContent = {
-            AccuracyDetailPlayerSheet(
-                selectedTab = selectedTab,
-                selectedSentence = selectedSentence,
-                sentenceDetails = sentenceDetails,
-                playerState = playerState,
-                expanded = expanded,
-                modifier = if (expanded) {
-                    Modifier.heightIn(max = expandedSheetMaxHeight)
-                } else {
-                    Modifier
-                },
-            )
-        },
-        sheetDragHandle = null,
-        containerColor = PrezelTheme.colors.bgRegular,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
-            if (!expanded) {
-                AccuracyDetailTopAppBar(onClose = onClose)
+        BottomSheetScaffold(
+            modifier = Modifier.fillMaxSize(),
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = 276.dp,
+            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            sheetContainerColor = PrezelTheme.colors.solidWhite,
+            sheetShadowElevation = if (expanded) 0.dp else 12.dp,
+            sheetContent = {
+                AccuracyDetailPlayerSheet(
+                    selectedTab = selectedTab,
+                    selectedSentence = selectedSentence,
+                    sentenceDetails = sentenceDetails,
+                    playerState = playerState,
+                    expanded = expanded,
+                    modifier = Modifier
+                        .then(
+                            if (expanded) {
+                                Modifier.heightIn(max = expandedSheetMaxHeight)
+                            } else {
+                                Modifier
+                            },
+                        ),
+                )
+            },
+            sheetDragHandle = null,
+            containerColor = PrezelTheme.colors.bgRegular,
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                if (!expanded) {
+                    AccuracyDetailTopAppBar(onClose = onClose)
+                }
+                PrezelTabs(
+                    tabs = tabLabels,
+                    pagerState = pagerState,
+                    onClickTab = onClickTab,
+                )
+                ScriptDetailList(
+                    selectedTab = selectedTab,
+                    selectedSentence = selectedSentence,
+                    sentenceDetails = sentenceDetails,
+                )
             }
-            PrezelTabs(
-                tabs = tabLabels,
-                pagerState = pagerState,
-                onClickTab = onClickTab,
-            )
-            ScriptDetailList(
-                selectedTab = selectedTab,
-                selectedSentence = selectedSentence,
-                sentenceDetails = sentenceDetails,
-            )
         }
     }
 }
 
 private const val SEEK_SYNC_THRESHOLD_MILLIS = 750L
-private val AccuracyDetailPlayerSheetPeekHeight = 252.dp
-private val AccuracyDetailExpandedSheetTopGap = 56.dp
 
 @BasicPreview
 @Composable

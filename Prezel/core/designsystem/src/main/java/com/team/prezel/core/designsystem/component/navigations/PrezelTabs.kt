@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabIndicatorScope
@@ -30,6 +31,7 @@ fun PrezelTabs(
         selectedTabIndex = pagerState.currentPage,
         modifier = modifier.fillMaxWidth(),
         containerColor = Color.Transparent,
+        divider = { HorizontalDivider(thickness = PrezelTheme.stroke.V2) },
         indicator = { PrezelTabIndicator(selectedTabIndex = pagerState.currentPage) },
     ) {
         tabs.forEachIndexed { index, label ->
@@ -51,7 +53,7 @@ private fun TabIndicatorScope.PrezelTabIndicator(
     Spacer(
         modifier = modifier
             .fillMaxWidth()
-            .height(2.dp)
+            .height(PrezelTheme.stroke.V2)
             .tabIndicatorOffset(selectedTabIndex = selectedTabIndex)
             .background(PrezelTheme.colors.solidBlack),
     )
