@@ -26,6 +26,7 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonH
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonType
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
+import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.analysis.impl.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +46,7 @@ internal fun AnalysisStepLayout(
     contentScrollable: Boolean = true,
     alwaysShowButtonAreaDivider: Boolean = false,
     isHiddenOptions: Boolean = false,
+    showProgressBar: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
@@ -79,7 +81,9 @@ internal fun AnalysisStepLayout(
                 }
             }
         }
-        ProgressBar(progress = progress)
+        if (showProgressBar) {
+            ProgressBar(progress = progress)
+        }
 
         AnalysisStepContent(
             scrollState = contentScrollState,
@@ -125,7 +129,9 @@ private fun AnalysisStepButtonArea(
     onSubButtonClick: (() -> Unit)?,
 ) {
     PrezelButtonArea(
-        modifier = Modifier.background(PrezelTheme.colors.bgRegular),
+        modifier = Modifier
+            .background(PrezelTheme.colors.bgRegular)
+            .advancedImePadding(),
         showBackground = showDivider,
         mainButton = { modifier ->
             PrezelButton(

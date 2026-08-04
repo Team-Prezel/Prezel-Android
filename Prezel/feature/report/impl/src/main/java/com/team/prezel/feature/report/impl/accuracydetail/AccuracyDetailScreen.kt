@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -39,6 +39,7 @@ import com.team.prezel.core.model.presentation.WordAnalysisStatus
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.report.impl.R
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailPlayerSheet
+import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailSheetPeekHeight
 import com.team.prezel.feature.report.impl.accuracydetail.component.AccuracyDetailTopAppBar
 import com.team.prezel.feature.report.impl.accuracydetail.component.ScriptDetailList
 import com.team.prezel.feature.report.impl.accuracydetail.component.toMarkerType
@@ -148,7 +149,8 @@ private fun AccuracyDetailScreenContent(
         }
     }
     val scaffoldState = rememberDetailScaffoldState(expandedSheet = expandedSheet)
-    val isSheetExpanded = scaffoldState.isSheetExpanded
+    val isSheetLayoutExpanded = scaffoldState.isSheetLayoutExpanded
+    val showTopBar = !scaffoldState.isSheetTargetExpanded
 
     PlaybackEffect(
         playerState = playerState,
@@ -161,7 +163,8 @@ private fun AccuracyDetailScreenContent(
         selectedSentence = selectedSentence,
         sentenceDetails = sentenceDetails,
         playerState = playerState,
-        expanded = isSheetExpanded,
+        expanded = isSheetLayoutExpanded,
+        showTopBar = showTopBar,
         onClose = onClose,
         tabLabels = tabLabels,
         onClickTab = { index -> pagerState.requestScrollToPage(index) },
@@ -215,9 +218,13 @@ private fun rememberDetailScaffoldState(expandedSheet: Boolean): BottomSheetScaf
     )
 
 @OptIn(ExperimentalMaterial3Api::class)
-private val BottomSheetScaffoldState.isSheetExpanded: Boolean
+private val BottomSheetScaffoldState.isSheetLayoutExpanded: Boolean
     get() = bottomSheetState.currentValue == SheetValue.Expanded ||
         bottomSheetState.targetValue == SheetValue.Expanded
+
+@OptIn(ExperimentalMaterial3Api::class)
+private val BottomSheetScaffoldState.isSheetTargetExpanded: Boolean
+    get() = bottomSheetState.targetValue == SheetValue.Expanded
 
 @Composable
 private fun PlaybackEffect(
@@ -264,6 +271,7 @@ private fun AccuracyDetailScaffold(
     sentenceDetails: ImmutableList<SentenceAnalysisUiModel>,
     playerState: PrezelPlayerState,
     expanded: Boolean,
+    showTopBar: Boolean,
     onClose: () -> Unit,
     tabLabels: ImmutableList<String>,
     onClickTab: (Int) -> Unit,
@@ -275,7 +283,7 @@ private fun AccuracyDetailScaffold(
         BottomSheetScaffold(
             modifier = Modifier.fillMaxSize(),
             scaffoldState = scaffoldState,
-            sheetPeekHeight = 276.dp,
+            sheetPeekHeight = AccuracyDetailSheetPeekHeight,
             sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             sheetContainerColor = PrezelTheme.colors.solidWhite,
             sheetShadowElevation = if (expanded) 0.dp else 12.dp,
@@ -286,14 +294,7 @@ private fun AccuracyDetailScaffold(
                     sentenceDetails = sentenceDetails,
                     playerState = playerState,
                     expanded = expanded,
-                    modifier = Modifier
-                        .then(
-                            if (expanded) {
-                                Modifier.heightIn(max = expandedSheetMaxHeight)
-                            } else {
-                                Modifier
-                            },
-                        ),
+                    modifier = Modifier.height(expandedSheetMaxHeight),
                 )
             },
             sheetDragHandle = null,
@@ -304,7 +305,7 @@ private fun AccuracyDetailScaffold(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                if (!expanded) {
+                if (showTopBar) {
                     AccuracyDetailTopAppBar(onClose = onClose)
                 }
                 PrezelTabs(

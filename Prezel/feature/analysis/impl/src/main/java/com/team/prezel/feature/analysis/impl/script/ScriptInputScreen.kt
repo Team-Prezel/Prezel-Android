@@ -158,6 +158,7 @@ private fun ScriptInputScreen(
         onButtonClick = onNext,
         onBack = onBack,
         isHiddenOptions = isHiddenOptions,
+        showProgressBar = !isHiddenOptions,
         trailingText = stringResource(R.string.feature_analysis_impl_skip),
         onTrailingTextClick = onSkip,
         contentScrollable = false,

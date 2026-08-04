@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +43,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
+internal val AccuracyDetailSheetPeekHeight = 276.dp
+
 @Composable
 internal fun AccuracyDetailPlayerSheet(
     selectedTab: AccuracyDetailTab,
@@ -54,28 +54,29 @@ internal fun AccuracyDetailPlayerSheet(
     expanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.then(
-            if (expanded) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = if (expanded) {
                 Modifier.fillMaxSize()
             } else {
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
+                    .height(AccuracyDetailSheetPeekHeight)
             },
-        ),
-    ) {
-        SheetHandle()
-        SheetDetailContent(
-            selectedTab = selectedTab,
-            selectedSentence = selectedSentence,
-            sentenceDetails = sentenceDetails,
-            expanded = expanded,
-            modifier = if (expanded) Modifier.weight(1f) else Modifier,
-        )
-        PrezelPlayer(
-            state = playerState,
-            trackContentDescription = stringResource(R.string.feature_report_impl_script_detail_player_track_desc),
-            modifier = Modifier.navigationBarsPadding(),
-        )
+        ) {
+            SheetHandle()
+            SheetDetailContent(
+                selectedTab = selectedTab,
+                selectedSentence = selectedSentence,
+                sentenceDetails = sentenceDetails,
+                expanded = expanded,
+                modifier = Modifier.weight(1f),
+            )
+            PrezelPlayer(
+                state = playerState,
+                trackContentDescription = stringResource(R.string.feature_report_impl_script_detail_player_track_desc),
+            )
+        }
     }
 }
 
@@ -213,6 +214,7 @@ private fun SpeechDetailContent(
             SentenceAnalysisCard(
                 detail = detail,
                 highlighted = detail == highlightedDetail,
+                text = detail.mainFeedback,
                 subText = detail.subFeedback.takeIf { expanded },
                 useStatusTextColor = false,
                 status = detail.speechAccuracyStatus,
@@ -261,7 +263,6 @@ private fun ScriptMatchDetailContent(
             SentenceAnalysisCard(
                 detail = detail,
                 highlighted = detail == highlightedDetail,
-                modifier = Modifier.heightIn(min = 104.dp),
                 text = detail.mainFeedback,
                 useStatusTextColor = false,
                 status = detail.scriptMatchStatus,
