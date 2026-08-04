@@ -45,6 +45,7 @@ internal fun AnalysisStepLayout(
     contentScrollable: Boolean = true,
     alwaysShowButtonAreaDivider: Boolean = false,
     isHiddenOptions: Boolean = false,
+    showProgressBar: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
@@ -79,7 +80,9 @@ internal fun AnalysisStepLayout(
                 }
             }
         }
-        ProgressBar(progress = progress)
+        if (showProgressBar) {
+            ProgressBar(progress = progress)
+        }
 
         AnalysisStepContent(
             scrollState = contentScrollState,
