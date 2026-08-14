@@ -52,6 +52,7 @@ internal fun AnalysisScreen(
     navigateToHome: () -> Unit,
     navigateToStep: (step: AnalysisFlowStep, clearStack: Boolean) -> Unit,
     navigateToReport: (presentationId: Long) -> Unit,
+    shouldShowVoiceRecordingGuide: Boolean,
     viewModel: AnalysisFlowViewModel,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -89,6 +90,7 @@ internal fun AnalysisScreen(
     AnalysisScreen(
         uiState = uiState,
         isScriptExpanded = isScriptExpanded,
+        shouldShowVoiceRecordingGuide = shouldShowVoiceRecordingGuide,
         onIntent = viewModel::onIntent,
         onScriptExpandedChange = { isScriptExpanded = it },
     )
@@ -124,6 +126,7 @@ private fun AnalysisFlowUiState.statusBarStyle(isScriptExpanded: Boolean): EdgeT
 private fun AnalysisScreen(
     uiState: AnalysisFlowUiState,
     isScriptExpanded: Boolean,
+    shouldShowVoiceRecordingGuide: Boolean,
     onIntent: (AnalysisFlowUiIntent) -> Unit,
     onScriptExpandedChange: (Boolean) -> Unit,
 ) {
@@ -131,9 +134,15 @@ private fun AnalysisScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val voiceRecordingFeedback = uiState.voiceRecordingFeedback
     val voiceRecordingChromeUi = voiceRecordingFeedback?.toChromeUi()
+    var hasShownVoiceRecordingGuide by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(uiState.step) {
-        if (uiState.step == AnalysisFlowStep.VOICE_RECORDING) {
+    LaunchedEffect(shouldShowVoiceRecordingGuide, uiState.step) {
+        if (
+            shouldShowVoiceRecordingGuide &&
+            !hasShownVoiceRecordingGuide &&
+            uiState.step == AnalysisFlowStep.VOICE_RECORDING
+        ) {
+            hasShownVoiceRecordingGuide = true
             snackbarHostState.showPrezelSnackbar(
                 message = resources.getString(R.string.feature_analysis_impl_voice_recording_guide),
             )
