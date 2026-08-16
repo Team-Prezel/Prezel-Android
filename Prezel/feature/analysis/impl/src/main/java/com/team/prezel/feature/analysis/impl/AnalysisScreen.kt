@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -43,6 +44,9 @@ private const val RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS = 50
 private const val VOICE_RECORDING_FEEDBACK_DURATION_MILLIS = 3_000
 private const val VOICE_RECORDING_FEEDBACK_SAMPLE_COUNT =
     VOICE_RECORDING_FEEDBACK_DURATION_MILLIS / RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS
+private const val VOICE_RECORDING_FEEDBACK_UPDATE_INTERVAL_MILLIS = 1_000
+private const val VOICE_RECORDING_FEEDBACK_UPDATE_SAMPLE_COUNT =
+    VOICE_RECORDING_FEEDBACK_UPDATE_INTERVAL_MILLIS / RECORDING_VOLUME_SAMPLE_INTERVAL_MILLIS
 private const val SILENCE_VOLUME_THRESHOLD = 0.12f
 private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
 
@@ -132,7 +136,7 @@ private fun AnalysisScreen(
 ) {
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val voiceRecordingFeedback = uiState.voiceRecordingFeedback
+    val voiceRecordingFeedback = uiState.rememberVoiceRecordingFeedback()
     val voiceRecordingChromeUi = voiceRecordingFeedback?.toChromeUi()
     var hasShownVoiceRecordingGuide by rememberSaveable { mutableStateOf(false) }
 
@@ -187,6 +191,20 @@ private fun VoiceRecordingFeedback.toChromeUi(): VoiceRecordingChromeUi =
             titleResId = R.string.feature_analysis_impl_voice_recording_speak_louder_feedback,
         )
     }
+
+/**
+ * 상단 녹음 안내가 너무 빨리 바뀌지 않도록 최근 3초 음량을 1초마다 확인한다.
+ */
+@Composable
+private fun AnalysisFlowUiState.rememberVoiceRecordingFeedback(): VoiceRecordingFeedback? {
+    val isRecording = step == AnalysisFlowStep.VOICE_RECORDING &&
+        recordingState is AudioSessionState.Recording
+    val feedbackUpdateIndex = recordingVolumes.size / VOICE_RECORDING_FEEDBACK_UPDATE_SAMPLE_COUNT
+
+    return remember(isRecording, feedbackUpdateIndex) {
+        if (isRecording) voiceRecordingFeedback else null
+    }
+}
 
 private val AnalysisFlowUiState.voiceRecordingFeedback: VoiceRecordingFeedback?
     get() {
