@@ -81,6 +81,7 @@ private fun AnalysisRoute(
 
     AnalysisScreen(
         onBack = { navigator.goBack() },
+        shouldShowVoiceRecordingGuide = enterIntent.shouldShowVoiceRecordingGuide,
         navigateToStep = { step, clearStack ->
             navigator.navigate(
                 key = stepToNavKey(step),
@@ -102,6 +103,17 @@ private fun AnalysisRoute(
         viewModel = viewModel,
     )
 }
+
+/**
+ * 화면 전환 중 이전 화면에서 녹음 안내가 다시 뜨지 않도록,
+ * 실제 녹음 화면으로 들어가는 경우에만 true를 반환한다.
+ */
+private val AnalysisFlowUiIntent.shouldShowVoiceRecordingGuide: Boolean
+    get() = when (this) {
+        is AnalysisFlowUiIntent.EnterStep -> step == AnalysisFlowStep.VOICE_RECORDING
+        is AnalysisFlowUiIntent.StartReRecording -> true
+        else -> false
+    }
 
 private fun AnalysisNavKey.toNavKey(step: AnalysisFlowStep): AnalysisNavKey =
     when (step) {

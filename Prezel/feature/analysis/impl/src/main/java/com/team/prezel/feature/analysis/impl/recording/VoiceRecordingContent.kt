@@ -1,7 +1,7 @@
 package com.team.prezel.feature.analysis.impl.recording
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,9 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -288,26 +288,43 @@ private fun RecordingWaveform(
         status = voiceChromeUi?.status ?: recordingState.toVoiceChromeStatus(),
         volumes = visibleVolumes,
         showBaseline = false,
+        usesStreamingLayout = recordingState is AudioSessionState.Recording ||
+            recordingState is AudioSessionState.PausedRecording ||
+            recordingState is AudioSessionState.Playing,
         modifier = modifier,
     )
 }
 
+/**
+ * 1초 단위로 수신하는 재생 위치를 선형 보간해 50ms 원본 샘플을 시간순으로 공급한다.
+ * VoiceChrome은 원본 샘플 두 개를 100ms 막대로 합치므로 녹음과 재생이 같은 속도로 이동한다.
+ */
 @Composable
 private fun AudioSessionState.playbackProgress(): Float {
     if (this !is AudioSessionState.Playing) return playbackProgress
 
-    return key(source, durationSeconds) {
-        val animatedPlaybackProgress by animateFloatAsState(
-            targetValue = playbackProgress,
+    val animatedPlaybackProgress = remember(source, durationSeconds) {
+        Animatable(initialValue = playbackProgress)
+    }
+
+    LaunchedEffect(positionSeconds, durationSeconds) {
+        val nextPositionSeconds = (positionSeconds + 1).coerceAtMost(durationSeconds)
+        val nextProgress = if (durationSeconds <= 0) {
+            1f
+        } else {
+            nextPositionSeconds.toFloat() / durationSeconds
+        }
+
+        animatedPlaybackProgress.animateTo(
+            targetValue = nextProgress,
             animationSpec = tween(
-                durationMillis = 1000,
+                durationMillis = 1_000,
                 easing = LinearEasing,
             ),
-            label = "RecordingWaveformPlaybackProgress",
         )
-
-        animatedPlaybackProgress
     }
+
+    return animatedPlaybackProgress.value
 }
 
 private fun AudioSessionState.visibleRecordingVolumes(
