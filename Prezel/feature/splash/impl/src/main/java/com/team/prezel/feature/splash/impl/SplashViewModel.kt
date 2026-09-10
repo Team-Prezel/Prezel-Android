@@ -2,6 +2,7 @@ package com.team.prezel.feature.splash.impl
 
 import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.domain.usecase.auth.CheckLoginStatusUseCase
+import com.team.prezel.core.domain.usecase.fcm.RegisterFcmTokenUseCase
 import com.team.prezel.core.model.profile.User
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.splash.impl.contract.SplashUiEffect
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SplashViewModel @Inject constructor(
     private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
+    private val registerFcmTokenUseCase: RegisterFcmTokenUseCase,
 ) : BaseViewModel<SplashUiState, SplashUiIntent, SplashUiEffect>(SplashUiState()) {
     override fun onIntent(intent: SplashUiIntent) {
         when (intent) {
@@ -29,7 +31,10 @@ internal class SplashViewModel @Inject constructor(
             .launch {
                 checkLoginStatusUseCase()
                     .onSuccess { user ->
-                        user?.let { routeUser(user) } ?: sendEffect(SplashUiEffect.NavigateToLogin)
+                        user?.let {
+                            registerFcmToken()
+                            routeUser(user)
+                        } ?: sendEffect(SplashUiEffect.NavigateToLogin)
                     }.onFailure { exception ->
                         Timber.e(exception)
                         sendEffect(SplashUiEffect.ShowRetryableFailureMessage)
@@ -44,5 +49,10 @@ internal class SplashViewModel @Inject constructor(
             !user.isProfileComplete -> sendEffect(SplashUiEffect.NavigateToCreateProfile)
             else -> sendEffect(SplashUiEffect.NavigateToHome)
         }
+    }
+
+    private suspend fun registerFcmToken() {
+        registerFcmTokenUseCase()
+            .onFailure { exception -> Timber.e(exception, "Failed to register FCM token.") }
     }
 }

@@ -106,4 +106,6 @@ dependencies {
     implementation(libs.orhanobut.logger)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 }
