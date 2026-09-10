@@ -22,10 +22,8 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
 import com.team.prezel.feature.history.impl.component.HistoryItemList
@@ -164,6 +162,9 @@ private fun HistoryContent(
                             items = items.toImmutableList(),
                             onClickItem = { item -> onClickHistoryItem(item, pageType) },
                             modifier = Modifier.fillMaxSize(),
+                            itemEnabled = { item ->
+                                pageType != HistoryPageType.PREPARING || item.analysisStatus.canOpenReport()
+                            },
                         )
                     }
                 }
@@ -176,6 +177,17 @@ private val HISTORY_PAGE_TYPES = persistentListOf(
     HistoryPageType.PREPARING,
     HistoryPageType.COMPLETED,
 )
+
+private fun PresentationAnalysisStatus.canOpenReport(): Boolean =
+    when (this) {
+        PresentationAnalysisStatus.COMPLETE,
+        PresentationAnalysisStatus.DEFAULT,
+        -> true
+
+        PresentationAnalysisStatus.IN_PROCESS,
+        PresentationAnalysisStatus.FAIL,
+        -> false
+    }
 
 @BasicPreview
 @Composable
@@ -190,10 +202,8 @@ private fun HistoryScreenPreview() {
                         title = "캡스톤서비스기획 중간고사 발표",
                         presentationDate = LocalDate(2026, 4, 19),
                         category = Category.EDUCATION,
-                        purpose = Purpose.INFO,
-                        style = Style.FORMAL,
-                        audience = Audience.PROFESSIONAL,
                         dDay = "D-5",
+                        analysisStatus = PresentationAnalysisStatus.COMPLETE,
                     ),
                 ),
             ),
@@ -205,9 +215,6 @@ private fun HistoryScreenPreview() {
                         title = "서비스 런칭 회고 발표",
                         presentationDate = LocalDate(2026, 4, 12),
                         category = Category.OFFER,
-                        purpose = Purpose.EMPATHY,
-                        style = Style.CALM,
-                        audience = Audience.GENERAL,
                         dDay = "D+1",
                     ),
                 ),

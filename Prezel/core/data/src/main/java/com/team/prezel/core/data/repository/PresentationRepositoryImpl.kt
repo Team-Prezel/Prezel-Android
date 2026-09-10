@@ -18,6 +18,7 @@ import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
 import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import javax.inject.Inject
 
 internal class PresentationRepositoryImpl @Inject constructor(
@@ -145,7 +146,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         runCatching {
             presentationRemoteDataSource.getUpcomingPresentations()
         }.mapCatching { response ->
-            response.map(GetPresentationsResponse::toDomain)
+            response.map(GetUpcomingPresentationsV2Response::toDomain)
         }.mapDomainFailure()
 
     override suspend fun getPastPresentations(): Result<List<PresentationInfo>> =

@@ -1,11 +1,9 @@
 package com.team.prezel.feature.history.impl.model
 
 import androidx.compose.runtime.Immutable
-import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.model.presentation.PresentationInfo
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
 
@@ -15,12 +13,10 @@ internal data class HistoryUiModel(
     val title: String,
     val presentationDate: LocalDate,
     val category: Category,
-    val purpose: Purpose,
-    val style: Style,
-    val audience: Audience,
     val dDay: String,
+    val analysisStatus: PresentationAnalysisStatus = PresentationAnalysisStatus.DEFAULT,
 ) {
-    val dateLabel: String = "%04d.%02d.%02d".format(presentationDate.year, presentationDate.month.number, presentationDate.day)
+    val dateLabel: String = "%04d년 %02d월 %02d일".format(presentationDate.year, presentationDate.month.number, presentationDate.day)
 
     companion object {
         fun PresentationInfo.toUiModel(): HistoryUiModel =
@@ -29,10 +25,8 @@ internal data class HistoryUiModel(
                 title = title,
                 presentationDate = presentationDate,
                 category = category,
-                purpose = purpose,
-                style = style,
-                audience = audience,
                 dDay = dDay,
+                analysisStatus = analysisStatus,
             )
     }
 }

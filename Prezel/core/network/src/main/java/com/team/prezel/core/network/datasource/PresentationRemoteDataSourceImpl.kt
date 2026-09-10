@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -183,7 +184,8 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         presentationService.deleteAnalysis(analysisResultId = analysisResultId).requireSuccess()
     }
 
-    override suspend fun getUpcomingPresentations(): List<GetPresentationsResponse> = presentationService.getUpcomingPresentations().requireData()
+    override suspend fun getUpcomingPresentations(): List<GetUpcomingPresentationsV2Response> =
+        presentationService.getUpcomingPresentations().requireData()
 
     override suspend fun getPastPresentations(): List<GetPresentationsResponse> = presentationService.getPastPresentations().requireData()
 

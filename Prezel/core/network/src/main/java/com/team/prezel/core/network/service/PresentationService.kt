@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -57,8 +58,8 @@ interface PresentationService {
         @Path("analysisResultId") analysisResultId: Long,
     ): BaseResponse<Unit>
 
-    @GET("recording/upcoming")
-    suspend fun getUpcomingPresentations(): BaseResponse<List<GetPresentationsResponse>>
+    @GET("v2/recording/upcoming")
+    suspend fun getUpcomingPresentations(): BaseResponse<List<GetUpcomingPresentationsV2Response>>
 
     @GET("recording/past")
     suspend fun getPastPresentations(): BaseResponse<List<GetPresentationsResponse>>
