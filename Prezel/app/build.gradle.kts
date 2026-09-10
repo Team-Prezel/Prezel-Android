@@ -18,7 +18,7 @@ val androidVersionNameProvider = providers
 val appApplicationIdProvider = providers
     .gradleProperty("APP_APPLICATION_ID")
     .orElse(providers.environmentVariable("APP_APPLICATION_ID"))
-    .orElse("com.team.prezel")
+    .orElse("com.finger.prezel")
 val appNameProvider = providers
     .gradleProperty("APP_NAME")
     .orElse(providers.environmentVariable("APP_NAME"))
