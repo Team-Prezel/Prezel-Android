@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.PresentationAnalysisIdsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -30,6 +31,11 @@ interface PresentationService {
         @Path("presentationId") presentationId: Long,
         @Body multipart: MultiPartFormDataContent,
     ): BaseResponse<PresentationSummaryResponse>
+
+    @POST("v2/recording/analyze")
+    suspend fun analyzePresentationV2(
+        @Body multipart: MultiPartFormDataContent,
+    ): BaseResponse<PresentationAnalysisIdsResponse>
 
     @GET("recording/analyze/{analysisResultId}/scripts")
     suspend fun getScriptDetail(

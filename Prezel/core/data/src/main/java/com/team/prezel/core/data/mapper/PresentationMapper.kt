@@ -7,6 +7,7 @@ import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.ExpectedQuestion
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
+import com.team.prezel.core.model.presentation.PresentationAnalysisIds
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationGrowthPoint
 import com.team.prezel.core.model.presentation.PresentationInfo
@@ -23,6 +24,7 @@ import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.PresentationAnalysisIdsResponse
 import com.team.prezel.core.network.model.presentation.PresentationExpectedQuestionResponse
 import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptAnalysisResponse
@@ -57,6 +59,12 @@ internal fun PresentationSummaryResponse.toDomain(): PresentationAnalysisSummary
         growth = growthGraph?.map { item -> item.toDomain() }.orEmpty(),
         expectedQuestions = expectedQuestions.map { item -> item.toDomain() },
         selfFeedback = reviewContent,
+    )
+
+internal fun PresentationAnalysisIdsResponse.toDomain(): PresentationAnalysisIds =
+    PresentationAnalysisIds(
+        presentationId = presentationId,
+        analysisResultId = analysisResultId,
     )
 
 private fun PresentationGrowthResponse.toDomain(): PresentationGrowthPoint =

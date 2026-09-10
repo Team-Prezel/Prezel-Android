@@ -4,6 +4,7 @@ import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.PresentationAnalysisIdsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -27,6 +28,25 @@ interface PresentationRemoteDataSource {
         scriptFilePath: String?,
         audioFilePath: String,
     ): PresentationSummaryResponse
+
+    suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        type: String,
+        purpose: String,
+        style: String,
+        audience: String,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): PresentationAnalysisIdsResponse
+
+    suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+    ): PresentationAnalysisIdsResponse
 
     suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse
 

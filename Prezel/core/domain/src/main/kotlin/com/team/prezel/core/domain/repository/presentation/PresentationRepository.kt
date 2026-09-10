@@ -5,6 +5,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
+import com.team.prezel.core.model.presentation.PresentationAnalysisIds
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
@@ -31,6 +32,25 @@ interface PresentationRepository {
         scriptFilePath: String?,
         audioFilePath: String,
     ): Result<PresentationAnalysisSummary>
+
+    suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        category: Category,
+        purpose: Purpose,
+        style: Style,
+        audience: Audience,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): Result<PresentationAnalysisIds>
+
+    suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+    ): Result<PresentationAnalysisIds>
 
     suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail>
 

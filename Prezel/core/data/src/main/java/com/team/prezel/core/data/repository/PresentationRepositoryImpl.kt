@@ -8,6 +8,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
+import com.team.prezel.core.model.presentation.PresentationAnalysisIds
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
@@ -58,6 +59,50 @@ internal class PresentationRepositoryImpl @Inject constructor(
     ): Result<PresentationAnalysisSummary> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentation(
+                presentationId = presentationId,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+            )
+        }.mapCatching { response ->
+            response.toDomain()
+        }.mapDomainFailure()
+
+    override suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        category: Category,
+        purpose: Purpose,
+        style: Style,
+        audience: Audience,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): Result<PresentationAnalysisIds> =
+        runCatching {
+            presentationRemoteDataSource.analyzePresentationV2(
+                name = name,
+                date = date,
+                type = category.value,
+                purpose = purpose.value,
+                style = style.value,
+                audience = audience.value,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+            )
+        }.mapCatching { response ->
+            response.toDomain()
+        }.mapDomainFailure()
+
+    override suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+    ): Result<PresentationAnalysisIds> =
+        runCatching {
+            presentationRemoteDataSource.reAnalyzePresentationV2(
                 presentationId = presentationId,
                 script = script,
                 scriptFilePath = scriptFilePath,

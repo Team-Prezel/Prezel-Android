@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.PresentationAnalysisIdsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -99,6 +100,63 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                 }
                 setBody(multipart)
             }.body<BaseResponse<PresentationSummaryResponse>>()
+            .requireData()
+    }
+
+    override suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        type: String,
+        purpose: String,
+        style: String,
+        audience: String,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): PresentationAnalysisIdsResponse {
+        require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
+
+        val multipart = MultiPartFormDataContent(
+            formData {
+                append("name", name)
+                append("date", date)
+                append("type", type)
+                append("purpose", purpose)
+                append("style", style)
+                append("audience", audience)
+                appendAudioPart(audioFilePath = audioFilePath)
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
+                }
+            },
+        )
+
+        return presentationService.analyzePresentationV2(multipart = multipart).requireData()
+    }
+
+    override suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+    ): PresentationAnalysisIdsResponse {
+        val multipart = MultiPartFormDataContent(
+            formData {
+                audioFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendAudioPart(audioFilePath = path)
+                }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
+                }
+            },
+        )
+
+        return httpClient
+            .post("v2/recording/$presentationId/re-analyze") {
+                script?.takeIf(String::isNotBlank)?.let { url.parameters.append("script", it) }
+                setBody(multipart)
+            }.body<BaseResponse<PresentationAnalysisIdsResponse>>()
             .requireData()
     }
 
