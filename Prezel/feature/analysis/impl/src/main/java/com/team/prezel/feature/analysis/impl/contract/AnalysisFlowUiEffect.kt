@@ -8,13 +8,11 @@ internal sealed interface AnalysisFlowUiEffect : UiEffect {
 
     data object NavigateHome : AnalysisFlowUiEffect
 
+    data object NavigateToHistory : AnalysisFlowUiEffect
+
     data class NavigateToStep(
         val step: AnalysisFlowStep,
         val clearStack: Boolean = false,
-    ) : AnalysisFlowUiEffect
-
-    data class NavigateToReport(
-        val presentationId: Long,
     ) : AnalysisFlowUiEffect
 
     data class ShowMessage(

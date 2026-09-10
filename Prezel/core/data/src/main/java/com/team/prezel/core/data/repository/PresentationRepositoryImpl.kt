@@ -8,7 +8,6 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
-import com.team.prezel.core.model.presentation.PresentationAnalysisIds
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationInfo
 import com.team.prezel.core.model.presentation.PresentationScriptDetail
@@ -78,7 +77,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
-    ): Result<PresentationAnalysisIds> =
+    ): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.analyzePresentationV2(
                 name = name,
@@ -91,8 +90,6 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             )
-        }.mapCatching { response ->
-            response.toDomain()
         }.mapDomainFailure()
 
     override suspend fun reAnalyzePresentationV2(
@@ -100,7 +97,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
-    ): Result<PresentationAnalysisIds> =
+    ): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentationV2(
                 presentationId = presentationId,
@@ -108,8 +105,6 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
             )
-        }.mapCatching { response ->
-            response.toDomain()
         }.mapDomainFailure()
 
     override suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail> =

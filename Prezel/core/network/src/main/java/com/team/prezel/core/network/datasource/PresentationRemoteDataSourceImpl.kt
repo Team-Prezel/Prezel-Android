@@ -6,7 +6,6 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
-import com.team.prezel.core.network.model.presentation.PresentationAnalysisIdsResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -113,7 +112,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
-    ): PresentationAnalysisIdsResponse {
+    ) {
         require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
 
         val multipart = MultiPartFormDataContent(
@@ -132,7 +131,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             },
         )
 
-        return presentationService.analyzePresentationV2(multipart = multipart).requireData()
+        presentationService.analyzePresentationV2(multipart = multipart).requireSuccess()
     }
 
     override suspend fun reAnalyzePresentationV2(
@@ -140,7 +139,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
-    ): PresentationAnalysisIdsResponse {
+    ) {
         val multipart = MultiPartFormDataContent(
             formData {
                 audioFilePath?.takeIf(String::isNotBlank)?.let { path ->
@@ -152,12 +151,12 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             },
         )
 
-        return httpClient
+        httpClient
             .post("v2/recording/$presentationId/re-analyze") {
                 script?.takeIf(String::isNotBlank)?.let { url.parameters.append("script", it) }
                 setBody(multipart)
-            }.body<BaseResponse<PresentationAnalysisIdsResponse>>()
-            .requireData()
+            }.body<BaseResponse<Unit>>()
+            .requireSuccess()
     }
 
     override suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse =

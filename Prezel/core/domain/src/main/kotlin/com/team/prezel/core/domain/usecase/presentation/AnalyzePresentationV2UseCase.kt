@@ -3,7 +3,6 @@ package com.team.prezel.core.domain.usecase.presentation
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
 import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.PresentationAnalysisIds
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 import javax.inject.Inject
@@ -21,7 +20,7 @@ class AnalyzePresentationV2UseCase @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
-    ): Result<PresentationAnalysisIds> =
+    ): Result<Unit> =
         presentationRepository.analyzePresentationV2(
             name = name,
             date = date,

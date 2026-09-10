@@ -81,7 +81,7 @@
     <string name="feature_analysis_impl_upload_title">파일 업로드</string>
     <string name="feature_analysis_impl_direct_input_title">직접 입력</string>
     <string name="feature_analysis_impl_analyzing_title">분석 중</string>
-    <string name="feature_analysis_impl_analyzing_headline">발표 음성을 분석하고 있어요</string>
+    <string name="feature_analysis_impl_analyzing_headline">분석을 준비하고 있어요</string>
     <string name="feature_analysis_impl_report_placeholder">분석 리포트 화면</string>
     <string name="feature_analysis_impl_file_recognition_failed_title">분석할 음성을 인식하지 못했어요.</string>
     <string name="feature_analysis_impl_file_recognition_failed_description">음성이 작거나 주변 소음이 많았을 수 있어요.\n조용한 환경에서 다시 녹음해 주세요.</string>
@@ -101,5 +101,5 @@
     <string name="feature_analysis_impl_skip">건너뛰기</string>
     <string name="feature_analysis_impl_retry">다시 시도하기</string>
     <string name="feature_analysis_impl_analyze">분석하기</string>
-    <string name="feature_analysis_impl_analyze_complete_message">분석 리포트가 저장되었어요.</string>
+    <string name="feature_analysis_impl_analyze_complete_message">분석이 시작되었어요</string>
 </resources>
