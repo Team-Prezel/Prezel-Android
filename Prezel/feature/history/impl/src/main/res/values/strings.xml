@@ -28,6 +28,25 @@
     <string name="feature_history_impl_status_complete">분석완료!</string>
     <string name="feature_history_impl_status_fail">분석실패</string>
 
+    <!-- Failed Analysis -->
+    <string name="feature_history_impl_failed_analysis_title">분석 실패</string>
+    <string name="feature_history_impl_voice_recognition_failed_title">분석할 음성을 인식하지 못했어요.</string>
+    <string name="feature_history_impl_voice_recognition_failed_description">조용한 환경에서 다시 녹음해 주세요.</string>
+    <string name="feature_history_impl_file_recognition_failed_title">음성 파일을 찾지 못했어요.</string>
+    <string name="feature_history_impl_file_recognition_failed_description">다른 음성 파일로 다시 시도해 주세요.</string>
+    <string name="feature_history_impl_analysis_failed_title">분석 중 문제가 발생했어요.</string>
+    <string name="feature_history_impl_analysis_failed_description">일시적인 오류로 분석을 완료하지 못했어요.\n다시 시도해 주세요.</string>
+    <string name="feature_history_impl_delete">삭제</string>
+    <string name="feature_history_impl_retry">다시하기</string>
+    <string name="feature_history_impl_close">닫기</string>
+    <string name="feature_history_impl_delete_report_dialog_title">리포트를 삭제하시겠어요?</string>
+    <string name="feature_history_impl_delete_report_dialog_description">삭제된 분석 리포트는 다시 복구하기 어렵습니다.</string>
+    <string name="feature_history_impl_dialog_cancel">취소</string>
+    <string name="feature_history_impl_retry_failed">다시 시도하지 못했습니다.</string>
+    <string name="feature_history_impl_delete_failed">리포트를 삭제하지 못했습니다.</string>
+    <string name="feature_history_impl_retry_data_missing">다시 시도할 음성 데이터가 없습니다.</string>
+    <string name="feature_history_impl_delete_data_missing">삭제할 리포트 정보가 없습니다.</string>
+
     <!-- Message  -->
     <string name="feature_history_impl_fetch_data_failed">데이터를 불러오지 못했습니다.</string>
 </resources>

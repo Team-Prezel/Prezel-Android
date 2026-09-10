@@ -41,6 +41,13 @@ import kotlinx.datetime.LocalDate
 @Composable
 internal fun HistoryScreen(
     navigateToReport: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToFailedAnalysis: (
+        presentationId: Long,
+        analysisResultId: Long?,
+        errorType: String?,
+        script: String?,
+        audioUrl: String?,
+    ) -> Unit,
     navigateToAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
@@ -58,14 +65,21 @@ internal fun HistoryScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is HistoryUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.resId))
                 }
 
                 is HistoryUiEffect.NavigateToReport -> {
                     navigateToReport(effect.presentationId, effect.isPast)
+                }
+
+                is HistoryUiEffect.NavigateToFailedAnalysis -> {
+                    navigateToFailedAnalysis(
+                        effect.presentationId,
+                        effect.analysisResultId,
+                        effect.errorType,
+                        effect.script,
+                        effect.audioUrl,
+                    )
                 }
             }
         }
@@ -78,7 +92,7 @@ internal fun HistoryScreen(
         onClickHistoryItem = { item, pageType ->
             viewModel.onIntent(
                 HistoryUiIntent.ClickItem(
-                    presentationId = item.presentationId,
+                    item = item,
                     pageType = pageType,
                 ),
             )
@@ -114,6 +128,15 @@ internal fun HistoryScreen(
         )
     }
 }
+
+private val HistoryUiMessage.resId: Int
+    get() = when (this) {
+        HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
+        HistoryUiMessage.RETRY_FAILED -> R.string.feature_history_impl_retry_failed
+        HistoryUiMessage.DELETE_FAILED -> R.string.feature_history_impl_delete_failed
+        HistoryUiMessage.RETRY_DATA_MISSING -> R.string.feature_history_impl_retry_data_missing
+        HistoryUiMessage.DELETE_DATA_MISSING -> R.string.feature_history_impl_delete_data_missing
+    }
 
 @Composable
 private fun HistoryContent(
@@ -182,10 +205,10 @@ private fun PresentationAnalysisStatus.canOpenReport(): Boolean =
     when (this) {
         PresentationAnalysisStatus.COMPLETE,
         PresentationAnalysisStatus.DEFAULT,
+        PresentationAnalysisStatus.FAIL,
         -> true
 
         PresentationAnalysisStatus.IN_PROCESS,
-        PresentationAnalysisStatus.FAIL,
         -> false
     }
 

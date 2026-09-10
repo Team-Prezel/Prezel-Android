@@ -11,11 +11,13 @@ class ReAnalyzePresentationV2UseCase @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
+        audioUrl: String? = null,
     ): Result<Unit> =
         presentationRepository.reAnalyzePresentationV2(
             presentationId = presentationId,
             script = script,
             scriptFilePath = scriptFilePath,
             audioFilePath = audioFilePath,
+            audioUrl = audioUrl,
         )
 }

@@ -46,6 +46,7 @@ interface PresentationRemoteDataSource {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
+        audioUrl: String? = null,
     )
 
     suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse

@@ -49,6 +49,7 @@ interface PresentationRepository {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
+        audioUrl: String? = null,
     ): Result<Unit>
 
     suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail>

@@ -7,6 +7,7 @@ import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.ExpectedQuestion
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
+import com.team.prezel.core.model.presentation.PresentationAnalysisErrorType
 import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationGrowthPoint
@@ -138,6 +139,10 @@ internal fun GetUpcomingPresentationsV2Response.toDomain(): PresentationInfo =
         category = Category.from(value = type),
         dDay = dDay,
         analysisStatus = PresentationAnalysisStatus.from(value = cardStatus),
+        analysisResultId = analysisResultId,
+        analysisErrorType = PresentationAnalysisErrorType.from(value = errorType),
+        script = script,
+        audioUrl = audioUrl,
     )
 
 internal fun GetPracticeRecordsResponse.toDomain(): PracticeRecords =

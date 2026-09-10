@@ -98,6 +98,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String?,
+        audioUrl: String?,
     ): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentationV2(
@@ -105,6 +106,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                audioUrl = audioUrl,
             )
         }.mapDomainFailure()
 

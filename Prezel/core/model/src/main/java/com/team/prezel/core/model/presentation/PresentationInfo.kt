@@ -9,4 +9,8 @@ data class PresentationInfo(
     val category: Category,
     val dDay: String,
     val analysisStatus: PresentationAnalysisStatus = PresentationAnalysisStatus.DEFAULT,
+    val analysisResultId: Long? = null,
+    val analysisErrorType: PresentationAnalysisErrorType? = null,
+    val script: String? = null,
+    val audioUrl: String? = null,
 )
