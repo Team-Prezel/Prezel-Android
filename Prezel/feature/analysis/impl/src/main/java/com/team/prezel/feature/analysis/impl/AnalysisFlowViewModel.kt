@@ -451,7 +451,9 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
 
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
-            sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
+            if (currentState.retryFailedPresentationId == null) {
+                sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
+            }
 
             val audioFilePath = audioFileUri
                 ?.let { uri ->
@@ -474,9 +476,21 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
                     handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
-                    handleAnalysisFailure(throwable.toAnalysisFailureAction())
+                    handleRetryFailedAnalysisFailure(throwable.toAnalysisFailureAction())
                 },
             )
+        }
+    }
+
+    private fun handleRetryFailedAnalysisFailure(action: AnalysisFailureAction) {
+        if (currentState.retryFailedPresentationId == null) {
+            handleAnalysisFailure(action)
+            return
+        }
+
+        audioController.reset()
+        viewModelScope.launch {
+            sendEffect(AnalysisFlowUiEffect.NavigateBack)
         }
     }
 
