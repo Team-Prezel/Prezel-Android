@@ -1,27 +1,18 @@
 package com.team.prezel.feature.history.impl
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,13 +27,15 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.presentation.PresentationAnalysisErrorType
+import com.team.prezel.core.ui.component.StatusView
+import com.team.prezel.core.ui.state.LocalSnackbarCoroutineScope
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.contract.HistoryFailedAnalysisUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryFailedAnalysisUiIntent
 import com.team.prezel.feature.history.impl.contract.HistoryFailedAnalysisUiState
+import com.team.prezel.feature.history.impl.model.HistoryFailedAnalysisUiType
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
-import com.team.prezel.core.ui.R as CoreUiR
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun HistoryFailedAnalysisScreen(
@@ -53,12 +46,21 @@ internal fun HistoryFailedAnalysisScreen(
     audioUrl: String?,
     onClose: () -> Unit,
     navigateToHistory: () -> Unit,
+    navigateToFailedVoiceRecordingRetry: (presentationId: Long, script: String?) -> Unit,
+    navigateToFailedAudioUploadRetry: (presentationId: Long, script: String?) -> Unit,
+    navigateToFailedAnalysisRetry: (presentationId: Long, script: String?, audioUrl: String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryFailedAnalysisViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val snackbarScope = LocalSnackbarCoroutineScope.current
     val resources = LocalResources.current
+    val failureType = HistoryFailedAnalysisUiType.from(
+        value = errorTypeValue,
+        script = script,
+        audioUrl = audioUrl,
+    )
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -73,17 +75,35 @@ internal fun HistoryFailedAnalysisScreen(
 
     HistoryFailedAnalysisScreen(
         uiState = uiState,
-        errorType = PresentationAnalysisErrorType.from(errorTypeValue) ?: PresentationAnalysisErrorType.ANALYSIS,
+        failureType = failureType,
         modifier = modifier,
         onClose = onClose,
         onRetry = {
-            viewModel.onIntent(
-                HistoryFailedAnalysisUiIntent.Retry(
-                    presentationId = presentationId,
-                    script = script,
-                    audioUrl = audioUrl,
-                ),
-            )
+            when (failureType) {
+                is HistoryFailedAnalysisUiType.VoiceRecognition -> {
+                    navigateToFailedVoiceRecordingRetry(presentationId, failureType.script)
+                }
+
+                is HistoryFailedAnalysisUiType.FileRecognition -> {
+                    navigateToFailedAudioUploadRetry(presentationId, failureType.script)
+                }
+
+                is HistoryFailedAnalysisUiType.Analysis -> {
+                    navigateToFailedAnalysisRetry(presentationId, failureType.script, failureType.reusableAudioUrl)
+                }
+
+                is HistoryFailedAnalysisUiType.Unknown -> {
+                    if (failureType.reusableAudioUrl.isNullOrBlank()) {
+                        snackbarScope.launch {
+                            snackbarHostState.showPrezelSnackbar(
+                                message = resources.getString(R.string.feature_history_impl_retry_data_missing),
+                            )
+                        }
+                    } else {
+                        navigateToFailedAnalysisRetry(presentationId, failureType.script, failureType.reusableAudioUrl)
+                    }
+                }
+            }
         },
         onClickDelete = { viewModel.onIntent(HistoryFailedAnalysisUiIntent.ClickDelete) },
         onDismissDeleteDialog = { viewModel.onIntent(HistoryFailedAnalysisUiIntent.DismissDeleteDialog) },
@@ -97,7 +117,7 @@ internal fun HistoryFailedAnalysisScreen(
 @Composable
 private fun HistoryFailedAnalysisScreen(
     uiState: HistoryFailedAnalysisUiState,
-    errorType: PresentationAnalysisErrorType,
+    failureType: HistoryFailedAnalysisUiType,
     onClose: () -> Unit,
     onRetry: () -> Unit,
     onClickDelete: () -> Unit,
@@ -119,9 +139,7 @@ private fun HistoryFailedAnalysisScreen(
         }
 
         HistoryFailedAnalysisContent(
-            title = stringResource(errorType.titleResId),
-            description = stringResource(errorType.descriptionResId),
-            visualResId = errorType.visualResId,
+            failureType = failureType,
             modifier = Modifier.weight(1f),
         )
 
@@ -171,68 +189,27 @@ private fun HistoryFailedAnalysisScreen(
 
 @Composable
 private fun HistoryFailedAnalysisContent(
-    title: String,
-    description: String,
-    @DrawableRes visualResId: Int,
+    failureType: HistoryFailedAnalysisUiType,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(visualResId),
-            contentDescription = null,
-            modifier = Modifier.size(120.dp),
-        )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V8))
-        Text(
-            text = title,
-            style = PrezelTheme.typography.body2Bold,
-            color = PrezelTheme.colors.textLarge,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(PrezelTheme.spacing.V6))
-        Text(
-            text = description,
-            style = PrezelTheme.typography.caption1Regular,
-            color = PrezelTheme.colors.textMedium,
-            textAlign = TextAlign.Center,
-        )
-    }
+    StatusView(
+        title = stringResource(failureType.titleResId),
+        description = stringResource(failureType.descriptionResId),
+        modifier = modifier,
+        visual = {
+            Image(
+                painter = painterResource(failureType.visualResId),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp),
+            )
+        },
+    )
 }
-
-private val PresentationAnalysisErrorType.titleResId: Int
-    @StringRes get() = when (this) {
-        PresentationAnalysisErrorType.VOICE_RECOGNITION -> R.string.feature_history_impl_voice_recognition_failed_title
-        PresentationAnalysisErrorType.FILE_RECOGNITION -> R.string.feature_history_impl_file_recognition_failed_title
-        PresentationAnalysisErrorType.ANALYSIS -> R.string.feature_history_impl_analysis_failed_title
-    }
-
-private val PresentationAnalysisErrorType.descriptionResId: Int
-    @StringRes get() = when (this) {
-        PresentationAnalysisErrorType.VOICE_RECOGNITION -> R.string.feature_history_impl_voice_recognition_failed_description
-        PresentationAnalysisErrorType.FILE_RECOGNITION -> R.string.feature_history_impl_file_recognition_failed_description
-        PresentationAnalysisErrorType.ANALYSIS -> R.string.feature_history_impl_analysis_failed_description
-    }
-
-private val PresentationAnalysisErrorType.visualResId: Int
-    @DrawableRes get() = when (this) {
-        PresentationAnalysisErrorType.VOICE_RECOGNITION,
-        PresentationAnalysisErrorType.FILE_RECOGNITION,
-        -> CoreUiR.drawable.core_ui_error_voice
-
-        PresentationAnalysisErrorType.ANALYSIS -> CoreUiR.drawable.core_ui_error_analyze
-    }
 
 private val HistoryUiMessage.resId: Int
     get() = when (this) {
         HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
-        HistoryUiMessage.RETRY_FAILED -> R.string.feature_history_impl_retry_failed
         HistoryUiMessage.DELETE_FAILED -> R.string.feature_history_impl_delete_failed
-        HistoryUiMessage.RETRY_DATA_MISSING -> R.string.feature_history_impl_retry_data_missing
         HistoryUiMessage.DELETE_DATA_MISSING -> R.string.feature_history_impl_delete_data_missing
     }
 
@@ -242,7 +219,7 @@ private fun HistoryFailedAnalysisScreenPreview() {
     PrezelTheme {
         HistoryFailedAnalysisScreen(
             uiState = HistoryFailedAnalysisUiState(),
-            errorType = PresentationAnalysisErrorType.VOICE_RECOGNITION,
+            failureType = HistoryFailedAnalysisUiType.VoiceRecognition(script = "발표 대본"),
             onClose = {},
             onRetry = {},
             onClickDelete = {},

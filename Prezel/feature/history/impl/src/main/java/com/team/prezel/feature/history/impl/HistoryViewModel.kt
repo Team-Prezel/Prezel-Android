@@ -1,6 +1,7 @@
 package com.team.prezel.feature.history.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.common.fcm.HistoryRefreshNotifier
 import com.team.prezel.core.domain.usecase.presentation.FetchPastPresentationsUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchUpcomingPresentationsUseCase
 import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
@@ -24,7 +25,12 @@ import javax.inject.Inject
 internal class HistoryViewModel @Inject constructor(
     private val fetchUpcomingPresentationsUseCase: FetchUpcomingPresentationsUseCase,
     private val fetchPastPresentationsUseCase: FetchPastPresentationsUseCase,
+    private val historyRefreshNotifier: HistoryRefreshNotifier,
 ) : BaseViewModel<HistoryUiState, HistoryUiIntent, HistoryUiEffect>(HistoryUiState.Loading) {
+    init {
+        observeRefreshEvents()
+    }
+
     override fun onIntent(intent: HistoryUiIntent) {
         when (intent) {
             HistoryUiIntent.FetchData -> fetchData()
@@ -32,6 +38,14 @@ internal class HistoryViewModel @Inject constructor(
                 item = intent.item,
                 pageType = intent.pageType,
             )
+        }
+    }
+
+    private fun observeRefreshEvents() {
+        viewModelScope.launch {
+            historyRefreshNotifier.events.collect {
+                fetchData()
+            }
         }
     }
 

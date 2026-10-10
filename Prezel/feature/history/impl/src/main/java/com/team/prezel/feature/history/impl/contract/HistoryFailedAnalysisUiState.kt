@@ -13,12 +13,6 @@ internal data class HistoryFailedAnalysisUiState(
 ) : UiState
 
 internal sealed interface HistoryFailedAnalysisUiIntent : UiIntent {
-    data class Retry(
-        val presentationId: Long,
-        val script: String?,
-        val audioUrl: String?,
-    ) : HistoryFailedAnalysisUiIntent
-
     data object ClickDelete : HistoryFailedAnalysisUiIntent
 
     data object DismissDeleteDialog : HistoryFailedAnalysisUiIntent

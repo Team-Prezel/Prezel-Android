@@ -132,9 +132,7 @@ internal fun HistoryScreen(
 private val HistoryUiMessage.resId: Int
     get() = when (this) {
         HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
-        HistoryUiMessage.RETRY_FAILED -> R.string.feature_history_impl_retry_failed
         HistoryUiMessage.DELETE_FAILED -> R.string.feature_history_impl_delete_failed
-        HistoryUiMessage.RETRY_DATA_MISSING -> R.string.feature_history_impl_retry_data_missing
         HistoryUiMessage.DELETE_DATA_MISSING -> R.string.feature_history_impl_delete_data_missing
     }
 
@@ -168,7 +166,7 @@ private fun HistoryContent(
         ) {
             when (uiState) {
                 HistoryUiState.Loading -> {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = PrezelTheme.colors.interactiveRegular)
                 }
 
                 is HistoryUiState.Content -> {

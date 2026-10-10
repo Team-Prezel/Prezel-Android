@@ -2,6 +2,7 @@ package com.team.prezel
 
 import android.app.Application
 import com.team.prezel.core.auth.AuthInitializer
+import com.team.prezel.fcm.createFcmNotificationChannels
 import com.team.prezel.util.PrettyLoggerTree
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -13,5 +14,6 @@ class PrezelApplication : Application() {
 
         Timber.plant(PrettyLoggerTree())
         AuthInitializer.init(this)
+        createFcmNotificationChannels()
     }
 }

@@ -1,15 +1,21 @@
 package com.team.prezel
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.common.event.GlobalEventBus
+import com.team.prezel.core.common.fcm.AnalysisResultFcmPayload
 import com.team.prezel.core.data.NetworkMonitor
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.domain.usecase.badge.ConnectBadgeEventStreamUseCase
+import com.team.prezel.fcm.getAnalysisResultPayload
 import com.team.prezel.ui.PrezelApp
 import com.team.prezel.ui.rememberPrezelAppState
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,9 +36,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var entryBuilders: Set<@JvmSuppressWildcards EntryProviderScope<NavKey>.() -> Unit>
 
+    private var pendingAnalysisResultPayload by mutableStateOf<AnalysisResultFcmPayload?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        pendingAnalysisResultPayload = intent.getAnalysisResultPayload()
 
         setContent {
             PrezelTheme {
@@ -43,8 +52,16 @@ class MainActivity : ComponentActivity() {
                     globalEventBus = globalEventBus,
                     connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
                     entryBuilders = entryBuilders.toImmutableSet(),
+                    pendingAnalysisResultPayload = pendingAnalysisResultPayload,
+                    onAnalysisResultPayloadConsumed = { pendingAnalysisResultPayload = null },
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingAnalysisResultPayload = intent.getAnalysisResultPayload()
     }
 }

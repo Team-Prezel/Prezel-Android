@@ -155,6 +155,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                 downloadedAudioFile?.let { file ->
                     appendAudioPart(audioFile = file)
                 }
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
                 scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
                     appendScriptPart(scriptFilePath = path)
                 }
@@ -164,7 +165,6 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         try {
             httpClient
                 .post("v2/recording/$presentationId/re-analyze") {
-                    script?.takeIf(String::isNotBlank)?.let { url.parameters.append("script", it) }
                     setBody(multipart)
                 }.body<BaseResponse<Unit>>()
                 .requireSuccess()

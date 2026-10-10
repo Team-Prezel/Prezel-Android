@@ -42,6 +42,25 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
             isPast = key.isPast,
         )
     }
+    analysisEntry<AnalysisNavKey.RetryFailedVoiceRecording> { key ->
+        AnalysisFlowUiIntent.StartFailedVoiceRecordingRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+        )
+    }
+    analysisEntry<AnalysisNavKey.RetryFailedAudioUpload> { key ->
+        AnalysisFlowUiIntent.StartFailedAudioUploadRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+        )
+    }
+    analysisEntry<AnalysisNavKey.RetryFailedAnalysis> { key ->
+        AnalysisFlowUiIntent.StartFailedAnalysisRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+            audioUrl = key.audioUrl,
+        )
+    }
 }
 
 private fun AnalysisNavKey.enterStep(step: AnalysisFlowStep): AnalysisFlowUiIntent =
@@ -105,6 +124,7 @@ private val AnalysisFlowUiIntent.shouldShowVoiceRecordingGuide: Boolean
     get() = when (this) {
         is AnalysisFlowUiIntent.EnterStep -> step == AnalysisFlowStep.VOICE_RECORDING
         is AnalysisFlowUiIntent.StartReRecording -> true
+        is AnalysisFlowUiIntent.StartFailedVoiceRecordingRetry -> true
         else -> false
     }
 

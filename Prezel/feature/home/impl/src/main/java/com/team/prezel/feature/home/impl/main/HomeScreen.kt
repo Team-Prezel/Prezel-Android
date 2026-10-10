@@ -1,11 +1,16 @@
 package com.team.prezel.feature.home.impl.main
 
+import android.Manifest
+import android.os.Build
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -17,6 +22,7 @@ import com.team.prezel.core.model.presentation.Category
 import com.team.prezel.core.ui.state.LocalAppDimmerState
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.state.rememberAppDimmerState
+import com.team.prezel.core.ui.util.rememberPermissionRequest
 import com.team.prezel.feature.home.impl.R
 import com.team.prezel.feature.home.impl.main.component.HomeScreenContent
 import com.team.prezel.feature.home.impl.main.contract.HomeUiEffect
@@ -47,6 +53,29 @@ internal fun HomeScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
+    val shouldRequestNotificationPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
+    val notificationPermissionRequest = rememberPermissionRequest(
+        permission = Manifest.permission.POST_NOTIFICATIONS,
+        onPermissionGranted = {},
+        onPermissionDenied = {},
+        onPermissionPermanentlyDenied = {},
+    )
+
+    LaunchedEffect(
+        shouldRequestNotificationPermission,
+        notificationPermissionRequest.isGranted,
+        hasRequestedNotificationPermission,
+    ) {
+        if (
+            shouldRequestNotificationPermission &&
+            !notificationPermissionRequest.isGranted &&
+            !hasRequestedNotificationPermission
+        ) {
+            hasRequestedNotificationPermission = true
+            notificationPermissionRequest.launch()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)

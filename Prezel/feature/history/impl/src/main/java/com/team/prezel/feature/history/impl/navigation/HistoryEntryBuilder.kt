@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.team.prezel.core.navigation.LocalNavigator
 import com.team.prezel.feature.analysis.api.AnalysisNavKey
+import com.team.prezel.feature.history.api.HistoryFailedAnalysisNavKey
 import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.history.impl.HistoryFailedAnalysisScreen
 import com.team.prezel.feature.history.impl.HistoryScreen
@@ -14,7 +15,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
-import kotlinx.serialization.Serializable
 
 internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
     entry<HistoryNavKey> {
@@ -58,18 +58,34 @@ internal fun EntryProviderScope<NavKey>.featureHistoryEntryBuilder() {
             audioUrl = key.audioUrl,
             onClose = { navigator.goBack() },
             navigateToHistory = { navigator.replaceRoot(HistoryNavKey) },
+            navigateToFailedVoiceRecordingRetry = { presentationId, script ->
+                navigator.navigate(
+                    AnalysisNavKey.RetryFailedVoiceRecording(
+                        presentationId = presentationId,
+                        script = script,
+                    ),
+                )
+            },
+            navigateToFailedAudioUploadRetry = { presentationId, script ->
+                navigator.navigate(
+                    AnalysisNavKey.RetryFailedAudioUpload(
+                        presentationId = presentationId,
+                        script = script,
+                    ),
+                )
+            },
+            navigateToFailedAnalysisRetry = { presentationId, script, audioUrl ->
+                navigator.navigate(
+                    AnalysisNavKey.RetryFailedAnalysis(
+                        presentationId = presentationId,
+                        script = script,
+                        audioUrl = audioUrl,
+                    ),
+                )
+            },
         )
     }
 }
-
-@Serializable
-private data class HistoryFailedAnalysisNavKey(
-    val presentationId: Long,
-    val analysisResultId: Long?,
-    val errorType: String?,
-    val script: String?,
-    val audioUrl: String?,
-) : NavKey
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)

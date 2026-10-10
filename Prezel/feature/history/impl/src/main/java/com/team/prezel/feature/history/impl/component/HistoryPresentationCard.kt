@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -71,8 +73,18 @@ private fun HistoryPresentationStatusTrack(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(style.containerColor)
-            .padding(horizontal = PrezelTheme.spacing.V12, vertical = PrezelTheme.spacing.V8),
+            .drawBehind {
+                drawRect(color = style.containerColor)
+                style.progressColor?.let { progressColor ->
+                    drawRect(
+                        color = progressColor,
+                        size = Size(
+                            width = size.width * style.progressFraction,
+                            height = size.height,
+                        ),
+                    )
+                }
+            }.padding(horizontal = PrezelTheme.spacing.V12, vertical = PrezelTheme.spacing.V8),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -168,8 +180,10 @@ private fun Category.iconResId(): Int =
 private fun PresentationAnalysisStatus.trackStyle(): HistoryPresentationStatusTrackStyle =
     when (this) {
         PresentationAnalysisStatus.IN_PROCESS -> HistoryPresentationStatusTrackStyle(
-            containerColor = PrezelTheme.colors.bgLarge,
+            containerColor = PrezelTheme.colors.bgDisabled,
             contentColor = PrezelTheme.colors.textRegular,
+            progressColor = PrezelTheme.colors.bgLarge,
+            progressFraction = 0.5f,
         )
 
         PresentationAnalysisStatus.COMPLETE,
@@ -197,6 +211,8 @@ private fun PresentationAnalysisStatus.statusLabelResId(): Int? =
 private data class HistoryPresentationStatusTrackStyle(
     val containerColor: Color,
     val contentColor: Color,
+    val progressColor: Color? = null,
+    val progressFraction: Float = 0f,
 )
 
 @BasicPreview
