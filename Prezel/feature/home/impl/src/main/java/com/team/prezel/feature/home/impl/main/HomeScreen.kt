@@ -53,29 +53,7 @@ internal fun HomeScreen(
     val snackbarHostState = LocalSnackbarHostState.current
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
-    val shouldRequestNotificationPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
-    val notificationPermissionRequest = rememberPermissionRequest(
-        permission = Manifest.permission.POST_NOTIFICATIONS,
-        onPermissionGranted = {},
-        onPermissionDenied = {},
-        onPermissionPermanentlyDenied = {},
-    )
-
-    LaunchedEffect(
-        shouldRequestNotificationPermission,
-        notificationPermissionRequest.isGranted,
-        hasRequestedNotificationPermission,
-    ) {
-        if (
-            shouldRequestNotificationPermission &&
-            !notificationPermissionRequest.isGranted &&
-            !hasRequestedNotificationPermission
-        ) {
-            hasRequestedNotificationPermission = true
-            notificationPermissionRequest.launch()
-        }
-    }
+    RequestNotificationPermissionOnce()
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(HomeUiIntent.FetchData)
@@ -121,6 +99,33 @@ internal fun HomeScreen(
         },
         modifier = modifier,
     )
+}
+
+@Composable
+private fun RequestNotificationPermissionOnce() {
+    val shouldRequestNotificationPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
+    val notificationPermissionRequest = rememberPermissionRequest(
+        permission = Manifest.permission.POST_NOTIFICATIONS,
+        onPermissionGranted = {},
+        onPermissionDenied = {},
+        onPermissionPermanentlyDenied = {},
+    )
+
+    LaunchedEffect(
+        shouldRequestNotificationPermission,
+        notificationPermissionRequest.isGranted,
+        hasRequestedNotificationPermission,
+    ) {
+        if (
+            shouldRequestNotificationPermission &&
+            !notificationPermissionRequest.isGranted &&
+            !hasRequestedNotificationPermission
+        ) {
+            hasRequestedNotificationPermission = true
+            notificationPermissionRequest.launch()
+        }
+    }
 }
 
 @BasicPreview

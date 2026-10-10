@@ -20,6 +20,7 @@ import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 import io.ktor.client.request.forms.MultiPartFormDataContent
 
+@Suppress("TooManyFunctions")
 interface PresentationService {
     @POST("recording/analyze")
     suspend fun analyzePresentation(

@@ -31,6 +31,7 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import java.io.File
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 internal class PresentationRemoteDataSourceImpl @Inject constructor(
     private val presentationService: PresentationService,
     private val httpClient: HttpClient,

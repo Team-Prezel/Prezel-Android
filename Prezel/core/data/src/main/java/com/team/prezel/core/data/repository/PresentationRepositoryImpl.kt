@@ -21,6 +21,7 @@ import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
 import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 internal class PresentationRepositoryImpl @Inject constructor(
     private val presentationRemoteDataSource: PresentationRemoteDataSource,
 ) : PresentationRepository {

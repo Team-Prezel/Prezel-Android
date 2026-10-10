@@ -33,6 +33,7 @@ import kotlinx.coroutines.withContext
 private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
 private const val ANALYSIS_SUCCESS_HANDLING_DELAY_MILLIS = 3_000L
 
+@Suppress("TooManyFunctions")
 @HiltViewModel(assistedFactory = AnalysisFlowViewModel.Factory::class)
 internal class AnalysisFlowViewModel @AssistedInject constructor(
     @Assisted isFromReport: Boolean,
@@ -71,6 +72,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     override fun onIntent(intent: AnalysisFlowUiIntent) {
         intent.reduceFormOrNull(currentState.form)?.let { nextForm ->
             updateState { copy(form = nextForm) }
