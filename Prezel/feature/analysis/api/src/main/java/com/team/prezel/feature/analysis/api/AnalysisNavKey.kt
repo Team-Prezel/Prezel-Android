@@ -62,6 +62,31 @@ sealed interface AnalysisNavKey : NavKey {
         override val flowId: String = newAnalysisFlowId(),
         override val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
     ) : AnalysisNavKey
+
+    @Serializable
+    data class RetryFailedVoiceRecording(
+        val presentationId: Long,
+        val script: String?,
+        override val flowId: String = newAnalysisFlowId(),
+        override val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
+    ) : AnalysisNavKey
+
+    @Serializable
+    data class RetryFailedAudioUpload(
+        val presentationId: Long,
+        val script: String?,
+        override val flowId: String = newAnalysisFlowId(),
+        override val startType: AnalysisStartType = AnalysisStartType.FILE_UPLOAD,
+    ) : AnalysisNavKey
+
+    @Serializable
+    data class RetryFailedAnalysis(
+        val presentationId: Long,
+        val script: String?,
+        val audioUrl: String?,
+        override val flowId: String = newAnalysisFlowId(),
+        override val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
+    ) : AnalysisNavKey
 }
 
 @Serializable

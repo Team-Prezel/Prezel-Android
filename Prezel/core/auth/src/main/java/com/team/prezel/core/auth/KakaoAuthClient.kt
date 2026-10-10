@@ -40,8 +40,6 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
 
     override suspend fun logout(): Result<Unit> =
         suspendCancellableCoroutine { continuation ->
-            Timber.d("카카오 로그아웃 시도")
-
             UserApiClient.instance.logout { error ->
                 if (error != null) {
                     Timber.e(error, "카카오 로그아웃에 실패했습니다.")
@@ -49,15 +47,12 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
                     return@logout
                 }
 
-                Timber.d("카카오 로그아웃에 성공했습니다.")
                 continuation.resume(Result.success(Unit))
             }
         }
 
     override suspend fun unlink(): Result<Unit> =
         suspendCancellableCoroutine { continuation ->
-            Timber.d("카카오 회원탈퇴 시도")
-
             UserApiClient.instance.unlink { error ->
                 if (error != null) {
                     Timber.e(error, "카카오 회원탈퇴에 실패했습니다.")
@@ -65,7 +60,6 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
                     return@unlink
                 }
 
-                Timber.d("카카오 회원탈퇴에 성공했습니다.")
                 continuation.resume(Result.success(Unit))
             }
         }
@@ -74,7 +68,6 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
         context: Context,
         continuation: CancellableContinuation<AuthResult>,
     ) {
-        Timber.d("카카오톡으로 로그인 시도")
         UserApiClient.instance.loginWithKakaoTalk(
             context = context,
             callback = continuation.loginCallback(loginType = "카카오톡"),
@@ -85,7 +78,6 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
         context: Context,
         continuation: CancellableContinuation<AuthResult>,
     ) {
-        Timber.d("카카오 계정으로 로그인 시도")
         UserApiClient.instance.loginWithKakaoAccount(
             context = context,
             callback = continuation.loginCallback(loginType = "카카오 계정"),
@@ -98,7 +90,7 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
                 error != null -> {
                     val authResult = error.toAuthResult()
                     when (authResult) {
-                        AuthResult.Cancelled -> Timber.i(error, "$loginType 로그인이 취소되었습니다.")
+                        AuthResult.Cancelled -> Unit
                         is AuthResult.Failure -> Timber.w(error, "$loginType 로그인에 실패했습니다.")
                         is AuthResult.Success -> Unit
                     }
@@ -112,7 +104,6 @@ class KakaoAuthClient @Inject constructor() : AuthClient {
                         Timber.w(throwable)
                         resume(AuthResult.Failure(throwable))
                     } else {
-                        Timber.d("$loginType 로그인에 성공했습니다.")
                         resume(AuthResult.Success(idToken = idToken))
                     }
                 }

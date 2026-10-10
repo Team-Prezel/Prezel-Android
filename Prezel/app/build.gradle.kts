@@ -18,7 +18,7 @@ val androidVersionNameProvider = providers
 val appApplicationIdProvider = providers
     .gradleProperty("APP_APPLICATION_ID")
     .orElse(providers.environmentVariable("APP_APPLICATION_ID"))
-    .orElse("com.team.prezel")
+    .orElse("com.finger.prezel")
 val appNameProvider = providers
     .gradleProperty("APP_NAME")
     .orElse(providers.environmentVariable("APP_NAME"))
@@ -98,6 +98,7 @@ dependencies {
     implementation(projects.featureAnalysisImpl)
     implementation(projects.featureSettingImpl)
     implementation(projects.featureProfileImpl)
+    implementation(projects.featureReportApi)
     implementation(projects.featureReportImpl)
 
     implementation(libs.androidx.core.ktx)
@@ -106,4 +107,6 @@ dependencies {
     implementation(libs.orhanobut.logger)
     implementation(libs.timber)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 }

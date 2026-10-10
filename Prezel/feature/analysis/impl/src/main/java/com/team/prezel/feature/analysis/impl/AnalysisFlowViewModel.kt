@@ -4,9 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.audio.RecordingAudioController
 import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationUseCase
+import com.team.prezel.core.domain.usecase.presentation.AnalyzePresentationV2UseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationDetailUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchPresentationScriptDetailUseCase
-import com.team.prezel.core.domain.usecase.presentation.ReAnalyzePresentationUseCase
+import com.team.prezel.core.domain.usecase.presentation.ReAnalyzePresentationV2UseCase
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.analysis.api.AnalysisStartType
@@ -17,6 +18,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
+import com.team.prezel.feature.analysis.impl.contract.recordingFilePath
 import com.team.prezel.feature.analysis.impl.model.AnalysisUiMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -24,16 +26,20 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
+private const val ANALYSIS_SUCCESS_HANDLING_DELAY_MILLIS = 3_000L
 
+@Suppress("TooManyFunctions")
 @HiltViewModel(assistedFactory = AnalysisFlowViewModel.Factory::class)
 internal class AnalysisFlowViewModel @AssistedInject constructor(
     @Assisted isFromReport: Boolean,
     private val analyzePresentationUseCase: AnalyzePresentationUseCase,
-    private val reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
+    private val analyzePresentationV2UseCase: AnalyzePresentationV2UseCase,
+    private val reAnalyzePresentationV2UseCase: ReAnalyzePresentationV2UseCase,
     private val fetchPresentationDetailUseCase: FetchPresentationDetailUseCase,
     private val fetchPresentationScriptDetailUseCase: FetchPresentationScriptDetailUseCase,
     private val analysisFileCache: AnalysisFileCache,
@@ -66,6 +72,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         }
     }
 
+    @Suppress("CyclomaticComplexMethod")
     override fun onIntent(intent: AnalysisFlowUiIntent) {
         intent.reduceFormOrNull(currentState.form)?.let { nextForm ->
             updateState { copy(form = nextForm) }
@@ -89,6 +96,22 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
             is AnalysisFlowUiIntent.StartReWritingScript -> startReWritingScript(
                 presentationId = intent.presentationId,
                 isPast = intent.isPast,
+            )
+
+            is AnalysisFlowUiIntent.StartFailedVoiceRecordingRetry -> startFailedVoiceRecordingRetry(
+                presentationId = intent.presentationId,
+                script = intent.script,
+            )
+
+            is AnalysisFlowUiIntent.StartFailedAudioUploadRetry -> startFailedAudioUploadRetry(
+                presentationId = intent.presentationId,
+                script = intent.script,
+            )
+
+            is AnalysisFlowUiIntent.StartFailedAnalysisRetry -> startFailedAnalysisRetry(
+                presentationId = intent.presentationId,
+                script = intent.script,
+                audioUrl = intent.audioUrl,
             )
 
             is AnalysisFlowUiIntent.SelectScriptFile -> selectScriptFile(intent.fileUri)
@@ -155,6 +178,11 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         if (!currentState.canMoveNext) return
 
         if (currentState.step == AnalysisFlowStep.VOICE_RECORDING || currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) {
+            if (currentState.retryFailedPresentationId != null) {
+                retryFailedAnalysisFromInput()
+                return
+            }
+
             analyzePresentation()
             return
         }
@@ -199,14 +227,12 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
             val analysisResult = submission.analyzePresentationRecording(
                 analysisFileCache = analysisFileCache,
                 analyzePresentationUseCase = analyzePresentationUseCase,
+                analyzePresentationV2UseCase = analyzePresentationV2UseCase,
             )
 
             analysisResult.fold(
-                onSuccess = { result ->
-                    if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        audioController.reset()
-                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result))
-                    }
+                onSuccess = {
+                    handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
                     handleAnalysisFailure(throwable.toAnalysisFailureAction())
@@ -228,20 +254,26 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
             val reAnalyzeResult = submission.reAnalyzePresentationRecording(
                 presentationId = presentationId,
                 analysisFileCache = analysisFileCache,
-                reAnalyzePresentationUseCase = reAnalyzePresentationUseCase,
+                reAnalyzePresentationV2UseCase = reAnalyzePresentationV2UseCase,
             )
 
             reAnalyzeResult.fold(
-                onSuccess = { result ->
-                    if (currentState.step == AnalysisFlowStep.ANALYZING) {
-                        audioController.reset()
-                        sendEffect(AnalysisFlowUiEffect.NavigateToReport(presentationId = result.presentationId))
-                    }
+                onSuccess = {
+                    handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
                     handleAnalysisFailure(throwable.toAnalysisFailureAction())
                 },
             )
+        }
+    }
+
+    private suspend fun handleAnalysisRequestSuccess() {
+        delay(ANALYSIS_SUCCESS_HANDLING_DELAY_MILLIS)
+
+        if (currentState.step == AnalysisFlowStep.ANALYZING) {
+            audioController.reset()
+            sendEffect(AnalysisFlowUiEffect.NavigateToHistory)
         }
     }
 
@@ -314,6 +346,153 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
                     sendEffect(AnalysisFlowUiEffect.ShowMessage(AnalysisUiMessage.ANALYSIS_FAILED))
                     sendEffect(AnalysisFlowUiEffect.NavigateBack)
                 }
+        }
+    }
+
+    private fun startFailedVoiceRecordingRetry(
+        presentationId: Long,
+        script: String?,
+    ) {
+        if (currentState.retryFailedPresentationId == presentationId && currentState.step == AnalysisFlowStep.VOICE_RECORDING) return
+
+        audioController.reset()
+        updateState {
+            copy(
+                step = AnalysisFlowStep.VOICE_RECORDING,
+                startType = AnalysisStartType.VOICE_RECORDING,
+                retryFailedPresentationId = presentationId,
+                retryFailedScript = script,
+                reRecordingPresentationId = null,
+                reWritingScriptPresentationId = null,
+                form = form.copy(
+                    scriptInputType = ScriptInputType.DIRECT_INPUT,
+                    script = script.orEmpty(),
+                    audioFileUri = null,
+                ),
+            )
+        }
+    }
+
+    private fun startFailedAudioUploadRetry(
+        presentationId: Long,
+        script: String?,
+    ) {
+        if (currentState.retryFailedPresentationId == presentationId && currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) return
+
+        audioController.reset()
+        updateState {
+            copy(
+                step = AnalysisFlowStep.AUDIO_UPLOAD,
+                startType = AnalysisStartType.FILE_UPLOAD,
+                retryFailedPresentationId = presentationId,
+                retryFailedScript = script,
+                reRecordingPresentationId = null,
+                reWritingScriptPresentationId = null,
+                form = form.copy(
+                    scriptInputType = ScriptInputType.DIRECT_INPUT,
+                    script = script.orEmpty(),
+                    audioFileUri = null,
+                ),
+            )
+        }
+    }
+
+    private fun startFailedAnalysisRetry(
+        presentationId: Long,
+        script: String?,
+        audioUrl: String?,
+    ) {
+        if (currentState.retryFailedPresentationId == presentationId && currentState.step == AnalysisFlowStep.ANALYZING) return
+
+        audioController.reset()
+        updateState {
+            copy(
+                startType = AnalysisStartType.VOICE_RECORDING,
+                retryFailedPresentationId = presentationId,
+                retryFailedScript = script,
+                reRecordingPresentationId = null,
+                reWritingScriptPresentationId = null,
+                form = form.copy(
+                    scriptInputType = ScriptInputType.DIRECT_INPUT,
+                    script = script.orEmpty(),
+                    audioFileUri = null,
+                ),
+            )
+        }
+        retryFailedAnalysis(
+            presentationId = presentationId,
+            script = script,
+            audioFileUri = null,
+            recordingFilePath = null,
+            audioUrl = audioUrl,
+        )
+    }
+
+    private fun retryFailedAnalysisFromInput() {
+        val presentationId = currentState.retryFailedPresentationId ?: return
+        val audioFileUri = currentState.form.audioFileUri
+        val recordingFilePath = currentState.recordingState.recordingFilePath
+
+        retryFailedAnalysis(
+            presentationId = presentationId,
+            script = currentState.retryFailedScript,
+            audioFileUri = audioFileUri,
+            recordingFilePath = recordingFilePath,
+            audioUrl = null,
+        )
+    }
+
+    private fun retryFailedAnalysis(
+        presentationId: Long,
+        script: String?,
+        audioFileUri: String?,
+        recordingFilePath: String?,
+        audioUrl: String?,
+    ) {
+        updateState { copy(step = AnalysisFlowStep.ANALYZING) }
+
+        analyzeJob?.cancel()
+        analyzeJob = viewModelScope.launch {
+            if (currentState.retryFailedPresentationId == null) {
+                sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
+            }
+
+            val audioFilePath = audioFileUri
+                ?.let { uri ->
+                    analysisFileCache
+                        .copyUriToCache(
+                            uriString = uri,
+                            prefix = "audio",
+                        ).absolutePath
+                }
+                ?: recordingFilePath
+
+            reAnalyzePresentationV2UseCase(
+                presentationId = presentationId,
+                script = script,
+                scriptFilePath = null,
+                audioFilePath = audioFilePath,
+                audioUrl = audioUrl,
+            ).fold(
+                onSuccess = {
+                    handleAnalysisRequestSuccess()
+                },
+                onFailure = { throwable ->
+                    handleRetryFailedAnalysisFailure(throwable.toAnalysisFailureAction())
+                },
+            )
+        }
+    }
+
+    private fun handleRetryFailedAnalysisFailure(action: AnalysisFailureAction) {
+        if (currentState.retryFailedPresentationId == null) {
+            handleAnalysisFailure(action)
+            return
+        }
+
+        audioController.reset()
+        viewModelScope.launch {
+            sendEffect(AnalysisFlowUiEffect.NavigateBack)
         }
     }
 
@@ -457,10 +636,25 @@ private suspend fun PresentationAnalysisSummary.fetchOriginalScript(
 private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
     analysisFileCache: AnalysisFileCache,
     analyzePresentationUseCase: AnalyzePresentationUseCase,
-): Result<Long> {
+    analyzePresentationV2UseCase: AnalyzePresentationV2UseCase,
+): Result<Unit> {
     val audioFilePath = resolveAudioFilePath(analysisFileCache)
     val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-    return analyzePresentationUseCase(
+    if (script.isNullOrBlank() && scriptFilePath.isNullOrBlank()) {
+        return analyzePresentationUseCase(
+            name = name,
+            date = date.toRequestDate(),
+            category = category,
+            purpose = purpose,
+            style = style,
+            audience = audience,
+            script = null,
+            scriptFilePath = null,
+            audioFilePath = audioFilePath,
+        ).map { }
+    }
+
+    return analyzePresentationV2UseCase(
         name = name,
         date = date.toRequestDate(),
         category = category,
@@ -476,11 +670,11 @@ private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
 private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecording(
     presentationId: Long,
     analysisFileCache: AnalysisFileCache,
-    reAnalyzePresentationUseCase: ReAnalyzePresentationUseCase,
-): Result<PresentationAnalysisSummary> {
+    reAnalyzePresentationV2UseCase: ReAnalyzePresentationV2UseCase,
+): Result<Unit> {
     val audioFilePath = resolveAudioFilePath(analysisFileCache)
     val scriptFilePath = resolveScriptFilePath(analysisFileCache)
-    return reAnalyzePresentationUseCase(
+    return reAnalyzePresentationV2UseCase(
         presentationId = presentationId,
         script = script,
         scriptFilePath = scriptFilePath,

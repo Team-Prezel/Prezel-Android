@@ -5,3 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data object HistoryNavKey : NavKey
+
+@Serializable
+data class HistoryFailedAnalysisNavKey(
+    val presentationId: Long,
+    val analysisResultId: Long?,
+    val errorType: String?,
+    val script: String?,
+    val audioUrl: String?,
+) : NavKey

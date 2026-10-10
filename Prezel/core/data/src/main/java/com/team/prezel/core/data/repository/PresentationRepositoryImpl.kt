@@ -18,8 +18,10 @@ import com.team.prezel.core.network.datasource.PresentationRemoteDataSource
 import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 internal class PresentationRepositoryImpl @Inject constructor(
     private val presentationRemoteDataSource: PresentationRemoteDataSource,
 ) : PresentationRepository {
@@ -67,6 +69,48 @@ internal class PresentationRepositoryImpl @Inject constructor(
             response.toDomain()
         }.mapDomainFailure()
 
+    override suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        category: Category,
+        purpose: Purpose,
+        style: Style,
+        audience: Audience,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): Result<Unit> =
+        runCatching {
+            presentationRemoteDataSource.analyzePresentationV2(
+                name = name,
+                date = date,
+                type = category.value,
+                purpose = purpose.value,
+                style = style.value,
+                audience = audience.value,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+            )
+        }.mapDomainFailure()
+
+    override suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+        audioUrl: String?,
+    ): Result<Unit> =
+        runCatching {
+            presentationRemoteDataSource.reAnalyzePresentationV2(
+                presentationId = presentationId,
+                script = script,
+                scriptFilePath = scriptFilePath,
+                audioFilePath = audioFilePath,
+                audioUrl = audioUrl,
+            )
+        }.mapDomainFailure()
+
     override suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail> =
         runCatching {
             presentationRemoteDataSource.getScriptDetail(analysisResultId = analysisResultId)
@@ -105,7 +149,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         runCatching {
             presentationRemoteDataSource.getUpcomingPresentations()
         }.mapCatching { response ->
-            response.map(GetPresentationsResponse::toDomain)
+            response.map(GetUpcomingPresentationsV2Response::toDomain)
         }.mapDomainFailure()
 
     override suspend fun getPastPresentations(): Result<List<PresentationInfo>> =

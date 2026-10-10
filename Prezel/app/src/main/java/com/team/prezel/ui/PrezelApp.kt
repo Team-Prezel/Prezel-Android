@@ -44,6 +44,7 @@ import com.team.prezel.R
 import com.team.prezel.core.common.event.EdgeToEdgeStatusBarStyle
 import com.team.prezel.core.common.event.GlobalEvent
 import com.team.prezel.core.common.event.GlobalEventBus
+import com.team.prezel.core.common.fcm.AnalysisResultFcmPayload
 import com.team.prezel.core.designsystem.component.PrezelNavigationScaffold
 import com.team.prezel.core.designsystem.component.PrezelNavigationScope
 import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelSnackbar
@@ -59,8 +60,13 @@ import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.core.ui.state.rememberAppDimmerState
 import com.team.prezel.core.ui.util.noRippleClickable
 import com.team.prezel.feature.badge.api.BadgeNavKey
+import com.team.prezel.feature.history.api.HistoryFailedAnalysisNavKey
+import com.team.prezel.feature.history.api.HistoryNavKey
+import com.team.prezel.feature.report.api.ReportEntrySource
+import com.team.prezel.feature.report.api.ReportNavKey
 import com.team.prezel.feature.splash.api.SplashNavKey
 import com.team.prezel.navigation.MAIN_NAV_ITEMS
+import com.team.prezel.navigation.MAIN_NAV_KEYS
 import kotlinx.collections.immutable.ImmutableSet
 
 @Composable
@@ -69,6 +75,8 @@ fun PrezelApp(
     globalEventBus: GlobalEventBus,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
+    pendingAnalysisResultPayload: AnalysisResultFcmPayload?,
+    onAnalysisResultPayloadConsumed: () -> Unit,
 ) {
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -88,6 +96,8 @@ fun PrezelApp(
             globalEventBus = globalEventBus,
             connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
             entryBuilders = entryBuilders,
+            pendingAnalysisResultPayload = pendingAnalysisResultPayload,
+            onAnalysisResultPayloadConsumed = onAnalysisResultPayloadConsumed,
         )
     }
 }
@@ -98,6 +108,8 @@ private fun PrezelAppContent(
     globalEventBus: GlobalEventBus,
     connectBadgeEventStreamUseCase: ConnectBadgeEventStreamUseCase,
     entryBuilders: ImmutableSet<EntryProviderScope<NavKey>.() -> Unit>,
+    pendingAnalysisResultPayload: AnalysisResultFcmPayload?,
+    onAnalysisResultPayloadConsumed: () -> Unit,
 ) {
     val navigator = LocalNavigator.current
     val appDimmerState = LocalAppDimmerState.current
@@ -114,6 +126,13 @@ private fun PrezelAppContent(
         connectBadgeEventStreamUseCase = connectBadgeEventStreamUseCase,
         shouldShowNavigationBar = appState.shouldShowNavigationBar,
         navigateToBadge = { badgeCode -> navigator.navigate(BadgeNavKey(badgeCode = badgeCode)) },
+    )
+
+    ObserveAnalysisResultPayload(
+        payload = pendingAnalysisResultPayload,
+        appState = appState,
+        navigator = navigator,
+        onConsumed = onAnalysisResultPayloadConsumed,
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -133,6 +152,42 @@ private fun PrezelAppContent(
             foregroundContent = appDimmerState.foregroundContent,
             onDismiss = appDimmerState::dismiss,
         )
+    }
+}
+
+@Composable
+private fun ObserveAnalysisResultPayload(
+    payload: AnalysisResultFcmPayload?,
+    appState: PrezelAppState,
+    navigator: Navigator,
+    onConsumed: () -> Unit,
+) {
+    val currentTopLevelKey = appState.navigationState.currentTopLevelKey
+
+    LaunchedEffect(payload, currentTopLevelKey) {
+        val currentPayload = payload ?: return@LaunchedEffect
+        if (currentTopLevelKey !in MAIN_NAV_KEYS) return@LaunchedEffect
+
+        onConsumed()
+        navigator.navigate(HistoryNavKey)
+        if (currentPayload.isCompleted) {
+            navigator.navigate(
+                ReportNavKey(
+                    presentationId = currentPayload.presentationId,
+                    entrySource = ReportEntrySource.HISTORY,
+                ),
+            )
+        } else {
+            navigator.navigate(
+                HistoryFailedAnalysisNavKey(
+                    presentationId = currentPayload.presentationId,
+                    analysisResultId = currentPayload.analysisResultId,
+                    errorType = currentPayload.errorType,
+                    script = currentPayload.script,
+                    audioUrl = currentPayload.audioUrl,
+                ),
+            )
+        }
     }
 }
 

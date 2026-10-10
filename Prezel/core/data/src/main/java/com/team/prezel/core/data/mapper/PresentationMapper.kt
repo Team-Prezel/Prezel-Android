@@ -7,6 +7,8 @@ import com.team.prezel.core.model.presentation.Curation
 import com.team.prezel.core.model.presentation.ExpectedQuestion
 import com.team.prezel.core.model.presentation.MainData
 import com.team.prezel.core.model.presentation.PracticeRecords
+import com.team.prezel.core.model.presentation.PresentationAnalysisErrorType
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.model.presentation.PresentationAnalysisSummary
 import com.team.prezel.core.model.presentation.PresentationGrowthPoint
 import com.team.prezel.core.model.presentation.PresentationInfo
@@ -23,6 +25,7 @@ import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import com.team.prezel.core.network.model.presentation.PresentationExpectedQuestionResponse
 import com.team.prezel.core.network.model.presentation.PresentationGrowthResponse
 import com.team.prezel.core.network.model.presentation.PresentationScriptAnalysisResponse
@@ -125,10 +128,21 @@ internal fun GetPresentationsResponse.toDomain(): PresentationInfo =
         title = title,
         presentationDate = LocalDate.parse(presentationDate),
         category = Category.from(value = type),
-        purpose = Purpose.from(value = purpose),
-        style = Style.from(value = style),
-        audience = Audience.from(value = audience),
         dDay = dday,
+    )
+
+internal fun GetUpcomingPresentationsV2Response.toDomain(): PresentationInfo =
+    PresentationInfo(
+        id = presentationId,
+        title = title,
+        presentationDate = LocalDate.parse(presentationDate),
+        category = Category.from(value = type),
+        dDay = dDay,
+        analysisStatus = PresentationAnalysisStatus.from(value = cardStatus),
+        analysisResultId = analysisResultId,
+        analysisErrorType = PresentationAnalysisErrorType.from(value = errorType),
+        script = script,
+        audioUrl = audioUrl,
     )
 
 internal fun GetPracticeRecordsResponse.toDomain(): PracticeRecords =

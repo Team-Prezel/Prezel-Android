@@ -12,4 +12,12 @@ internal sealed interface HistoryUiEffect : UiEffect {
         val presentationId: Long,
         val isPast: Boolean,
     ) : HistoryUiEffect
+
+    data class NavigateToFailedAnalysis(
+        val presentationId: Long,
+        val analysisResultId: Long?,
+        val errorType: String?,
+        val script: String?,
+        val audioUrl: String?,
+    ) : HistoryUiEffect
 }

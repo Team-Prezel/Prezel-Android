@@ -6,6 +6,7 @@ import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationDetailResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
@@ -21,6 +22,7 @@ import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.FormBuilder
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.Headers
@@ -29,6 +31,7 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 import java.io.File
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 internal class PresentationRemoteDataSourceImpl @Inject constructor(
     private val presentationService: PresentationService,
     private val httpClient: HttpClient,
@@ -102,6 +105,75 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             .requireData()
     }
 
+    override suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        type: String,
+        purpose: String,
+        style: String,
+        audience: String,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ) {
+        require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
+
+        val multipart = MultiPartFormDataContent(
+            formData {
+                append("name", name)
+                append("date", date)
+                append("type", type)
+                append("purpose", purpose)
+                append("style", style)
+                append("audience", audience)
+                appendAudioPart(audioFilePath = audioFilePath)
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
+                }
+            },
+        )
+
+        presentationService.analyzePresentationV2(multipart = multipart).requireSuccess()
+    }
+
+    override suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+        audioUrl: String?,
+    ) {
+        val downloadedAudioFile = audioFilePath
+            ?.takeIf(String::isNotBlank)
+            ?.let(::File)
+            ?: audioUrl
+                ?.takeIf(String::isNotBlank)
+                ?.let { url -> downloadAudioFile(httpClient = httpClient, url = url) }
+
+        val multipart = MultiPartFormDataContent(
+            formData {
+                downloadedAudioFile?.let { file ->
+                    appendAudioPart(audioFile = file)
+                }
+                script?.takeIf(String::isNotBlank)?.let { append("script", it) }
+                scriptFilePath?.takeIf(String::isNotBlank)?.let { path ->
+                    appendScriptPart(scriptFilePath = path)
+                }
+            },
+        )
+
+        try {
+            httpClient
+                .post("v2/recording/$presentationId/re-analyze") {
+                    setBody(multipart)
+                }.body<BaseResponse<Unit>>()
+                .requireSuccess()
+        } finally {
+            if (downloadedAudioFile?.path != audioFilePath) downloadedAudioFile?.delete()
+        }
+    }
+
     override suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse =
         presentationService.getScriptDetail(analysisResultId = analysisResultId).requireData()
 
@@ -126,7 +198,8 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         presentationService.deleteAnalysis(analysisResultId = analysisResultId).requireSuccess()
     }
 
-    override suspend fun getUpcomingPresentations(): List<GetPresentationsResponse> = presentationService.getUpcomingPresentations().requireData()
+    override suspend fun getUpcomingPresentations(): List<GetUpcomingPresentationsV2Response> =
+        presentationService.getUpcomingPresentations().requireData()
 
     override suspend fun getPastPresentations(): List<GetPresentationsResponse> = presentationService.getPastPresentations().requireData()
 
@@ -157,7 +230,10 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 }
 
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {
-    val audioFile = File(audioFilePath)
+    appendAudioPart(audioFile = File(audioFilePath))
+}
+
+private fun FormBuilder.appendAudioPart(audioFile: File) {
     append(
         key = "audio",
         value = audioFile.toChannelProvider(),
@@ -166,6 +242,19 @@ private fun FormBuilder.appendAudioPart(audioFilePath: String) {
             append(HttpHeaders.ContentDisposition, "filename=\"${audioFile.name}\"")
         },
     )
+}
+
+private suspend fun downloadAudioFile(
+    httpClient: HttpClient,
+    url: String,
+): File {
+    val extension = url
+        .substringBefore('?')
+        .substringAfterLast('.', missingDelimiterValue = "m4a")
+        .ifBlank { "m4a" }
+    val audioFile = File.createTempFile("prezel-re-analyze-", ".$extension")
+    audioFile.writeBytes(httpClient.get(url).body<ByteArray>())
+    return audioFile
 }
 
 private fun GetPresentationDetailResponse.toPresentationSummaryResponse(): PresentationSummaryResponse =

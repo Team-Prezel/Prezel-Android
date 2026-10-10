@@ -15,9 +15,8 @@ import com.team.prezel.feature.analysis.impl.AnalysisFlowViewModel
 import com.team.prezel.feature.analysis.impl.AnalysisScreen
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
+import com.team.prezel.feature.history.api.HistoryNavKey
 import com.team.prezel.feature.home.api.HomeNavKey
-import com.team.prezel.feature.report.api.ReportEntrySource
-import com.team.prezel.feature.report.api.ReportNavKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,6 +40,25 @@ internal fun EntryProviderScope<NavKey>.featureAnalysisEntryBuilder() {
         AnalysisFlowUiIntent.StartReWritingScript(
             presentationId = key.presentationId,
             isPast = key.isPast,
+        )
+    }
+    analysisEntry<AnalysisNavKey.RetryFailedVoiceRecording> { key ->
+        AnalysisFlowUiIntent.StartFailedVoiceRecordingRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+        )
+    }
+    analysisEntry<AnalysisNavKey.RetryFailedAudioUpload> { key ->
+        AnalysisFlowUiIntent.StartFailedAudioUploadRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+        )
+    }
+    analysisEntry<AnalysisNavKey.RetryFailedAnalysis> { key ->
+        AnalysisFlowUiIntent.StartFailedAnalysisRetry(
+            presentationId = key.presentationId,
+            script = key.script,
+            audioUrl = key.audioUrl,
         )
     }
 }
@@ -88,14 +106,8 @@ private fun AnalysisRoute(
                 clearStack = clearStack,
             )
         },
-        navigateToReport = { presentationId ->
-            navigator.navigate(
-                key = ReportNavKey(
-                    presentationId = presentationId,
-                    entrySource = ReportEntrySource.ANALYSIS,
-                ),
-                clearStack = true,
-            )
+        navigateToHistory = {
+            navigator.replaceRoot(HistoryNavKey)
         },
         navigateToHome = {
             navigator.replaceRoot(HomeNavKey)
@@ -112,6 +124,7 @@ private val AnalysisFlowUiIntent.shouldShowVoiceRecordingGuide: Boolean
     get() = when (this) {
         is AnalysisFlowUiIntent.EnterStep -> step == AnalysisFlowStep.VOICE_RECORDING
         is AnalysisFlowUiIntent.StartReRecording -> true
+        is AnalysisFlowUiIntent.StartFailedVoiceRecordingRetry -> true
         else -> false
     }
 

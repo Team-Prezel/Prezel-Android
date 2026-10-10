@@ -2,12 +2,14 @@ package com.team.prezel.core.data.di
 
 import com.team.prezel.core.data.repository.AuthRepositoryImpl
 import com.team.prezel.core.data.repository.BadgeRepositoryImpl
+import com.team.prezel.core.data.repository.FcmRepositoryImpl
 import com.team.prezel.core.data.repository.PracticeRepositoryImpl
 import com.team.prezel.core.data.repository.PresentationRepositoryImpl
 import com.team.prezel.core.data.repository.TermsRepositoryImpl
 import com.team.prezel.core.data.repository.UserRepositoryImpl
 import com.team.prezel.core.domain.repository.auth.AuthRepository
 import com.team.prezel.core.domain.repository.badge.BadgeRepository
+import com.team.prezel.core.domain.repository.fcm.FcmRepository
 import com.team.prezel.core.domain.repository.practice.PracticeRepository
 import com.team.prezel.core.domain.repository.presentation.PresentationRepository
 import com.team.prezel.core.domain.repository.profile.UserRepository
@@ -28,6 +30,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBadgeRepository(impl: BadgeRepositoryImpl): BadgeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFcmRepository(impl: FcmRepositoryImpl): FcmRepository
 
     @Binds
     @Singleton

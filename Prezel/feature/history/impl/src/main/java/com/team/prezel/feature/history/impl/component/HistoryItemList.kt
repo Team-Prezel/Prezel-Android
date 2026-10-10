@@ -10,13 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -24,6 +22,7 @@ internal fun HistoryItemList(
     items: ImmutableList<HistoryUiModel>,
     onClickItem: (HistoryUiModel) -> Unit,
     modifier: Modifier = Modifier,
+    itemEnabled: (HistoryUiModel) -> Boolean = { true },
 ) {
     LazyColumn(
         modifier = modifier,
@@ -38,6 +37,7 @@ internal fun HistoryItemList(
             HistoryPresentationCard(
                 item = item,
                 onClick = { onClickItem(item) },
+                enabled = itemEnabled(item),
             )
         }
     }
@@ -48,28 +48,7 @@ internal fun HistoryItemList(
 private fun HistoryItemListPreview() {
     PrezelTheme {
         HistoryItemList(
-            items = persistentListOf(
-                HistoryUiModel(
-                    presentationId = 1L,
-                    title = "캡스톤서비스기획 중간고사 발표",
-                    presentationDate = LocalDate(2025, 10, 20),
-                    category = Category.EDUCATION,
-                    purpose = Purpose.INFO,
-                    style = Style.FORMAL,
-                    audience = Audience.PROFESSIONAL,
-                    dDay = "D-5",
-                ),
-                HistoryUiModel(
-                    presentationId = 2L,
-                    title = "IT동아리 대규모 세미나",
-                    presentationDate = LocalDate(2025, 10, 22),
-                    category = Category.WORK,
-                    purpose = Purpose.INFO,
-                    style = Style.FRIENDLY,
-                    audience = Audience.GENERAL,
-                    dDay = "D-7",
-                ),
-            ),
+            items = historyItemListPreviewItems(),
             onClickItem = { },
             modifier = Modifier
                 .fillMaxSize()
@@ -77,3 +56,24 @@ private fun HistoryItemListPreview() {
         )
     }
 }
+
+private fun historyItemListPreviewItems(): ImmutableList<HistoryUiModel> =
+    PresentationAnalysisStatus.entries
+        .mapIndexed { index, status ->
+            HistoryUiModel(
+                presentationId = index.toLong(),
+                title = status.previewTitle(),
+                presentationDate = LocalDate(2025, 10, 20 + index),
+                category = Category.EDUCATION,
+                dDay = "D-${5 + index}",
+                analysisStatus = status,
+            )
+        }.toImmutableList()
+
+private fun PresentationAnalysisStatus.previewTitle(): String =
+    when (this) {
+        PresentationAnalysisStatus.IN_PROCESS -> "분석 진행 중 발표"
+        PresentationAnalysisStatus.COMPLETE -> "분석 완료 발표"
+        PresentationAnalysisStatus.DEFAULT -> "분석 전 발표"
+        PresentationAnalysisStatus.FAIL -> "분석 실패 발표"
+    }

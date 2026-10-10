@@ -12,6 +12,7 @@ import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 
+@Suppress("TooManyFunctions")
 interface PresentationRepository {
     suspend fun analyzePresentation(
         name: String,
@@ -31,6 +32,26 @@ interface PresentationRepository {
         scriptFilePath: String?,
         audioFilePath: String,
     ): Result<PresentationAnalysisSummary>
+
+    suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        category: Category,
+        purpose: Purpose,
+        style: Style,
+        audience: Audience,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    ): Result<Unit>
+
+    suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+        audioUrl: String? = null,
+    ): Result<Unit>
 
     suspend fun fetchScriptDetail(analysisResultId: Long): Result<PresentationScriptDetail>
 

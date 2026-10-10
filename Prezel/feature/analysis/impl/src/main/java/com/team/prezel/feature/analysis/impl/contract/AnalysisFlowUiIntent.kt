@@ -25,6 +25,22 @@ internal sealed interface AnalysisFlowUiIntent : UiIntent {
         val isPast: Boolean,
     ) : AnalysisFlowUiIntent
 
+    data class StartFailedVoiceRecordingRetry(
+        val presentationId: Long,
+        val script: String?,
+    ) : AnalysisFlowUiIntent
+
+    data class StartFailedAudioUploadRetry(
+        val presentationId: Long,
+        val script: String?,
+    ) : AnalysisFlowUiIntent
+
+    data class StartFailedAnalysisRetry(
+        val presentationId: Long,
+        val script: String?,
+        val audioUrl: String?,
+    ) : AnalysisFlowUiIntent
+
     data class UpdatePresentationTitle(
         val title: String,
     ) : AnalysisFlowUiIntent

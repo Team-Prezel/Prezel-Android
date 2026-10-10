@@ -1,8 +1,10 @@
 package com.team.prezel.feature.history.impl
 
 import androidx.lifecycle.viewModelScope
+import com.team.prezel.core.common.fcm.HistoryRefreshNotifier
 import com.team.prezel.core.domain.usecase.presentation.FetchPastPresentationsUseCase
 import com.team.prezel.core.domain.usecase.presentation.FetchUpcomingPresentationsUseCase
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.ui.base.BaseViewModel
 import com.team.prezel.feature.history.impl.contract.HistoryUiEffect
 import com.team.prezel.feature.history.impl.contract.HistoryUiIntent
@@ -10,6 +12,7 @@ import com.team.prezel.feature.history.impl.contract.HistoryUiState
 import com.team.prezel.feature.history.impl.model.HistoryPageType
 import com.team.prezel.feature.history.impl.model.HistoryPageUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiMessage
+import com.team.prezel.feature.history.impl.model.HistoryUiModel
 import com.team.prezel.feature.history.impl.model.HistoryUiModel.Companion.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -22,14 +25,27 @@ import javax.inject.Inject
 internal class HistoryViewModel @Inject constructor(
     private val fetchUpcomingPresentationsUseCase: FetchUpcomingPresentationsUseCase,
     private val fetchPastPresentationsUseCase: FetchPastPresentationsUseCase,
+    private val historyRefreshNotifier: HistoryRefreshNotifier,
 ) : BaseViewModel<HistoryUiState, HistoryUiIntent, HistoryUiEffect>(HistoryUiState.Loading) {
+    init {
+        observeRefreshEvents()
+    }
+
     override fun onIntent(intent: HistoryUiIntent) {
         when (intent) {
             HistoryUiIntent.FetchData -> fetchData()
             is HistoryUiIntent.ClickItem -> handleClickItem(
-                presentationId = intent.presentationId,
+                item = intent.item,
                 pageType = intent.pageType,
             )
+        }
+    }
+
+    private fun observeRefreshEvents() {
+        viewModelScope.launch {
+            historyRefreshNotifier.events.collect {
+                fetchData()
+            }
         }
     }
 
@@ -65,15 +81,30 @@ internal class HistoryViewModel @Inject constructor(
     }
 
     private fun handleClickItem(
-        presentationId: Long,
+        item: HistoryUiModel,
         pageType: HistoryPageType,
     ) {
+        if (pageType == HistoryPageType.PREPARING && item.analysisStatus == PresentationAnalysisStatus.FAIL) {
+            viewModelScope.launch {
+                sendEffect(
+                    HistoryUiEffect.NavigateToFailedAnalysis(
+                        presentationId = item.presentationId,
+                        analysisResultId = item.analysisResultId,
+                        errorType = item.analysisErrorType?.value,
+                        script = item.script,
+                        audioUrl = item.audioUrl,
+                    ),
+                )
+            }
+            return
+        }
+
         val isPast = pageType == HistoryPageType.COMPLETED
 
         viewModelScope.launch {
             sendEffect(
                 HistoryUiEffect.NavigateToReport(
-                    presentationId = presentationId,
+                    presentationId = item.presentationId,
                     isPast = isPast,
                 ),
             )

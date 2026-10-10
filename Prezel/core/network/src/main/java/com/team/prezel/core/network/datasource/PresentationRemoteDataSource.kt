@@ -4,10 +4,12 @@ import com.team.prezel.core.network.model.presentation.GetCurationResponse
 import com.team.prezel.core.network.model.presentation.GetMainDataResponse
 import com.team.prezel.core.network.model.presentation.GetPracticeRecordsResponse
 import com.team.prezel.core.network.model.presentation.GetPresentationsResponse
+import com.team.prezel.core.network.model.presentation.GetUpcomingPresentationsV2Response
 import com.team.prezel.core.network.model.presentation.PresentationScriptDetailResponse
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
 
+@Suppress("TooManyFunctions")
 interface PresentationRemoteDataSource {
     suspend fun analyzePresentation(
         name: String,
@@ -28,6 +30,26 @@ interface PresentationRemoteDataSource {
         audioFilePath: String,
     ): PresentationSummaryResponse
 
+    suspend fun analyzePresentationV2(
+        name: String,
+        date: String,
+        type: String,
+        purpose: String,
+        style: String,
+        audience: String,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String,
+    )
+
+    suspend fun reAnalyzePresentationV2(
+        presentationId: Long,
+        script: String?,
+        scriptFilePath: String?,
+        audioFilePath: String?,
+        audioUrl: String? = null,
+    )
+
     suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse
 
     suspend fun correctScript(
@@ -40,7 +62,7 @@ interface PresentationRemoteDataSource {
 
     suspend fun deleteAnalysis(analysisResultId: Long)
 
-    suspend fun getUpcomingPresentations(): List<GetPresentationsResponse>
+    suspend fun getUpcomingPresentations(): List<GetUpcomingPresentationsV2Response>
 
     suspend fun getPastPresentations(): List<GetPresentationsResponse>
 

@@ -20,6 +20,8 @@ internal data class AnalysisFlowUiState(
     val recordingVolumes: ImmutableList<Float> = persistentListOf(),
     val reRecordingPresentationId: Long? = null,
     val reWritingScriptPresentationId: Long? = null,
+    val retryFailedPresentationId: Long? = null,
+    val retryFailedScript: String? = null,
     val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
 ) : UiState {
     val progress: Float

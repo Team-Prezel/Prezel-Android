@@ -22,10 +22,8 @@ import com.team.prezel.core.designsystem.component.feedback.snackbar.showPrezelS
 import com.team.prezel.core.designsystem.component.navigations.PrezelTabsPager
 import com.team.prezel.core.designsystem.preview.BasicPreview
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.core.model.presentation.Audience
 import com.team.prezel.core.model.presentation.Category
-import com.team.prezel.core.model.presentation.Purpose
-import com.team.prezel.core.model.presentation.Style
+import com.team.prezel.core.model.presentation.PresentationAnalysisStatus
 import com.team.prezel.core.ui.state.LocalSnackbarHostState
 import com.team.prezel.feature.history.impl.component.HistoryEmptyContent
 import com.team.prezel.feature.history.impl.component.HistoryItemList
@@ -43,6 +41,13 @@ import kotlinx.datetime.LocalDate
 @Composable
 internal fun HistoryScreen(
     navigateToReport: (presentationId: Long, isPast: Boolean) -> Unit,
+    navigateToFailedAnalysis: (
+        presentationId: Long,
+        analysisResultId: Long?,
+        errorType: String?,
+        script: String?,
+        audioUrl: String?,
+    ) -> Unit,
     navigateToAnalysis: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
@@ -60,14 +65,21 @@ internal fun HistoryScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is HistoryUiEffect.ShowMessage -> {
-                    val resId = when (effect.message) {
-                        HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
-                    }
-                    snackbarHostState.showPrezelSnackbar(message = resources.getString(resId))
+                    snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.resId))
                 }
 
                 is HistoryUiEffect.NavigateToReport -> {
                     navigateToReport(effect.presentationId, effect.isPast)
+                }
+
+                is HistoryUiEffect.NavigateToFailedAnalysis -> {
+                    navigateToFailedAnalysis(
+                        effect.presentationId,
+                        effect.analysisResultId,
+                        effect.errorType,
+                        effect.script,
+                        effect.audioUrl,
+                    )
                 }
             }
         }
@@ -80,7 +92,7 @@ internal fun HistoryScreen(
         onClickHistoryItem = { item, pageType ->
             viewModel.onIntent(
                 HistoryUiIntent.ClickItem(
-                    presentationId = item.presentationId,
+                    item = item,
                     pageType = pageType,
                 ),
             )
@@ -117,6 +129,13 @@ internal fun HistoryScreen(
     }
 }
 
+private val HistoryUiMessage.resId: Int
+    get() = when (this) {
+        HistoryUiMessage.FETCH_DATA_FAILED -> R.string.feature_history_impl_fetch_data_failed
+        HistoryUiMessage.DELETE_FAILED -> R.string.feature_history_impl_delete_failed
+        HistoryUiMessage.DELETE_DATA_MISSING -> R.string.feature_history_impl_delete_data_missing
+    }
+
 @Composable
 private fun HistoryContent(
     uiState: HistoryUiState,
@@ -147,7 +166,7 @@ private fun HistoryContent(
         ) {
             when (uiState) {
                 HistoryUiState.Loading -> {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = PrezelTheme.colors.interactiveRegular)
                 }
 
                 is HistoryUiState.Content -> {
@@ -164,6 +183,9 @@ private fun HistoryContent(
                             items = items.toImmutableList(),
                             onClickItem = { item -> onClickHistoryItem(item, pageType) },
                             modifier = Modifier.fillMaxSize(),
+                            itemEnabled = { item ->
+                                pageType != HistoryPageType.PREPARING || item.analysisStatus.canOpenReport()
+                            },
                         )
                     }
                 }
@@ -176,6 +198,17 @@ private val HISTORY_PAGE_TYPES = persistentListOf(
     HistoryPageType.PREPARING,
     HistoryPageType.COMPLETED,
 )
+
+private fun PresentationAnalysisStatus.canOpenReport(): Boolean =
+    when (this) {
+        PresentationAnalysisStatus.COMPLETE,
+        PresentationAnalysisStatus.DEFAULT,
+        PresentationAnalysisStatus.FAIL,
+        -> true
+
+        PresentationAnalysisStatus.IN_PROCESS,
+        -> false
+    }
 
 @BasicPreview
 @Composable
@@ -190,10 +223,8 @@ private fun HistoryScreenPreview() {
                         title = "캡스톤서비스기획 중간고사 발표",
                         presentationDate = LocalDate(2026, 4, 19),
                         category = Category.EDUCATION,
-                        purpose = Purpose.INFO,
-                        style = Style.FORMAL,
-                        audience = Audience.PROFESSIONAL,
                         dDay = "D-5",
+                        analysisStatus = PresentationAnalysisStatus.COMPLETE,
                     ),
                 ),
             ),
@@ -205,9 +236,6 @@ private fun HistoryScreenPreview() {
                         title = "서비스 런칭 회고 발표",
                         presentationDate = LocalDate(2026, 4, 12),
                         category = Category.OFFER,
-                        purpose = Purpose.EMPATHY,
-                        style = Style.CALM,
-                        audience = Audience.GENERAL,
                         dDay = "D+1",
                     ),
                 ),

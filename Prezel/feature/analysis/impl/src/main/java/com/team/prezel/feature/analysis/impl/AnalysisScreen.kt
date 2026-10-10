@@ -54,8 +54,8 @@ private const val LOW_AVERAGE_VOLUME_THRESHOLD = 0.25f
 internal fun AnalysisScreen(
     onBack: () -> Unit,
     navigateToHome: () -> Unit,
+    navigateToHistory: () -> Unit,
     navigateToStep: (step: AnalysisFlowStep, clearStack: Boolean) -> Unit,
-    navigateToReport: (presentationId: Long) -> Unit,
     shouldShowVoiceRecordingGuide: Boolean,
     viewModel: AnalysisFlowViewModel,
 ) {
@@ -74,9 +74,8 @@ internal fun AnalysisScreen(
             when (effect) {
                 AnalysisFlowUiEffect.NavigateBack -> onBack()
                 AnalysisFlowUiEffect.NavigateHome -> navigateToHome()
-                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
-                is AnalysisFlowUiEffect.NavigateToReport -> {
-                    navigateToReport(effect.presentationId)
+                AnalysisFlowUiEffect.NavigateToHistory -> {
+                    navigateToHistory()
                     scope.launch {
                         snackbarHostState.showPrezelSnackbar(
                             message = resources.getString(R.string.feature_analysis_impl_analyze_complete_message),
@@ -84,6 +83,7 @@ internal fun AnalysisScreen(
                         )
                     }
                 }
+                is AnalysisFlowUiEffect.NavigateToStep -> navigateToStep(effect.step, effect.clearStack)
                 is AnalysisFlowUiEffect.ShowMessage -> {
                     snackbarHostState.showPrezelSnackbar(message = resources.getString(effect.message.toStringRes()))
                 }

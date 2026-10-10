@@ -7,8 +7,10 @@ data class PresentationInfo(
     val title: String,
     val presentationDate: LocalDate,
     val category: Category,
-    val purpose: Purpose,
-    val style: Style,
-    val audience: Audience,
     val dDay: String,
+    val analysisStatus: PresentationAnalysisStatus = PresentationAnalysisStatus.DEFAULT,
+    val analysisResultId: Long? = null,
+    val analysisErrorType: PresentationAnalysisErrorType? = null,
+    val script: String? = null,
+    val audioUrl: String? = null,
 )
