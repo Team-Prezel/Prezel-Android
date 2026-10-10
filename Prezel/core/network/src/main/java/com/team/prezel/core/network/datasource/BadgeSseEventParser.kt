@@ -3,7 +3,6 @@ package com.team.prezel.core.network.datasource
 import com.team.prezel.core.network.model.badge.BadgeEventResponse
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import timber.log.Timber
 
 internal object BadgeSseEventParser {
     private val sseJson: Json =
@@ -15,7 +14,6 @@ internal object BadgeSseEventParser {
         eventName: String?,
         data: String?,
     ): BadgeEventResponse? {
-        Timber.tag("SSE-TEST").i("$eventName: $data")
         val rawData = data?.trim().orEmpty()
         if (rawData.isBlank()) return null
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
@@ -16,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -107,7 +109,10 @@ private fun HomeContent(
     onCurationLinkOpenFailed: () -> Unit,
 ) {
     when (uiState) {
-        HomeUiState.Loading -> Unit
+        HomeUiState.Loading -> {
+            HomeLoadingContent()
+        }
+
         is HomeUiState.Empty -> {
             HomeEmptyContent(
                 maxHeight = maxHeight,
@@ -143,6 +148,16 @@ private fun HomeContent(
                 onCurationLinkOpenFailed = onCurationLinkOpenFailed,
             )
         }
+    }
+}
+
+@Composable
+private fun HomeLoadingContent() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator(color = PrezelTheme.colors.interactiveRegular)
     }
 }
 
