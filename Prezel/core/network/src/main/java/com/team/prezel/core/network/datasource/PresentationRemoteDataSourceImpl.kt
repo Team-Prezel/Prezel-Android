@@ -17,6 +17,7 @@ import com.team.prezel.core.network.model.requireSuccess
 import com.team.prezel.core.network.service.PresentationService
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.FormBuilder
@@ -46,6 +47,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ): PresentationSummaryResponse {
         require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
 
@@ -71,6 +73,13 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                     requestTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
                     socketTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
                 }
+                onUpload { bytesSentTotal, contentLength ->
+                    reportUploadProgress(
+                        bytesSentTotal = bytesSentTotal,
+                        contentLength = contentLength,
+                        onUploadProgress = onUploadProgress,
+                    )
+                }
                 setBody(multipart)
             }.body<BaseResponse<PresentationSummaryResponse>>()
             .requireData()
@@ -81,6 +90,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ): PresentationSummaryResponse {
         require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
 
@@ -100,6 +110,13 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
                     requestTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
                     socketTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
                 }
+                onUpload { bytesSentTotal, contentLength ->
+                    reportUploadProgress(
+                        bytesSentTotal = bytesSentTotal,
+                        contentLength = contentLength,
+                        onUploadProgress = onUploadProgress,
+                    )
+                }
                 setBody(multipart)
             }.body<BaseResponse<PresentationSummaryResponse>>()
             .requireData()
@@ -115,6 +132,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ) {
         require(audioFilePath.isNotBlank()) { "발표 음성 파일 경로가 비어 있습니다." }
 
@@ -134,7 +152,22 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
             },
         )
 
-        presentationService.analyzePresentationV2(multipart = multipart).requireSuccess()
+        httpClient
+            .post("v2/recording/analyze") {
+                timeout {
+                    requestTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                    socketTimeoutMillis = ANALYSIS_TIMEOUT_MILLIS
+                }
+                onUpload { bytesSentTotal, contentLength ->
+                    reportUploadProgress(
+                        bytesSentTotal = bytesSentTotal,
+                        contentLength = contentLength,
+                        onUploadProgress = onUploadProgress,
+                    )
+                }
+                setBody(multipart)
+            }.body<BaseResponse<Unit>>()
+            .requireSuccess()
     }
 
     override suspend fun reAnalyzePresentationV2(
@@ -143,6 +176,7 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         scriptFilePath: String?,
         audioFilePath: String?,
         audioUrl: String?,
+        onUploadProgress: (Float) -> Unit,
     ) {
         val downloadedAudioFile = audioFilePath
             ?.takeIf(String::isNotBlank)
@@ -166,6 +200,13 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
         try {
             httpClient
                 .post("v2/recording/$presentationId/re-analyze") {
+                    onUpload { bytesSentTotal, contentLength ->
+                        reportUploadProgress(
+                            bytesSentTotal = bytesSentTotal,
+                            contentLength = contentLength,
+                            onUploadProgress = onUploadProgress,
+                        )
+                    }
                     setBody(multipart)
                 }.body<BaseResponse<Unit>>()
                 .requireSuccess()
@@ -231,6 +272,15 @@ internal class PresentationRemoteDataSourceImpl @Inject constructor(
 
 private fun FormBuilder.appendAudioPart(audioFilePath: String) {
     appendAudioPart(audioFile = File(audioFilePath))
+}
+
+private fun reportUploadProgress(
+    bytesSentTotal: Long,
+    contentLength: Long?,
+    onUploadProgress: (Float) -> Unit,
+) {
+    val totalBytes = contentLength?.takeIf { it > 0L } ?: return
+    onUploadProgress((bytesSentTotal.toFloat() / totalBytes).coerceIn(0f, 1f))
 }
 
 private fun FormBuilder.appendAudioPart(audioFile: File) {

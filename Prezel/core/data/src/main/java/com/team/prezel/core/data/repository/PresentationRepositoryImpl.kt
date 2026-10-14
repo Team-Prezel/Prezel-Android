@@ -35,6 +35,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ): Result<Long> =
         runCatching {
             presentationRemoteDataSource.analyzePresentation(
@@ -47,6 +48,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                onUploadProgress = onUploadProgress,
             )
         }.mapCatching { response ->
             response.presentationId
@@ -57,6 +59,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ): Result<PresentationAnalysisSummary> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentation(
@@ -64,6 +67,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                onUploadProgress = onUploadProgress,
             )
         }.mapCatching { response ->
             response.toDomain()
@@ -79,6 +83,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit,
     ): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.analyzePresentationV2(
@@ -91,6 +96,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                onUploadProgress = onUploadProgress,
             )
         }.mapDomainFailure()
 
@@ -100,6 +106,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
         scriptFilePath: String?,
         audioFilePath: String?,
         audioUrl: String?,
+        onUploadProgress: (Float) -> Unit,
     ): Result<Unit> =
         runCatching {
             presentationRemoteDataSource.reAnalyzePresentationV2(
@@ -108,6 +115,7 @@ internal class PresentationRepositoryImpl @Inject constructor(
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
                 audioUrl = audioUrl,
+                onUploadProgress = onUploadProgress,
             )
         }.mapDomainFailure()
 

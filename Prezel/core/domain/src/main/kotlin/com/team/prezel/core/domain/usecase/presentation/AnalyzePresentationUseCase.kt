@@ -20,6 +20,7 @@ class AnalyzePresentationUseCase @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit = {},
     ): Result<Long> =
         presentationRepository
             .analyzePresentation(
@@ -32,5 +33,6 @@ class AnalyzePresentationUseCase @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                onUploadProgress = onUploadProgress,
             )
 }

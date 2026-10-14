@@ -21,6 +21,7 @@ interface PresentationRemoteDataSource {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit = {},
     ): PresentationSummaryResponse
 
     suspend fun reAnalyzePresentation(
@@ -28,6 +29,7 @@ interface PresentationRemoteDataSource {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit = {},
     ): PresentationSummaryResponse
 
     suspend fun analyzePresentationV2(
@@ -40,6 +42,7 @@ interface PresentationRemoteDataSource {
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit = {},
     )
 
     suspend fun reAnalyzePresentationV2(
@@ -48,6 +51,7 @@ interface PresentationRemoteDataSource {
         scriptFilePath: String?,
         audioFilePath: String?,
         audioUrl: String? = null,
+        onUploadProgress: (Float) -> Unit = {},
     )
 
     suspend fun getScriptDetail(analysisResultId: Long): PresentationScriptDetailResponse
