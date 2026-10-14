@@ -35,6 +35,7 @@ import com.team.prezel.feature.analysis.impl.R
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSubmitState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 
@@ -56,6 +57,7 @@ internal fun VoiceRecordingScreen(
         recordingVolumes = uiState.recordingVolumes,
         voiceChromeUi = voiceChromeUi,
         analyzeEnabled = uiState.canMoveNext,
+        submitState = uiState.submitState,
         isScriptExpanded = isScriptExpanded,
         onClickRecordingControl = onClickRecordingControl,
         onStopRecording = onStopRecording,
@@ -73,6 +75,7 @@ private fun VoiceRecordingScreen(
     recordingVolumes: ImmutableList<Float>,
     voiceChromeUi: VoiceRecordingChromeUi? = null,
     analyzeEnabled: Boolean,
+    submitState: AnalysisSubmitState,
     isScriptExpanded: Boolean,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
@@ -119,6 +122,7 @@ private fun VoiceRecordingScreen(
         VoiceRecordingButtonArea(
             recordingState = recordingState,
             analyzeEnabled = analyzeEnabled,
+            submitState = submitState,
             modifier = Modifier.background(
                 if (isScriptExpanded || recordingState.isCompleted) {
                     PrezelTheme.colors.bgRegular

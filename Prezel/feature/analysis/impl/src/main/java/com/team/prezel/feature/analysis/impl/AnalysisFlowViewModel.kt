@@ -16,6 +16,7 @@ import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiEffect
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiIntent
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSubmitState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisUploadType
 import com.team.prezel.feature.analysis.impl.contract.ScriptInputType
 import com.team.prezel.feature.analysis.impl.contract.recordingFilePath
@@ -24,6 +25,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,7 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val SUPPORTED_AUDIO_FILE_EXTENSIONS = setOf("m4a", "mp4", "mp3")
-private const val ANALYSIS_SUCCESS_HANDLING_DELAY_MILLIS = 3_000L
+private const val MIN_UPLOAD_PROGRESS_DISPLAY_MILLIS = 800L
+private const val UPLOADED_DISPLAY_MILLIS = 600L
 
 @Suppress("TooManyFunctions")
 @HiltViewModel(assistedFactory = AnalysisFlowViewModel.Factory::class)
@@ -51,6 +54,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
     }
 
     private var analyzeJob: Job? = null
+    private var submitStartedAtMillis: Long = 0L
 
     init {
         viewModelScope.launch {
@@ -175,6 +179,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
     }
 
     private fun moveNext() {
+        if (currentState.submitState != AnalysisSubmitState.Idle) return
         if (!currentState.canMoveNext) return
 
         if (currentState.step == AnalysisFlowStep.VOICE_RECORDING || currentState.step == AnalysisFlowStep.AUDIO_UPLOAD) {
@@ -218,16 +223,14 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
             return
         }
 
-        updateState { copy(step = AnalysisFlowStep.ANALYZING) }
-
         analyzeJob?.cancel()
+        startSubmitProgress()
         analyzeJob = viewModelScope.launch {
-            sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
-
             val analysisResult = submission.analyzePresentationRecording(
                 analysisFileCache = analysisFileCache,
                 analyzePresentationUseCase = analyzePresentationUseCase,
                 analyzePresentationV2UseCase = analyzePresentationV2UseCase,
+                onUploadProgress = ::updateUploadProgress,
             )
 
             analysisResult.fold(
@@ -235,7 +238,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
                     handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
-                    handleAnalysisFailure(throwable.toAnalysisFailureAction())
+                    handleAnalysisRequestFailure(throwable)
                 },
             )
         }
@@ -245,16 +248,14 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         presentationId: Long,
         submission: PresentationAnalysisSubmission,
     ) {
-        updateState { copy(step = AnalysisFlowStep.ANALYZING) }
-
         analyzeJob?.cancel()
+        startSubmitProgress()
         analyzeJob = viewModelScope.launch {
-            sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
-
             val reAnalyzeResult = submission.reAnalyzePresentationRecording(
                 presentationId = presentationId,
                 analysisFileCache = analysisFileCache,
                 reAnalyzePresentationV2UseCase = reAnalyzePresentationV2UseCase,
+                onUploadProgress = ::updateUploadProgress,
             )
 
             reAnalyzeResult.fold(
@@ -262,17 +263,21 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
                     handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
-                    handleAnalysisFailure(throwable.toAnalysisFailureAction())
+                    handleAnalysisRequestFailure(throwable)
                 },
             )
         }
     }
 
     private suspend fun handleAnalysisRequestSuccess() {
-        delay(ANALYSIS_SUCCESS_HANDLING_DELAY_MILLIS)
+        updateUploadProgress(1f)
+        delayRemainingUploadProgressTime()
+        updateState { copy(submitState = AnalysisSubmitState.Uploaded) }
+        delay(UPLOADED_DISPLAY_MILLIS)
 
-        if (currentState.step == AnalysisFlowStep.ANALYZING) {
+        if (currentState.submitState == AnalysisSubmitState.Uploaded) {
             audioController.reset()
+            updateState { copy(submitState = AnalysisSubmitState.Idle) }
             sendEffect(AnalysisFlowUiEffect.NavigateToHistory)
         }
     }
@@ -402,7 +407,7 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         script: String?,
         audioUrl: String?,
     ) {
-        if (currentState.retryFailedPresentationId == presentationId && currentState.step == AnalysisFlowStep.ANALYZING) return
+        if (currentState.retryFailedPresentationId == presentationId && currentState.submitState != AnalysisSubmitState.Idle) return
 
         audioController.reset()
         updateState {
@@ -449,14 +454,9 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         recordingFilePath: String?,
         audioUrl: String?,
     ) {
-        updateState { copy(step = AnalysisFlowStep.ANALYZING) }
-
         analyzeJob?.cancel()
+        startSubmitProgress()
         analyzeJob = viewModelScope.launch {
-            if (currentState.retryFailedPresentationId == null) {
-                sendEffect(AnalysisFlowUiEffect.NavigateToStep(step = AnalysisFlowStep.ANALYZING))
-            }
-
             val audioFilePath = audioFileUri
                 ?.let { uri ->
                     analysisFileCache
@@ -473,62 +473,32 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
                 scriptFilePath = null,
                 audioFilePath = audioFilePath,
                 audioUrl = audioUrl,
+                onUploadProgress = ::updateUploadProgress,
             ).fold(
                 onSuccess = {
                     handleAnalysisRequestSuccess()
                 },
                 onFailure = { throwable ->
-                    handleRetryFailedAnalysisFailure(throwable.toAnalysisFailureAction())
+                    handleRetryFailedAnalysisFailure(throwable)
                 },
             )
         }
     }
 
-    private fun handleRetryFailedAnalysisFailure(action: AnalysisFailureAction) {
-        if (currentState.retryFailedPresentationId == null) {
-            handleAnalysisFailure(action)
-            return
-        }
+    private fun handleRetryFailedAnalysisFailure(throwable: Throwable) {
+        handleAnalysisRequestFailure(throwable)
+    }
 
-        audioController.reset()
-        viewModelScope.launch {
-            sendEffect(AnalysisFlowUiEffect.NavigateBack)
-        }
+    private fun handleAnalysisRequestFailure(throwable: Throwable) {
+        if (throwable is CancellationException) return
+
+        handleAnalysisFailure(throwable.toAnalysisFailureAction())
     }
 
     private fun handleAnalysisFailure(action: AnalysisFailureAction) {
-        when (action) {
-            AnalysisFailureAction.NavigateHome -> {
-                audioController.reset()
-                viewModelScope.launch {
-                    sendEffect(AnalysisFlowUiEffect.NavigateHome)
-                }
-            }
-
-            AnalysisFailureAction.RetryAnalysis -> {
-                updateState { copy(step = AnalysisFlowStep.ANALYSIS_FAILED) }
-            }
-
-            is AnalysisFailureAction.RetryFileUpload -> {
-                val failureStep = when (action.uploadType) {
-                    AnalysisUploadType.AUDIO -> AnalysisFlowStep.FILE_RECOGNITION_FAILED
-                    AnalysisUploadType.SCRIPT -> AnalysisFlowStep.SCRIPT_FILE_RECOGNITION_FAILED
-                }
-
-                updateState {
-                    copy(
-                        step = failureStep,
-                    )
-                }
-            }
-
-            is AnalysisFailureAction.ShowMessage -> {
-                val retryStep = currentState.audioInputStep
-                viewModelScope.launch {
-                    sendEffect(AnalysisFlowUiEffect.ShowMessage(action.message))
-                }
-                updateState { copy(step = retryStep) }
-            }
+        updateState { copy(submitState = AnalysisSubmitState.Idle) }
+        viewModelScope.launch {
+            sendEffect(AnalysisFlowUiEffect.ShowMessage(action.toUiMessage()))
         }
     }
 
@@ -588,7 +558,10 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
     }
 
     private fun moveBack() {
-        if (currentState.step == AnalysisFlowStep.ANALYZING) analyzeJob?.cancel()
+        if (currentState.submitState != AnalysisSubmitState.Idle) {
+            analyzeJob?.cancel()
+            updateState { copy(submitState = AnalysisSubmitState.Idle) }
+        }
 
         if (currentState.shouldResetAudioOnBack) {
             audioController.reset()
@@ -605,7 +578,39 @@ internal class AnalysisFlowViewModel @AssistedInject constructor(
         audioController.release()
         super.onCleared()
     }
+
+    private fun updateUploadProgress(progress: Float) {
+        val coercedProgress = progress.coerceIn(0f, 1f)
+        updateState {
+            val currentUploadState = submitState as? AnalysisSubmitState.Uploading ?: return@updateState this
+            if (coercedProgress < currentUploadState.progress) {
+                this
+            } else {
+                copy(submitState = AnalysisSubmitState.Uploading(progress = coercedProgress))
+            }
+        }
+    }
+
+    private fun startSubmitProgress() {
+        submitStartedAtMillis = System.currentTimeMillis()
+        updateState { copy(submitState = AnalysisSubmitState.Uploading(progress = 0f)) }
+    }
+
+    private suspend fun delayRemainingUploadProgressTime() {
+        val elapsedMillis = System.currentTimeMillis() - submitStartedAtMillis
+        val remainingMillis = MIN_UPLOAD_PROGRESS_DISPLAY_MILLIS - elapsedMillis
+        if (remainingMillis > 0L) delay(remainingMillis)
+    }
 }
+
+private fun AnalysisFailureAction.toUiMessage(): AnalysisUiMessage =
+    when (this) {
+        is AnalysisFailureAction.ShowMessage -> message
+        AnalysisFailureAction.NavigateHome,
+        AnalysisFailureAction.RetryAnalysis,
+        is AnalysisFailureAction.RetryFileUpload,
+        -> AnalysisUiMessage.ANALYSIS_FAILED
+    }
 
 private val AnalysisFlowUiState.audioInputStep: AnalysisFlowStep
     get() = when (startType) {
@@ -637,6 +642,7 @@ private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
     analysisFileCache: AnalysisFileCache,
     analyzePresentationUseCase: AnalyzePresentationUseCase,
     analyzePresentationV2UseCase: AnalyzePresentationV2UseCase,
+    onUploadProgress: (Float) -> Unit,
 ): Result<Unit> {
     val audioFilePath = resolveAudioFilePath(analysisFileCache)
     val scriptFilePath = resolveScriptFilePath(analysisFileCache)
@@ -651,6 +657,7 @@ private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
             script = null,
             scriptFilePath = null,
             audioFilePath = audioFilePath,
+            onUploadProgress = onUploadProgress,
         ).map { }
     }
 
@@ -664,6 +671,7 @@ private suspend fun PresentationAnalysisSubmission.analyzePresentationRecording(
         script = script,
         scriptFilePath = scriptFilePath,
         audioFilePath = audioFilePath,
+        onUploadProgress = onUploadProgress,
     )
 }
 
@@ -671,6 +679,7 @@ private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecordin
     presentationId: Long,
     analysisFileCache: AnalysisFileCache,
     reAnalyzePresentationV2UseCase: ReAnalyzePresentationV2UseCase,
+    onUploadProgress: (Float) -> Unit,
 ): Result<Unit> {
     val audioFilePath = resolveAudioFilePath(analysisFileCache)
     val scriptFilePath = resolveScriptFilePath(analysisFileCache)
@@ -679,6 +688,7 @@ private suspend fun PresentationAnalysisSubmission.reAnalyzePresentationRecordin
         script = script,
         scriptFilePath = scriptFilePath,
         audioFilePath = audioFilePath,
+        onUploadProgress = onUploadProgress,
     )
 }
 

@@ -46,6 +46,7 @@ import com.team.prezel.feature.analysis.impl.component.toFileName
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowStep
 import com.team.prezel.feature.analysis.impl.contract.AnalysisFlowUiState
 import com.team.prezel.feature.analysis.impl.contract.AnalysisForm
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSubmitState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -101,6 +102,7 @@ internal fun AudioUploadScreen(
         uploadProgress = uploadProgress,
         progress = uiState.progress,
         buttonEnabled = uiState.canMoveNext,
+        submitState = uiState.submitState,
         onAudioFileUploadClick = { audioPicker.launch(AUDIO_FILE_MIME_TYPES) },
         onAudioFileClear = {
             if (pendingAudioFileUri != null) {
@@ -121,6 +123,7 @@ private fun AudioUploadScreen(
     uploadProgress: Float,
     progress: Float,
     buttonEnabled: Boolean,
+    submitState: AnalysisSubmitState,
     onAudioFileUploadClick: () -> Unit,
     onAudioFileClear: () -> Unit,
     onAnalyze: () -> Unit,
@@ -136,6 +139,7 @@ private fun AudioUploadScreen(
         buttonEnabled = buttonEnabled,
         onButtonClick = onAnalyze,
         onBack = onBack,
+        submitState = submitState,
         contentScrollable = false,
         alwaysShowButtonAreaDivider = true,
     ) {
@@ -377,6 +381,7 @@ private fun AudioUploadScreenProgressPreview() {
             uploadProgress = 0.5f,
             progress = AnalysisFlowUiState(step = AnalysisFlowStep.AUDIO_UPLOAD).progress,
             buttonEnabled = false,
+            submitState = AnalysisSubmitState.Idle,
             onAudioFileUploadClick = {},
             onAudioFileClear = {},
             onAnalyze = {},

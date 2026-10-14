@@ -28,6 +28,7 @@ import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
 import com.team.prezel.core.ui.util.advancedImePadding
 import com.team.prezel.feature.analysis.impl.R
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSubmitState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +48,7 @@ internal fun AnalysisStepLayout(
     alwaysShowButtonAreaDivider: Boolean = false,
     isHiddenOptions: Boolean = false,
     showProgressBar: Boolean = true,
+    submitState: AnalysisSubmitState = AnalysisSubmitState.Idle,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val contentScrollState = rememberScrollState()
@@ -94,6 +96,7 @@ internal fun AnalysisStepLayout(
         AnalysisStepButtonArea(
             buttonText = buttonText,
             buttonEnabled = buttonEnabled,
+            submitState = submitState,
             showDivider = showButtonAreaDivider,
             onButtonClick = onButtonClick,
             subButtonText = subButtonText,
@@ -123,6 +126,7 @@ private fun ColumnScope.AnalysisStepContent(
 private fun AnalysisStepButtonArea(
     buttonText: String,
     buttonEnabled: Boolean,
+    submitState: AnalysisSubmitState,
     showDivider: Boolean,
     onButtonClick: () -> Unit,
     subButtonText: String?,
@@ -134,14 +138,23 @@ private fun AnalysisStepButtonArea(
             .advancedImePadding(),
         showBackground = showDivider,
         mainButton = { modifier ->
-            PrezelButton(
-                modifier = modifier,
-                text = buttonText,
-                enabled = buttonEnabled,
-                onClick = onButtonClick,
-                type = ButtonType.FILLED,
-                hierarchy = ButtonHierarchy.PRIMARY,
-            )
+            if (submitState != AnalysisSubmitState.Idle) {
+                AnalysisSubmitButton(
+                    modifier = modifier,
+                    submitState = submitState,
+                    enabled = buttonEnabled,
+                    onClick = onButtonClick,
+                )
+            } else {
+                PrezelButton(
+                    modifier = modifier,
+                    text = buttonText,
+                    enabled = buttonEnabled,
+                    onClick = onButtonClick,
+                    type = ButtonType.FILLED,
+                    hierarchy = ButtonHierarchy.PRIMARY,
+                )
+            }
         },
         subButton = if (subButtonText != null && onSubButtonClick != null) {
             { modifier ->

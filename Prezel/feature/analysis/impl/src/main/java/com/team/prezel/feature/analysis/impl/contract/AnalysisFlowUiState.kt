@@ -23,6 +23,7 @@ internal data class AnalysisFlowUiState(
     val retryFailedPresentationId: Long? = null,
     val retryFailedScript: String? = null,
     val startType: AnalysisStartType = AnalysisStartType.VOICE_RECORDING,
+    val submitState: AnalysisSubmitState = AnalysisSubmitState.Idle,
 ) : UiState {
     val progress: Float
         get() = when (step) {
@@ -64,6 +65,17 @@ internal data class AnalysisFlowUiState(
         }
 
     val isScriptInputOptionsHidden: Boolean = isFromReport && step == AnalysisFlowStep.SCRIPT_INPUT
+}
+
+@Immutable
+internal sealed interface AnalysisSubmitState {
+    data object Idle : AnalysisSubmitState
+
+    data class Uploading(
+        val progress: Float,
+    ) : AnalysisSubmitState
+
+    data object Uploaded : AnalysisSubmitState
 }
 
 @Immutable

@@ -101,5 +101,6 @@
     <string name="feature_analysis_impl_skip">건너뛰기</string>
     <string name="feature_analysis_impl_retry">다시 시도하기</string>
     <string name="feature_analysis_impl_analyze">분석하기</string>
+    <string name="feature_analysis_impl_upload_complete">업로드 완료</string>
     <string name="feature_analysis_impl_analyze_complete_message">분석이 시작되었어요</string>
 </resources>

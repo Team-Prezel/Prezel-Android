@@ -8,11 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.team.prezel.core.audio.AudioSessionState
 import com.team.prezel.core.designsystem.component.actions.area.PrezelButtonArea
-import com.team.prezel.core.designsystem.component.actions.button.PrezelButton
 import com.team.prezel.core.designsystem.component.actions.button.PrezelIconButton
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonHierarchy
 import com.team.prezel.core.designsystem.component.actions.button.config.ButtonSize
@@ -20,12 +18,14 @@ import com.team.prezel.core.designsystem.component.actions.button.config.ButtonT
 import com.team.prezel.core.designsystem.component.actions.button.config.PrezelButtonDefaults
 import com.team.prezel.core.designsystem.icon.PrezelIcons
 import com.team.prezel.core.designsystem.theme.PrezelTheme
-import com.team.prezel.feature.analysis.impl.R
+import com.team.prezel.feature.analysis.impl.component.AnalysisSubmitButton
+import com.team.prezel.feature.analysis.impl.contract.AnalysisSubmitState
 
 @Composable
 internal fun VoiceRecordingButtonArea(
     recordingState: AudioSessionState,
     analyzeEnabled: Boolean,
+    submitState: AnalysisSubmitState,
     modifier: Modifier = Modifier,
     onClickRecordingControl: () -> Unit,
     onStopRecording: () -> Unit,
@@ -52,6 +52,7 @@ internal fun VoiceRecordingButtonArea(
         is AudioSessionState.Playing,
         -> CompletedRecordingButtonArea(
             analyzeEnabled = analyzeEnabled,
+            submitState = submitState,
             modifier = modifier,
             onResetRecording = onResetRecording,
             onAnalyze = onAnalyze,
@@ -113,6 +114,7 @@ private fun ActiveRecordingButtonArea(
 @Composable
 private fun CompletedRecordingButtonArea(
     analyzeEnabled: Boolean,
+    submitState: AnalysisSubmitState,
     modifier: Modifier,
     onResetRecording: () -> Unit,
     onAnalyze: () -> Unit,
@@ -121,12 +123,10 @@ private fun CompletedRecordingButtonArea(
         modifier = modifier,
         isVertical = false,
         mainButton = { buttonModifier ->
-            PrezelButton(
-                text = stringResource(R.string.feature_analysis_impl_analyze),
+            AnalysisSubmitButton(
                 modifier = buttonModifier,
+                submitState = submitState,
                 enabled = analyzeEnabled,
-                type = ButtonType.FILLED,
-                hierarchy = ButtonHierarchy.PRIMARY,
                 onClick = onAnalyze,
             )
         },
