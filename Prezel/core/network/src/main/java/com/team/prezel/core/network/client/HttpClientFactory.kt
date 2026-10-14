@@ -43,6 +43,7 @@ import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
 @Singleton
+@Suppress("TooManyFunctions")
 internal class HttpClientFactory @Inject constructor(
     private val tokenProvider: TokenProvider,
     private val globalEventBus: GlobalEventBus,

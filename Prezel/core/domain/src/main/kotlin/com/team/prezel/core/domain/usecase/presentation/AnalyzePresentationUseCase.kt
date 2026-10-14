@@ -10,6 +10,7 @@ import javax.inject.Inject
 class AnalyzePresentationUseCase @Inject constructor(
     private val presentationRepository: PresentationRepository,
 ) {
+    @Suppress("LongParameterList")
     suspend operator fun invoke(
         name: String,
         date: String,

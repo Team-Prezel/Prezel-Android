@@ -12,7 +12,7 @@ import com.team.prezel.core.model.presentation.PresentationWordDetail
 import com.team.prezel.core.model.presentation.Purpose
 import com.team.prezel.core.model.presentation.Style
 
-@Suppress("TooManyFunctions")
+@Suppress("LongParameterList", "TooManyFunctions")
 interface PresentationRepository {
     suspend fun analyzePresentation(
         name: String,

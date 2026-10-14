@@ -9,7 +9,7 @@ import com.team.prezel.core.network.model.presentation.PresentationScriptDetailR
 import com.team.prezel.core.network.model.presentation.PresentationSummaryResponse
 import com.team.prezel.core.network.model.presentation.PresentationWordDetailResponse
 
-@Suppress("TooManyFunctions")
+@Suppress("LongParameterList", "TooManyFunctions")
 interface PresentationRemoteDataSource {
     suspend fun analyzePresentation(
         name: String,
