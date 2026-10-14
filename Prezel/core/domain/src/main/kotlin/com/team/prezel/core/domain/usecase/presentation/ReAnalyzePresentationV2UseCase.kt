@@ -12,6 +12,7 @@ class ReAnalyzePresentationV2UseCase @Inject constructor(
         scriptFilePath: String?,
         audioFilePath: String?,
         audioUrl: String? = null,
+        onUploadProgress: (Float) -> Unit = {},
     ): Result<Unit> =
         presentationRepository.reAnalyzePresentationV2(
             presentationId = presentationId,
@@ -19,5 +20,6 @@ class ReAnalyzePresentationV2UseCase @Inject constructor(
             scriptFilePath = scriptFilePath,
             audioFilePath = audioFilePath,
             audioUrl = audioUrl,
+            onUploadProgress = onUploadProgress,
         )
 }

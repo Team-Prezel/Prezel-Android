@@ -16,6 +16,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BodyProgress
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
@@ -42,6 +43,7 @@ import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
 @Singleton
+@Suppress("TooManyFunctions")
 internal class HttpClientFactory @Inject constructor(
     private val tokenProvider: TokenProvider,
     private val globalEventBus: GlobalEventBus,
@@ -57,6 +59,7 @@ internal class HttpClientFactory @Inject constructor(
         block: HttpClientConfig<*>.() -> Unit = {
             configureDefaultRequest()
             installContentNegotiation()
+            installBodyProgress()
             installHttpTimeout()
             installUserAgent()
             installLogging()
@@ -76,6 +79,10 @@ internal class HttpClientFactory @Inject constructor(
         install(ContentNegotiation) {
             json(networkJson)
         }
+    }
+
+    internal fun HttpClientConfig<*>.installBodyProgress() {
+        install(BodyProgress)
     }
 
     internal fun HttpClientConfig<*>.installHttpTimeout() {

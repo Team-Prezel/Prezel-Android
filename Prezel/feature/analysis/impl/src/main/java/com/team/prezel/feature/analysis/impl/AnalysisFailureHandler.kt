@@ -40,11 +40,11 @@ internal fun Throwable.toAnalysisFailureAction(): AnalysisFailureAction {
         AppError.SCRIPT_FILE_RECOGNITION_FAILED -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.SCRIPT)
 
         AppError.UNAUTHORIZED -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.AUTH_EXPIRED)
+        AppError.NETWORK -> AnalysisFailureAction.ShowMessage(message = AnalysisUiMessage.NETWORK_FAILED)
         AppError.VOICE_RECOGNITION_FAILED -> AnalysisFailureAction.RetryFileUpload(uploadType = AnalysisUploadType.AUDIO)
 
         AppError.VOICE_ANALYSIS_FAILED,
         AppError.SERVER_ERROR,
-        AppError.NETWORK,
         -> AnalysisFailureAction.RetryAnalysis
 
         AppError.NOT_FOUND,

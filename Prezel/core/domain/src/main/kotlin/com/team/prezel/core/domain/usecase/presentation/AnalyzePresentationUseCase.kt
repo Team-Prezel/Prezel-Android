@@ -10,6 +10,7 @@ import javax.inject.Inject
 class AnalyzePresentationUseCase @Inject constructor(
     private val presentationRepository: PresentationRepository,
 ) {
+    @Suppress("LongParameterList")
     suspend operator fun invoke(
         name: String,
         date: String,
@@ -20,6 +21,7 @@ class AnalyzePresentationUseCase @Inject constructor(
         script: String?,
         scriptFilePath: String?,
         audioFilePath: String,
+        onUploadProgress: (Float) -> Unit = {},
     ): Result<Long> =
         presentationRepository
             .analyzePresentation(
@@ -32,5 +34,6 @@ class AnalyzePresentationUseCase @Inject constructor(
                 script = script,
                 scriptFilePath = scriptFilePath,
                 audioFilePath = audioFilePath,
+                onUploadProgress = onUploadProgress,
             )
 }
